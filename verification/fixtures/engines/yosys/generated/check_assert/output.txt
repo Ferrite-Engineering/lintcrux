@@ -1,0 +1,2 @@
+/proj/cpu.sv:42:5: Warning: synthesis: unused signal foo
+/proj/cpu.sv:7: ERROR: multiply driven net conflict

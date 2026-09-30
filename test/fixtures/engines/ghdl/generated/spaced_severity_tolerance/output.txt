@@ -1,0 +1,1 @@
+legacy.vhd:7:2: warning: signal "q" is never referenced [-Wunused]

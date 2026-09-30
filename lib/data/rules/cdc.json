@@ -1,0 +1,75 @@
+{
+  "engineId": "cdc",
+  "displayName": "CDC",
+  "note": "First-party rules. LintCrux emits these itself from its own clock-domain-crossing analysis, so unlike the external engines this list is exhaustive by construction.",
+  "rules": [
+    {
+      "id": "unsync-single-bit",
+      "defaultSeverity": "warning",
+      "tags": [
+        "cdc",
+        "metastability"
+      ]
+    },
+    {
+      "id": "unsync-multi-bit",
+      "defaultSeverity": "error",
+      "tags": [
+        "cdc",
+        "incoherence",
+        "bus"
+      ]
+    },
+    {
+      "id": "combo-in-sync",
+      "defaultSeverity": "error",
+      "tags": [
+        "cdc",
+        "synchronizer",
+        "metastability"
+      ]
+    },
+    {
+      "id": "per-bit-sync-bus",
+      "defaultSeverity": "error",
+      "tags": [
+        "cdc",
+        "incoherence",
+        "bus",
+        "pro"
+      ]
+    },
+    {
+      "id": "unsupported-sources",
+      "defaultSeverity": "error",
+      "tags": [
+        "cdc",
+        "tooling"
+      ]
+    },
+    {
+      "id": "elaboration-failed",
+      "defaultSeverity": "error",
+      "tags": [
+        "cdc",
+        "tooling"
+      ]
+    },
+    {
+      "id": "analysis-note",
+      "defaultSeverity": "note",
+      "tags": [
+        "cdc",
+        "info"
+      ]
+    },
+    {
+      "id": "summary",
+      "defaultSeverity": "note",
+      "tags": [
+        "cdc",
+        "info"
+      ]
+    }
+  ]
+}

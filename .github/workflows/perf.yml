@@ -1,0 +1,87 @@
+name: Performance
+
+# ─── Trigger configuration ─────────────────────────────────────────────────────
+# Perf-regression harness for the performance budgets: ingest
+# parse+RSS, filter/sort, per-engine aggregation, baseline-derive cold/warm,
+# and transformer-pipeline timings over the deterministic stress corpus. All
+# wall-clock — machine-dependent and unsuited to gating a shared CI runner —
+# so this job records the numbers as an artifact. It carries one loose
+# sanity assertion (3x the soft budget) purely to catch a multi-second hang,
+# not to gate on tight timing; every other metric is recorded, not asserted.
+#
+# Nightly + manual, matching the suite convention (ci.yml runs the same way
+# while push/PR triggers are disabled during stabilization).
+on:
+  workflow_dispatch:
+  schedule:
+    # Nightly at 11 PM Mountain Time. Cron runs in UTC and does NOT follow
+    # DST: 05:00 UTC = 23:00 MDT (summer) / 22:00 MST (winter). Matches ci.yml.
+    - cron: '50 2 * * *'
+
+concurrency:
+  # Keyed by event as well as ref: a nightly must never be cancelled by a
+  # push, and a push must never be cancelled by a nightly.
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  # Superseded pushes are cancelled outright. `false` on main was the source
+  # of a whole class of phantom failures: a run still QUEUED when a third
+  # push arrives is cancelled by GitHub regardless, and a run whose jobs were
+  # cancelled reports conclusion=failure — not cancelled. So main never did
+  # verify every commit, it just misreported the ones it skipped. Cancelling
+  # is honest, cheaper, and gates the thing that matters: the tip.
+  cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  benchmarks:
+    name: Benchmarks (recorded)
+    runs-on: ubuntu-latest
+    # Cost guardrail: no job may run unbounded (max observed suite-wide is 29 min).
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          submodules: recursive
+          # A read-only PAT (Contents) for the crux-shared submodule when the
+          # secret is set, else the job's own token: a public crux-shared
+          # needs no credentials, and fork PRs receive no secrets.
+          token: ${{ secrets.SUBMODULE_PAT || github.token }}
+
+      - name: Install Flutter (pinned)
+        id: flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: '3.47.3'
+          cache: true
+
+      - name: Cache pub dependencies
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: |
+            ${{ steps.flutter.outputs.pub-cache-path }}
+            .dart_tool/
+          key: pub-ubuntu-bench-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-ubuntu-bench-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate l10n
+        run: flutter gen-l10n
+
+      # Invoked by exact file path so the runner picks it up regardless of
+      # the `*_test.dart` discovery glob applied to directory arguments.
+      - name: Lint perf bench — ingest, filter, aggregate, baseline-derive
+        run: >
+          flutter test --dart-define=RUN_BENCHMARKS=true
+          test/perf/lint_perf_bench_test.dart
+
+      - name: Upload recorded perf numbers
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: lintcrux-perf
+          path: build/perf/
+          retention-days: 7

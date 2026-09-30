@@ -1,0 +1,1 @@
+slang -q top.sv  # textModeFallback / slang < 8.0

@@ -1,0 +1,9 @@
+[
+  {
+    "severity": "warning",
+    "message": "implicit conversion from 'logic[7:0]' to 'logic[3:0]' changes value",
+    "optionName": "implicit-conv",
+    "location": "top.sv:20:9",
+    "symbolPath": "top"
+  }
+]

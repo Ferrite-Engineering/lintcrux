@@ -1,0 +1,1 @@
+{"path":"日本語.sv","line":2,"column":1,"rule":"explicit-parameter-storage-type","severity":"warning","message":"パラメータ"}

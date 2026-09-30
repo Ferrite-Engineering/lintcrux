@@ -1,0 +1,15 @@
+# Tab walk: 14 stops, cycles
+1. Open Workspace… button
+2. Open Session… button
+3. New Project… button
+4. Import SARIF report… button
+5. WaveCrux See a violation actually happen. Open the waveform from the run that tripped the rule. link
+6. NetCrux Look at the logic a finding points at. Cross-probe a violation into the schematic. link
+7. SimCrux Run it, not just read it. Launch the regression over the sources you just linted. link
+8. A member of the EDACrux suite of products — edacrux.app link
+9. [Toolbar grouping] Open Project… (Ctrl+O) button
+10. Cross-Probe Panel (Ctrl+Shift+X) button
+11. Settings… (Ctrl+,) button
+12. Open Workspace… button
+13. Import SARIF report… button
+14. [Welcome to LintCrux grouping] Open Project… button

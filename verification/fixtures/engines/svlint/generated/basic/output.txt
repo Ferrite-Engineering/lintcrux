@@ -1,0 +1,1 @@
+{"path":"top.sv","line":15,"column":5,"rule":"non_blocking_assignment_in_always_comb","message":"non-blocking in always_comb"}

@@ -1,0 +1,1 @@
+{"path":"a dir/mod x.sv","line":5,"column":1,"rule":"line-length","severity":"warning","message":"Line too long"}

@@ -1,0 +1,1 @@
+%Warning-UNUSED: a dir/sub mod.sv:12:3: Bits of signal are not used: 'q'[7:4]

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "name": "vhdl_basic_warnings",
+  "rootPath": "test/fixtures/projects/vhdl/basic_warnings",
+  "language": "vhdl",
+  "sourceFiles": ["design.vhd"],
+  "enabledEngineIds": ["ghdl"],
+  "perEngineOptions": {
+    "ghdl": {
+      "warnFlags": ["unused", "hide", "binding"]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "name": "basic_warnings",
+  "rootPath": "test/fixtures/projects/basic_warnings",
+  "language": "systemverilog",
+  "sourceFiles": ["top.sv"],
+  "enabledEngineIds": ["verilator"]
+}

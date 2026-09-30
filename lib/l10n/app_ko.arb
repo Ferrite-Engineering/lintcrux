@@ -1,0 +1,1623 @@
+{
+  "@@locale": "ko",
+  "settingsShortcutsSection": "키보드 단축키",
+  "@settingsShortcutsSection": {
+    "description": "Settings category title for the keyboard shortcuts editor"
+  },
+  "settingsShortcutsDescription": "연필 아이콘을 눌러 단축키를 변경한 다음 새 키를 누르세요. 내보내기와 가져오기로 키 설정을 다른 사용자와 공유할 수 있습니다.",
+  "@settingsShortcutsDescription": {
+    "description": "Intro note above the editable shortcuts list"
+  },
+  "settingsShortcutNotBound": "—",
+  "@settingsShortcutNotBound": {
+    "description": "Placeholder shown when an action has no key binding"
+  },
+  "settingsShortcutNotBoundSpoken": "단축키 없음",
+  "@settingsShortcutNotBoundSpoken": {
+    "description": "What a screen reader says for an action with no key binding. The visual placeholder is a dash, which is not spoken."
+  },
+  "settingsShortcutsKeyboardHint": "위아래 화살표 키로 단축키 사이를 이동합니다. Enter는 변경, Delete는 제거, Shift+Delete는 기본값으로 복원합니다.",
+  "@settingsShortcutsKeyboardHint": {
+    "description": "Keyboard instructions for the shortcut list in Settings > Keyboard Shortcuts. Shown under the description and spoken once by a screen reader when focus enters the list."
+  },
+  "settingsShortcutsImport": "가져오기…",
+  "@settingsShortcutsImport": {
+    "description": "Button that imports a shared .crux-keymap shortcut file"
+  },
+  "settingsShortcutsExport": "내보내기…",
+  "@settingsShortcutsExport": {
+    "description": "Button that exports shortcut customizations to a .crux-keymap file"
+  },
+  "settingsShortcutsResetAll": "모두 재설정",
+  "@settingsShortcutsResetAll": {
+    "description": "Button/confirm action restoring every shortcut to its default"
+  },
+  "settingsShortcutEditTooltip": "단축키 변경",
+  "@settingsShortcutEditTooltip": {
+    "description": "Tooltip for the per-action capture button"
+  },
+  "settingsShortcutUnbindTooltip": "단축키 제거",
+  "@settingsShortcutUnbindTooltip": {
+    "description": "Tooltip for the per-action unbind button"
+  },
+  "settingsShortcutResetTooltip": "기본값으로 재설정",
+  "@settingsShortcutResetTooltip": {
+    "description": "Tooltip for the per-action reset button"
+  },
+  "settingsShortcutCapturePrompt": "새 단축키를 누르세요… (Esc로 취소)",
+  "@settingsShortcutCapturePrompt": {
+    "description": "Prompt shown while capturing a new chord"
+  },
+  "settingsShortcutConflict": "{actions}에서도 사용 중",
+  "@settingsShortcutConflict": {
+    "description": "Warning under an action whose chord collides with others",
+    "placeholders": {
+      "actions": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictWins": "{others}보다 우선합니다",
+  "@settingsShortcutConflictWins": {
+    "description": "Conflict warning on the row whose shortcut fires; lists the shadowed actions sharing the chord",
+    "placeholders": {
+      "others": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictShadowed": "{winner}에 가려져 실행되지 않습니다",
+  "@settingsShortcutConflictShadowed": {
+    "description": "Conflict warning on a shadowed row whose shortcut will not fire; names the winning action",
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictSummary": "{count, plural, =1{단축키 충돌 1건이 있습니다} other{단축키 충돌 {count}건이 있습니다}}",
+  "@settingsShortcutConflictSummary": {
+    "description": "Summary banner above the shortcut list showing how many chords are in conflict",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsShortcutResetAllTitle": "모든 단축키를 재설정하시겠습니까?",
+  "@settingsShortcutResetAllTitle": {
+    "description": "Title of the reset-all confirmation dialog"
+  },
+  "settingsShortcutResetAllBody": "모든 키보드 단축키가 기본값으로 돌아가고 사용자 정의가 제거됩니다.",
+  "@settingsShortcutResetAllBody": {
+    "description": "Body of the reset-all confirmation dialog"
+  },
+  "settingsShortcutResetAllCancel": "취소",
+  "@settingsShortcutResetAllCancel": {
+    "description": "Cancel button in the reset-all confirmation dialog"
+  },
+  "settingsShortcutExportSuccess": "키보드 단축키를 내보냈습니다.",
+  "@settingsShortcutExportSuccess": {
+    "description": "Snackbar after a successful keymap export"
+  },
+  "settingsShortcutExportFailure": "단축키를 내보내지 못했습니다: {error}",
+  "@settingsShortcutExportFailure": {
+    "description": "Snackbar when keymap export fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutImportEmpty": "해당 파일에는 단축키 사용자 정의가 없습니다.",
+  "@settingsShortcutImportEmpty": {
+    "description": "Snackbar when an imported keymap has no customizations"
+  },
+  "settingsShortcutImportSuccess": "{count, plural, =0{가져온 단축키 사용자 정의가 없습니다.} =1{사용자 정의 단축키 1개를 가져왔습니다.} other{사용자 정의 단축키 {count}개를 가져왔습니다.}}",
+  "@settingsShortcutImportSuccess": {
+    "description": "Snackbar after a successful keymap import",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsShortcutImportFailure": "단축키를 가져오지 못했습니다: {error}",
+  "@settingsShortcutImportFailure": {
+    "description": "Snackbar when keymap import fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutImportFailureNewerVersion": "이 키맵은 최신 버전의 LintCrux에서 저장되어 가져올 수 없습니다. LintCrux를 업데이트한 후 다시 시도하세요.",
+  "@settingsShortcutImportFailureNewerVersion": {
+    "description": "Snackbar when a keymap file declares a schema version this build does not support, meaning it was written by a newer LintCrux release. Distinct from the generic invalid-file message."
+  },
+  "settingsShortcutsPresetLabel": "프리셋",
+  "@settingsShortcutsPresetLabel": {
+    "description": "Label for the keymap preset chooser above the editable shortcut list"
+  },
+  "settingsShortcutsPresetDescription": "전체 키 바인딩 세트를 불러옵니다. 불러온 후에도 개별 단축키를 사용자 정의할 수 있습니다.",
+  "@settingsShortcutsPresetDescription": {
+    "description": "Description under the keymap preset chooser"
+  },
+  "settingsShortcutsPresetLintCrux": "LintCrux(기본값)",
+  "@settingsShortcutsPresetLintCrux": {
+    "description": "Name of the default LintCrux keymap preset in the preset chooser"
+  },
+  "settingsShortcutsPresetCustom": "사용자 정의",
+  "@settingsShortcutsPresetCustom": {
+    "description": "Shown in the preset chooser when the user's bindings match no built-in preset"
+  },
+  "appTitle": "LintCrux",
+  "@appTitle": {
+    "description": "Application title shown in the window title bar and About box."
+  },
+  "actionCategoryApp": "LintCrux",
+  "@actionCategoryApp": {
+    "description": "Browsable category for the host-application menu (Quit, Settings, Preferences). Renders as the macOS app menu and the branded leading menu on Linux/Windows."
+  },
+  "actionCategoryFile": "파일",
+  "@actionCategoryFile": {
+    "description": "Browsable category grouping file operations (Open Project, Open Sources, Reset Workspace)."
+  },
+  "actionCategoryView": "보기",
+  "@actionCategoryView": {
+    "description": "Browsable category grouping view operations (toggle theme, panel visibility)."
+  },
+  "actionCategoryNavigate": "탐색",
+  "@actionCategoryNavigate": {
+    "description": "Browsable category grouping navigation actions (jump-to, next/previous violation)."
+  },
+  "actionCategorySearch": "검색",
+  "@actionCategorySearch": {
+    "description": "Browsable category grouping search and find operations."
+  },
+  "actionCategoryTools": "도구",
+  "@actionCategoryTools": {
+    "description": "Browsable category grouping tools and analyses (run engines, cancel run, diagnostics)."
+  },
+  "actionCategoryHelp": "도움말",
+  "@actionCategoryHelp": {
+    "description": "Browsable category grouping help-related actions (About, command palette, documentation)."
+  },
+  "actionOpenProject": "프로젝트 열기…",
+  "@actionOpenProject": {
+    "description": "Menu / command palette label for the action that opens a .lintcrux project file."
+  },
+  "actionOpenSources": "소스 파일 열기…",
+  "@actionOpenSources": {
+    "description": "Menu / command palette label for the action that opens raw Verilog/SystemVerilog/VHDL source files."
+  },
+  "actionQuit": "LintCrux 종료",
+  "@actionQuit": {
+    "description": "Menu / command palette label for the action that quits the app."
+  },
+  "actionRunAllEngines": "모든 엔진 실행",
+  "@actionRunAllEngines": {
+    "description": "Menu / command palette label for the action that invokes every enabled lint engine against the active project."
+  },
+  "actionCancelRun": "실행 중단",
+  "@actionCancelRun": {
+    "description": "Menu / command palette label for the action that cancels an in-progress lint run."
+  },
+  "actionToggleTheme": "테마 전환",
+  "@actionToggleTheme": {
+    "description": "Menu / command palette label for the action that flips between light and dark theme."
+  },
+  "actionOpenCommandPalette": "명령 팔레트…",
+  "@actionOpenCommandPalette": {
+    "description": "Menu / command palette label for the action that opens the VS Code-style command palette."
+  },
+  "commandPaletteSearchHint": "명령 검색…",
+  "@commandPaletteSearchHint": {
+    "description": "Placeholder hint text in the command palette search field"
+  },
+  "commandPaletteNoResults": "명령을 찾을 수 없음",
+  "@commandPaletteNoResults": {
+    "description": "Message displayed in the command palette when the search query matches no actions"
+  },
+  "actionFocusSearch": "위반에서 찾기…",
+  "@actionFocusSearch": {
+    "description": "Menu / command palette label for the action that opens the Find-in-Violations search dialog (substring / glob / regex over rule id + message; picking a result selects the violation)."
+  },
+  "actionOpenSettings": "설정…",
+  "@actionOpenSettings": {
+    "description": "Menu / command palette label for the action that opens the settings screen."
+  },
+  "actionResetWorkspace": "워크스페이스 재설정…",
+  "@actionResetWorkspace": {
+    "description": "Menu / command palette label for the action that empties the current workspace."
+  },
+  "actionOpenAbout": "LintCrux 정보",
+  "@actionOpenAbout": {
+    "description": "Menu / command palette label for the action that shows the About box."
+  },
+  "actionOpenCrossProbePanel": "교차 프로브 피어",
+  "@actionOpenCrossProbePanel": {
+    "description": "Menu / command palette label for the action that opens the cross-probe panel showing connected CXP peers and recent cross-probe events."
+  },
+  "actionOpenWaiverReview": "면제 검토…",
+  "@actionOpenWaiverReview": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the managed-waiver review screen for the active project."
+  },
+  "actionSetBaseline": "현재 실행에서 기준선 설정…",
+  "@actionSetBaseline": {
+    "description": "Menu / command palette label for the Pro-tier action that snapshots the current run's violations as the project baseline."
+  },
+  "actionClearBaseline": "기준선 지우기",
+  "@actionClearBaseline": {
+    "description": "Menu / command palette label for the Pro-tier action that clears the project's active baseline."
+  },
+  "actionOpenBaselineComparison": "기준선 차이 보기…",
+  "@actionOpenBaselineComparison": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the baseline-vs-current comparison screen."
+  },
+  "actionShowRuleTrendChart": "규칙 추세 차트 보기…",
+  "@actionShowRuleTrendChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the per-rule trend chart."
+  },
+  "actionShowSeverityClassDriftChart": "심각도 추이 차트 보기…",
+  "@actionShowSeverityClassDriftChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the severity-class drift chart."
+  },
+  "actionShowProjectTrendChart": "프로젝트 추세 차트 보기…",
+  "@actionShowProjectTrendChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the project trend chart."
+  },
+  "actionShowCalendarHeatmap": "달력 히트맵 보기…",
+  "@actionShowCalendarHeatmap": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the calendar heatmap screen (GitHub-style contributions grid of per-day violation activity)."
+  },
+  "actionConfigureTrendRetention": "추세 보존 기간 설정…",
+  "@actionConfigureTrendRetention": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the trend retention configuration UI."
+  },
+  "actionOpenBookmarksManager": "북마크된 위반 표시…",
+  "@actionOpenBookmarksManager": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the violation-bookmark management panel."
+  },
+  "actionToggleBookmarkForCurrentViolation": "북마크 전환",
+  "@actionToggleBookmarkForCurrentViolation": {
+    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the Pro-tier action that toggles a bookmark on the selected violation."
+  },
+  "actionRunVeribleDryRun": "Verible 자동 수정 드라이런…",
+  "@actionRunVeribleDryRun": {
+    "description": "Menu / command palette label for the Pro-tier action that invokes Verible in dry-run mode and opens the FixReviewDialog with the proposed fixes."
+  },
+  "actionApplyVeribleFixes": "Verible 수정 사항 검토…",
+  "@actionApplyVeribleFixes": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Verible fix review dialog on a fresh dry-run batch. Applying is confirmed by the user inside that dialog — the action itself never applies fixes unattended. The trailing ellipsis marks that further interaction follows."
+  },
+  "actionConfigureVeribleBinary": "Verible 바이너리 구성…",
+  "@actionConfigureVeribleBinary": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Settings → External Tools → Verible section."
+  },
+  "actionClearLintCache": "린트 캐시 비우기…",
+  "@actionClearLintCache": {
+    "description": "Menu / command palette label for the Pro-tier action that wipes every cached lint result for the active project after a confirmation dialog."
+  },
+  "actionOpenLintCacheStats": "린트 캐시 통계 표시…",
+  "@actionOpenLintCacheStats": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Settings → Lint Cache section scrolled to the live-stats panel."
+  },
+  "actionForceLintRunWithoutCache": "린트 실행(캐시 우회)",
+  "@actionForceLintRunWithoutCache": {
+    "description": "Menu / command palette label for the Pro-tier action that runs lint once with the cache bypassed in both directions for that single invocation."
+  },
+  "crossProbePanelTitle": "교차 프로브 피어",
+  "@crossProbePanelTitle": {
+    "description": "Title of the cross-probe panel."
+  },
+  "crossProbePanelServerStopped": "교차 프로브 서버가 비활성화되어 있습니다.",
+  "@crossProbePanelServerStopped": {
+    "description": "Status text shown in the cross-probe panel when the CXP server is disabled in Settings."
+  },
+  "crossProbePanelPeersHeader": "발견된 피어",
+  "@crossProbePanelPeersHeader": {
+    "description": "Header above the discovered-peers list in the cross-probe panel."
+  },
+  "crossProbePanelPeersEmpty": "아직 발견된 피어가 없습니다.",
+  "@crossProbePanelPeersEmpty": {
+    "description": "Empty-state text shown when no CXP peers have been discovered."
+  },
+  "crossProbePanelEventsHeader": "최근 이벤트",
+  "@crossProbePanelEventsHeader": {
+    "description": "Header above the rolling event log in the cross-probe panel."
+  },
+  "crossProbePanelEventsEmpty": "교차 프로브 이벤트가 아직 없습니다.",
+  "@crossProbePanelEventsEmpty": {
+    "description": "Empty-state text shown when the cross-probe event log is empty."
+  },
+  "crossProbePanelClearEvents": "이벤트 지우기",
+  "@crossProbePanelClearEvents": {
+    "description": "Button that clears the cross-probe event log."
+  },
+  "crossProbePanelClose": "닫기",
+  "@crossProbePanelClose": {
+    "description": "Button that closes the cross-probe panel dialog."
+  },
+  "settingsCxpEnabledLabel": "CXP 서버 활성화",
+  "@settingsCxpEnabledLabel": {
+    "description": "Label of the toggle controlling whether the CXP cross-probe server starts at boot."
+  },
+  "settingsCxpEnabledDescription": "다른 Crux 도구(WaveCrux, NetCrux, SimCrux)가 LintCrux를 발견하고 교차 프로브 요청을 보낼 수 있도록 합니다.",
+  "@settingsCxpEnabledDescription": {
+    "description": "Helper text explaining what the cross-probe server does."
+  },
+  "settingsCxpPortLabel": "CXP 포트",
+  "@settingsCxpPortLabel": {
+    "description": "Label of the port input for the CXP server."
+  },
+  "settingsCxpPortDescription": "기본값 54324",
+  "@settingsCxpPortDescription": {
+    "description": "Hint text for the CXP port input showing the suite default."
+  },
+  "violationColumnSeverity": "심각도",
+  "@violationColumnSeverity": {
+    "description": "Header label for the severity column in the violation table."
+  },
+  "violationColumnEngine": "엔진",
+  "@violationColumnEngine": {
+    "description": "Header label for the engine column in the violation table."
+  },
+  "violationColumnRule": "규칙",
+  "@violationColumnRule": {
+    "description": "Header label for the rule-id column in the violation table."
+  },
+  "violationColumnFile": "파일",
+  "@violationColumnFile": {
+    "description": "Header label for the file column in the violation table."
+  },
+  "violationColumnLine": "라인",
+  "@violationColumnLine": {
+    "description": "Header label for the line-number column in the violation table."
+  },
+  "violationColumnMessage": "메시지",
+  "@violationColumnMessage": {
+    "description": "Header label for the violation-message column in the violation table."
+  },
+  "violationFilterRuleHint": "규칙 또는 메시지로 필터…",
+  "@violationFilterRuleHint": {
+    "description": "Placeholder text in the rule / message substring filter input above the violation table."
+  },
+  "violationFilterFileHint": "파일 glob으로 필터 (예: **/top.sv)…",
+  "@violationFilterFileHint": {
+    "description": "Placeholder text in the file-path glob filter input above the violation table."
+  },
+  "violationStatusEmpty": "위반 사항이 없습니다.",
+  "@violationStatusEmpty": {
+    "description": "Body text shown in the violation table when no engines have produced any violations and no run is in progress."
+  },
+  "violationStatusFiltered": "활성 필터와 일치하는 위반이 없습니다.",
+  "@violationStatusFiltered": {
+    "description": "Body text shown in the violation table when violations exist but the active filters exclude all of them."
+  },
+  "violationStatusSummary": "전체 {total} · 오류 {errors} · 경고 {warnings} · 참고 {notes} · 면제 {waived}",
+  "@violationStatusSummary": {
+    "description": "Status-bar summary text below the violation table. Renders live counts of total, error, warning, note, and waived violations.",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      },
+      "warnings": {
+        "type": "int"
+      },
+      "notes": {
+        "type": "int"
+      },
+      "waived": {
+        "type": "int"
+      }
+    }
+  },
+  "severityFatal": "치명적",
+  "@severityFatal": {
+    "description": "Display label for the Fatal severity in filter chips and the severity column tooltip."
+  },
+  "severityError": "오류",
+  "@severityError": {
+    "description": "Display label for the Error severity in filter chips and the severity column tooltip."
+  },
+  "severityWarning": "경고",
+  "@severityWarning": {
+    "description": "Display label for the Warning severity in filter chips and the severity column tooltip."
+  },
+  "severityNote": "참고",
+  "@severityNote": {
+    "description": "Display label for the Note severity in filter chips and the severity column tooltip."
+  },
+  "severityNone": "미분류",
+  "@severityNone": {
+    "description": "Display label for the None severity (unclassified output) in filter chips and the severity column tooltip."
+  },
+  "inspectorEmpty": "검토할 위반을 선택하세요.",
+  "inspectorEngineStatusHeader": "엔진 상태",
+  "inspectorEnginePhaseIdle": "대기 중",
+  "inspectorEnginePhaseRunning": "실행 중",
+  "inspectorEnginePhaseCompleted": "완료됨",
+  "inspectorEnginePhaseFailed": "실패",
+  "inspectorEnginePhaseUnavailable": "바이너리를 사용할 수 없음",
+  "inspectorEnginePhaseCancelled": "취소됨",
+  "inspectorEngineConfigureHint": "누락된 바이너리를 설치하거나 설정 > 엔진에서 사용자 정의 경로를 설정하세요.",
+  "@inspectorEmpty": {
+    "description": "Empty-state body shown in the inspector pane when no violation is selected."
+  },
+  "inspectorRuleHeader": "규칙",
+  "@inspectorRuleHeader": {
+    "description": "Section header in the inspector pane above the engine-namespaced rule id and severity badge."
+  },
+  "inspectorMessageHeader": "메시지",
+  "@inspectorMessageHeader": {
+    "description": "Section header in the inspector pane above the full engine-supplied message."
+  },
+  "inspectorLocationHeader": "위치",
+  "@inspectorLocationHeader": {
+    "description": "Section header in the inspector pane above the file:line:col."
+  },
+  "inspectorMetadataHeader": "규칙 세부 정보",
+  "@inspectorMetadataHeader": {
+    "description": "Section header in the inspector pane above the rule-database metadata block (tags + help url)."
+  },
+  "inspectorTagsLabel": "태그",
+  "@inspectorTagsLabel": {
+    "description": "Label rendered to the left of the rule's tag chips in the inspector pane."
+  },
+  "inspectorRelatedLocationsHeader": "관련 위치",
+  "@inspectorRelatedLocationsHeader": {
+    "description": "Section header in the inspector pane above the list of additional locations associated with the violation."
+  },
+  "inspectorOpenInEditor": "에디터에서 열기",
+  "@inspectorOpenInEditor": {
+    "description": "Button label that launches the user's editor at the violation's primary location."
+  },
+  "inspectorHelpUrlLabel": "자세히 보기",
+  "@inspectorHelpUrlLabel": {
+    "description": "Button label that opens the rule's help URL in the user's browser."
+  },
+  "sourcePreviewEmpty": "소스를 미리 보려면 위반을 선택하세요.",
+  "@sourcePreviewEmpty": {
+    "description": "Empty-state body shown in the source preview pane when no violation is selected."
+  },
+  "sourcePreviewFileMissing": "소스를 읽을 수 없습니다: {file}",
+  "@sourcePreviewFileMissing": {
+    "description": "Error body shown in the source preview pane when the selected violation's file cannot be read.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "editorLaunchFailed": "에디터를 시작할 수 없습니다 ({command}).",
+  "@editorLaunchFailed": {
+    "description": "Snackbar text shown when click-to-source fails because the configured editor binary is not on PATH or could not be started.",
+    "placeholders": {
+      "command": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsEditorPresetVsCode": "Visual Studio Code",
+  "@settingsEditorPresetVsCode": {
+    "description": "Settings → Editors radio label for the VS Code preset."
+  },
+  "settingsEditorPresetSublime": "Sublime Text",
+  "@settingsEditorPresetSublime": {
+    "description": "Settings → Editors radio label for the Sublime Text preset."
+  },
+  "settingsEditorPresetVim": "Vim / Neovim",
+  "@settingsEditorPresetVim": {
+    "description": "Settings → Editors radio label for the Vim / Neovim preset."
+  },
+  "settingsEditorPresetEmacs": "Emacs",
+  "@settingsEditorPresetEmacs": {
+    "description": "Settings → Editors radio label for the Emacs preset."
+  },
+  "settingsEditorPresetCustom": "사용자 정의",
+  "@settingsEditorPresetCustom": {
+    "description": "Settings → Editors radio label for the custom executable + arg template."
+  },
+  "settingsEditorExecutableLabel": "실행 파일",
+  "@settingsEditorExecutableLabel": {
+    "description": "Label of the executable text input under Settings → Editors."
+  },
+  "settingsEditorArgsTemplateLabel": "인수 템플릿",
+  "@settingsEditorArgsTemplateLabel": {
+    "description": "Label of the args template text input under Settings → Editors. Tooltip explains that {file}, {line}, and {column} are substituted."
+  },
+  "settingsEditorTemplateHelp": "{file}, {line}, {column}을(를) 자리표시자로 사용하세요.",
+  "@settingsEditorTemplateHelp": {
+    "description": "Helper text shown beneath the args template input under Settings → Editors."
+  },
+  "settingsGeneralSection": "일반",
+  "@settingsGeneralSection": {
+    "description": "Section header for the General group in Settings."
+  },
+  "settingsAppearanceSection": "모양",
+  "@settingsAppearanceSection": {
+    "description": "Section header for the Appearance group in Settings."
+  },
+  "settingsEnginesSection": "엔진",
+  "@settingsEnginesSection": {
+    "description": "Section header for the Engines group in Settings."
+  },
+  "settingsEditorsSection": "에디터",
+  "@settingsEditorsSection": {
+    "description": "Section header for the Editors group in Settings."
+  },
+  "settingsAutoReloadLabel": "소스 변경 시 자동 새로고침",
+  "@settingsAutoReloadLabel": {
+    "description": "Settings → General label for the AutoReloadMode toggle."
+  },
+  "settingsAutoReloadAuto": "자동으로 다시 실행",
+  "@settingsAutoReloadAuto": {
+    "description": "Settings → General option for AutoReloadMode.auto."
+  },
+  "settingsAutoReloadPrompt": "먼저 확인",
+  "@settingsAutoReloadPrompt": {
+    "description": "Settings → General option for AutoReloadMode.prompt."
+  },
+  "settingsAutoReloadOff": "아무 작업 안 함",
+  "@settingsAutoReloadOff": {
+    "description": "Settings → General option for AutoReloadMode.off."
+  },
+  "autoReloadPromptMessage": "소스 파일이 변경되었습니다. 변경 사항을 반영하도록 엔진을 다시 실행하시겠습니까?",
+  "@autoReloadPromptMessage": {
+    "description": "Snackbar shown in a project tab when a watched source file changed and Settings > General > Auto-reload on source change is set to Prompt me first."
+  },
+  "autoReloadActionRerun": "지금 다시 실행",
+  "@autoReloadActionRerun": {
+    "description": "Action on the source-changed snackbar that re-runs the tab's engines."
+  },
+  "engineConfigSeverityOverridesHeader": "규칙별 심각도 재정의",
+  "@engineConfigSeverityOverridesHeader": {
+    "description": "Section header in the engine config screen above the rule-list with severity dropdowns."
+  },
+  "engineConfigOverrideBadge": "재정의됨",
+  "@engineConfigOverrideBadge": {
+    "description": "Short badge shown next to a rule whose severity has been overridden by the user."
+  },
+  "searchDialogTitle": "위반 검색",
+  "@searchDialogTitle": {
+    "description": "Title bar of the search-violations modal overlay."
+  },
+  "searchDialogHint": "규칙 또는 메시지 검색",
+  "@searchDialogHint": {
+    "description": "Placeholder text in the search-violations input."
+  },
+  "searchModeSubstring": "부분 문자열",
+  "@searchModeSubstring": {
+    "description": "Search-mode toggle label for substring matching."
+  },
+  "searchModeGlob": "Glob",
+  "@searchModeGlob": {
+    "description": "Search-mode toggle label for glob matching."
+  },
+  "searchModeRegex": "정규식",
+  "@searchModeRegex": {
+    "description": "Search-mode toggle label for regex matching."
+  },
+  "searchNoResults": "일치 항목이 없습니다.",
+  "@searchNoResults": {
+    "description": "Empty-state body shown in the search dialog when no violations match the active pattern."
+  },
+  "exportSuccess": "{n}개의 위반을 {path}(으)로 내보냄",
+  "@exportSuccess": {
+    "description": "Snackbar text shown after a successful export.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyCanvasTitle": "LintCrux에 오신 것을 환영합니다",
+  "@emptyCanvasTitle": {
+    "description": "Headline rendered in the empty-canvas state when no tabs are open."
+  },
+  "diagnosticsTabDrawerTitle": "탭 진단",
+  "@diagnosticsTabDrawerTitle": {
+    "description": "Title of the per-tab diagnostics drawer."
+  },
+  "diagnosticsAppDialogTitle": "앱 진단",
+  "@diagnosticsAppDialogTitle": {
+    "description": "Title of the process-wide diagnostics dialog."
+  },
+  "diagnosticsSectionEngines": "엔진",
+  "@diagnosticsSectionEngines": {
+    "description": "Section header in the Tab Diagnostics drawer above the per-engine status block."
+  },
+  "diagnosticsSectionProjectInfo": "프로젝트 정보",
+  "@diagnosticsSectionProjectInfo": {
+    "description": "Section header in the Tab Diagnostics drawer above the project-info block."
+  },
+  "diagnosticsSectionViolationStats": "위반 통계",
+  "@diagnosticsSectionViolationStats": {
+    "description": "Section header in the Tab Diagnostics drawer above the per-severity / per-engine / per-rule violation counts."
+  },
+  "diagnosticsCopyTabReport": "탭 진단 보고서 복사",
+  "@diagnosticsCopyTabReport": {
+    "description": "Action label that copies the active tab's diagnostics report to the clipboard."
+  },
+  "diagnosticsCopyFullReport": "전체 진단 보고서 복사",
+  "@diagnosticsCopyFullReport": {
+    "description": "Action label that copies the full app diagnostics report to the clipboard."
+  },
+  "settingsTitle": "설정",
+  "@settingsTitle": {
+    "description": "AppBar title for the multi-section Settings screen."
+  },
+  "settingsClose": "닫기",
+  "@settingsClose": {
+    "description": "Tooltip for the back/close button in the Settings screen AppBar."
+  },
+  "settingsGeneralDefaultSortLabel": "기본 정렬 열",
+  "@settingsGeneralDefaultSortLabel": {
+    "description": "Settings → General label for the default-sort-column dropdown that controls the initial sort of the violation table."
+  },
+  "settingsGeneralDefaultSortSeverity": "심각도",
+  "@settingsGeneralDefaultSortSeverity": {
+    "description": "Settings → General option for the 'Severity' default sort column."
+  },
+  "settingsGeneralDefaultSortEngine": "엔진",
+  "@settingsGeneralDefaultSortEngine": {
+    "description": "Settings → General option for the 'Engine' default sort column."
+  },
+  "settingsGeneralDefaultSortRule": "규칙",
+  "@settingsGeneralDefaultSortRule": {
+    "description": "Settings → General option for the 'Rule' default sort column."
+  },
+  "settingsGeneralDefaultSortFile": "파일",
+  "@settingsGeneralDefaultSortFile": {
+    "description": "Settings → General option for the 'File' default sort column."
+  },
+  "settingsGeneralDefaultFilterLabel": "시작 시 기본 필터",
+  "@settingsGeneralDefaultFilterLabel": {
+    "description": "Settings → General label for the saved-filter-preset dropdown that controls which filter set is active on app launch."
+  },
+  "settingsGeneralDefaultFilterNone": "없음 — 모든 위반 표시",
+  "@settingsGeneralDefaultFilterNone": {
+    "description": "Settings → General dropdown option indicating no default filter preset is selected."
+  },
+  "settingsEditorsHeader": "클릭으로 소스 이동 — 에디터",
+  "@settingsEditorsHeader": {
+    "description": "Settings → Editors section heading above the preset radios."
+  },
+  "settingsEditorsLivePreviewLabel": "실시간 미리보기",
+  "@settingsEditorsLivePreviewLabel": {
+    "description": "Settings → Editors label above the line that previews the fully expanded shell command for a sample file."
+  },
+  "settingsEditorsLivePreviewSample": "샘플: src/example.sv:42:13",
+  "@settingsEditorsLivePreviewSample": {
+    "description": "Settings → Editors caption indicating which sample file + line + column the preview row substitutes."
+  },
+  "settingsEditorsResetButton": "기본값(VS Code)으로 재설정",
+  "@settingsEditorsResetButton": {
+    "description": "Settings → Editors button that restores the click-to-source editor command to the VS Code preset."
+  },
+  "filterPresetSaveAction": "현재 필터를 프리셋으로 저장…",
+  "@filterPresetSaveAction": {
+    "description": "Filter-preset dropdown action that opens a name-input dialog to save the current filters as a new named preset."
+  },
+  "filterPresetManageAction": "프리셋 관리…",
+  "@filterPresetManageAction": {
+    "description": "Filter-preset dropdown action that opens the manage-presets dialog (delete, rename)."
+  },
+  "filterPresetDropdownLabel": "필터 프리셋",
+  "@filterPresetDropdownLabel": {
+    "description": "Label above the filter-preset dropdown that appears above the violation table."
+  },
+  "filterPresetNoneLabel": "없음",
+  "@filterPresetNoneLabel": {
+    "description": "Filter-preset dropdown entry representing 'no preset active' (i.e. filters are whatever the user has manually applied)."
+  },
+  "filterPresetSaveDialogTitle": "필터 프리셋 저장",
+  "@filterPresetSaveDialogTitle": {
+    "description": "Title of the dialog that prompts for a preset name when saving current filters as a new preset."
+  },
+  "filterPresetNameLabel": "프리셋 이름",
+  "@filterPresetNameLabel": {
+    "description": "Input field label in the save-filter-preset dialog."
+  },
+  "filterPresetManageDialogTitle": "필터 프리셋 관리",
+  "@filterPresetManageDialogTitle": {
+    "description": "Title of the dialog that lists existing filter presets with delete affordances."
+  },
+  "filterPresetEmptyState": "저장된 프리셋이 없습니다. 필터를 구성하고 '현재 필터를 프리셋으로 저장…'을 선택하여 추가하세요.",
+  "@filterPresetEmptyState": {
+    "description": "Empty-state body text in the manage-filter-presets dialog when the user has not yet saved any presets."
+  },
+  "filterPresetDeleteTooltip": "프리셋 삭제",
+  "@filterPresetDeleteTooltip": {
+    "description": "Tooltip on the trash icon next to each preset in the manage-filter-presets dialog."
+  },
+  "filterPresetSaveButton": "저장",
+  "@filterPresetSaveButton": {
+    "description": "Confirm button label in the save-filter-preset dialog."
+  },
+  "filterPresetCancelButton": "취소",
+  "@filterPresetCancelButton": {
+    "description": "Cancel button label in the save-filter-preset / manage-presets dialogs."
+  },
+  "filterPresetDoneButton": "완료",
+  "@filterPresetDoneButton": {
+    "description": "Close button label in the manage-filter-presets dialog."
+  },
+  "actionSaveSession": "세션 저장…",
+  "@actionSaveSession": {
+    "description": "Menu / command palette label for the action that saves a .lintcrux-session file."
+  },
+  "actionOpenSession": "세션 열기…",
+  "@actionOpenSession": {
+    "description": "Menu / command palette label for the action that opens a .lintcrux-session file."
+  },
+  "actionImportSarif": "SARIF 보고서 가져오기…",
+  "@actionImportSarif": {
+    "description": "Menu / command palette / toolbar / welcome label for the desktop action that imports a CI-generated SARIF report into a read-only viewer without re-running engines."
+  },
+  "actionExportSarif": "위반을 SARIF로 내보내기…",
+  "@actionExportSarif": {
+    "description": "Menu / command palette label for the action that exports the current violation set as SARIF 2.1.0."
+  },
+  "actionExportJson": "위반을 JSON으로 내보내기…",
+  "@actionExportJson": {
+    "description": "Menu / command palette label for the action that exports the current violation set as JSON."
+  },
+  "actionExportCsv": "위반을 CSV로 내보내기…",
+  "@actionExportCsv": {
+    "description": "Menu / command palette label for the action that exports the current violation set as CSV (RFC 4180 quoting)."
+  },
+  "actionExportHtml": "위반을 HTML로 내보내기…",
+  "@actionExportHtml": {
+    "description": "Menu / command palette label for the action that exports the current violation set as a single-page HTML dashboard."
+  },
+  "actionOpenTabDiagnostics": "탭 진단…",
+  "@actionOpenTabDiagnostics": {
+    "description": "Menu / command palette label for the action that opens the per-tab diagnostics drawer."
+  },
+  "actionOpenAppDiagnostics": "앱 진단…",
+  "@actionOpenAppDiagnostics": {
+    "description": "Menu / command palette label for the action that opens the process-wide diagnostics dialog."
+  },
+  "actionSaveFilterPreset": "필터 프리셋 저장…",
+  "@actionSaveFilterPreset": {
+    "description": "Menu / command palette label for the action that opens the save-filter-preset dialog."
+  },
+  "actionManageFilterPresets": "필터 프리셋 관리…",
+  "@actionManageFilterPresets": {
+    "description": "Menu / command palette label for the action that opens the manage-filter-presets dialog."
+  },
+  "actionImportVivadoFilelist": "Vivado 파일 리스트 가져오기…",
+  "@actionImportVivadoFilelist": {
+    "description": "Menu / command palette label for the action that imports a Vivado-style `.f` filelist into a new .lintcrux project."
+  },
+  "actionImportEdam": "FuseSoC EDAM 가져오기…",
+  "@actionImportEdam": {
+    "description": "Menu / command palette label for the action that imports a FuseSoC/Edalize EDAM (.eda.yml) file into a new .lintcrux project."
+  },
+  "filelistImportError": "파일 리스트를 가져올 수 없습니다: {message}",
+  "@filelistImportError": {
+    "description": "Snackbar shown after a failed filelist import. Includes the underlying FilelistImportException message.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "edamImportError": "EDAM 파일을 가져올 수 없습니다: {message}",
+  "@edamImportError": {
+    "description": "Snackbar shown after a failed EDAM import. Includes the underlying EdamImportException message.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigBinaryOverridesHeader": "엔진 바이너리 경로",
+  "@engineConfigBinaryOverridesHeader": {
+    "description": "Section header for the per-engine binary-path override list in Settings → Engines."
+  },
+  "engineConfigBinaryOverridesHelp": "각 엔진 바이너리의 출처를 선택합니다. 자동 감지는 PATH를 검색합니다. 번들은 LintCrux와 함께 배포되는 플랫폼별 바이너리를 위한 항목이지만 현재 포함된 엔진은 없습니다. 따라서 LINTCRUX_BUNDLED_BIN_DIR이 바이너리 디렉터리를 가리키지 않는 한 번들도 PATH로 대체됩니다. 사용자 정의는 명시적 절대 경로를 받습니다.",
+  "@engineConfigBinaryOverridesHelp": {
+    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the three modes, including that Bundled resolves nothing today because no engine binaries ship with the app."
+  },
+  "engineConfigBinarySourceAuto": "자동 감지",
+  "@engineConfigBinarySourceAuto": {
+    "description": "Label for the auto-detect segment of the binary-source SegmentedButton (Settings → Engines)."
+  },
+  "engineConfigBinarySourceBundled": "번들",
+  "@engineConfigBinarySourceBundled": {
+    "description": "Label for the bundled-binary segment of the binary-source SegmentedButton."
+  },
+  "engineConfigBinarySourceCustom": "사용자 정의",
+  "@engineConfigBinarySourceCustom": {
+    "description": "Label for the custom-path segment of the binary-source SegmentedButton."
+  },
+  "engineConfigBinaryPathLabel": "바이너리 경로",
+  "@engineConfigBinaryPathLabel": {
+    "description": "Label for the custom binary-path text field shown when 'Custom' is selected."
+  },
+  "engineConfigBinaryProbeButton": "확인",
+  "@engineConfigBinaryProbeButton": {
+    "description": "Label for the button that runs `<binary> --version` against the entered custom path and surfaces the detected version."
+  },
+  "engineConfigBinaryProbing": "확인 중…",
+  "@engineConfigBinaryProbing": {
+    "description": "Status text shown while the version probe is in flight."
+  },
+  "engineConfigBinaryProbeSuccess": "감지됨: {version}",
+  "@engineConfigBinaryProbeSuccess": {
+    "description": "Status text shown after a successful version probe. Includes the detected version string verbatim.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigBinaryProbeFailure": "버전을 감지할 수 없습니다 — 바이너리가 없거나 호환되지 않을 수 있습니다.",
+  "@engineConfigBinaryProbeFailure": {
+    "description": "Status text shown when the version probe returned null / exited non-zero."
+  },
+  "yosysDiagnosticsSectionTitle": "Yosys 진단",
+  "@yosysDiagnosticsSectionTitle": {
+    "description": "Section header in the Tab Diagnostics drawer above the raw YosysDiagnostic list captured during the most recent run."
+  },
+  "yosysDiagnosticsEmpty": "최근 실행에서 Yosys 진단이 없습니다.",
+  "@yosysDiagnosticsEmpty": {
+    "description": "Placeholder text shown when the Yosys engine produced no diagnostics (or the engine was disabled / unavailable)."
+  },
+  "yosysDiagnosticsSeverityError": "오류",
+  "@yosysDiagnosticsSeverityError": {
+    "description": "Filter-chip label for the 'error' severity in the Yosys Diagnostics section. Plural label because the chip filters every row of that severity."
+  },
+  "yosysDiagnosticsSeverityWarning": "경고",
+  "@yosysDiagnosticsSeverityWarning": {
+    "description": "Filter-chip label for the 'warning' severity in the Yosys Diagnostics section."
+  },
+  "yosysDiagnosticsSeverityInfo": "정보",
+  "@yosysDiagnosticsSeverityInfo": {
+    "description": "Filter-chip label for the 'info' severity in the Yosys Diagnostics section."
+  },
+  "webModeAppBarTitle": "LintCrux 뷰어",
+  "@webModeAppBarTitle": {
+    "description": "App bar title on the web read-only landing screen — communicates that this is the read-only browser viewer, not the full desktop LintCrux."
+  },
+  "webModeHeadline": "읽기 전용 SARIF 뷰어",
+  "@webModeHeadline": {
+    "description": "Hero headline on the web read-only landing screen — sets the expectation that this is a viewer, not a runner."
+  },
+  "webModeBody": "SARIF 보고서를 업로드하거나 호스팅된 보고서의 URL을 붙여넣으세요. 브라우저 뷰어는 데스크톱 대시보드와 동일하게 위반 테이블, 필터 칩, 검사기, 소스 미리보기를 렌더링하지만 린트 엔진을 실행하거나 프로젝트 설정을 수정할 수는 없습니다.",
+  "@webModeBody": {
+    "description": "Body text on the web read-only landing screen explaining the two ingestion paths and the read-only limitation."
+  },
+  "webModeOpenFileButton": "SARIF 파일 열기…",
+  "@webModeOpenFileButton": {
+    "description": "Button label for the file-picker upload path on the web landing screen."
+  },
+  "webModeUrlPrompt": "또는 URL로 호스팅된 SARIF 보고서를 엽니다:",
+  "@webModeUrlPrompt": {
+    "description": "Label above the URL input field on the web landing screen."
+  },
+  "webModeUrlFieldLabel": "SARIF URL",
+  "@webModeUrlFieldLabel": {
+    "description": "Floating label of the URL input field on the web landing screen."
+  },
+  "webModeUrlOpenButton": "열기",
+  "@webModeUrlOpenButton": {
+    "description": "Button label next to the URL input field — fetches and opens the SARIF document at the given URL."
+  },
+  "webModeInvalidUrl": "유효한 http 또는 https URL을 입력하세요.",
+  "@webModeInvalidUrl": {
+    "description": "Error message shown when the URL field contains a value that is not a parseable http/https URI."
+  },
+  "webModeFooterNote": "엔진 오케스트레이션, 파일 감시, 프로젝트 설정 및 면제는 데스크톱 전용 기능입니다. 린트 엔진을 로컬에서 실행하려면 lintcrux.app/download에서 데스크톱 앱을 설치하세요.",
+  "@webModeFooterNote": {
+    "description": "Footer note on the web read-only landing screen — clarifies that the browser viewer is observation-only and points users to the desktop app for engine orchestration."
+  },
+  "webViewerAppBarTitle": "SARIF 보기",
+  "@webViewerAppBarTitle": {
+    "description": "App bar title on the web read-only viewer screen — descriptive prefix; the loaded source name renders to its right."
+  },
+  "webViewerNoSource": "(소스가 로드되지 않음)",
+  "@webViewerNoSource": {
+    "description": "Placeholder rendered in the viewer subtitle when no SARIF source is loaded yet (the user navigated directly to /web/viewer without going through the landing screen)."
+  },
+  "webViewerOpenAnotherButton": "다른 파일 열기",
+  "@webViewerOpenAnotherButton": {
+    "description": "App bar action label on the web viewer screen — returns the user to the landing screen to upload a different SARIF report."
+  },
+  "importSarifFailed": "SARIF 보고서를 가져오지 못했습니다: {error}",
+  "@importSarifFailed": {
+    "description": "Snackbar shown on the desktop when importing a SARIF report fails (malformed / truncated / unreadable file). The previously-loaded report, if any, is left intact.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importSarifViewerTitle": "가져온 SARIF 보고서",
+  "@importSarifViewerTitle": {
+    "description": "App bar title on the desktop read-only imported-SARIF viewer screen — descriptive prefix; the imported file name renders to its right."
+  },
+  "importSarifViewerNoSource": "(가져온 보고서 없음)",
+  "@importSarifViewerNoSource": {
+    "description": "Placeholder rendered in the imported-SARIF viewer subtitle when no report has been imported yet."
+  },
+  "importSarifViewerBackButton": "작업 공간으로 돌아가기",
+  "@importSarifViewerBackButton": {
+    "description": "App bar action on the desktop imported-SARIF viewer that returns the user to the project workspace."
+  },
+  "importSarifViewerImportAnotherButton": "다른 보고서 가져오기…",
+  "@importSarifViewerImportAnotherButton": {
+    "description": "App bar action on the desktop imported-SARIF viewer that opens the file picker to import a different SARIF report."
+  },
+  "viewerTabBarCloseTabTooltip": "탭 닫기",
+  "@viewerTabBarCloseTabTooltip": {
+    "description": "Tooltip rendered over the per-chip close (×) button."
+  },
+  "tabChipCloseTooltip": "{name} 닫기",
+  "@tabChipCloseTooltip": {
+    "description": "See app_en.arb for description",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "viewerTabBarScrollTabsLeftTooltip": "탭 왼쪽으로 스크롤",
+  "@viewerTabBarScrollTabsLeftTooltip": {
+    "description": "Tooltip on the chevron that scrolls the tab strip toward its start."
+  },
+  "viewerTabBarScrollTabsRightTooltip": "탭 오른쪽으로 스크롤",
+  "@viewerTabBarScrollTabsRightTooltip": {
+    "description": "Tooltip on the chevron that scrolls the tab strip toward its end."
+  },
+  "diagnosticsCloseTooltip": "닫기",
+  "@diagnosticsCloseTooltip": {
+    "description": "Tooltip on the close (×) button in the App Diagnostics dialog."
+  },
+  "viewerTabBarNewTabTooltip": "새 탭",
+  "@viewerTabBarNewTabTooltip": {
+    "description": "Tooltip rendered over the trailing \"+\" new-tab button."
+  },
+  "viewerTabBarNewTabDefaultDisplayName": "새 탭",
+  "@viewerTabBarNewTabDefaultDisplayName": {
+    "description": "Default display name used when the user creates an empty new tab via the trailing \"+\" button."
+  },
+  "viewerTabBarUnnamedTabFallback": "(이름 없는 탭)",
+  "@viewerTabBarUnnamedTabFallback": {
+    "description": "Fallback rendered in place of a tab's display name when the host hands in a blank string."
+  },
+  "viewerTabBarCloseTabMenuItem": "탭 닫기",
+  "@viewerTabBarCloseTabMenuItem": {
+    "description": "Tab chip context-menu item that closes the tab."
+  },
+  "viewerTabBarCloseOtherTabsMenuItem": "다른 탭 닫기",
+  "@viewerTabBarCloseOtherTabsMenuItem": {
+    "description": "Tab chip context-menu item that closes every tab except the right-clicked one."
+  },
+  "viewerTabBarCloseTabsToTheRightMenuItem": "오른쪽 탭 닫기",
+  "@viewerTabBarCloseTabsToTheRightMenuItem": {
+    "description": "Tab chip context-menu item that closes every tab to the right of the right-clicked one."
+  },
+  "viewerTabBarMoveToNewWindowMenuItem": "새 창으로 이동",
+  "@viewerTabBarMoveToNewWindowMenuItem": {
+    "description": "Tab chip context-menu item that detaches the tab into its own window. Disabled until Flutter multi-window stabilizes."
+  },
+  "viewerTabBarMultiWindowUnavailableTooltip": "Flutter 다중 창 기능이 안정화되면 사용 가능",
+  "@viewerTabBarMultiWindowUnavailableTooltip": {
+    "description": "Tooltip shown next to the disabled \"Move to New Window\" menu item."
+  },
+  "viewerTabBarActivePaneAccessibilityLabel": "활성 창",
+  "@viewerTabBarActivePaneAccessibilityLabel": {
+    "description": "Accessibility label rendered on the surrounding container of the active pane so screen readers announce focus changes."
+  },
+  "viewerTabBarDragToPaneAccessibilityHint": "여기에 놓으면 탭이 이 창으로 이동합니다",
+  "@viewerTabBarDragToPaneAccessibilityHint": {
+    "description": "Accessibility hint announced while a tab is being dragged toward another pane's tab bar."
+  },
+  "viewerTabBarReorderHandleTooltip": "끌어서 순서 변경",
+  "@viewerTabBarReorderHandleTooltip": {
+    "description": "Tooltip describing the leading drag handle on each chip."
+  },
+  "emptyCanvasSubtitle": "프로젝트를 열어 린트를 시작하거나, 저장된 세션을 복원하거나, 명명된 워크스페이스를 로드하세요.",
+  "@emptyCanvasSubtitle": {
+    "description": "One-line subtitle below the empty-canvas headline."
+  },
+  "emptyCanvasVersion": "버전 {version}",
+  "@emptyCanvasVersion": {
+    "description": "Muted version line under the empty-canvas (welcome) subtitle. The only always-visible version indicator on web, where there is no native menu bar to host an About entry point.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyCanvasSuiteFooter": "EDACrux 제품군의 일원 — edacrux.app",
+  "@emptyCanvasSuiteFooter": {
+    "description": "Suite-membership line at the foot of the empty-canvas (welcome) screen. The whole line is a link to the EDACrux suite site. \"edacrux.app\" must appear verbatim — the widget splits the sentence around it to underline the domain — but a translation that drops it still renders and is still followable, just without an underlined segment. \"EDACrux\" is one word and is never translated."
+  },
+  "emptyCanvasPeersHeading": "EDACrux의 다른 제품",
+  "@emptyCanvasPeersHeading": {
+    "description": "Section header above the three sibling-product rows at the foot of the empty-canvas (welcome) screen. Rendered upper-case in English as a small letter-spaced label, matching the \"RECENT FILES\" headers above it; a locale whose script has no case simply reads as a label. \"EDACrux\" is one word and is never translated."
+  },
+  "emptyCanvasPeerWaveCrux": "위반이 실제로 일어나는 순간을 보세요. 규칙을 건드린 실행의 파형을 엽니다.",
+  "@emptyCanvasPeerWaveCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing WaveCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what WaveCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasPeerNetCrux": "지적된 논리를 직접 보세요. 위반을 회로도로 크로스 프로빙합니다.",
+  "@emptyCanvasPeerNetCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing NetCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what NetCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasPeerSimCrux": "읽기만 하지 말고 실행하세요. 방금 lint한 소스로 회귀을 실행합니다.",
+  "@emptyCanvasPeerSimCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing SimCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what SimCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasOpenProjectButton": "프로젝트 열기…",
+  "@emptyCanvasOpenProjectButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux` project file."
+  },
+  "emptyCanvasOpenSessionButton": "세션 열기…",
+  "@emptyCanvasOpenSessionButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux-session` file."
+  },
+  "emptyCanvasOpenWorkspaceButton": "워크스페이스 열기…",
+  "@emptyCanvasOpenWorkspaceButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux-workspace` file."
+  },
+  "emptyCanvasNewProjectButton": "새 프로젝트…",
+  "@emptyCanvasNewProjectButton": {
+    "description": "Empty-canvas button that creates a new `.lintcrux` project."
+  },
+  "emptyCanvasRecentProjectsHeading": "최근 프로젝트",
+  "@emptyCanvasRecentProjectsHeading": {
+    "description": "Section heading above the recent-projects list on the empty-canvas state."
+  },
+  "emptyCanvasRecentWorkspacesHeading": "최근 워크스페이스",
+  "@emptyCanvasRecentWorkspacesHeading": {
+    "description": "Section heading above the recent-workspaces list on the empty-canvas state."
+  },
+  "emptyCanvasNoRecentProjects": "최근 프로젝트가 없습니다.",
+  "@emptyCanvasNoRecentProjects": {
+    "description": "Placeholder shown in the recent-projects section when the list is empty."
+  },
+  "emptyCanvasNoRecentWorkspaces": "최근 워크스페이스가 없습니다.",
+  "@emptyCanvasNoRecentWorkspaces": {
+    "description": "Placeholder shown in the recent-workspaces section when the list is empty."
+  },
+  "actionNewWorkspace": "새 워크스페이스",
+  "@actionNewWorkspace": {
+    "description": "Menu / command palette label for the action that closes the current workspace and starts a fresh empty one."
+  },
+  "actionSaveWorkspaceAs": "워크스페이스 다른 이름으로 저장…",
+  "@actionSaveWorkspaceAs": {
+    "description": "Menu / command palette label for the action that saves the current workspace under a user-chosen filename."
+  },
+  "actionOpenWorkspace": "워크스페이스 열기…",
+  "@actionOpenWorkspace": {
+    "description": "Menu / command palette label for the action that loads a `.lintcrux-workspace` file, replacing the current workspace."
+  },
+  "actionSplitPaneRight": "창을 오른쪽으로 분할",
+  "@actionSplitPaneRight": {
+    "description": "Menu / command palette label for the action that splits the active pane horizontally."
+  },
+  "actionClosePane": "창 닫기",
+  "@actionClosePane": {
+    "description": "Menu / command palette label for the action that closes the active pane, merging its tabs into the surviving pane."
+  },
+  "actionFocusOtherPane": "다른 창에 포커스",
+  "@actionFocusOtherPane": {
+    "description": "Menu / command palette label for the action that toggles focus to the non-active pane."
+  },
+  "actionMoveTabToOtherPane": "탭을 다른 창으로 이동",
+  "@actionMoveTabToOtherPane": {
+    "description": "Menu / command palette label for the action that moves the active tab to the other pane."
+  },
+  "actionNewTab": "새 탭",
+  "@actionNewTab": {
+    "description": "Menu / command palette label for the action that creates a new empty tab in the active pane."
+  },
+  "actionCloseTab": "탭 닫기",
+  "@actionCloseTab": {
+    "description": "Menu / command palette label for the action that closes the active tab."
+  },
+  "actionNextTab": "다음 탭",
+  "@actionNextTab": {
+    "description": "Menu / command palette label for the action that activates the next tab in the active pane."
+  },
+  "actionPreviousTab": "이전 탭",
+  "@actionPreviousTab": {
+    "description": "Menu / command palette label for the action that activates the previous tab in the active pane."
+  },
+  "workspaceLoadFailed": "워크스페이스를 로드하지 못했습니다: {message}",
+  "@workspaceLoadFailed": {
+    "description": "Snackbar message shown when loading a `.lintcrux-workspace` file fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "filePickerFailed": "파일 선택기를 열 수 없습니다: {error}",
+  "@filePickerFailed": {
+    "description": "Snackbar shown when the file picker throws (e.g. macOS rejects an unknown extension, or the OS file-selector plugin returns an error). Surfaces the underlying error so file-open failures are not silent.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "openProjectLegacyManifestName": "이 설계의 매니페스트가 아직 이전 파일 이름 .crux-project를 사용합니다. {suggestedName}(으)로 이름을 바꾸세요. 이후 릴리스에서는 이전 파일 이름을 읽지 않습니다.",
+  "@openProjectLegacyManifestName": {
+    "description": "Info snackbar shown once after opening a design manifest still named with the legacy bare .crux-project file name. suggestedName is the <design>.crux-project file name to rename it to. Keep .crux-project and the placeholder verbatim.",
+    "placeholders": {
+      "suggestedName": {
+        "type": "String"
+      }
+    }
+  },
+  "openProjectAmbiguousManifests": "설계를 열 수 없습니다. {directory}에 설계 매니페스트가 여러 개 있습니다({names}). 설계 폴더에는 매니페스트가 하나만 있어야 합니다. 나머지를 삭제하거나 병합하세요.",
+  "@openProjectAmbiguousManifests": {
+    "description": "Error snackbar shown when opening a design manifest whose folder holds more than one manifest, so nothing is opened. directory is the folder path; names lists the manifest file names, comma-separated. Keep the placeholders verbatim.",
+    "placeholders": {
+      "directory": {
+        "type": "String"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "filePickerOpenProjectButton": "프로젝트 열기",
+  "@filePickerOpenProjectButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux project file. On macOS this is `NSOpenPanel.prompt`; the rendered text appears on the picker's confirm button so the user can distinguish Open Project / Open Session / Open Workspace pickers from each other."
+  },
+  "filePickerImportSarifButton": "보고서 가져오기",
+  "@filePickerImportSarifButton": {
+    "description": "Action button label rendered by the OS file picker when importing a SARIF report via LintcruxAction.importSarif."
+  },
+  "filePickerOpenSessionButton": "세션 열기",
+  "@filePickerOpenSessionButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux-session file."
+  },
+  "filePickerOpenWorkspaceButton": "워크스페이스 열기",
+  "@filePickerOpenWorkspaceButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux-workspace file."
+  },
+  "filePickerImportFilelistButton": "가져오기",
+  "@filePickerImportFilelistButton": {
+    "description": "Action button label rendered by the OS file picker when importing a .f Vivado-style filelist."
+  },
+  "filePickerImportEdamButton": "가져오기",
+  "@filePickerImportEdamButton": {
+    "description": "Action button label rendered by the OS file picker when importing a FuseSoC/Edalize EDAM (.eda.yml) file."
+  },
+  "filePickerCreateProjectButton": "프로젝트 만들기",
+  "@filePickerCreateProjectButton": {
+    "description": "Action button label rendered by the OS save-file picker when creating a new .lintcrux project from the Welcome screen's New Project… button or the New Tab shortcut."
+  },
+  "filePickerSaveWorkspaceButton": "워크스페이스 저장",
+  "@filePickerSaveWorkspaceButton": {
+    "description": "Action button label rendered by the OS save-file picker when saving the active workspace as a new .lintcrux-workspace file via `LintcruxAction.saveWorkspaceAs`."
+  },
+  "filePickerExportSessionButton": "세션 내보내기",
+  "@filePickerExportSessionButton": {
+    "description": "Action button label rendered by the OS save-file picker when exporting the active tab as a .lintcrux-session file via `LintcruxAction.exportTabAsSession` / `LintcruxAction.saveSession`."
+  },
+  "filePickerOpenSourcesButton": "프로젝트에 추가",
+  "@filePickerOpenSourcesButton": {
+    "description": "Action button label rendered by the OS file picker when picking HDL source files to add to the active project via `LintcruxAction.openSources`."
+  },
+  "openSourcesNoActiveProject": "먼저 프로젝트를 열거나 만든 다음 소스 파일을 추가하세요.",
+  "@openSourcesNoActiveProject": {
+    "description": "Snackbar shown when the user invokes Open Sources (Cmd/Ctrl+Shift+O) without an active project tab. Hints that source files attach to a project."
+  },
+  "exportSessionNoActiveTab": "세션을 내보내기 전에 프로젝트 탭을 여세요.",
+  "@exportSessionNoActiveTab": {
+    "description": "Snackbar shown when the user invokes Export Tab as Session / Save Session without an active project tab."
+  },
+  "openSourcesAdded": "{projectName}에 소스 파일 {count}개를 추가했습니다.",
+  "@openSourcesAdded": {
+    "description": "Snackbar shown after the user picks one or more HDL source files and they are appended to the active project's sourceFiles list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "projectName": {
+        "type": "String"
+      }
+    }
+  },
+  "saveWorkspaceFailed": "워크스페이스 저장 실패: {message}",
+  "@saveWorkspaceFailed": {
+    "description": "Snackbar shown when saving the workspace via `LintcruxAction.saveWorkspaceAs` fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "saveSessionFailed": "세션 내보내기 실패: {message}",
+  "@saveSessionFailed": {
+    "description": "Snackbar shown when exporting the active tab as a .lintcrux-session via `LintcruxAction.exportTabAsSession` fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionSaved": "{path}에 세션을 저장했습니다.",
+  "@sessionSaved": {
+    "description": "Snackbar shown after a session is successfully exported.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceSaved": "{path}에 워크스페이스를 저장했습니다.",
+  "@workspaceSaved": {
+    "description": "Snackbar shown after the workspace is successfully saved.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceResetConfirmTitle": "워크스페이스를 재설정하시겠습니까?",
+  "@workspaceResetConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before `File → Reset Workspace` empties every open tab."
+  },
+  "workspaceResetConfirmBody": "열려 있는 모든 탭이 닫힙니다. 실행을 취소할 수 없지만 자동 저장된 워크스페이스 파일만 교체되며, 기존 프로젝트 파일은 디스크에 그대로 남아 있습니다.",
+  "@workspaceResetConfirmBody": {
+    "description": "Body text of the confirmation dialog shown before `File → Reset Workspace`."
+  },
+  "workspaceResetConfirmAction": "재설정",
+  "@workspaceResetConfirmAction": {
+    "description": "Confirmation button label on the reset-workspace dialog."
+  },
+  "dialogCancel": "취소",
+  "@dialogCancel": {
+    "description": "Generic cancel button label used by workspace confirmation dialogs and other modal dialogs."
+  },
+  "menuItemTierSuffix": " ({tier})",
+  "@menuItemTierSuffix": {
+    "description": "Suffix appended to a native menu-bar item's label to mark the license tier it requires; the placeholder is the short PRO/ENT badge text. The platform menu bar can only render a string label (no badge widget), so tier is shown as a parenthetical suffix there.",
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "tierBadgePro": "PRO",
+  "@tierBadgePro": {
+    "description": "Short visual label for the Pro-tier badge chip rendered next to Pro features in menus, palette entries, and panel headers."
+  },
+  "tierBadgeProSemantic": "Pro 등급 기능",
+  "@tierBadgeProSemantic": {
+    "description": "Screen-reader phrase rendered on the Pro-tier badge chip."
+  },
+  "tierBadgeEnterprise": "ENT",
+  "@tierBadgeEnterprise": {
+    "description": "Short visual label for the Enterprise-tier badge chip rendered next to Enterprise features."
+  },
+  "tierBadgeEnterpriseSemantic": "Enterprise 등급 기능",
+  "@tierBadgeEnterpriseSemantic": {
+    "description": "Screen-reader phrase rendered on the Enterprise-tier badge chip."
+  },
+  "editionMenuLine": "{edition} 에디션 — {identity}",
+  "editionMenuLineOrganization": "{edition} 에디션 — 조직에서 라이선스를 부여함",
+  "editionNameEducational": "교육용",
+  "editionNamePro": "Pro",
+  "editionNameEnterprise": "Enterprise",
+  "editionBadgeEduSemantic": "교육용 에디션",
+  "editionBadgeProSemantic": "Pro 에디션",
+  "editionBadgeEnterpriseSemantic": "Enterprise 에디션",
+  "tierBadgeEdu": "EDU",
+  "@tierBadgeEdu": {
+    "description": "Short visual label for the Educational license badge chip shown on user-status surfaces when the active license is EDU."
+  },
+  "tierBadgeEduSemantic": "교육용 라이선스",
+  "@tierBadgeEduSemantic": {
+    "description": "Screen-reader phrase rendered on the Educational license badge chip."
+  },
+  "actionCloseActiveProject": "활성 프로젝트 닫기",
+  "@actionCloseActiveProject": {
+    "description": "Menu / command palette label for the action that closes the currently-active project tab in the multi-project workspace."
+  },
+  "actionSwitchProject": "프로젝트 전환…",
+  "@actionSwitchProject": {
+    "description": "Menu / command palette label for the action that opens the project switcher dialog (Cmd/Ctrl+P). Lets the user pick from open and recently-closed projects."
+  },
+  "actionReopenRecentProject": "최근 프로젝트 다시 열기",
+  "@actionReopenRecentProject": {
+    "description": "Menu / command palette label for the action that re-opens the most-recently-closed project from the recent-projects list."
+  },
+  "actionPinActiveProject": "프로젝트 탭 고정",
+  "@actionPinActiveProject": {
+    "description": "Menu / command palette label for the Pro-tier action that pins (or unpins) the active project tab. Pinned tabs survive Close-All-Projects actions."
+  },
+  "actionCloseAllTabs": "모든 탭 닫기",
+  "@actionCloseAllTabs": {
+    "description": "Menu / command palette label for the open-core action that closes every open workspace tab."
+  },
+  "closeAllTabsConfirmTitle": "모든 탭을 닫으시겠습니까?",
+  "@closeAllTabsConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before `File → Close All Tabs` closes every open tab."
+  },
+  "closeAllTabsConfirmBody": "열려 있는 모든 작업 공간 탭이 닫힙니다.",
+  "@closeAllTabsConfirmBody": {
+    "description": "Body of the confirmation dialog shown before `File → Close All Tabs`."
+  },
+  "closeAllTabsConfirmConfirm": "모두 닫기",
+  "@closeAllTabsConfirmConfirm": {
+    "description": "Confirmation button label on the close-all-tabs dialog."
+  },
+  "actionCloseAllProjects": "모든 프로젝트 닫기",
+  "@actionCloseAllProjects": {
+    "description": "Menu / command palette label for the Pro-tier action that closes every open project except pinned ones."
+  },
+  "actionSearchAcrossProjects": "프로젝트 간 검색…",
+  "@actionSearchAcrossProjects": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the cross-project violation-search dialog (Cmd/Ctrl+Shift+F)."
+  },
+  "configLoadFailedTitle": "이 프로젝트를 불러올 수 없습니다",
+  "configLoadFailedPathLabel": "프로젝트 파일",
+  "configLoadFailedReasonLabel": "원인",
+  "configLoadFailedHint": "파일 > 프로젝트 열기…에서 다른 .lintcrux 파일을 선택하거나 위 경로를 수정하고 다시 로드하세요.",
+  "runEnginesNoActiveProject": "린트 엔진을 실행하려면 먼저 프로젝트를 여세요.",
+  "@runEnginesNoActiveProject": {
+    "description": "Snackbar shown when the user invokes Run All Engines (F5) with no active project tab."
+  },
+  "runEnginesAlreadyRunning": "이미 린트 실행이 진행 중입니다.",
+  "@runEnginesAlreadyRunning": {
+    "description": "Snackbar shown when the user invokes Run All Engines (F5) while the current tab's runner is mid-run."
+  },
+  "cancelRunNoActiveRun": "진행 중인 린트 실행이 없습니다.",
+  "@cancelRunNoActiveRun": {
+    "description": "Snackbar shown when the user invokes Cancel Run (Esc) with nothing in flight."
+  },
+  "aboutDialogTitle": "LintCrux 정보",
+  "@aboutDialogTitle": {
+    "description": "Title of the About dialog / screen."
+  },
+  "aboutTagline": "하드웨어 엔지니어를 위한 현대적인 HDL 린트 및 스타일 뷰어",
+  "@aboutTagline": {
+    "description": "One-line product tagline shown under the app name in the About header."
+  },
+  "aboutBetaChip": "공개 베타",
+  "@aboutBetaChip": {
+    "description": "Label on the public-beta chip in the About header."
+  },
+  "aboutEditionOpenCore": "오픈 코어",
+  "@aboutEditionOpenCore": {
+    "description": "Edition label for the open-core build; hides the edition chip when matched."
+  },
+  "aboutSectionVersion": "버전",
+  "@aboutSectionVersion": {
+    "description": "Header / row label for the version sub-section in the About dialog."
+  },
+  "aboutBuildNumber": "빌드",
+  "@aboutBuildNumber": {
+    "description": "Row label for the platform build number in the About dialog."
+  },
+  "aboutGitSha": "커밋",
+  "@aboutGitSha": {
+    "description": "Row label for the short git SHA in the About dialog."
+  },
+  "aboutSectionPlatform": "플랫폼",
+  "@aboutSectionPlatform": {
+    "description": "Header for the platform sub-section in the About dialog."
+  },
+  "aboutOperatingSystem": "운영체제",
+  "@aboutOperatingSystem": {
+    "description": "Row label for the host operating system in the About dialog."
+  },
+  "aboutArchitecture": "아키텍처",
+  "@aboutArchitecture": {
+    "description": "Row label for the CPU architecture in the About dialog."
+  },
+  "aboutFlutterVersion": "Flutter",
+  "@aboutFlutterVersion": {
+    "description": "Row label for the Flutter SDK version in the About dialog."
+  },
+  "aboutDartVersion": "Dart",
+  "@aboutDartVersion": {
+    "description": "Row label for the Dart SDK version in the About dialog."
+  },
+  "aboutButtonVisitWebsite": "웹사이트 방문",
+  "@aboutButtonVisitWebsite": {
+    "description": "About-dialog action button that opens the company website."
+  },
+  "aboutButtonDocs": "문서",
+  "@aboutButtonDocs": {
+    "description": "About-dialog action button that opens the LintCrux documentation site."
+  },
+  "aboutButtonPrivacy": "개인정보 처리방침",
+  "@aboutButtonPrivacy": {
+    "description": "About-dialog action button that opens the LintCrux privacy policy."
+  },
+  "aboutButtonTerms": "서비스 약관",
+  "@aboutButtonTerms": {
+    "description": "About-dialog action button that opens the LintCrux terms of service."
+  },
+  "aboutButtonCopyVersionInfo": "버전 정보 복사",
+  "@aboutButtonCopyVersionInfo": {
+    "description": "About-dialog action button that copies the structured version paragraph."
+  },
+  "aboutCopiedConfirmation": "버전 정보가 복사되었습니다",
+  "@aboutCopiedConfirmation": {
+    "description": "Snackbar confirmation shown after Copy Version Info copies to the clipboard."
+  },
+  "aboutCompanyName": "Ferrite Engineering",
+  "@aboutCompanyName": {
+    "description": "Company tagline shown on the first line of the About branding banner."
+  },
+  "filePickerExportButton": "내보내기",
+  "exportFailed": "내보내기에 실패했습니다: {error}",
+  "snackFeatureRequiresPro": "{feature}에는 LintCrux Pro가 필요합니다.",
+  "snackFeatureNotAvailableYet": "{feature}은(는) 아직 사용할 수 없습니다.",
+  "engineConfigSeverityOff": "끄기",
+  "diagnosticsNoProjectLoaded": "로드된 프로젝트가 없습니다.",
+  "filePickerTypeProjectLabel": "LintCrux 프로젝트",
+  "filePickerTypeSourcesLabel": "HDL 소스",
+  "filePickerTypeFilelistLabel": "Vivado 파일 리스트",
+  "filePickerTypeEdamLabel": "FuseSoC EDAM",
+  "filePickerTypeSessionLabel": "LintCrux 세션",
+  "filePickerTypeWorkspaceLabel": "LintCrux 워크스페이스",
+  "updateBannerMessage": "LintCrux {version} 업데이트를 사용할 수 있습니다.",
+  "updateViewChangesAction": "변경 사항 보기",
+  "updateNowAction": "지금 업데이트",
+  "updateDismissLabel": "닫기",
+  "updateCheckInProgress": "업데이트를 확인하는 중…",
+  "updateCheckUpToDate": "최신 버전({version})을 사용하고 있습니다.",
+  "updateCheckFailed": "업데이트를 확인할 수 없습니다.",
+  "actionCheckForUpdates": "업데이트 확인",
+  "settingsRestoreTabsOnLaunchLabel": "시작 시 탭 복원",
+  "settingsRestoreTabsOnLaunchDescription": "LintCrux를 마지막으로 종료했을 때 열려 있던 프로젝트 탭을 다시 엽니다. 끄면 LintCrux가 빈 작업 공간으로 시작합니다. 저장된 세션은 디스크에 그대로 유지되므로 다시 켜면 복원됩니다.",
+  "settingsAutoCheckUpdatesLabel": "업데이트 자동 확인",
+  "settingsAutoCheckUpdatesDescription": "시작 시 및 하루에 한 번 새 버전을 확인합니다. 앱 버전과 운영 체제만 전송되며 프로젝트, 소스, 위반 데이터는 전송되지 않습니다.",
+  "aboutButtonCheckForUpdates": "업데이트 확인",
+  "actionSubmitIssue": "이슈 제출…",
+  "aboutButtonSubmitIssue": "문제 보고",
+  "issueReporterTitle": "문제 보고",
+  "issueReporterTitleFieldLabel": "문제 요약",
+  "issueReporterTitleFieldHint": "무엇이 잘못되었는지 간단히 설명하세요",
+  "issueReporterPrivacyNotice": "정보가 많을수록 문제 재현에 도움이 됩니다. 공유하고 싶지 않은 항목은 끄세요. 파일 내용이나 파일 경로는 절대 포함되지 않습니다.",
+  "issueReporterPreviewHeader": "이슈 본문 미리보기",
+  "issueReporterCategoryAppEnv": "앱 및 환경",
+  "issueReporterCategoryAppEnvDescription": "버전, 빌드 SHA, 플랫폼, 운영 체제, 화면 DPI, 로캘, SDK 버전.",
+  "issueReporterCategorySession": "세션 상태",
+  "issueReporterCategorySessionDescription": "엔진 이름과 버전, 위반 및 면제 개수만 — 파일 경로나 소스 내용은 포함되지 않습니다.",
+  "issueReporterCategoryLog": "진단 정보",
+  "issueReporterCategoryLogDescription": "이번 세션에서 기록된 최근 경고와 오류.",
+  "issueReporterCategoryScreenshot": "스크린샷",
+  "issueReporterCategoryScreenshotDescription": "첨부할 수 있도록 저장된 앱 창 이미지.",
+  "issueReporterLockedCategorySemantics": "항상 포함됨",
+  "issueReporterSubmitButton": "제출",
+  "issueReporterCancelButton": "취소",
+  "issueReporterOpenedToast": "GitHub 이슈가 열렸습니다 — 클립보드에서 본문에 붙여넣은 다음 스크린샷을 끌어다 놓으세요.",
+  "issueReporterOpenedToastPrefilled": "보고서가 미리 입력된 상태로 GitHub 이슈가 열렸습니다 — 캡처한 스크린샷이 있으면 끌어다 놓으세요.",
+  "issueReporterScreenshotSaved": "스크린샷을 {path}에 저장했습니다",
+  "issueReporterEmptyLogPlaceholder": "(기록된 로그 항목 없음)",
+  "issueReporterEmptySessionLogPlaceholder": "(이번 세션에 기록된 오류나 경고 없음)",
+  "betaExpiryBannerMessage": "{days, plural, =1{LintCrux 베타가 1일 후 만료됩니다. 최신 빌드를 다운로드하세요.} other{LintCrux 베타가 {days}일 후 만료됩니다. 최신 빌드를 다운로드하세요.}}",
+  "betaExpiryBannerAction": "다운로드",
+  "betaExpiryDismissLabel": "닫기",
+  "betaExpiryExpiredTitle": "베타 빌드가 만료되었습니다",
+  "betaExpiryExpiredBody": "이 LintCrux 베타 빌드는 만료일에 도달했습니다. LintCrux를 계속 사용하려면 최신 빌드를 다운로드하세요.",
+  "betaExpiryExpiredAction": "최신 빌드 다운로드",
+  "betaExpiryExpiredQuit": "LintCrux 종료",
+  "crossProbeSendTooltip": "이 피어로 선택 항목 보내기",
+  "crossProbeUnreachableTitle": "연결할 수 없는 피어",
+  "crossProbeSendFailed": "{peer}에 보낸 교차 프로브가 완료되지 않았습니다",
+  "crossProbeSendRefused": "{peer}에 보낸 교차 프로브: {reason}",
+  "toolbarToggleCrossProbe": "크로스프로브 패널",
+  "settingsRequestAttentionOnCrossProbeLabel": "크로스 프로브 시 주의 요청",
+  "settingsRequestAttentionOnCrossProbeDescription": "크로스 프로브가 도착하면 독을 튕기거나 작업 표시줄을 깜박입니다. 포커스를 가로채지 않습니다.",
+  "settingsBroadcastSelectionOnCrossProbeLabel": "선택 항목 자동 브로드캐스트",
+  "settingsBroadcastSelectionOnCrossProbeDescription": "선택하는 즉시 연결된 피어에 선택 항목을 알립니다(라이브 크로스 프로브). 끄면 명시적으로 보낸 항목만 공유됩니다.",
+  "settingsCxpStatus": "CXP 상태",
+  "settingsCxpStatusRunning": "포트 {port}에서 실행 중",
+  "settingsCxpStatusStopped": "중지됨",
+  "settingsCxpPeersConnected": "{count, plural, =0{연결된 피어 없음} =1{피어 1개 연결됨} other{피어 {count}개 연결됨}}",
+  "actionCategoryFileMnemonic": "파일(&F)",
+  "actionCategoryEditMnemonic": "편집(&E)",
+  "actionCategoryViewMnemonic": "보기(&V)",
+  "actionCategoryNavigateMnemonic": "탐색(&N)",
+  "actionCategorySearchMnemonic": "검색(&S)",
+  "actionCategoryToolsMnemonic": "도구(&T)",
+  "actionCategoryHelpMnemonic": "도움말(&H)",
+  "actionCategoryEdit": "편집",
+  "menuWindow": "윈도우",
+  "actionExit": "종료",
+  "actionOpenDocumentation": "문서",
+  "accessibilityViolationRow": "{severity} 위반, 규칙 {rule}, 파일 {file} {line}행: {message}",
+  "@accessibilityViolationRow": {
+    "description": "Screen-reader label for one violation table row.",
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "rule": {
+        "type": "String"
+      },
+      "file": {
+        "type": "String"
+      },
+      "line": {
+        "type": "int"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "accessibilityToolbarRegion": "도구 모음",
+  "accessibilityStatusBarRegion": "상태 표시줄",
+  "accessibilityViolationTableKeyboardHint": "위아래 화살표 키로 위반 사이를 이동합니다. Enter는 위반을 에디터에서 열고, Space는 체크박스를 전환합니다.",
+  "toolbarOverflowActions": "동작",
+  "toolbarExportCluster": "보고서 내보내기",
+  "statusBarBusyLintRun": "Lint 엔진 실행 중",
+  "statusBarNoProject": "열린 프로젝트 없음",
+  "dockTabDetails": "세부 정보",
+  "dockTabRules": "규칙",
+  "dockTabSource": "소스",
+  "dockTabCrossProbe": "크로스 프로브",
+  "dockCollapseTooltip": "패널 숨기기",
+  "accessibilityRightDockRegion": "세부 정보 독",
+  "accessibilityLeftDockRegion": "브라우저 독",
+  "accessibilityBottomDockRegion": "패널 독",
+  "settingsLanguageLabel": "언어",
+  "settingsLanguageDescription": "애플리케이션 인터페이스에 사용할 언어",
+  "settingsCxpSectionTitle": "CXP 교차 프로브",
+  "settingsAutoReloadDescription": "불러온 프로젝트가 디스크에서 변경될 때 LintCrux의 응답 방식",
+  "settingsCxpPortError": "1부터 65535 사이의 포트를 입력하세요.",
+  "tabContextMenuRevealInFinder": "Finder에서 표시",
+  "tabContextMenuRevealInExplorer": "Explorer에서 표시",
+  "tabContextMenuRevealInFiles": "파일 관리자에서 표시",
+  "helpLinkLearnMore": "자세히 알아보기",
+  "telemetryConsentTitle": "LintCrux 개선에 참여해 주세요",
+  "telemetryConsentBody": "익명 사용 횟수와 오류 횟수는 다음에 무엇을 만들고 무엇을 고칠지 정하는 데 도움이 됩니다. 파일, 설계 데이터, 사용자를 식별할 수 있는 정보는 수집하지 않습니다.",
+  "telemetryConsentLearnMore": "수집 항목 자세히 보기",
+  "telemetryConsentToggleLabel": "익명 사용 통계 보내기",
+  "telemetryConsentContinue": "계속",
+  "settingsPrivacySection": "개인정보",
+  "settingsTelemetryLabel": "익명 사용 통계 보내기",
+  "settingsTelemetryDescription": "기능, 엔진, 오류 횟수, 앱과 OS 버전, 폼 팩터, 언어, 라이선스 등급. 파일 이름, 규칙 식별자, lint 메시지나 오류 메시지의 내용은 절대 포함하지 않습니다.",
+  "settingsTelemetryDocsLabel": "텔레메트리 문서",
+  "settingsTelemetryDocsDescription": "전송되는 필드의 정확한 목록, 절대 수집하지 않는 목록, 그리고 이를 보내는 소스 코드.",
+  "diagnosticsCloseDrawer": "진단 닫기",
+  "settingsDiagnosticsEnabledLabel": "진단 사용",
+  "settingsDiagnosticsEnabledDescription": "도구 메뉴에서 탭 진단과 앱 진단을 사용할 수 있게 합니다. 디버그 및 프로파일 빌드에서는 항상 켜져 있습니다.",
+  "incomingFileNotSupported": "LintCrux에서 {fileName}을(를) 열 수 없습니다.",
+  "diagnosticsDisabledSnack": "진단이 꺼져 있습니다. 설정 > {section}에서 켜세요.",
+  "inspectorClearSelection": "엔진 상태로 돌아가기",
+  "dockTabSources": "소스",
+  "sourcesPanelEmpty": "이 프로젝트에 소스 파일이 없습니다.",
+  "sourcesPanelNoProject": "프로젝트를 열면 소스 파일이 표시됩니다.",
+  "sourcesRemoveTooltip": "프로젝트에서 제거",
+  "sourcesRemoveConfirmTitle": "소스 파일을 제거할까요?",
+  "sourcesRemoveConfirmBody": "{file}이(가) 이 프로젝트에서 제거됩니다. 파일 자체는 삭제되지 않습니다.",
+  "sourcesRemoveConfirmAction": "제거",
+  "sourcesRemoved": "{project}에서 {file}을(를) 제거했습니다.",
+  "sourcesCount": "{count, plural, =1{소스 파일 1개} other{소스 파일 {count}개}}",
+  "sourcesRemoveNotFound": "{file}은(는) 이 프로젝트 파일에 없습니다. 변경된 내용이 없습니다.",
+  "rulesPanelSearchHint": "규칙 검색…",
+  "rulesPanelAllEngines": "모든 엔진",
+  "rulesPanelEmpty": "일치하는 규칙이 없습니다.",
+  "rulesPanelCount": "{count, plural, =1{규칙 1개} other{규칙 {count}개}}",
+  "rulesPanelLearnMore": "문서",
+  "rulesPanelLoadFailed": "규칙 데이터베이스를 사용할 수 없습니다.",
+  "settingsTelemetryInstallationIdLabel": "설치 ID",
+  "settingsTelemetryInstallationIdDescription": "수집되는 데이터에 연결된 유일한 식별자입니다. 무작위 값이며 사용자와 연결되지 않습니다. 이 설치의 데이터 삭제를 원하시면 지원팀으로 보내주세요.",
+  "settingsTelemetryInstallationIdCopy": "복사",
+  "settingsTelemetryInstallationIdCopied": "설치 ID가 복사되었습니다."
+}

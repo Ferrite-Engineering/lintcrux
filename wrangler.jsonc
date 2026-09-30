@@ -1,0 +1,28 @@
+{
+  // Cloudflare Workers Static Assets host for the OPEN-CORE LintCrux web viewer
+  // (the read-only Flutter web SARIF-report viewer). Same model as the WaveCrux
+  // app and the marketing sites — a separate Worker on its own subdomain.
+  // Deployed via scripts/deploy_web.sh.
+  "name": "lintcrux-app",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    // The Flutter web build output. Built by `flutter build web --release`
+    // (see scripts/deploy_web.sh) before `wrangler deploy`. Gitignored.
+    "directory": "build/web",
+    // Flutter web is a single-page app: serve index.html for unknown routes so
+    // ?sarif= deep links resolve client-side instead of 404ing.
+    "not_found_handling": "single-page-application"
+  },
+  // Provision app.lintcrux.app as a custom domain on first deploy. Requires
+  // the lintcrux.app zone to be on this Cloudflare account (it hosts the
+  // marketing site).
+  // NOTE: this Worker serves the REAL Flutter web build and lives at
+  // app.<product>.app, matching app.wavecrux.app. The viewer./dashboard.
+  // hostnames belong to the hand-written interactive DEMOS in the marketing-site
+  // repo — two different things that previously fought over one hostname (for
+  // LintCrux they even shared a Worker NAME, so a deploy from either repo
+  // replaced the other outright). Keep them apart.
+  "routes": [
+    { "pattern": "app.lintcrux.app", "custom_domain": true }
+  ]
+}

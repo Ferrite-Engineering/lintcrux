@@ -1,0 +1,10 @@
+{
+  "capturedAt": "2026-08-03",
+  "host": "macos macos_arm64",
+  "engineVersions": {
+    "verilator": "Verilator 5.050 2026-07-01 rev vUNKNOWN-built20260701",
+    "verible": "Version\tv0.0-4084-gf3e4d98b",
+    "slang": "slang version 11.0.0+7ddf4059f"
+  },
+  "unverified": {}
+}

@@ -1,0 +1,1 @@
+café.vhd:2:1:warning: signal "señal" is never referenced [-Wunused]

@@ -1,0 +1,3 @@
+top.sv:8:24-42: Line length exceeds max: 100; is: 118 [line-length]
+top.sv:12:1-8: Use spaces, not tabs. [Style: tabs] [no-tabs]
+top.sv:31:3: Explicit parameter storage type recommended [explicit-parameter-storage-type]

@@ -1,0 +1,15 @@
+[
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_thing'",
+    "location": "top.sv:15:23",
+    "symbolPath": "top"
+  },
+  {
+    "severity": "warning",
+    "message": "unused variable 'never_used'",
+    "optionName": "unused-variable",
+    "location": "top.sv:8:15",
+    "symbolPath": "top.never_used"
+  }
+]

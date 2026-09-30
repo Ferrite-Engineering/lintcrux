@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "verilator",
+          "version": "5.026 2024-09-01",
+          "informationUri": "https://www.veripool.org/verilator/",
+          "rules": [
+            {
+              "id": "UNUSEDSIGNAL",
+              "shortDescription": {
+                "text": "Signal is declared but never read"
+              }
+            },
+            {
+              "id": "WIDTHTRUNC",
+              "shortDescription": {
+                "text": "Operator result width truncated"
+              }
+            }
+          ]
+        }
+      },
+      "automationDetails": {
+        "id": "verilator-2026-05-22T10:30:00Z"
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "2026-05-22T10:30:00.000Z",
+          "endTimeUtc": "2026-05-22T10:30:01.250Z",
+          "exitCode": 0,
+          "commandLine": "verilator --lint-only --top-module top src/top.v"
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "UNUSEDSIGNAL",
+          "level": "warning",
+          "message": {
+            "text": "Signal is not used: 'unused_wire'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/top.v"
+                },
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 8,
+                  "endLine": 17,
+                  "endColumn": 19
+                }
+              }
+            }
+          ],
+          "relatedLocations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/top.v"
+                },
+                "region": {
+                  "startLine": 23,
+                  "startColumn": 3
+                }
+              },
+              "message": {
+                "text": "Declared here"
+              }
+            }
+          ],
+          "properties": {
+            "verilator": {
+              "category": "STYLE"
+            }
+          }
+        },
+        {
+          "ruleId": "WIDTHTRUNC",
+          "level": "warning",
+          "message": {
+            "text": "Operator ASSIGN expects 32 bits, got 8: 'result'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/alu.v"
+                },
+                "region": {
+                  "startLine": 42,
+                  "startColumn": 12
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "PINMISSING",
+          "level": "error",
+          "message": {
+            "text": "Cell pin connected by name with mismatching name: 'clk_in'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/top.v"
+                },
+                "region": {
+                  "startLine": 88,
+                  "startColumn": 4
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "SYNTAX",
+          "level": "error",
+          "message": {
+            "text": "Unexpected token 'endmodule', expected ';'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/broken.v"
+                },
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "lintcrux": {
+              "severity": "fatal"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

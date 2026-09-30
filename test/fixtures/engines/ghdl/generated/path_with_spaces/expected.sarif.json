@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "ghdl"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "1970-01-01T00:00:00.000Z",
+          "endTimeUtc": "1970-01-01T00:00:00.000Z"
+        }
+      ],
+      "automationDetails": {
+        "id": "gen/ghdl/path_with_spaces"
+      },
+      "results": [
+        {
+          "ruleId": "UNCLASSIFIED",
+          "level": "error",
+          "message": {
+            "text": "entity \"foo\" not found"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/work/my designs/top entity.vhd"
+                },
+                "region": {
+                  "startLine": 3,
+                  "startColumn": 1
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

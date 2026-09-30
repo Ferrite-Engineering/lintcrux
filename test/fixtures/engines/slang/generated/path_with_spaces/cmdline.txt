@@ -1,0 +1,1 @@
+slang -q --diag-json - "a dir/m.sv"

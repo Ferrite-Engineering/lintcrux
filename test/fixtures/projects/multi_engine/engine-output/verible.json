@@ -1,0 +1,28 @@
+{
+  "engineId": "verible",
+  "invocations": [
+    {
+      "executable": "verible-verilog-lint",
+      "arguments": [
+        "--lint_output=jsonline",
+        "multi_engine.sv"
+      ],
+      "exitCode": 1,
+      "stdout": [],
+      "stderr": [
+        "ERROR: Unknown command line flag 'lint_output'"
+      ]
+    },
+    {
+      "executable": "verible-verilog-lint",
+      "arguments": [
+        "multi_engine.sv"
+      ],
+      "exitCode": 1,
+      "stdout": [],
+      "stderr": [
+        "multi_engine.sv:21:1: Use spaces, not tabs. [Style: tabs] [no-tabs]"
+      ]
+    }
+  ]
+}

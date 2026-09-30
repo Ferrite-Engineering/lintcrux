@@ -1,0 +1,6 @@
+top.sv:15:23: error: use of undeclared identifier 'undeclared_thing'
+  assign narrow_out = undeclared_thing;
+                      ^~~~~~~~~~~~~~~~
+top.sv:8:15: warning: unused variable 'never_used' [-Wunused-variable]
+  logic       never_used;
+              ^

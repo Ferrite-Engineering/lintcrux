@@ -1,0 +1,118 @@
+name: 🐞 Bug report
+description: Something in LintCrux is broken or behaves incorrectly.
+title: "[Bug]: "
+labels: ["bug", "user-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve LintCrux!
+
+        **Tip:** the easiest way to file a bug is from inside the app —
+        **Help → Submit Issue** — which fills in your version, platform, and an
+        optional diagnostics snapshot for you. Use this form if you'd rather
+        report by hand.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: |
+        1. Opened my project.lintcrux with Verilator and Verible enabled
+        2. Ran lint; Verilator printed %Warning-WIDTHTRUNC at alu.sv:88:14
+        3. Expected that row in the table; LintCrux shows it at alu.sv:87
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: A numbered list we can follow exactly.
+    validations:
+      required: true
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Which engine?
+      options:
+        - Verilator
+        - Verible
+        - Slang
+        - Yosys checks
+        - GHDL
+        - Svlint
+        - Multiple / mixed
+        - Not engine-specific
+    validations:
+      required: true
+  - type: input
+    id: engine-version
+    attributes:
+      label: Engine version
+      description: "`verilator --version`, `verible-verilog-lint --version`, `slang --version`, `ghdl --version`, `svlint --version`, or `yosys -V`."
+      placeholder: "e.g. Verilator 5.026 2024-08-04"
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of LintCrux?
+      options:
+        - Engine output parsing (missing, misplaced, or mis-ranked violation)
+        - Engine invocation (wrong command line, engine not found, timeout)
+        - Violation table — sorting, columns, virtualization
+        - Filtering, search, or filter presets
+        - Waivers (inline pragmas or managed waivers)
+        - Baseline and delta
+        - Trend tracking / calendar heatmap
+        - Custom regex rules
+        - Severity mapping or per-project overrides
+        - Source preview / open-in-editor
+        - Export (SARIF / JSON / CSV / HTML)
+        - Project file, source open, or filelist import
+        - Verible auto-fix
+        - Multi-project workspace, sessions, or tabs
+        - Auto-reload / incremental re-run
+        - Cross-probing (CXP)
+        - Settings, theming, or shortcuts
+        - Web SARIF viewer
+        - Something else
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Web (read-only SARIF viewer)
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: LintCrux version / build SHA
+      description: From **Help → About LintCrux** → **Copy Version Info** (the in-app reporter fills this in automatically).
+      placeholder: "e.g. 1.0.0 (cbaa252)"
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics (optional)
+      description: |
+        Paste the diagnostics report from **Help → Submit Issue** if you have it.
+        Do **not** paste proprietary RTL source or violation messages you can't share.
+      render: text
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        **Is this a parsing bug?** Then the raw engine output is the whole fix —
+        paste the exact stdout/stderr text and the command line that produced it.
+        We can turn that into a test without ever seeing your RTL. Use the
+        [fixture submission form](https://github.com/Ferrite-Engineering/lintcrux/issues/new?template=fixture_submission.yml).
+        Please only attach files you can share under a permissive license.

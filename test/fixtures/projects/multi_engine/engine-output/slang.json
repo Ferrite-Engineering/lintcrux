@@ -1,0 +1,26 @@
+{
+  "engineId": "slang",
+  "invocations": [
+    {
+      "executable": "slang",
+      "arguments": [
+        "-q",
+        "--diag-json",
+        "-",
+        "multi_engine.sv"
+      ],
+      "exitCode": 0,
+      "stdout": [
+        "[",
+        "  {",
+        "    \"severity\": \"warning\",",
+        "    \"message\": \"if statement has empty body (put the semicolon on a separate line to silence this warning)\",",
+        "    \"optionName\": \"empty-body\",",
+        "    \"location\": \"multi_engine.sv:26:14\"",
+        "  }",
+        "]"
+      ],
+      "stderr": []
+    }
+  ]
+}

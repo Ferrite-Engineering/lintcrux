@@ -1,0 +1,1 @@
+svlint --output-format=json 回路.sv

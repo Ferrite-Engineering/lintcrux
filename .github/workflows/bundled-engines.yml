@@ -1,0 +1,308 @@
+name: Bundled Engines
+
+# Composite workflow that downloads + caches the lint-engine binaries
+# pinned in `tool/bundled_engines.yaml`. Manually invoked while the
+# main CI is still on workflow_dispatch; the integration suite invokes
+# this workflow as a `needs:` dependency once it gains bundled-binary
+# integration tests.
+#
+# What this workflow IS:
+#   - The reviewable version pin for every engine binary.
+#   - The fetch step that pre-populates the GitHub Actions per-OS
+#     cache so subsequent runs reuse the cached binary instead of
+#     re-downloading.
+#   - The bridge that the integration test harness sets
+#     `LINTCRUX_BUNDLED_BIN_DIR` to via repository_dispatch / call
+#     once the matrix lands.
+#
+# What this workflow is NOT (yet):
+#   - It does not bundle binaries into the release build of the
+#     Flutter app. That step belongs to distribution packaging; this
+#     workflow exists so the *seam* — env
+#     var → cached directory → BundledBinaryResolver — is exercised in
+#     CI ahead of the packaging milestone.
+
+on:
+  workflow_dispatch:
+    inputs:
+      engineFilter:
+        description: "Which engine to fetch (verilator/verible/slang/all)"
+        required: false
+        default: "all"
+
+concurrency:
+  # Keyed by event as well as ref: a nightly must never be cancelled by a
+  # push, and a push must never be cancelled by a nightly.
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  # Superseded pushes are cancelled outright. `false` on main was the source
+  # of a whole class of phantom failures: a run still QUEUED when a third
+  # push arrives is cancelled by GitHub regardless, and a run whose jobs were
+  # cancelled reports conclusion=failure — not cancelled. So main never did
+  # verify every commit, it just misreported the ones it skipped. Cancelling
+  # is honest, cheaper, and gates the thing that matters: the tip.
+  cancel-in-progress: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # Preflight: prove every pin in tool/bundled_engines.yaml still points
+  # at a real upstream asset BEFORE spending matrix runners on it.
+  #
+  # This job exists because the Verible pin sat unfetchable in the
+  # manifest without anything noticing: the fetch matrix below only
+  # truly downloads Verible on Linux, and that step used to swallow a
+  # 404 (see the `--fail` note there), so a dead pin produced a green
+  # run. A cheap HEAD sweep is the honest gate.
+  preflight:
+    name: Verify pinned URLs resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          submodules: recursive
+          # A read-only PAT (Contents) for the crux-shared submodule when the
+          # secret is set, else the job's own token: a public crux-shared
+          # needs no credentials, and fork PRs receive no secrets.
+          token: ${{ secrets.SUBMODULE_PAT || github.token }}
+
+      - name: Install Flutter (pinned)
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: '3.47.3'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Runs the offline shape/ordering/well-formedness assertions AND
+      # the live URL sweep, which the env var un-skips.
+      - name: Check bundled engine manifest
+        env:
+          LINTCRUX_CHECK_ENGINE_URLS: "1"
+        run: flutter test test/static/bundled_engines_manifest_test.dart
+
+  fetch:
+    name: Fetch ${{ matrix.engine }} on ${{ matrix.platform }}
+    needs: preflight
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - engine: verilator
+            platform: linux-x86_64
+            runner: ubuntu-latest
+          - engine: verilator
+            platform: macos-universal
+            runner: macos-latest
+          - engine: verilator
+            platform: windows-x86_64
+            runner: windows-latest
+          - engine: verible
+            platform: linux-x86_64
+            runner: ubuntu-latest
+          - engine: verible
+            platform: macos-universal
+            runner: macos-latest
+          - engine: verible
+            platform: windows-x86_64
+            runner: windows-latest
+          - engine: slang
+            platform: linux-x86_64
+            runner: ubuntu-latest
+          - engine: slang
+            platform: windows-x86_64
+            runner: windows-latest
+          - engine: ghdl
+            platform: linux-x86_64
+            runner: ubuntu-latest
+          - engine: ghdl
+            platform: macos-universal
+            runner: macos-latest
+          - engine: ghdl
+            platform: windows-x86_64
+            runner: windows-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          submodules: recursive
+          # A read-only PAT (Contents) for the crux-shared submodule when the
+          # secret is set, else the job's own token: a public crux-shared
+          # needs no credentials, and fork PRs receive no secrets.
+          token: ${{ secrets.SUBMODULE_PAT || github.token }}
+
+      - name: Skip if engineFilter excludes this row
+        if: ${{ inputs.engineFilter != 'all' && inputs.engineFilter != matrix.engine }}
+        run: |
+          echo "Skipping ${{ matrix.engine }} on ${{ matrix.platform }}"
+          exit 0
+
+      - name: Compute cache key
+        id: cachekey
+        shell: bash
+        run: |
+          # hashFiles() rather than `shasum`: shasum is a Perl script that
+          # ships on the macOS and Ubuntu runners but is absent from Git Bash
+          # on windows-latest, so this step exited 127 — command not found —
+          # on every windows-x86_64 row while Linux and macOS sailed through.
+          # hashFiles is evaluated by the runner, not the shell, so it is the
+          # same value on all three platforms.
+          echo "key=bundled-${{ matrix.engine }}-${{ matrix.platform }}-${{ hashFiles('tool/bundled_engines.yaml') }}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore cached binary
+        id: cache-restore
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: bundled-bin/${{ matrix.platform }}/${{ matrix.engine }}*
+          key: ${{ steps.cachekey.outputs.key }}
+
+      - name: Read pinned version
+        id: pin
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Take the first `    version:` line inside this engine's
+          # `  - id:` block. The previous `grep -A 1` looked only at the
+          # single line after `id:`, so a comment between `- id: verible`
+          # and its `version:` made this return the empty string — which
+          # interpolates into `.../download/v/...` and 404s. The Dart
+          # mirror of this rule is asserted offline by
+          # `test/static/bundled_engines_manifest_test.dart` ("CI can
+          # extract every pinned version from the manifest"); keep the
+          # two in step.
+          version=$(awk -v id="  - id: ${{ matrix.engine }}" '
+            $0 == id { inblock = 1; next }
+            inblock && /^  - id: / { exit }
+            inblock && /^    version:/ {
+              sub(/^    version:[ \t]*/, "")
+              gsub(/"/, "")
+              print; exit
+            }
+          ' tool/bundled_engines.yaml)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # Engine-specific download. We keep this in-line per row so each
+      # engine's archive format / executable layout is visible to the
+      # reviewer. When a fourth engine joins, copy the matching row.
+      - name: Download Verilator (linux)
+        if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && matrix.engine == 'verilator' && matrix.platform == 'linux-x86_64' }}
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y verilator
+          mkdir -p bundled-bin/${{ matrix.platform }}
+          cp "$(which verilator)" bundled-bin/${{ matrix.platform }}/verilator
+
+      - name: Download Verilator (macOS)
+        if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && matrix.engine == 'verilator' && matrix.platform == 'macos-universal' }}
+        run: |
+          brew install verilator
+          mkdir -p bundled-bin/${{ matrix.platform }}
+          cp "$(which verilator)" bundled-bin/${{ matrix.platform }}/verilator
+
+      # Release archives are checked against a SHA-256 recorded here, keyed
+      # to the version it was recorded for. A version bump in
+      # tool/bundled_engines.yaml without a new digest fails the step rather
+      # than trusting whatever the new URL serves. The Slang digest is the one
+      # GitHub records for the asset; Verible's release carries none, so its
+      # digest was computed from the asset (size matching GitHub's record).
+      - name: Download Verible (linux)
+        if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && matrix.engine == 'verible' && matrix.platform == 'linux-x86_64' }}
+        env:
+          VERIBLE_PINNED_VERSION: 'v0.0-3795-gf4d72375'
+          VERIBLE_LINUX_SHA256: '18f2a024357e9e37d440669da1d500172420fbd33f606338cbbdcd3f12981edb'
+        run: |
+          set -euo pipefail
+          v="${{ steps.pin.outputs.version }}"
+          if [[ "$v" != "$VERIBLE_PINNED_VERSION" ]]; then
+            echo "::error::tool/bundled_engines.yaml pins verible $v, but this step's SHA-256 is for $VERIBLE_PINNED_VERSION. Record the new digest alongside the bump."
+            exit 1
+          fi
+          url="https://github.com/chipsalliance/verible/releases/download/${v}/verible-${v}-linux-static-x86_64.tar.gz"
+          # `--fail` is load-bearing: without it a 404 writes GitHub's
+          # "Not Found" HTML into verible.tar.gz, the `|| true` on the
+          # untar hid the resulting error, `find` matched nothing, and
+          # the step exited 0 — which is exactly how an unfetchable pin
+          # stayed green. Do not reintroduce a soft failure here.
+          curl --fail -L "$url" -o verible.tar.gz
+          echo "${VERIBLE_LINUX_SHA256}  verible.tar.gz" | sha256sum -c -
+          mkdir -p verible-extract
+          tar -xzf verible.tar.gz -C verible-extract --strip-components=2
+          mkdir -p bundled-bin/${{ matrix.platform }}
+          find verible-extract -name verible-verilog-lint -type f -exec cp {} bundled-bin/${{ matrix.platform }}/verible \;
+          # Fail loudly if the archive layout changed and nothing copied.
+          test -x bundled-bin/${{ matrix.platform }}/verible
+
+      - name: Download Slang (linux)
+        if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && matrix.engine == 'slang' && matrix.platform == 'linux-x86_64' }}
+        env:
+          SLANG_PINNED_VERSION: '11.0'
+          SLANG_LINUX_SHA256: '951a170e10e25e54c91565030acfdfc11c3226714ebf225a18ad4166a898d8a4'
+        run: |
+          set -euo pipefail
+          # Slang's release artifacts vary in path; a MISSING asset fails
+          # soft so this workflow stays informational while upstream
+          # packaging stabilizes. A downloaded asset that does not match its
+          # digest never does.
+          v="${{ steps.pin.outputs.version }}"
+          if [[ "$v" != "$SLANG_PINNED_VERSION" ]]; then
+            echo "::error::tool/bundled_engines.yaml pins slang $v, but this step's SHA-256 is for $SLANG_PINNED_VERSION. Record the new digest alongside the bump."
+            exit 1
+          fi
+          url="https://github.com/MikePopoloski/slang/releases/download/v${v}/slang-linux-x86_64.tar.gz"
+          if curl --fail -sL "$url" -o slang.tar.gz; then
+            echo "${SLANG_LINUX_SHA256}  slang.tar.gz" | sha256sum -c -
+            mkdir -p slang-extract
+            tar -xzf slang.tar.gz -C slang-extract
+            mkdir -p bundled-bin/${{ matrix.platform }}
+            find slang-extract -name slang -type f -exec cp {} bundled-bin/${{ matrix.platform }}/slang \;
+          else
+            echo "::warning::slang v${v} not yet published for linux — skip"
+          fi
+
+      - name: Download GHDL (linux)
+        if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && matrix.engine == 'ghdl' && matrix.platform == 'linux-x86_64' }}
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ghdl
+          mkdir -p bundled-bin/${{ matrix.platform }}
+          cp "$(which ghdl)" bundled-bin/${{ matrix.platform }}/ghdl
+
+      - name: Download GHDL (macOS)
+        if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && matrix.engine == 'ghdl' && matrix.platform == 'macos-universal' }}
+        run: |
+          brew install ghdl || true
+          if [ -x "$(command -v ghdl)" ]; then
+            mkdir -p bundled-bin/${{ matrix.platform }}
+            cp "$(which ghdl)" bundled-bin/${{ matrix.platform }}/ghdl
+          else
+            echo "::warning::ghdl not available via Homebrew on this runner"
+          fi
+
+      # Two distinct reasons a cell does not fetch. Keep them apart: the
+      # first is upstream's decision and nothing here can change it; the
+      # second is work this workflow has not done yet. Collapsing them
+      # into one "no published URL" message is how three engines' dead
+      # templates stayed invisible.
+      - name: Skip notice — upstream publishes nothing for this cell
+        if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && ((matrix.engine == 'slang' && matrix.platform == 'macos-universal') || (matrix.engine == 'verilator' && matrix.platform == 'windows-x86_64')) }}
+        run: |
+          echo "::warning::Upstream publishes no ${{ matrix.engine }} binary for ${{ matrix.platform }}. tool/bundled_engines.yaml records the absence and why; there is no URL to point at."
+
+      - name: Skip notice — URL exists, fetch step not written yet
+        if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && ((matrix.engine == 'verible' && matrix.platform == 'macos-universal') || (matrix.engine == 'verible' && matrix.platform == 'windows-x86_64') || (matrix.engine == 'slang' && matrix.platform == 'windows-x86_64') || (matrix.engine == 'ghdl' && matrix.platform == 'windows-x86_64')) }}
+        run: |
+          echo "::warning::tool/bundled_engines.yaml pins a verified download URL for ${{ matrix.engine }} on ${{ matrix.platform }} (the preflight job HEAD-checks it), but no fetch/unpack step exists for this cell yet."
+
+      - name: Save artifact
+        if: ${{ always() && hashFiles(format('bundled-bin/{0}/*', matrix.platform)) != '' }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: bundled-${{ matrix.engine }}-${{ matrix.platform }}
+          path: bundled-bin/${{ matrix.platform }}/*
+          retention-days: 14

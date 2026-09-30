@@ -1,0 +1,819 @@
+{
+  "engineId": "verilator",
+  "displayName": "Verilator",
+  "verifiedAgainstVerilatorVersions": [
+    "5.050"
+  ],
+  "rules": [
+    {
+      "id": "ALWCOMBORDER",
+      "defaultSeverity": "warning",
+      "tags": [
+        "always-comb",
+        "ordering"
+      ],
+      "helpUrl": "https://verilator.org/warn/ALWCOMBORDER"
+    },
+    {
+      "id": "ALWNEVER",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ALWNEVER"
+    },
+    {
+      "id": "ASCRANGE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ASCRANGE"
+    },
+    {
+      "id": "ASSIGNDLY",
+      "defaultSeverity": "warning",
+      "tags": [
+        "nonblocking",
+        "ordering"
+      ],
+      "helpUrl": "https://verilator.org/warn/ASSIGNDLY"
+    },
+    {
+      "id": "ASSIGNEQEXPR",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ASSIGNEQEXPR"
+    },
+    {
+      "id": "ASSIGNIN",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ASSIGNIN"
+    },
+    {
+      "id": "BADSTDPRAGMA",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/BADSTDPRAGMA"
+    },
+    {
+      "id": "BADVLTPRAGMA",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/BADVLTPRAGMA"
+    },
+    {
+      "id": "BLKANDNBLK",
+      "defaultSeverity": "warning",
+      "tags": [
+        "nonblocking",
+        "mixing"
+      ],
+      "helpUrl": "https://verilator.org/warn/BLKANDNBLK"
+    },
+    {
+      "id": "BLKLOOPINIT",
+      "defaultSeverity": "warning",
+      "tags": [
+        "nonblocking",
+        "loop"
+      ],
+      "helpUrl": "https://verilator.org/warn/BLKLOOPINIT"
+    },
+    {
+      "id": "BLKSEQ",
+      "defaultSeverity": "warning",
+      "tags": [
+        "blocking",
+        "sequential"
+      ],
+      "helpUrl": "https://verilator.org/warn/BLKSEQ"
+    },
+    {
+      "id": "BSSPACE",
+      "defaultSeverity": "warning",
+      "tags": [
+        "style",
+        "whitespace"
+      ],
+      "helpUrl": "https://verilator.org/warn/BSSPACE"
+    },
+    {
+      "id": "CASEINCOMPLETE",
+      "defaultSeverity": "warning",
+      "tags": [
+        "case",
+        "completeness"
+      ],
+      "helpUrl": "https://verilator.org/warn/CASEINCOMPLETE"
+    },
+    {
+      "id": "CASEOVERLAP",
+      "defaultSeverity": "warning",
+      "tags": [
+        "case",
+        "overlap"
+      ],
+      "helpUrl": "https://verilator.org/warn/CASEOVERLAP"
+    },
+    {
+      "id": "CASEWITHX",
+      "defaultSeverity": "warning",
+      "tags": [
+        "case",
+        "x-state"
+      ],
+      "helpUrl": "https://verilator.org/warn/CASEWITHX"
+    },
+    {
+      "id": "CASEX",
+      "defaultSeverity": "warning",
+      "tags": [
+        "case",
+        "x-state"
+      ],
+      "helpUrl": "https://verilator.org/warn/CASEX"
+    },
+    {
+      "id": "CASTCONST",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/CASTCONST"
+    },
+    {
+      "id": "CDCRSTLOGIC",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/CDCRSTLOGIC"
+    },
+    {
+      "id": "CLKDATA",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/CLKDATA"
+    },
+    {
+      "id": "CMPCONST",
+      "defaultSeverity": "warning",
+      "tags": [
+        "comparison",
+        "constant"
+      ],
+      "helpUrl": "https://verilator.org/warn/CMPCONST"
+    },
+    {
+      "id": "COLONPLUS",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/COLONPLUS"
+    },
+    {
+      "id": "COMBDLY",
+      "defaultSeverity": "warning",
+      "tags": [
+        "combinational",
+        "delay"
+      ],
+      "helpUrl": "https://verilator.org/warn/COMBDLY"
+    },
+    {
+      "id": "CONSTRAINTIGN",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/CONSTRAINTIGN"
+    },
+    {
+      "id": "CONTASSREG",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/CONTASSREG"
+    },
+    {
+      "id": "COVERIGN",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/COVERIGN"
+    },
+    {
+      "id": "DECLFILENAME",
+      "defaultSeverity": "warning",
+      "tags": [
+        "style",
+        "naming"
+      ],
+      "helpUrl": "https://verilator.org/warn/DECLFILENAME"
+    },
+    {
+      "id": "DEFOVERRIDE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/DEFOVERRIDE"
+    },
+    {
+      "id": "DEFPARAM",
+      "defaultSeverity": "warning",
+      "tags": [
+        "deprecated"
+      ],
+      "helpUrl": "https://verilator.org/warn/DEFPARAM"
+    },
+    {
+      "id": "DEPRECATED",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/DEPRECATED"
+    },
+    {
+      "id": "ENCAPSULATED",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ENCAPSULATED"
+    },
+    {
+      "id": "ENDLABEL",
+      "defaultSeverity": "warning",
+      "tags": [
+        "style",
+        "naming"
+      ],
+      "helpUrl": "https://verilator.org/warn/ENDLABEL"
+    },
+    {
+      "id": "ENUMITEMWIDTH",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ENUMITEMWIDTH"
+    },
+    {
+      "id": "ENUMVALUE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ENUMVALUE"
+    },
+    {
+      "id": "EOFNEWLINE",
+      "defaultSeverity": "warning",
+      "tags": [
+        "style",
+        "whitespace"
+      ],
+      "helpUrl": "https://verilator.org/warn/EOFNEWLINE"
+    },
+    {
+      "id": "FINALDLY",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/FINALDLY"
+    },
+    {
+      "id": "FSMMULTI",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/FSMMULTI"
+    },
+    {
+      "id": "FUNCTIMECTL",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/FUNCTIMECTL"
+    },
+    {
+      "id": "FUTURE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/FUTURE"
+    },
+    {
+      "id": "GENCLK",
+      "defaultSeverity": "warning",
+      "tags": [
+        "clock",
+        "synthesis"
+      ],
+      "helpUrl": "https://verilator.org/warn/GENCLK"
+    },
+    {
+      "id": "GENUNNAMED",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/GENUNNAMED"
+    },
+    {
+      "id": "HIERBLOCK",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/HIERBLOCK"
+    },
+    {
+      "id": "HIERPARAM",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/HIERPARAM"
+    },
+    {
+      "id": "IEEEMAYDEPRECATE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/IEEEMAYDEPRECATE"
+    },
+    {
+      "id": "IFDEPTH",
+      "defaultSeverity": "warning",
+      "tags": [
+        "complexity"
+      ],
+      "helpUrl": "https://verilator.org/warn/IFDEPTH"
+    },
+    {
+      "id": "IGNOREDRETURN",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/IGNOREDRETURN"
+    },
+    {
+      "id": "IMPERFECTSCH",
+      "defaultSeverity": "warning",
+      "tags": [
+        "scheduling"
+      ],
+      "helpUrl": "https://verilator.org/warn/IMPERFECTSCH"
+    },
+    {
+      "id": "IMPLICIT",
+      "defaultSeverity": "warning",
+      "tags": [
+        "declaration",
+        "implicit"
+      ],
+      "helpUrl": "https://verilator.org/warn/IMPLICIT"
+    },
+    {
+      "id": "IMPLICITSTATIC",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/IMPLICITSTATIC"
+    },
+    {
+      "id": "IMPORTSTAR",
+      "defaultSeverity": "warning",
+      "tags": [
+        "import",
+        "wildcard"
+      ],
+      "helpUrl": "https://verilator.org/warn/IMPORTSTAR"
+    },
+    {
+      "id": "IMPURE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/IMPURE"
+    },
+    {
+      "id": "INCABSPATH",
+      "defaultSeverity": "warning",
+      "tags": [
+        "include",
+        "portability"
+      ],
+      "helpUrl": "https://verilator.org/warn/INCABSPATH"
+    },
+    {
+      "id": "INFINITELOOP",
+      "defaultSeverity": "warning",
+      "tags": [
+        "loop"
+      ],
+      "helpUrl": "https://verilator.org/warn/INFINITELOOP"
+    },
+    {
+      "id": "INITIALDLY",
+      "defaultSeverity": "warning",
+      "tags": [
+        "nonblocking",
+        "initial"
+      ],
+      "helpUrl": "https://verilator.org/warn/INITIALDLY"
+    },
+    {
+      "id": "INSECURE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/INSECURE"
+    },
+    {
+      "id": "INSIDETRUE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/INSIDETRUE"
+    },
+    {
+      "id": "LATCH",
+      "defaultSeverity": "warning",
+      "tags": [
+        "latch",
+        "synthesis"
+      ],
+      "helpUrl": "https://verilator.org/warn/LATCH"
+    },
+    {
+      "id": "LITENDIAN",
+      "defaultSeverity": "warning",
+      "tags": [
+        "endian"
+      ],
+      "helpUrl": "https://verilator.org/warn/LITENDIAN"
+    },
+    {
+      "id": "MINTYPMAXDLY",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/MINTYPMAXDLY"
+    },
+    {
+      "id": "MISINDENT",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/MISINDENT"
+    },
+    {
+      "id": "MODDUP",
+      "defaultSeverity": "warning",
+      "tags": [
+        "module",
+        "duplicate"
+      ],
+      "helpUrl": "https://verilator.org/warn/MODDUP"
+    },
+    {
+      "id": "MODMISSING",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/MODMISSING"
+    },
+    {
+      "id": "MULTIDRIVEN",
+      "defaultSeverity": "warning",
+      "tags": [
+        "driver",
+        "multi-driver"
+      ],
+      "helpUrl": "https://verilator.org/warn/MULTIDRIVEN"
+    },
+    {
+      "id": "MULTITOP",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/MULTITOP"
+    },
+    {
+      "id": "NEWERSTD",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/NEWERSTD"
+    },
+    {
+      "id": "NOEFFECT",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/NOEFFECT"
+    },
+    {
+      "id": "NOLATCH",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/NOLATCH"
+    },
+    {
+      "id": "NONSTD",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/NONSTD"
+    },
+    {
+      "id": "NORETURN",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/NORETURN"
+    },
+    {
+      "id": "NOTREDOP",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/NOTREDOP"
+    },
+    {
+      "id": "NULLPORT",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/NULLPORT"
+    },
+    {
+      "id": "PARAMNODEFAULT",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PARAMNODEFAULT"
+    },
+    {
+      "id": "PINCONNECTEMPTY",
+      "defaultSeverity": "warning",
+      "tags": [
+        "instance",
+        "pins"
+      ],
+      "helpUrl": "https://verilator.org/warn/PINCONNECTEMPTY"
+    },
+    {
+      "id": "PINMISSING",
+      "defaultSeverity": "warning",
+      "tags": [
+        "instance",
+        "pins"
+      ],
+      "helpUrl": "https://verilator.org/warn/PINMISSING"
+    },
+    {
+      "id": "PINNOCONNECT",
+      "defaultSeverity": "warning",
+      "tags": [
+        "instance",
+        "pins"
+      ],
+      "helpUrl": "https://verilator.org/warn/PINNOCONNECT"
+    },
+    {
+      "id": "PINNOTFOUND",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PINNOTFOUND"
+    },
+    {
+      "id": "PKGNODECL",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PKGNODECL"
+    },
+    {
+      "id": "PREPROCZERO",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PREPROCZERO"
+    },
+    {
+      "id": "PROCASSINIT",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PROCASSINIT"
+    },
+    {
+      "id": "PROCASSWIRE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PROCASSWIRE"
+    },
+    {
+      "id": "PROFOUTOFDATE",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PROFOUTOFDATE"
+    },
+    {
+      "id": "PROTECTED",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PROTECTED"
+    },
+    {
+      "id": "PROTOTYPEMIS",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/PROTOTYPEMIS"
+    },
+    {
+      "id": "RANDC",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/RANDC"
+    },
+    {
+      "id": "REALCVT",
+      "defaultSeverity": "warning",
+      "tags": [
+        "conversion",
+        "real"
+      ],
+      "helpUrl": "https://verilator.org/warn/REALCVT"
+    },
+    {
+      "id": "REDEFMACRO",
+      "defaultSeverity": "warning",
+      "tags": [
+        "macro",
+        "redefinition"
+      ],
+      "helpUrl": "https://verilator.org/warn/REDEFMACRO"
+    },
+    {
+      "id": "RISEFALLDLY",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/RISEFALLDLY"
+    },
+    {
+      "id": "SELRANGE",
+      "defaultSeverity": "warning",
+      "tags": [
+        "bit-select",
+        "range"
+      ],
+      "helpUrl": "https://verilator.org/warn/SELRANGE"
+    },
+    {
+      "id": "SHORTREAL",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/SHORTREAL"
+    },
+    {
+      "id": "SIDEEFFECT",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/SIDEEFFECT"
+    },
+    {
+      "id": "SPECIFYIGN",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/SPECIFYIGN"
+    },
+    {
+      "id": "SPLITVAR",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/SPLITVAR"
+    },
+    {
+      "id": "STATICVAR",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/STATICVAR"
+    },
+    {
+      "id": "STMTDLY",
+      "defaultSeverity": "warning",
+      "tags": [
+        "delay"
+      ],
+      "helpUrl": "https://verilator.org/warn/STMTDLY"
+    },
+    {
+      "id": "SUPERNFIRST",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/SUPERNFIRST"
+    },
+    {
+      "id": "SYMRSVDWORD",
+      "defaultSeverity": "warning",
+      "tags": [
+        "reserved",
+        "naming"
+      ],
+      "helpUrl": "https://verilator.org/warn/SYMRSVDWORD"
+    },
+    {
+      "id": "SYNCASYNCNET",
+      "defaultSeverity": "warning",
+      "tags": [
+        "clock",
+        "reset"
+      ],
+      "helpUrl": "https://verilator.org/warn/SYNCASYNCNET"
+    },
+    {
+      "id": "TICKCOUNT",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/TICKCOUNT"
+    },
+    {
+      "id": "TIMESCALEMOD",
+      "defaultSeverity": "warning",
+      "tags": [
+        "timescale"
+      ],
+      "helpUrl": "https://verilator.org/warn/TIMESCALEMOD"
+    },
+    {
+      "id": "UNDRIVEN",
+      "defaultSeverity": "warning",
+      "tags": [
+        "unused",
+        "driver"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNDRIVEN"
+    },
+    {
+      "id": "UNOPT",
+      "defaultSeverity": "warning",
+      "tags": [
+        "performance"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNOPT"
+    },
+    {
+      "id": "UNOPTFLAT",
+      "defaultSeverity": "warning",
+      "tags": [
+        "performance"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNOPTFLAT"
+    },
+    {
+      "id": "UNOPTTHREADS",
+      "defaultSeverity": "warning",
+      "tags": [
+        "performance"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNOPTTHREADS"
+    },
+    {
+      "id": "UNPACKED",
+      "defaultSeverity": "warning",
+      "tags": [
+        "unpacked"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNPACKED"
+    },
+    {
+      "id": "UNSATCONSTR",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/UNSATCONSTR"
+    },
+    {
+      "id": "UNSIGNED",
+      "defaultSeverity": "warning",
+      "tags": [
+        "sign",
+        "conversion"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNSIGNED"
+    },
+    {
+      "id": "UNUSED",
+      "defaultSeverity": "warning",
+      "tags": [
+        "unused"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNUSED"
+    },
+    {
+      "id": "UNUSEDGENVAR",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/UNUSEDGENVAR"
+    },
+    {
+      "id": "UNUSEDLOOP",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/UNUSEDLOOP"
+    },
+    {
+      "id": "UNUSEDPARAM",
+      "defaultSeverity": "warning",
+      "tags": [
+        "unused",
+        "parameter"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNUSEDPARAM"
+    },
+    {
+      "id": "UNUSEDSIGNAL",
+      "defaultSeverity": "warning",
+      "tags": [
+        "unused",
+        "signal"
+      ],
+      "helpUrl": "https://verilator.org/warn/UNUSEDSIGNAL"
+    },
+    {
+      "id": "USERERROR",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/USERERROR"
+    },
+    {
+      "id": "USERFATAL",
+      "defaultSeverity": "error",
+      "tags": [
+        "user",
+        "fatal"
+      ],
+      "helpUrl": "https://verilator.org/warn/USERFATAL"
+    },
+    {
+      "id": "USERINFO",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/USERINFO"
+    },
+    {
+      "id": "USERWARN",
+      "defaultSeverity": "warning",
+      "tags": [
+        "user"
+      ],
+      "helpUrl": "https://verilator.org/warn/USERWARN"
+    },
+    {
+      "id": "VARHIDDEN",
+      "defaultSeverity": "warning",
+      "tags": [
+        "naming",
+        "shadowing"
+      ],
+      "helpUrl": "https://verilator.org/warn/VARHIDDEN"
+    },
+    {
+      "id": "WAITCONST",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/WAITCONST"
+    },
+    {
+      "id": "WIDTH",
+      "defaultSeverity": "warning",
+      "tags": [
+        "width",
+        "truncation"
+      ],
+      "helpUrl": "https://verilator.org/warn/WIDTH"
+    },
+    {
+      "id": "WIDTHCONCAT",
+      "defaultSeverity": "warning",
+      "tags": [
+        "width",
+        "concat"
+      ],
+      "helpUrl": "https://verilator.org/warn/WIDTHCONCAT"
+    },
+    {
+      "id": "WIDTHEXPAND",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/WIDTHEXPAND"
+    },
+    {
+      "id": "WIDTHTRUNC",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/WIDTHTRUNC"
+    },
+    {
+      "id": "WIDTHXZEXPAND",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/WIDTHXZEXPAND"
+    },
+    {
+      "id": "ZERODLY",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ZERODLY"
+    },
+    {
+      "id": "ZEROREPL",
+      "defaultSeverity": "warning",
+      "helpUrl": "https://verilator.org/warn/ZEROREPL"
+    }
+  ]
+}

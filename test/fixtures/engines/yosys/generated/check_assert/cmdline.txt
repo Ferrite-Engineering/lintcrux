@@ -1,0 +1,1 @@
+yosys -q -p "read_verilog cpu.sv; hierarchy -top cpu; check -assert"

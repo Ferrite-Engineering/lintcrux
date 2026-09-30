@@ -1,0 +1,2226 @@
+{
+  "@@locale": "en",
+  "settingsShortcutsSection": "Keyboard Shortcuts",
+  "@settingsShortcutsSection": {
+    "description": "Settings category title for the keyboard shortcuts editor"
+  },
+  "settingsShortcutsDescription": "Press the pencil to change a shortcut, then type the new keys. Use Export and Import to share your bindings with others.",
+  "@settingsShortcutsDescription": {
+    "description": "Intro note above the editable shortcuts list"
+  },
+  "settingsShortcutNotBound": "—",
+  "@settingsShortcutNotBound": {
+    "description": "Placeholder shown when an action has no key binding"
+  },
+  "settingsShortcutNotBoundSpoken": "no shortcut",
+  "@settingsShortcutNotBoundSpoken": {
+    "description": "What a screen reader says for an action with no key binding. The visual placeholder is a dash, which is not spoken."
+  },
+  "settingsShortcutsKeyboardHint": "Up and Down move between shortcuts. Enter changes the selected shortcut, Delete removes it, and Shift+Delete restores its default.",
+  "@settingsShortcutsKeyboardHint": {
+    "description": "Keyboard instructions for the shortcut list in Settings > Keyboard Shortcuts. Shown under the description and spoken once by a screen reader when focus enters the list."
+  },
+  "settingsShortcutsImport": "Import…",
+  "@settingsShortcutsImport": {
+    "description": "Button that imports a shared .crux-keymap shortcut file"
+  },
+  "settingsShortcutsExport": "Export…",
+  "@settingsShortcutsExport": {
+    "description": "Button that exports shortcut customizations to a .crux-keymap file"
+  },
+  "settingsShortcutsResetAll": "Reset all",
+  "@settingsShortcutsResetAll": {
+    "description": "Button/confirm action restoring every shortcut to its default"
+  },
+  "settingsShortcutEditTooltip": "Change shortcut",
+  "@settingsShortcutEditTooltip": {
+    "description": "Tooltip for the per-action capture button"
+  },
+  "settingsShortcutUnbindTooltip": "Remove shortcut",
+  "@settingsShortcutUnbindTooltip": {
+    "description": "Tooltip for the per-action unbind button"
+  },
+  "settingsShortcutResetTooltip": "Reset to default",
+  "@settingsShortcutResetTooltip": {
+    "description": "Tooltip for the per-action reset button"
+  },
+  "settingsShortcutCapturePrompt": "Press the new shortcut… (Esc to cancel)",
+  "@settingsShortcutCapturePrompt": {
+    "description": "Prompt shown while capturing a new chord"
+  },
+  "settingsShortcutConflict": "Also used by {actions}",
+  "@settingsShortcutConflict": {
+    "description": "Warning under an action whose chord collides with others",
+    "placeholders": {
+      "actions": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictWins": "Takes precedence over {others}",
+  "@settingsShortcutConflictWins": {
+    "description": "Conflict warning on the row whose shortcut fires; lists the shadowed actions sharing the chord",
+    "placeholders": {
+      "others": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictShadowed": "Won''t fire — shadowed by {winner}",
+  "@settingsShortcutConflictShadowed": {
+    "description": "Conflict warning on a shadowed row whose shortcut will not fire; names the winning action",
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictSummary": "{count, plural, =1{1 shortcut conflict needs attention} other{{count} shortcut conflicts need attention}}",
+  "@settingsShortcutConflictSummary": {
+    "description": "Summary banner above the shortcut list showing how many chords are in conflict",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsShortcutResetAllTitle": "Reset all shortcuts?",
+  "@settingsShortcutResetAllTitle": {
+    "description": "Title of the reset-all confirmation dialog"
+  },
+  "settingsShortcutResetAllBody": "Every keyboard shortcut returns to its default and your customizations are removed.",
+  "@settingsShortcutResetAllBody": {
+    "description": "Body of the reset-all confirmation dialog"
+  },
+  "settingsShortcutResetAllCancel": "Cancel",
+  "@settingsShortcutResetAllCancel": {
+    "description": "Cancel button in the reset-all confirmation dialog"
+  },
+  "settingsShortcutExportSuccess": "Keyboard shortcuts exported.",
+  "@settingsShortcutExportSuccess": {
+    "description": "Snackbar after a successful keymap export"
+  },
+  "settingsShortcutExportFailure": "Couldn’t export shortcuts: {error}",
+  "@settingsShortcutExportFailure": {
+    "description": "Snackbar when keymap export fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutImportEmpty": "That file has no shortcut customizations.",
+  "@settingsShortcutImportEmpty": {
+    "description": "Snackbar when an imported keymap has no customizations"
+  },
+  "settingsShortcutImportSuccess": "{count, plural, =0{No shortcut customizations imported.} =1{Imported 1 customized shortcut.} other{Imported {count} customized shortcuts.}}",
+  "@settingsShortcutImportSuccess": {
+    "description": "Snackbar after a successful keymap import",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsShortcutImportFailure": "Couldn’t import shortcuts: {error}",
+  "@settingsShortcutImportFailure": {
+    "description": "Snackbar when keymap import fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutImportFailureNewerVersion": "This keymap was saved by a newer version of LintCrux and can’t be imported. Update LintCrux, then try again.",
+  "@settingsShortcutImportFailureNewerVersion": {
+    "description": "Snackbar when a keymap file declares a schema version this build does not support, meaning it was written by a newer LintCrux release. Distinct from the generic invalid-file message."
+  },
+  "appTitle": "LintCrux",
+  "@appTitle": {
+    "description": "Application title shown in the window title bar and About box."
+  },
+  "settingsShortcutsPresetLabel": "Preset",
+  "@settingsShortcutsPresetLabel": {
+    "description": "Label for the keymap preset chooser above the editable shortcut list"
+  },
+  "settingsShortcutsPresetDescription": "Load a complete set of key bindings. You can still customize individual shortcuts afterward.",
+  "@settingsShortcutsPresetDescription": {
+    "description": "Description under the keymap preset chooser"
+  },
+  "settingsShortcutsPresetLintCrux": "LintCrux (Default)",
+  "@settingsShortcutsPresetLintCrux": {
+    "description": "Name of the default LintCrux keymap preset in the preset chooser"
+  },
+  "settingsShortcutsPresetCustom": "Custom",
+  "@settingsShortcutsPresetCustom": {
+    "description": "Shown in the preset chooser when the user's bindings match no built-in preset"
+  },
+  "actionCategoryApp": "LintCrux",
+  "@actionCategoryApp": {
+    "description": "Browsable category for the host-application menu (Quit, Settings, Preferences). Renders as the macOS app menu and the branded leading menu on Linux/Windows."
+  },
+  "actionCategoryFile": "File",
+  "@actionCategoryFile": {
+    "description": "Browsable category grouping file operations (Open Project, Open Sources, Reset Workspace)."
+  },
+  "actionCategoryView": "View",
+  "@actionCategoryView": {
+    "description": "Browsable category grouping view operations (toggle theme, panel visibility)."
+  },
+  "actionCategoryNavigate": "Navigate",
+  "@actionCategoryNavigate": {
+    "description": "Browsable category grouping navigation actions (jump-to, next/previous violation)."
+  },
+  "actionCategorySearch": "Search",
+  "@actionCategorySearch": {
+    "description": "Browsable category grouping search and find operations."
+  },
+  "actionCategoryTools": "Tools",
+  "@actionCategoryTools": {
+    "description": "Browsable category grouping tools and analyses (run engines, cancel run, diagnostics)."
+  },
+  "actionCategoryHelp": "Help",
+  "@actionCategoryHelp": {
+    "description": "Browsable category grouping help-related actions (About, command palette, documentation)."
+  },
+  "actionOpenProject": "Open Project…",
+  "@actionOpenProject": {
+    "description": "Menu / command palette label for the action that opens a .lintcrux project file."
+  },
+  "actionOpenSources": "Open Source Files…",
+  "@actionOpenSources": {
+    "description": "Menu / command palette label for the action that opens raw Verilog/SystemVerilog/VHDL source files."
+  },
+  "actionQuit": "Quit LintCrux",
+  "@actionQuit": {
+    "description": "Menu / command palette label for the action that quits the app."
+  },
+  "actionRunAllEngines": "Run All Engines",
+  "@actionRunAllEngines": {
+    "description": "Menu / command palette label for the action that invokes every enabled lint engine against the active project."
+  },
+  "actionCancelRun": "Cancel Run",
+  "@actionCancelRun": {
+    "description": "Menu / command palette label for the action that cancels an in-progress lint run."
+  },
+  "actionToggleTheme": "Toggle Theme",
+  "@actionToggleTheme": {
+    "description": "Menu / command palette label for the action that flips between light and dark theme."
+  },
+  "actionOpenCommandPalette": "Command Palette…",
+  "@actionOpenCommandPalette": {
+    "description": "Menu / command palette label for the action that opens the VS Code-style command palette."
+  },
+  "commandPaletteSearchHint": "Search commands…",
+  "@commandPaletteSearchHint": {
+    "description": "Placeholder hint text in the command palette search field"
+  },
+  "commandPaletteNoResults": "No commands found",
+  "@commandPaletteNoResults": {
+    "description": "Message displayed in the command palette when the search query matches no actions"
+  },
+  "actionFocusSearch": "Find in Violations…",
+  "@actionFocusSearch": {
+    "description": "Menu / command palette label for the action that opens the Find-in-Violations search dialog (substring / glob / regex over rule id + message; picking a result selects the violation)."
+  },
+  "actionOpenSettings": "Settings…",
+  "@actionOpenSettings": {
+    "description": "Menu / command palette label for the action that opens the settings screen."
+  },
+  "actionResetWorkspace": "Reset Workspace…",
+  "@actionResetWorkspace": {
+    "description": "Menu / command palette label for the action that empties the current workspace."
+  },
+  "actionOpenAbout": "About LintCrux",
+  "@actionOpenAbout": {
+    "description": "Menu / command palette label for the action that shows the About box."
+  },
+  "actionOpenCrossProbePanel": "Cross-probe Peers",
+  "@actionOpenCrossProbePanel": {
+    "description": "Menu / command palette label for the action that opens the cross-probe panel showing connected CXP peers and recent cross-probe events."
+  },
+  "actionOpenWaiverReview": "Review Waivers…",
+  "@actionOpenWaiverReview": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the managed-waiver review screen for the active project."
+  },
+  "actionSetBaseline": "Set Baseline from Current Run…",
+  "@actionSetBaseline": {
+    "description": "Menu / command palette label for the Pro-tier action that snapshots the current run's violations as the project baseline."
+  },
+  "actionClearBaseline": "Clear Baseline",
+  "@actionClearBaseline": {
+    "description": "Menu / command palette label for the Pro-tier action that clears the project's active baseline."
+  },
+  "actionOpenBaselineComparison": "View Baseline Diff…",
+  "@actionOpenBaselineComparison": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the baseline-vs-current comparison screen."
+  },
+  "actionShowRuleTrendChart": "Show Rule Trend Chart…",
+  "@actionShowRuleTrendChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the per-rule trend chart."
+  },
+  "actionShowSeverityClassDriftChart": "Show Severity Drift Chart…",
+  "@actionShowSeverityClassDriftChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the severity-class drift chart."
+  },
+  "actionShowProjectTrendChart": "Show Project Trend Chart…",
+  "@actionShowProjectTrendChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the project trend chart."
+  },
+  "actionShowCalendarHeatmap": "Show Calendar Heatmap…",
+  "@actionShowCalendarHeatmap": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the calendar heatmap screen (GitHub-style contributions grid of per-day violation activity)."
+  },
+  "actionConfigureTrendRetention": "Configure Trend Retention…",
+  "@actionConfigureTrendRetention": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the trend retention configuration UI."
+  },
+  "actionOpenBookmarksManager": "Show Bookmarked Violations…",
+  "@actionOpenBookmarksManager": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the violation-bookmark management panel."
+  },
+  "actionToggleBookmarkForCurrentViolation": "Toggle Bookmark",
+  "@actionToggleBookmarkForCurrentViolation": {
+    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the Pro-tier action that toggles a bookmark on the selected violation."
+  },
+  "actionRunVeribleDryRun": "Run Verible Auto-Fix Dry-Run…",
+  "@actionRunVeribleDryRun": {
+    "description": "Menu / command palette label for the Pro-tier action that invokes Verible in dry-run mode and opens the FixReviewDialog with the proposed fixes."
+  },
+  "actionApplyVeribleFixes": "Review Verible Fixes…",
+  "@actionApplyVeribleFixes": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Verible fix review dialog on a fresh dry-run batch. Applying is confirmed by the user inside that dialog — the action itself never applies fixes unattended. The trailing ellipsis marks that further interaction follows."
+  },
+  "actionConfigureVeribleBinary": "Configure Verible Binary…",
+  "@actionConfigureVeribleBinary": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Settings → External Tools → Verible section."
+  },
+  "actionClearLintCache": "Clear Lint Cache…",
+  "@actionClearLintCache": {
+    "description": "Menu / command palette label for the Pro-tier action that wipes every cached lint result for the active project after a confirmation dialog."
+  },
+  "actionOpenLintCacheStats": "Show Lint Cache Stats…",
+  "@actionOpenLintCacheStats": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Settings → Lint Cache section scrolled to the live-stats panel."
+  },
+  "actionForceLintRunWithoutCache": "Run Lint (Bypass Cache)",
+  "@actionForceLintRunWithoutCache": {
+    "description": "Menu / command palette label for the Pro-tier action that runs lint once with the cache bypassed in both directions for that single invocation."
+  },
+  "crossProbePanelTitle": "Cross-probe Peers",
+  "@crossProbePanelTitle": {
+    "description": "Title of the cross-probe panel."
+  },
+  "crossProbePanelServerStopped": "Cross-probe server is disabled.",
+  "@crossProbePanelServerStopped": {
+    "description": "Status text shown in the cross-probe panel when the CXP server is disabled in Settings."
+  },
+  "crossProbePanelPeersHeader": "Discovered peers",
+  "@crossProbePanelPeersHeader": {
+    "description": "Header above the discovered-peers list in the cross-probe panel."
+  },
+  "crossProbePanelPeersEmpty": "No peers discovered yet.",
+  "@crossProbePanelPeersEmpty": {
+    "description": "Empty-state text shown when no CXP peers have been discovered."
+  },
+  "crossProbePanelEventsHeader": "Recent events",
+  "@crossProbePanelEventsHeader": {
+    "description": "Header above the rolling event log in the cross-probe panel."
+  },
+  "crossProbePanelEventsEmpty": "No cross-probe events yet.",
+  "@crossProbePanelEventsEmpty": {
+    "description": "Empty-state text shown when the cross-probe event log is empty."
+  },
+  "crossProbePanelClearEvents": "Clear events",
+  "@crossProbePanelClearEvents": {
+    "description": "Button that clears the cross-probe event log."
+  },
+  "crossProbePanelClose": "Close",
+  "@crossProbePanelClose": {
+    "description": "Button that closes the cross-probe panel dialog."
+  },
+  "crossProbeSendTooltip": "Send selection to this peer",
+  "@crossProbeSendTooltip": {
+    "description": "Tooltip on the per-peer direct-send button in the docked cross-probe panel."
+  },
+  "crossProbeUnreachableTitle": "Unreachable peers",
+  "@crossProbeUnreachableTitle": {
+    "description": "Section header for discovered-but-unreachable peers in the docked cross-probe panel."
+  },
+  "crossProbeSendFailed": "The cross-probe to {peer} did not go through",
+  "@crossProbeSendFailed": {
+    "description": "Toast in the docked cross-probe panel when a send failed and the peer gave no reason: it never reached the peer, the peer never answered, or the peer declined without saying why. {peer} is the peer's product name.",
+    "placeholders": {
+      "peer": {
+        "type": "String",
+        "example": "WaveCrux"
+      }
+    }
+  },
+  "crossProbeSendRefused": "Cross-probe to {peer}: {reason}",
+  "@crossProbeSendRefused": {
+    "description": "Toast in the docked cross-probe panel when a send came back with an explanation: a refusal, a partial result, or a delivery failure the carrier explained. {peer} is the peer's product name; {reason} is that explanation, as sent.",
+    "placeholders": {
+      "peer": {
+        "type": "String",
+        "example": "WaveCrux"
+      },
+      "reason": {
+        "type": "String",
+        "example": "no signal matches this rule"
+      }
+    }
+  },
+  "toolbarToggleCrossProbe": "Cross-Probe Panel",
+  "@toolbarToggleCrossProbe": {
+    "description": "Tooltip on the toolbar button that shows/hides the docked cross-probe panel."
+  },
+  "settingsCxpEnabledLabel": "Enable CXP server",
+  "@settingsCxpEnabledLabel": {
+    "description": "Label of the toggle controlling whether the CXP cross-probe server starts at boot."
+  },
+  "settingsCxpEnabledDescription": "Lets other Crux tools (WaveCrux, NetCrux, SimCrux) discover LintCrux and send cross-probe requests.",
+  "@settingsCxpEnabledDescription": {
+    "description": "Helper text explaining what the cross-probe server does."
+  },
+  "settingsCxpPortLabel": "CXP port",
+  "@settingsCxpPortLabel": {
+    "description": "Label of the port input for the CXP server."
+  },
+  "settingsCxpPortDescription": "Default 54324",
+  "@settingsCxpPortDescription": {
+    "description": "Hint text for the CXP port input showing the suite default."
+  },
+  "settingsRequestAttentionOnCrossProbeLabel": "Request attention on cross-probe",
+  "@settingsRequestAttentionOnCrossProbeLabel": {
+    "description": "Title for the toggle that requests OS attention on an inbound cross-probe."
+  },
+  "settingsRequestAttentionOnCrossProbeDescription": "Bounce the dock (or flash the taskbar) when a peer sends a cross-probe. Never steals focus.",
+  "@settingsRequestAttentionOnCrossProbeDescription": {
+    "description": "Description for the request-attention toggle."
+  },
+  "settingsBroadcastSelectionOnCrossProbeLabel": "Broadcast selection automatically",
+  "@settingsBroadcastSelectionOnCrossProbeLabel": {
+    "description": "Title for the toggle that controls the live selection auto-broadcast (notify_selection) on cross-probe."
+  },
+  "settingsBroadcastSelectionOnCrossProbeDescription": "Announce your selection to connected peers as you select it (live cross-probe). When off, only explicit sends are shared.",
+  "@settingsBroadcastSelectionOnCrossProbeDescription": {
+    "description": "Description for the auto-broadcast-selection toggle."
+  },
+  "settingsCxpStatus": "CXP Status",
+  "@settingsCxpStatus": {
+    "description": "Label for the CXP server status line in Settings, above the running-state and connected-peer readout."
+  },
+  "settingsCxpStatusRunning": "Running on port {port}",
+  "@settingsCxpStatusRunning": {
+    "description": "CXP status line shown when the server is running, naming the bound TCP port.",
+    "placeholders": {
+      "port": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsCxpStatusStopped": "Stopped",
+  "@settingsCxpStatusStopped": {
+    "description": "CXP status line shown when the server is not running."
+  },
+  "settingsCxpPeersConnected": "{count, plural, =0{No peers connected} =1{1 peer connected} other{{count} peers connected}}",
+  "@settingsCxpPeersConnected": {
+    "description": "CXP status line showing how many peers are currently connected.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "violationColumnSeverity": "Severity",
+  "@violationColumnSeverity": {
+    "description": "Header label for the severity column in the violation table."
+  },
+  "violationColumnEngine": "Engine",
+  "@violationColumnEngine": {
+    "description": "Header label for the engine column in the violation table."
+  },
+  "violationColumnRule": "Rule",
+  "@violationColumnRule": {
+    "description": "Header label for the rule-id column in the violation table."
+  },
+  "violationColumnFile": "File",
+  "@violationColumnFile": {
+    "description": "Header label for the file column in the violation table."
+  },
+  "violationColumnLine": "Line",
+  "@violationColumnLine": {
+    "description": "Header label for the line-number column in the violation table."
+  },
+  "violationColumnMessage": "Message",
+  "@violationColumnMessage": {
+    "description": "Header label for the violation-message column in the violation table."
+  },
+  "violationFilterRuleHint": "Filter by rule or message…",
+  "@violationFilterRuleHint": {
+    "description": "Placeholder text in the rule / message substring filter input above the violation table."
+  },
+  "violationFilterFileHint": "Filter by file glob (e.g. **/top.sv)…",
+  "@violationFilterFileHint": {
+    "description": "Placeholder text in the file-path glob filter input above the violation table."
+  },
+  "violationStatusEmpty": "No violations.",
+  "@violationStatusEmpty": {
+    "description": "Body text shown in the violation table when no engines have produced any violations and no run is in progress."
+  },
+  "violationStatusFiltered": "No violations match the active filters.",
+  "@violationStatusFiltered": {
+    "description": "Body text shown in the violation table when violations exist but the active filters exclude all of them."
+  },
+  "violationStatusSummary": "{total} total · {errors} errors · {warnings} warnings · {notes} notes · {waived} waived",
+  "@violationStatusSummary": {
+    "description": "Status-bar summary text below the violation table. Renders live counts of total, error, warning, note, and waived violations.",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      },
+      "warnings": {
+        "type": "int"
+      },
+      "notes": {
+        "type": "int"
+      },
+      "waived": {
+        "type": "int"
+      }
+    }
+  },
+  "severityFatal": "Fatal",
+  "@severityFatal": {
+    "description": "Display label for the Fatal severity in filter chips and the severity column tooltip."
+  },
+  "severityError": "Error",
+  "@severityError": {
+    "description": "Display label for the Error severity in filter chips and the severity column tooltip."
+  },
+  "severityWarning": "Warning",
+  "@severityWarning": {
+    "description": "Display label for the Warning severity in filter chips and the severity column tooltip."
+  },
+  "severityNote": "Note",
+  "@severityNote": {
+    "description": "Display label for the Note severity in filter chips and the severity column tooltip."
+  },
+  "severityNone": "Unclassified",
+  "@severityNone": {
+    "description": "Display label for the None severity (unclassified output) in filter chips and the severity column tooltip."
+  },
+  "inspectorEmpty": "Select a violation to inspect.",
+  "@inspectorEmpty": {
+    "description": "Empty-state body shown in the inspector pane when no violation is selected (and either no lint run has occurred or every engine completed cleanly)."
+  },
+  "inspectorEngineStatusHeader": "Engine status",
+  "@inspectorEngineStatusHeader": {
+    "description": "Section header rendered in the inspector's empty state above the per-engine status list shown after a lint run completes."
+  },
+  "inspectorEnginePhaseIdle": "Pending",
+  "@inspectorEnginePhaseIdle": {
+    "description": "Per-engine status label shown when the engine has not yet started this run."
+  },
+  "inspectorEnginePhaseRunning": "Running",
+  "@inspectorEnginePhaseRunning": {
+    "description": "Per-engine status label shown while the engine subprocess is in flight."
+  },
+  "inspectorEnginePhaseCompleted": "Completed",
+  "@inspectorEnginePhaseCompleted": {
+    "description": "Per-engine status label shown after a successful run (no violations or violations folded into the table)."
+  },
+  "inspectorEnginePhaseFailed": "Failed",
+  "@inspectorEnginePhaseFailed": {
+    "description": "Per-engine status label shown when the engine subprocess returned a non-zero exit code or threw mid-run. Error reason is rendered next to it."
+  },
+  "inspectorEnginePhaseUnavailable": "Binary not available",
+  "@inspectorEnginePhaseUnavailable": {
+    "description": "Per-engine status label shown when the engine binary could not be located on PATH or at a configured custom path."
+  },
+  "inspectorEnginePhaseCancelled": "Cancelled",
+  "@inspectorEnginePhaseCancelled": {
+    "description": "Per-engine status label shown after the user cancelled the active run (Esc)."
+  },
+  "inspectorEngineConfigureHint": "Install the missing binary, or set a custom path in Settings > Engines.",
+  "@inspectorEngineConfigureHint": {
+    "description": "Remediation hint rendered below the engine status list when at least one engine is unavailable or failed."
+  },
+  "inspectorRuleHeader": "Rule",
+  "@inspectorRuleHeader": {
+    "description": "Section header in the inspector pane above the engine-namespaced rule id and severity badge."
+  },
+  "inspectorMessageHeader": "Message",
+  "@inspectorMessageHeader": {
+    "description": "Section header in the inspector pane above the full engine-supplied message."
+  },
+  "inspectorLocationHeader": "Location",
+  "@inspectorLocationHeader": {
+    "description": "Section header in the inspector pane above the file:line:col."
+  },
+  "inspectorMetadataHeader": "Rule details",
+  "@inspectorMetadataHeader": {
+    "description": "Section header in the inspector pane above the rule-database metadata block (tags + help url)."
+  },
+  "inspectorTagsLabel": "Tags",
+  "@inspectorTagsLabel": {
+    "description": "Label rendered to the left of the rule's tag chips in the inspector pane."
+  },
+  "inspectorRelatedLocationsHeader": "Related locations",
+  "@inspectorRelatedLocationsHeader": {
+    "description": "Section header in the inspector pane above the list of additional locations associated with the violation."
+  },
+  "inspectorOpenInEditor": "Open in editor",
+  "@inspectorOpenInEditor": {
+    "description": "Button label that launches the user's editor at the violation's primary location."
+  },
+  "inspectorHelpUrlLabel": "Learn more",
+  "@inspectorHelpUrlLabel": {
+    "description": "Button label that opens the rule's help URL in the user's browser."
+  },
+  "sourcePreviewEmpty": "Select a violation to preview source.",
+  "@sourcePreviewEmpty": {
+    "description": "Empty-state body shown in the source preview pane when no violation is selected."
+  },
+  "sourcePreviewFileMissing": "Could not read source: {file}",
+  "@sourcePreviewFileMissing": {
+    "description": "Error body shown in the source preview pane when the selected violation's file cannot be read.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "editorLaunchFailed": "Could not launch editor ({command}). Set the full editor path in Settings > Editors.",
+  "@editorLaunchFailed": {
+    "description": "Snackbar text shown when click-to-source fails because the configured editor binary is not on PATH or could not be started.",
+    "placeholders": {
+      "command": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsEditorPresetVsCode": "Visual Studio Code",
+  "@settingsEditorPresetVsCode": {
+    "description": "Settings → Editors radio label for the VS Code preset."
+  },
+  "settingsEditorPresetSublime": "Sublime Text",
+  "@settingsEditorPresetSublime": {
+    "description": "Settings → Editors radio label for the Sublime Text preset."
+  },
+  "settingsEditorPresetVim": "Vim / Neovim",
+  "@settingsEditorPresetVim": {
+    "description": "Settings → Editors radio label for the Vim / Neovim preset."
+  },
+  "settingsEditorPresetEmacs": "Emacs",
+  "@settingsEditorPresetEmacs": {
+    "description": "Settings → Editors radio label for the Emacs preset."
+  },
+  "settingsEditorPresetCustom": "Custom",
+  "@settingsEditorPresetCustom": {
+    "description": "Settings → Editors radio label for the custom executable + arg template."
+  },
+  "settingsEditorExecutableLabel": "Executable",
+  "@settingsEditorExecutableLabel": {
+    "description": "Label of the executable text input under Settings → Editors."
+  },
+  "settingsEditorArgsTemplateLabel": "Arguments template",
+  "@settingsEditorArgsTemplateLabel": {
+    "description": "Label of the args template text input under Settings → Editors. Tooltip explains that {file}, {line}, and {column} are substituted."
+  },
+  "settingsEditorTemplateHelp": "Use {file}, {line}, {column} for placeholders.",
+  "@settingsEditorTemplateHelp": {
+    "description": "Helper text shown beneath the args template input under Settings → Editors. The three placeholders are template tokens shown to the user, not runtime substitutions — pass them through verbatim from the caller as '{file}', '{line}', and '{column}'.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      },
+      "line": {
+        "type": "String"
+      },
+      "column": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsGeneralSection": "General",
+  "@settingsGeneralSection": {
+    "description": "Section header for the General group in Settings."
+  },
+  "settingsAppearanceSection": "Appearance",
+  "@settingsAppearanceSection": {
+    "description": "Section header for the Appearance group in Settings."
+  },
+  "settingsEnginesSection": "Engines",
+  "@settingsEnginesSection": {
+    "description": "Section header for the Engines group in Settings."
+  },
+  "settingsEditorsSection": "Editors",
+  "@settingsEditorsSection": {
+    "description": "Section header for the Editors group in Settings."
+  },
+  "settingsAutoReloadLabel": "Auto-reload on source change",
+  "@settingsAutoReloadLabel": {
+    "description": "Settings → General label for the AutoReloadMode toggle."
+  },
+  "settingsAutoReloadAuto": "Re-run automatically",
+  "@settingsAutoReloadAuto": {
+    "description": "Settings → General option for AutoReloadMode.auto."
+  },
+  "settingsAutoReloadPrompt": "Prompt me first",
+  "@settingsAutoReloadPrompt": {
+    "description": "Settings → General option for AutoReloadMode.prompt."
+  },
+  "settingsAutoReloadOff": "Do nothing",
+  "@settingsAutoReloadOff": {
+    "description": "Settings → General option for AutoReloadMode.off."
+  },
+  "autoReloadPromptMessage": "Source files changed. Re-run the engines to pick up the changes?",
+  "@autoReloadPromptMessage": {
+    "description": "Snackbar shown in a project tab when a watched source file changed and Settings > General > Auto-reload on source change is set to Prompt me first."
+  },
+  "autoReloadActionRerun": "Re-run now",
+  "@autoReloadActionRerun": {
+    "description": "Action on the source-changed snackbar that re-runs the tab's engines."
+  },
+  "engineConfigSeverityOverridesHeader": "Per-rule severity overrides",
+  "@engineConfigSeverityOverridesHeader": {
+    "description": "Section header in the engine config screen above the rule-list with severity dropdowns."
+  },
+  "engineConfigOverrideBadge": "overridden",
+  "@engineConfigOverrideBadge": {
+    "description": "Short badge shown next to a rule whose severity has been overridden by the user."
+  },
+  "searchDialogTitle": "Search violations",
+  "@searchDialogTitle": {
+    "description": "Title bar of the search-violations modal overlay."
+  },
+  "searchDialogHint": "Search rule or message",
+  "@searchDialogHint": {
+    "description": "Placeholder text in the search-violations input."
+  },
+  "searchModeSubstring": "Substring",
+  "@searchModeSubstring": {
+    "description": "Search-mode toggle label for substring matching."
+  },
+  "searchModeGlob": "Glob",
+  "@searchModeGlob": {
+    "description": "Search-mode toggle label for glob matching."
+  },
+  "searchModeRegex": "Regex",
+  "@searchModeRegex": {
+    "description": "Search-mode toggle label for regex matching."
+  },
+  "searchNoResults": "No matches.",
+  "@searchNoResults": {
+    "description": "Empty-state body shown in the search dialog when no violations match the active pattern."
+  },
+  "exportSuccess": "Exported {n} violations to {path}",
+  "@exportSuccess": {
+    "description": "Snackbar text shown after a successful export.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosticsTabDrawerTitle": "Tab Diagnostics",
+  "@diagnosticsTabDrawerTitle": {
+    "description": "Title of the per-tab diagnostics drawer."
+  },
+  "diagnosticsAppDialogTitle": "App Diagnostics",
+  "@diagnosticsAppDialogTitle": {
+    "description": "Title of the process-wide diagnostics dialog."
+  },
+  "diagnosticsSectionEngines": "Engines",
+  "@diagnosticsSectionEngines": {
+    "description": "Section header in the Tab Diagnostics drawer above the per-engine status block."
+  },
+  "diagnosticsSectionProjectInfo": "Project info",
+  "@diagnosticsSectionProjectInfo": {
+    "description": "Section header in the Tab Diagnostics drawer above the project-info block."
+  },
+  "diagnosticsSectionViolationStats": "Violation stats",
+  "@diagnosticsSectionViolationStats": {
+    "description": "Section header in the Tab Diagnostics drawer above the per-severity / per-engine / per-rule violation counts."
+  },
+  "diagnosticsCopyTabReport": "Copy Tab Diagnostics Report",
+  "@diagnosticsCopyTabReport": {
+    "description": "Action label that copies the active tab's diagnostics report to the clipboard."
+  },
+  "diagnosticsCopyFullReport": "Copy Full Diagnostics Report",
+  "@diagnosticsCopyFullReport": {
+    "description": "Action label that copies the full app diagnostics report to the clipboard."
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "AppBar title for the multi-section Settings screen."
+  },
+  "settingsClose": "Close",
+  "@settingsClose": {
+    "description": "Tooltip for the back/close button in the Settings screen AppBar."
+  },
+  "settingsGeneralDefaultSortLabel": "Default sort column",
+  "@settingsGeneralDefaultSortLabel": {
+    "description": "Settings → General label for the default-sort-column dropdown that controls the initial sort of the violation table."
+  },
+  "settingsGeneralDefaultSortSeverity": "Severity",
+  "@settingsGeneralDefaultSortSeverity": {
+    "description": "Settings → General option for the 'Severity' default sort column."
+  },
+  "settingsGeneralDefaultSortEngine": "Engine",
+  "@settingsGeneralDefaultSortEngine": {
+    "description": "Settings → General option for the 'Engine' default sort column."
+  },
+  "settingsGeneralDefaultSortRule": "Rule",
+  "@settingsGeneralDefaultSortRule": {
+    "description": "Settings → General option for the 'Rule' default sort column."
+  },
+  "settingsGeneralDefaultSortFile": "File",
+  "@settingsGeneralDefaultSortFile": {
+    "description": "Settings → General option for the 'File' default sort column."
+  },
+  "settingsGeneralDefaultFilterLabel": "Default filter set on launch",
+  "@settingsGeneralDefaultFilterLabel": {
+    "description": "Settings → General label for the saved-filter-preset dropdown that controls which filter set is active on app launch."
+  },
+  "settingsGeneralDefaultFilterNone": "None — show all violations",
+  "@settingsGeneralDefaultFilterNone": {
+    "description": "Settings → General dropdown option indicating no default filter preset is selected."
+  },
+  "settingsEditorsHeader": "Click-to-source editor",
+  "@settingsEditorsHeader": {
+    "description": "Settings → Editors section heading above the preset radios."
+  },
+  "settingsEditorsLivePreviewLabel": "Live preview",
+  "@settingsEditorsLivePreviewLabel": {
+    "description": "Settings → Editors label above the line that previews the fully expanded shell command for a sample file."
+  },
+  "settingsEditorsLivePreviewSample": "Sample: src/example.sv:42:13",
+  "@settingsEditorsLivePreviewSample": {
+    "description": "Settings → Editors caption indicating which sample file + line + column the preview row substitutes."
+  },
+  "settingsEditorsResetButton": "Reset to default (VS Code)",
+  "@settingsEditorsResetButton": {
+    "description": "Settings → Editors button that restores the click-to-source editor command to the VS Code preset."
+  },
+  "filterPresetSaveAction": "Save current filters as preset…",
+  "@filterPresetSaveAction": {
+    "description": "Filter-preset dropdown action that opens a name-input dialog to save the current filters as a new named preset."
+  },
+  "filterPresetManageAction": "Manage presets…",
+  "@filterPresetManageAction": {
+    "description": "Filter-preset dropdown action that opens the manage-presets dialog (delete, rename)."
+  },
+  "filterPresetDropdownLabel": "Filter preset",
+  "@filterPresetDropdownLabel": {
+    "description": "Label above the filter-preset dropdown that appears above the violation table."
+  },
+  "filterPresetNoneLabel": "None",
+  "@filterPresetNoneLabel": {
+    "description": "Filter-preset dropdown entry representing 'no preset active' (i.e. filters are whatever the user has manually applied)."
+  },
+  "filterPresetSaveDialogTitle": "Save filter preset",
+  "@filterPresetSaveDialogTitle": {
+    "description": "Title of the dialog that prompts for a preset name when saving current filters as a new preset."
+  },
+  "filterPresetNameLabel": "Preset name",
+  "@filterPresetNameLabel": {
+    "description": "Input field label in the save-filter-preset dialog."
+  },
+  "filterPresetManageDialogTitle": "Manage filter presets",
+  "@filterPresetManageDialogTitle": {
+    "description": "Title of the dialog that lists existing filter presets with delete affordances."
+  },
+  "filterPresetEmptyState": "No saved presets yet. Configure filters and choose 'Save current filters as preset…' to add one.",
+  "@filterPresetEmptyState": {
+    "description": "Empty-state body text in the manage-filter-presets dialog when the user has not yet saved any presets."
+  },
+  "filterPresetDeleteTooltip": "Delete preset",
+  "@filterPresetDeleteTooltip": {
+    "description": "Tooltip on the trash icon next to each preset in the manage-filter-presets dialog."
+  },
+  "filterPresetSaveButton": "Save",
+  "@filterPresetSaveButton": {
+    "description": "Confirm button label in the save-filter-preset dialog."
+  },
+  "filterPresetCancelButton": "Cancel",
+  "@filterPresetCancelButton": {
+    "description": "Cancel button label in the save-filter-preset / manage-presets dialogs."
+  },
+  "filterPresetDoneButton": "Done",
+  "@filterPresetDoneButton": {
+    "description": "Close button label in the manage-filter-presets dialog."
+  },
+  "actionSaveSession": "Save Session…",
+  "@actionSaveSession": {
+    "description": "Menu / command palette label for the action that saves a .lintcrux-session file."
+  },
+  "actionOpenSession": "Open Session…",
+  "@actionOpenSession": {
+    "description": "Menu / command palette label for the action that opens a .lintcrux-session file."
+  },
+  "actionImportSarif": "Import SARIF report…",
+  "@actionImportSarif": {
+    "description": "Menu / command palette / toolbar / welcome label for the desktop action that imports a CI-generated SARIF report into a read-only viewer without re-running engines."
+  },
+  "actionExportSarif": "Export Violations as SARIF…",
+  "@actionExportSarif": {
+    "description": "Menu / command palette label for the action that exports the current violation set as SARIF 2.1.0."
+  },
+  "actionExportJson": "Export Violations as JSON…",
+  "@actionExportJson": {
+    "description": "Menu / command palette label for the action that exports the current violation set as JSON."
+  },
+  "actionExportCsv": "Export Violations as CSV…",
+  "@actionExportCsv": {
+    "description": "Menu / command palette label for the action that exports the current violation set as CSV (RFC 4180 quoting)."
+  },
+  "actionExportHtml": "Export Violations as HTML…",
+  "@actionExportHtml": {
+    "description": "Menu / command palette label for the action that exports the current violation set as a single-page HTML dashboard."
+  },
+  "actionOpenTabDiagnostics": "Tab Diagnostics…",
+  "@actionOpenTabDiagnostics": {
+    "description": "Menu / command palette label for the action that opens the per-tab diagnostics drawer."
+  },
+  "actionOpenAppDiagnostics": "App Diagnostics…",
+  "@actionOpenAppDiagnostics": {
+    "description": "Menu / command palette label for the action that opens the process-wide diagnostics dialog."
+  },
+  "actionSaveFilterPreset": "Save Filter Preset…",
+  "@actionSaveFilterPreset": {
+    "description": "Menu / command palette label for the action that opens the save-filter-preset dialog."
+  },
+  "actionManageFilterPresets": "Manage Filter Presets…",
+  "@actionManageFilterPresets": {
+    "description": "Menu / command palette label for the action that opens the manage-filter-presets dialog."
+  },
+  "actionImportVivadoFilelist": "Import Vivado Filelist…",
+  "@actionImportVivadoFilelist": {
+    "description": "Menu / command palette label for the action that imports a Vivado-style `.f` filelist into a new .lintcrux project."
+  },
+  "actionImportEdam": "Import FuseSoC EDAM…",
+  "@actionImportEdam": {
+    "description": "Menu / command palette label for the action that imports a FuseSoC/Edalize EDAM (.eda.yml) file into a new .lintcrux project."
+  },
+  "filelistImportError": "Could not import filelist: {message}",
+  "@filelistImportError": {
+    "description": "Snackbar shown after a failed filelist import. Includes the underlying FilelistImportException message.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "edamImportError": "Could not import EDAM file: {message}",
+  "@edamImportError": {
+    "description": "Snackbar shown after a failed EDAM import. Includes the underlying EdamImportException message.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigBinaryOverridesHeader": "Engine binary paths",
+  "@engineConfigBinaryOverridesHeader": {
+    "description": "Section header for the per-engine binary-path override list in Settings → Engines."
+  },
+  "engineConfigBinaryOverridesHelp": "Choose where each engine binary comes from. Auto-detect searches PATH. Bundled is reserved for a per-platform binary shipped with LintCrux — none ship yet, so it also falls back to PATH unless LINTCRUX_BUNDLED_BIN_DIR points at a binary directory. Custom takes an explicit absolute path.",
+  "@engineConfigBinaryOverridesHelp": {
+    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the three modes, including that Bundled resolves nothing today because no engine binaries ship with the app."
+  },
+  "engineConfigBinarySourceAuto": "Auto-detect",
+  "@engineConfigBinarySourceAuto": {
+    "description": "Label for the auto-detect segment of the binary-source SegmentedButton (Settings → Engines)."
+  },
+  "engineConfigBinarySourceBundled": "Bundled",
+  "@engineConfigBinarySourceBundled": {
+    "description": "Label for the bundled-binary segment of the binary-source SegmentedButton."
+  },
+  "engineConfigBinarySourceCustom": "Custom",
+  "@engineConfigBinarySourceCustom": {
+    "description": "Label for the custom-path segment of the binary-source SegmentedButton."
+  },
+  "engineConfigBinaryPathLabel": "Binary path",
+  "@engineConfigBinaryPathLabel": {
+    "description": "Label for the custom binary-path text field shown when 'Custom' is selected."
+  },
+  "engineConfigBinaryProbeButton": "Probe",
+  "@engineConfigBinaryProbeButton": {
+    "description": "Label for the button that runs `<binary> --version` against the entered custom path and surfaces the detected version."
+  },
+  "engineConfigBinaryProbing": "Probing…",
+  "@engineConfigBinaryProbing": {
+    "description": "Status text shown while the version probe is in flight."
+  },
+  "engineConfigBinaryProbeSuccess": "Detected: {version}",
+  "@engineConfigBinaryProbeSuccess": {
+    "description": "Status text shown after a successful version probe. Includes the detected version string verbatim.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigBinaryProbeFailure": "Could not detect a version — the binary may be missing or incompatible.",
+  "@engineConfigBinaryProbeFailure": {
+    "description": "Status text shown when the version probe returned null / exited non-zero."
+  },
+  "yosysDiagnosticsSectionTitle": "Yosys Diagnostics",
+  "@yosysDiagnosticsSectionTitle": {
+    "description": "Section header in the Tab Diagnostics drawer above the raw YosysDiagnostic list captured during the most recent run."
+  },
+  "yosysDiagnosticsEmpty": "No Yosys diagnostics from the most recent run.",
+  "@yosysDiagnosticsEmpty": {
+    "description": "Placeholder text shown when the Yosys engine produced no diagnostics (or the engine was disabled / unavailable)."
+  },
+  "yosysDiagnosticsSeverityError": "Errors",
+  "@yosysDiagnosticsSeverityError": {
+    "description": "Filter-chip label for the 'error' severity in the Yosys Diagnostics section. Plural label because the chip filters every row of that severity."
+  },
+  "yosysDiagnosticsSeverityWarning": "Warnings",
+  "@yosysDiagnosticsSeverityWarning": {
+    "description": "Filter-chip label for the 'warning' severity in the Yosys Diagnostics section."
+  },
+  "yosysDiagnosticsSeverityInfo": "Info",
+  "@yosysDiagnosticsSeverityInfo": {
+    "description": "Filter-chip label for the 'info' severity in the Yosys Diagnostics section."
+  },
+  "webModeAppBarTitle": "LintCrux Viewer",
+  "@webModeAppBarTitle": {
+    "description": "App bar title on the web read-only landing screen — communicates that this is the read-only browser viewer, not the full desktop LintCrux."
+  },
+  "webModeHeadline": "Read-Only SARIF Viewer",
+  "@webModeHeadline": {
+    "description": "Hero headline on the web read-only landing screen — sets the expectation that this is a viewer, not a runner."
+  },
+  "webModeBody": "Upload a SARIF report or paste a URL to a hosted report. The browser viewer renders the violation table, filter chips, inspector, and source preview just like the desktop dashboard — but cannot run lint engines or modify project settings.",
+  "@webModeBody": {
+    "description": "Body text on the web read-only landing screen explaining the two ingestion paths and the read-only limitation."
+  },
+  "webModeOpenFileButton": "Open SARIF File…",
+  "@webModeOpenFileButton": {
+    "description": "Button label for the file-picker upload path on the web landing screen."
+  },
+  "webModeUrlPrompt": "Or open a hosted SARIF report by URL:",
+  "@webModeUrlPrompt": {
+    "description": "Label above the URL input field on the web landing screen."
+  },
+  "webModeUrlFieldLabel": "SARIF URL",
+  "@webModeUrlFieldLabel": {
+    "description": "Floating label of the URL input field on the web landing screen."
+  },
+  "webModeUrlOpenButton": "Open",
+  "@webModeUrlOpenButton": {
+    "description": "Button label next to the URL input field — fetches and opens the SARIF document at the given URL."
+  },
+  "webModeInvalidUrl": "Enter a valid http or https URL.",
+  "@webModeInvalidUrl": {
+    "description": "Error message shown when the URL field contains a value that is not a parseable http/https URI."
+  },
+  "webModeFooterNote": "Engine orchestration, file watching, project settings, and waivers are desktop-only features. To run lint engines locally, install the desktop app from lintcrux.app/download.",
+  "@webModeFooterNote": {
+    "description": "Footer note on the web read-only landing screen — clarifies that the browser viewer is observation-only and points users to the desktop app for engine orchestration."
+  },
+  "webViewerAppBarTitle": "Viewing SARIF",
+  "@webViewerAppBarTitle": {
+    "description": "App bar title on the web read-only viewer screen — descriptive prefix; the loaded source name renders to its right."
+  },
+  "webViewerNoSource": "(no source loaded)",
+  "@webViewerNoSource": {
+    "description": "Placeholder rendered in the viewer subtitle when no SARIF source is loaded yet (the user navigated directly to /web/viewer without going through the landing screen)."
+  },
+  "webViewerOpenAnotherButton": "Open another",
+  "@webViewerOpenAnotherButton": {
+    "description": "App bar action label on the web viewer screen — returns the user to the landing screen to upload a different SARIF report."
+  },
+  "importSarifFailed": "Couldn't import SARIF report: {error}",
+  "@importSarifFailed": {
+    "description": "Snackbar shown on the desktop when importing a SARIF report fails (malformed / truncated / unreadable file). The previously-loaded report, if any, is left intact.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importSarifViewerTitle": "Imported SARIF report",
+  "@importSarifViewerTitle": {
+    "description": "App bar title on the desktop read-only imported-SARIF viewer screen — descriptive prefix; the imported file name renders to its right."
+  },
+  "importSarifViewerNoSource": "(no report imported)",
+  "@importSarifViewerNoSource": {
+    "description": "Placeholder rendered in the imported-SARIF viewer subtitle when no report has been imported yet."
+  },
+  "importSarifViewerBackButton": "Back to workspace",
+  "@importSarifViewerBackButton": {
+    "description": "App bar action on the desktop imported-SARIF viewer that returns the user to the project workspace."
+  },
+  "importSarifViewerImportAnotherButton": "Import another…",
+  "@importSarifViewerImportAnotherButton": {
+    "description": "App bar action on the desktop imported-SARIF viewer that opens the file picker to import a different SARIF report."
+  },
+  "viewerTabBarCloseTabTooltip": "Close tab",
+  "@viewerTabBarCloseTabTooltip": {
+    "description": "Tooltip rendered over the per-chip close (×) button."
+  },
+  "tabChipCloseTooltip": "Close {name}",
+  "@tabChipCloseTooltip": {
+    "description": "Tooltip and screen-reader name of the close (×) button of a tab chip; name is the tab display name, so each tab's close button says which tab it closes",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "viewerTabBarScrollTabsLeftTooltip": "Scroll tabs left",
+  "@viewerTabBarScrollTabsLeftTooltip": {
+    "description": "Tooltip on the chevron that scrolls the tab strip toward its start."
+  },
+  "viewerTabBarScrollTabsRightTooltip": "Scroll tabs right",
+  "@viewerTabBarScrollTabsRightTooltip": {
+    "description": "Tooltip on the chevron that scrolls the tab strip toward its end."
+  },
+  "diagnosticsCloseTooltip": "Close",
+  "@diagnosticsCloseTooltip": {
+    "description": "Tooltip on the close (×) button in the App Diagnostics dialog."
+  },
+  "viewerTabBarNewTabTooltip": "New tab",
+  "@viewerTabBarNewTabTooltip": {
+    "description": "Tooltip rendered over the trailing \"+\" new-tab button."
+  },
+  "viewerTabBarNewTabDefaultDisplayName": "New Tab",
+  "@viewerTabBarNewTabDefaultDisplayName": {
+    "description": "Default display name used when the user creates an empty new tab via the trailing \"+\" button."
+  },
+  "viewerTabBarUnnamedTabFallback": "(unnamed tab)",
+  "@viewerTabBarUnnamedTabFallback": {
+    "description": "Fallback rendered in place of a tab's display name when the host hands in a blank string."
+  },
+  "viewerTabBarCloseTabMenuItem": "Close Tab",
+  "@viewerTabBarCloseTabMenuItem": {
+    "description": "Tab chip context-menu item that closes the tab."
+  },
+  "viewerTabBarCloseOtherTabsMenuItem": "Close Other Tabs",
+  "@viewerTabBarCloseOtherTabsMenuItem": {
+    "description": "Tab chip context-menu item that closes every tab except the right-clicked one."
+  },
+  "viewerTabBarCloseTabsToTheRightMenuItem": "Close Tabs to the Right",
+  "@viewerTabBarCloseTabsToTheRightMenuItem": {
+    "description": "Tab chip context-menu item that closes every tab to the right of the right-clicked one."
+  },
+  "viewerTabBarMoveToNewWindowMenuItem": "Move to New Window",
+  "@viewerTabBarMoveToNewWindowMenuItem": {
+    "description": "Tab chip context-menu item that detaches the tab into its own window. Disabled until Flutter multi-window stabilizes."
+  },
+  "viewerTabBarMultiWindowUnavailableTooltip": "Available when Flutter multi-window reaches stable",
+  "@viewerTabBarMultiWindowUnavailableTooltip": {
+    "description": "Tooltip shown next to the disabled \"Move to New Window\" menu item."
+  },
+  "viewerTabBarActivePaneAccessibilityLabel": "Active pane",
+  "@viewerTabBarActivePaneAccessibilityLabel": {
+    "description": "Accessibility label rendered on the surrounding container of the active pane so screen readers announce focus changes."
+  },
+  "viewerTabBarDragToPaneAccessibilityHint": "Drop here to move the tab into this pane",
+  "@viewerTabBarDragToPaneAccessibilityHint": {
+    "description": "Accessibility hint announced while a tab is being dragged toward another pane's tab bar."
+  },
+  "viewerTabBarReorderHandleTooltip": "Drag to reorder",
+  "@viewerTabBarReorderHandleTooltip": {
+    "description": "Tooltip describing the leading drag handle on each chip."
+  },
+  "emptyCanvasTitle": "Welcome to LintCrux",
+  "@emptyCanvasTitle": {
+    "description": "Headline rendered in the empty-canvas state when no tabs are open."
+  },
+  "emptyCanvasSubtitle": "Open a project to start linting, restore a saved session, or load a named workspace.",
+  "@emptyCanvasSubtitle": {
+    "description": "One-line subtitle below the empty-canvas headline."
+  },
+  "emptyCanvasVersion": "Version {version}",
+  "@emptyCanvasVersion": {
+    "description": "Muted version line under the empty-canvas (welcome) subtitle. The only always-visible version indicator on web, where there is no native menu bar to host an About entry point.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyCanvasSuiteFooter": "A member of the EDACrux suite of products — edacrux.app",
+  "@emptyCanvasSuiteFooter": {
+    "description": "Suite-membership line at the foot of the empty-canvas (welcome) screen. The whole line is a link to the EDACrux suite site. \"edacrux.app\" must appear verbatim — the widget splits the sentence around it to underline the domain — but a translation that drops it still renders and is still followable, just without an underlined segment. \"EDACrux\" is one word and is never translated."
+  },
+  "emptyCanvasPeersHeading": "MORE FROM EDACRUX",
+  "@emptyCanvasPeersHeading": {
+    "description": "Section header above the three sibling-product rows at the foot of the empty-canvas (welcome) screen. Rendered upper-case in English as a small letter-spaced label, matching the \"RECENT FILES\" headers above it; a locale whose script has no case simply reads as a label. \"EDACrux\" is one word and is never translated."
+  },
+  "emptyCanvasPeerWaveCrux": "See a violation actually happen. Open the waveform from the run that tripped the rule.",
+  "@emptyCanvasPeerWaveCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing WaveCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what WaveCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasPeerNetCrux": "Look at the logic a finding points at. Cross-probe a violation into the schematic.",
+  "@emptyCanvasPeerNetCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing NetCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what NetCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasPeerSimCrux": "Run it, not just read it. Launch the regression over the sources you just linted.",
+  "@emptyCanvasPeerSimCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing SimCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what SimCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasOpenProjectButton": "Open Project…",
+  "@emptyCanvasOpenProjectButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux` project file."
+  },
+  "emptyCanvasOpenSessionButton": "Open Session…",
+  "@emptyCanvasOpenSessionButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux-session` file."
+  },
+  "emptyCanvasOpenWorkspaceButton": "Open Workspace…",
+  "@emptyCanvasOpenWorkspaceButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux-workspace` file."
+  },
+  "emptyCanvasNewProjectButton": "New Project…",
+  "@emptyCanvasNewProjectButton": {
+    "description": "Empty-canvas button that creates a new `.lintcrux` project."
+  },
+  "emptyCanvasRecentProjectsHeading": "Recent projects",
+  "@emptyCanvasRecentProjectsHeading": {
+    "description": "Section heading above the recent-projects list on the empty-canvas state."
+  },
+  "emptyCanvasRecentWorkspacesHeading": "Recent workspaces",
+  "@emptyCanvasRecentWorkspacesHeading": {
+    "description": "Section heading above the recent-workspaces list on the empty-canvas state."
+  },
+  "emptyCanvasNoRecentProjects": "No recent projects yet.",
+  "@emptyCanvasNoRecentProjects": {
+    "description": "Placeholder shown in the recent-projects section when the list is empty."
+  },
+  "emptyCanvasNoRecentWorkspaces": "No recent workspaces yet.",
+  "@emptyCanvasNoRecentWorkspaces": {
+    "description": "Placeholder shown in the recent-workspaces section when the list is empty."
+  },
+  "actionNewWorkspace": "New Workspace",
+  "@actionNewWorkspace": {
+    "description": "Menu / command palette label for the action that closes the current workspace and starts a fresh empty one."
+  },
+  "actionSaveWorkspaceAs": "Save Workspace As…",
+  "@actionSaveWorkspaceAs": {
+    "description": "Menu / command palette label for the action that saves the current workspace under a user-chosen filename."
+  },
+  "actionOpenWorkspace": "Open Workspace…",
+  "@actionOpenWorkspace": {
+    "description": "Menu / command palette label for the action that loads a `.lintcrux-workspace` file, replacing the current workspace."
+  },
+  "actionSplitPaneRight": "Split Pane Right",
+  "@actionSplitPaneRight": {
+    "description": "Menu / command palette label for the action that splits the active pane horizontally."
+  },
+  "actionClosePane": "Close Pane",
+  "@actionClosePane": {
+    "description": "Menu / command palette label for the action that closes the active pane, merging its tabs into the surviving pane."
+  },
+  "actionFocusOtherPane": "Focus Other Pane",
+  "@actionFocusOtherPane": {
+    "description": "Menu / command palette label for the action that toggles focus to the non-active pane."
+  },
+  "actionMoveTabToOtherPane": "Move Tab to Other Pane",
+  "@actionMoveTabToOtherPane": {
+    "description": "Menu / command palette label for the action that moves the active tab to the other pane."
+  },
+  "actionNewTab": "New Tab",
+  "@actionNewTab": {
+    "description": "Menu / command palette label for the action that creates a new empty tab in the active pane."
+  },
+  "actionCloseTab": "Close Tab",
+  "@actionCloseTab": {
+    "description": "Menu / command palette label for the action that closes the active tab."
+  },
+  "actionNextTab": "Next Tab",
+  "@actionNextTab": {
+    "description": "Menu / command palette label for the action that activates the next tab in the active pane."
+  },
+  "actionPreviousTab": "Previous Tab",
+  "@actionPreviousTab": {
+    "description": "Menu / command palette label for the action that activates the previous tab in the active pane."
+  },
+  "workspaceLoadFailed": "Failed to load workspace: {message}",
+  "@workspaceLoadFailed": {
+    "description": "Snackbar message shown when loading a `.lintcrux-workspace` file fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "filePickerFailed": "Could not open the file picker: {error}",
+  "@filePickerFailed": {
+    "description": "Snackbar shown when the file picker throws (e.g. macOS rejects an unknown extension, or the OS file-selector plugin returns an error). Surfaces the underlying error so file-open failures are not silent.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "openProjectLegacyManifestName": "This design's manifest still uses the old file name .crux-project. Rename it to {suggestedName}; a later release stops reading the old name.",
+  "@openProjectLegacyManifestName": {
+    "description": "Info snackbar shown once after opening a design manifest still named with the legacy bare .crux-project file name. suggestedName is the <design>.crux-project file name to rename it to. Keep .crux-project and the placeholder verbatim.",
+    "placeholders": {
+      "suggestedName": {
+        "type": "String"
+      }
+    }
+  },
+  "openProjectAmbiguousManifests": "Could not open the design: {directory} holds more than one design manifest ({names}). A design folder holds exactly one; remove or merge the extras.",
+  "@openProjectAmbiguousManifests": {
+    "description": "Error snackbar shown when opening a design manifest whose folder holds more than one manifest, so nothing is opened. directory is the folder path; names lists the manifest file names, comma-separated. Keep the placeholders verbatim.",
+    "placeholders": {
+      "directory": {
+        "type": "String"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "filePickerOpenProjectButton": "Open Project",
+  "@filePickerOpenProjectButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux project file. On macOS this is `NSOpenPanel.prompt`; the rendered text appears on the picker's confirm button so the user can distinguish Open Project / Open Session / Open Workspace pickers from each other."
+  },
+  "filePickerOpenSessionButton": "Open Session",
+  "@filePickerOpenSessionButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux-session file."
+  },
+  "filePickerImportSarifButton": "Import Report",
+  "@filePickerImportSarifButton": {
+    "description": "Action button label rendered by the OS file picker when importing a SARIF report via LintcruxAction.importSarif."
+  },
+  "filePickerOpenWorkspaceButton": "Open Workspace",
+  "@filePickerOpenWorkspaceButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux-workspace file."
+  },
+  "filePickerImportFilelistButton": "Import",
+  "@filePickerImportFilelistButton": {
+    "description": "Action button label rendered by the OS file picker when importing a .f Vivado-style filelist."
+  },
+  "filePickerImportEdamButton": "Import",
+  "@filePickerImportEdamButton": {
+    "description": "Action button label rendered by the OS file picker when importing a FuseSoC/Edalize EDAM (.eda.yml) file."
+  },
+  "filePickerCreateProjectButton": "Create Project",
+  "@filePickerCreateProjectButton": {
+    "description": "Action button label rendered by the OS save-file picker when creating a new .lintcrux project from the Welcome screen's New Project… button or the New Tab shortcut."
+  },
+  "filePickerSaveWorkspaceButton": "Save Workspace",
+  "@filePickerSaveWorkspaceButton": {
+    "description": "Action button label rendered by the OS save-file picker when saving the active workspace as a new .lintcrux-workspace file via `LintcruxAction.saveWorkspaceAs`."
+  },
+  "filePickerExportSessionButton": "Export Session",
+  "@filePickerExportSessionButton": {
+    "description": "Action button label rendered by the OS save-file picker when exporting the active tab as a .lintcrux-session file via `LintcruxAction.exportTabAsSession` / `LintcruxAction.saveSession`."
+  },
+  "filePickerOpenSourcesButton": "Add to Project",
+  "@filePickerOpenSourcesButton": {
+    "description": "Action button label rendered by the OS file picker when picking HDL source files to add to the active project via `LintcruxAction.openSources`."
+  },
+  "openSourcesNoActiveProject": "Open or create a project first, then add source files to it.",
+  "@openSourcesNoActiveProject": {
+    "description": "Snackbar shown when the user invokes Open Sources (Cmd/Ctrl+Shift+O) without an active project tab. Hints that source files attach to a project."
+  },
+  "exportSessionNoActiveTab": "Open a project tab before exporting a session.",
+  "@exportSessionNoActiveTab": {
+    "description": "Snackbar shown when the user invokes Export Tab as Session / Save Session without an active project tab."
+  },
+  "openSourcesAdded": "Added {count, plural, =1 {1 source file} other {{count} source files}} to {projectName}.",
+  "@openSourcesAdded": {
+    "description": "Snackbar shown after the user picks one or more HDL source files and they are appended to the active project's sourceFiles list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "projectName": {
+        "type": "String"
+      }
+    }
+  },
+  "saveWorkspaceFailed": "Failed to save workspace: {message}",
+  "@saveWorkspaceFailed": {
+    "description": "Snackbar shown when saving the workspace via `LintcruxAction.saveWorkspaceAs` fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "saveSessionFailed": "Failed to export session: {message}",
+  "@saveSessionFailed": {
+    "description": "Snackbar shown when exporting the active tab as a .lintcrux-session via `LintcruxAction.exportTabAsSession` fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionSaved": "Saved session to {path}.",
+  "@sessionSaved": {
+    "description": "Snackbar shown after a session is successfully exported.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceSaved": "Saved workspace to {path}.",
+  "@workspaceSaved": {
+    "description": "Snackbar shown after the workspace is successfully saved.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceResetConfirmTitle": "Reset workspace?",
+  "@workspaceResetConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before `File → Reset Workspace` empties every open tab."
+  },
+  "workspaceResetConfirmBody": "All open tabs will be closed. This cannot be undone, but the auto-saved workspace file is replaced — your previous project files remain on disk.",
+  "@workspaceResetConfirmBody": {
+    "description": "Body text of the confirmation dialog shown before `File → Reset Workspace`."
+  },
+  "workspaceResetConfirmAction": "Reset",
+  "@workspaceResetConfirmAction": {
+    "description": "Confirmation button label on the reset-workspace dialog."
+  },
+  "dialogCancel": "Cancel",
+  "@dialogCancel": {
+    "description": "Generic cancel button label used by workspace confirmation dialogs and other modal dialogs."
+  },
+  "menuItemTierSuffix": " ({tier})",
+  "@menuItemTierSuffix": {
+    "description": "Suffix appended to a native menu-bar item's label to mark the license tier it requires; the placeholder is the short PRO/ENT badge text. The platform menu bar can only render a string label (no badge widget), so tier is shown as a parenthetical suffix there.",
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "tierBadgePro": "PRO",
+  "@tierBadgePro": {
+    "description": "Short visual label for the Pro-tier badge chip rendered next to Pro features in menus, palette entries, and panel headers."
+  },
+  "tierBadgeProSemantic": "Pro tier feature",
+  "@tierBadgeProSemantic": {
+    "description": "Screen-reader phrase rendered on the Pro-tier badge chip."
+  },
+  "tierBadgeEnterprise": "ENT",
+  "@tierBadgeEnterprise": {
+    "description": "Short visual label for the Enterprise-tier badge chip rendered next to Enterprise features."
+  },
+  "tierBadgeEnterpriseSemantic": "Enterprise tier feature",
+  "@tierBadgeEnterpriseSemantic": {
+    "description": "Screen-reader phrase rendered on the Enterprise-tier badge chip."
+  },
+  "editionMenuLine": "{edition} edition — {identity}",
+  "@editionMenuLine": {
+    "description": "macOS application-menu line stating the edition in force and who it is licensed to. Shown disabled above About.",
+    "placeholders": {
+      "edition": {
+        "type": "String",
+        "example": "Pro"
+      },
+      "identity": {
+        "type": "String",
+        "example": "buyer@example.com"
+      }
+    }
+  },
+  "editionMenuLineOrganization": "{edition} edition — licensed by your organization",
+  "@editionMenuLineOrganization": {
+    "description": "macOS application-menu line when the licence names no individual — an Enterprise seat licensed from a policy file has no user email by construction.",
+    "placeholders": {
+      "edition": {
+        "type": "String",
+        "example": "Enterprise"
+      }
+    }
+  },
+  "editionNameEducational": "Educational",
+  "@editionNameEducational": {
+    "description": "Full name of the Educational edition, as used in the application-menu edition line."
+  },
+  "editionNamePro": "Pro",
+  "@editionNamePro": {
+    "description": "Full name of the Pro edition, as used in the application-menu edition line."
+  },
+  "editionNameEnterprise": "Enterprise",
+  "@editionNameEnterprise": {
+    "description": "Full name of the Enterprise edition, as used in the application-menu edition line."
+  },
+  "editionBadgeEduSemantic": "Educational edition",
+  "@editionBadgeEduSemantic": {
+    "description": "Accessibility / screen reader label for the badge stating the user is running the Educational edition. Distinct from tierBadgeEduSemantic, which labels a FEATURE as needing a tier."
+  },
+  "editionBadgeProSemantic": "Pro edition",
+  "@editionBadgeProSemantic": {
+    "description": "Accessibility / screen reader label for the badge stating the user is running the Pro edition. Distinct from tierBadgeProSemantic, which labels a FEATURE as needing a tier."
+  },
+  "editionBadgeEnterpriseSemantic": "Enterprise edition",
+  "@editionBadgeEnterpriseSemantic": {
+    "description": "Accessibility / screen reader label for the badge stating the user is running the Enterprise edition. Distinct from tierBadgeEnterpriseSemantic, which labels a FEATURE as needing a tier."
+  },
+  "tierBadgeEdu": "EDU",
+  "@tierBadgeEdu": {
+    "description": "Short visual label for the Educational license badge chip shown on user-status surfaces when the active license is EDU."
+  },
+  "tierBadgeEduSemantic": "Educational license",
+  "@tierBadgeEduSemantic": {
+    "description": "Screen-reader phrase rendered on the Educational license badge chip."
+  },
+  "actionCloseActiveProject": "Close Active Project",
+  "@actionCloseActiveProject": {
+    "description": "Menu / command palette label for the action that closes the currently-active project tab in the multi-project workspace."
+  },
+  "actionSwitchProject": "Switch Project…",
+  "@actionSwitchProject": {
+    "description": "Menu / command palette label for the action that opens the project switcher dialog (Cmd/Ctrl+P). Lets the user pick from open and recently-closed projects."
+  },
+  "actionReopenRecentProject": "Reopen Recent Project",
+  "@actionReopenRecentProject": {
+    "description": "Menu / command palette label for the action that re-opens the most-recently-closed project from the recent-projects list."
+  },
+  "actionPinActiveProject": "Pin Project Tab",
+  "@actionPinActiveProject": {
+    "description": "Menu / command palette label for the Pro-tier action that pins (or unpins) the active project tab. Pinned tabs survive Close-All-Projects actions."
+  },
+  "actionCloseAllTabs": "Close All Tabs",
+  "@actionCloseAllTabs": {
+    "description": "Menu / command palette label for the open-core action that closes every open workspace tab."
+  },
+  "closeAllTabsConfirmTitle": "Close all tabs?",
+  "@closeAllTabsConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before `File → Close All Tabs` closes every open tab."
+  },
+  "closeAllTabsConfirmBody": "Every open workspace tab will be closed.",
+  "@closeAllTabsConfirmBody": {
+    "description": "Body of the confirmation dialog shown before `File → Close All Tabs`."
+  },
+  "closeAllTabsConfirmConfirm": "Close All",
+  "@closeAllTabsConfirmConfirm": {
+    "description": "Confirmation button label on the close-all-tabs dialog."
+  },
+  "actionCloseAllProjects": "Close All Projects",
+  "@actionCloseAllProjects": {
+    "description": "Menu / command palette label for the Pro-tier action that closes every open project except pinned ones."
+  },
+  "actionSearchAcrossProjects": "Search Across Projects…",
+  "@actionSearchAcrossProjects": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the cross-project violation-search dialog (Cmd/Ctrl+Shift+F)."
+  },
+  "configLoadFailedTitle": "Couldn't load this project",
+  "@configLoadFailedTitle": {
+    "description": "Title of the empty-state error surface rendered inside a project tab when its .lintcrux file could not be loaded (file missing, permission denied, schema invalid, …)."
+  },
+  "configLoadFailedPathLabel": "Project file",
+  "@configLoadFailedPathLabel": {
+    "description": "Label rendered above the failing project-file path in the load-error empty state."
+  },
+  "configLoadFailedReasonLabel": "Reason",
+  "@configLoadFailedReasonLabel": {
+    "description": "Label rendered above the loader's exception message in the load-error empty state."
+  },
+  "configLoadFailedHint": "Use File > Open Project… to pick a different .lintcrux file, or fix the path above and reload.",
+  "@configLoadFailedHint": {
+    "description": "Remediation hint shown at the bottom of the load-error empty state pointing the user at File → Open Project."
+  },
+  "runEnginesNoActiveProject": "Open a project first to run lint engines.",
+  "@runEnginesNoActiveProject": {
+    "description": "Snackbar shown when the user invokes Run All Engines (F5) with no active project tab."
+  },
+  "runEnginesAlreadyRunning": "A lint run is already in progress.",
+  "@runEnginesAlreadyRunning": {
+    "description": "Snackbar shown when the user invokes Run All Engines (F5) while the current tab's runner is mid-run."
+  },
+  "cancelRunNoActiveRun": "No lint run is in progress.",
+  "@cancelRunNoActiveRun": {
+    "description": "Snackbar shown when the user invokes Cancel Run (Esc) with nothing in flight."
+  },
+  "aboutDialogTitle": "About LintCrux",
+  "@aboutDialogTitle": {
+    "description": "Title of the About dialog / screen."
+  },
+  "aboutTagline": "Modern HDL lint and style viewer for hardware engineers",
+  "@aboutTagline": {
+    "description": "One-line product tagline shown under the app name in the About header."
+  },
+  "aboutBetaChip": "Public Beta",
+  "@aboutBetaChip": {
+    "description": "Label on the public-beta chip in the About header."
+  },
+  "aboutEditionOpenCore": "Open Core",
+  "@aboutEditionOpenCore": {
+    "description": "Edition label for the open-core build; hides the edition chip when matched."
+  },
+  "aboutSectionVersion": "Version",
+  "@aboutSectionVersion": {
+    "description": "Header / row label for the version sub-section in the About dialog."
+  },
+  "aboutBuildNumber": "Build",
+  "@aboutBuildNumber": {
+    "description": "Row label for the platform build number in the About dialog."
+  },
+  "aboutGitSha": "Commit",
+  "@aboutGitSha": {
+    "description": "Row label for the short git SHA in the About dialog."
+  },
+  "aboutSectionPlatform": "Platform",
+  "@aboutSectionPlatform": {
+    "description": "Header for the platform sub-section in the About dialog."
+  },
+  "aboutOperatingSystem": "OS",
+  "@aboutOperatingSystem": {
+    "description": "Row label for the host operating system in the About dialog."
+  },
+  "aboutArchitecture": "Architecture",
+  "@aboutArchitecture": {
+    "description": "Row label for the CPU architecture in the About dialog."
+  },
+  "aboutFlutterVersion": "Flutter",
+  "@aboutFlutterVersion": {
+    "description": "Row label for the Flutter SDK version in the About dialog."
+  },
+  "aboutDartVersion": "Dart",
+  "@aboutDartVersion": {
+    "description": "Row label for the Dart SDK version in the About dialog."
+  },
+  "aboutButtonVisitWebsite": "Visit Website",
+  "@aboutButtonVisitWebsite": {
+    "description": "About-dialog action button that opens the company website."
+  },
+  "aboutButtonDocs": "Documentation",
+  "@aboutButtonDocs": {
+    "description": "About-dialog action button that opens the LintCrux documentation site."
+  },
+  "aboutButtonPrivacy": "Privacy Policy",
+  "@aboutButtonPrivacy": {
+    "description": "About-dialog action button that opens the LintCrux privacy policy."
+  },
+  "aboutButtonTerms": "Terms of Service",
+  "@aboutButtonTerms": {
+    "description": "About-dialog action button that opens the LintCrux terms of service."
+  },
+  "aboutButtonCopyVersionInfo": "Copy Version Info",
+  "@aboutButtonCopyVersionInfo": {
+    "description": "About-dialog action button that copies the structured version paragraph."
+  },
+  "aboutCopiedConfirmation": "Version info copied",
+  "@aboutCopiedConfirmation": {
+    "description": "Snackbar confirmation shown after Copy Version Info copies to the clipboard."
+  },
+  "aboutCompanyName": "Ferrite Engineering",
+  "@aboutCompanyName": {
+    "description": "Company tagline shown on the first line of the About branding banner."
+  },
+  "filePickerExportButton": "Export",
+  "@filePickerExportButton": {
+    "description": "Action button label rendered by the OS save-file picker when exporting the violation set (SARIF / JSON / CSV / HTML)."
+  },
+  "exportFailed": "Export failed: {error}",
+  "@exportFailed": {
+    "description": "Snackbar shown when writing the exported violation file to disk fails.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "snackFeatureRequiresPro": "{feature} requires LintCrux Pro.",
+  "@snackFeatureRequiresPro": {
+    "description": "Snackbar body shown when a Pro-tier feature is invoked without a Pro license (post-beta).",
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "snackFeatureNotAvailableYet": "{feature} is not available yet.",
+  "@snackFeatureNotAvailableYet": {
+    "description": "Snackbar body shown when an open-core feature is invoked before it ships.",
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigSeverityOff": "Off",
+  "@engineConfigSeverityOff": {
+    "description": "Dropdown option in the per-rule severity-override control meaning the rule is disabled (no severity emitted). Distinct from severityNone ('Unclassified')."
+  },
+  "diagnosticsNoProjectLoaded": "No project loaded.",
+  "@diagnosticsNoProjectLoaded": {
+    "description": "Empty-state message in the Tab Diagnostics drawer when no project is active."
+  },
+  "filePickerTypeProjectLabel": "LintCrux project",
+  "@filePickerTypeProjectLabel": {
+    "description": "File-type filter label shown by the OS file dialog when opening or saving a .lintcrux project file."
+  },
+  "filePickerTypeSourcesLabel": "HDL sources",
+  "@filePickerTypeSourcesLabel": {
+    "description": "File-type filter label shown by the OS file dialog when picking HDL source files."
+  },
+  "filePickerTypeFilelistLabel": "Vivado filelist",
+  "@filePickerTypeFilelistLabel": {
+    "description": "File-type filter label shown by the OS file dialog when importing a Vivado .f filelist."
+  },
+  "filePickerTypeEdamLabel": "FuseSoC EDAM",
+  "@filePickerTypeEdamLabel": {
+    "description": "File-type filter label shown by the OS file dialog when importing a FuseSoC/Edalize EDAM (.eda.yml) file."
+  },
+  "filePickerTypeSessionLabel": "LintCrux session",
+  "@filePickerTypeSessionLabel": {
+    "description": "File-type filter label shown by the OS file dialog when opening or exporting a .lintcrux-session file."
+  },
+  "filePickerTypeWorkspaceLabel": "LintCrux workspace",
+  "@filePickerTypeWorkspaceLabel": {
+    "description": "File-type filter label shown by the OS file dialog when opening or saving a .lintcrux-workspace file."
+  },
+  "updateBannerMessage": "LintCrux {version} is available.",
+  "@updateBannerMessage": {
+    "description": "Update banner message announcing that a newer LintCrux release is available.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateViewChangesAction": "View Changes",
+  "@updateViewChangesAction": {
+    "description": "Update banner button that opens the release changelog in the browser."
+  },
+  "updateNowAction": "Update Now",
+  "@updateNowAction": {
+    "description": "Update banner button that opens the LintCrux download page in the browser."
+  },
+  "updateDismissLabel": "Dismiss",
+  "@updateDismissLabel": {
+    "description": "Accessible name of the update banner's dismiss button."
+  },
+  "updateCheckInProgress": "Checking for updates…",
+  "@updateCheckInProgress": {
+    "description": "Transient snackbar shown while a manual update check is in flight."
+  },
+  "updateCheckUpToDate": "You're on the latest version ({version}).",
+  "@updateCheckUpToDate": {
+    "description": "Snackbar confirming a manual update check found no newer release; names the running version.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateCheckFailed": "Couldn't check for updates.",
+  "@updateCheckFailed": {
+    "description": "Snackbar shown when a manual update check could not reach the version manifest."
+  },
+  "actionCheckForUpdates": "Check for Updates",
+  "@actionCheckForUpdates": {
+    "description": "Action label for the manual Check for Updates command (Help menu, command palette, About box)."
+  },
+  "settingsRestoreTabsOnLaunchLabel": "Restore tabs on launch",
+  "@settingsRestoreTabsOnLaunchLabel": {
+    "description": "Settings General row label for the persisted restore-tabs-on-launch toggle."
+  },
+  "settingsRestoreTabsOnLaunchDescription": "Reopen the project tabs that were open when LintCrux last quit. When off, LintCrux starts with an empty workspace; the saved session is kept on disk, so turning this back on restores it.",
+  "@settingsRestoreTabsOnLaunchDescription": {
+    "description": "Settings General row description explaining what the restore-tabs-on-launch toggle does and that turning it off is not destructive."
+  },
+  "settingsAutoCheckUpdatesLabel": "Automatically check for updates",
+  "@settingsAutoCheckUpdatesLabel": {
+    "description": "Settings General row label for the persisted automatic update-check toggle."
+  },
+  "settingsAutoCheckUpdatesDescription": "Check for new versions on launch and once a day. Only your app version and operating system are sent — never project, source or violation data.",
+  "@settingsAutoCheckUpdatesDescription": {
+    "description": "Settings General row description explaining what the automatic update check sends."
+  },
+  "aboutButtonCheckForUpdates": "Check for Updates",
+  "@aboutButtonCheckForUpdates": {
+    "description": "About dialog action button that runs a manual update check."
+  },
+  "actionSubmitIssue": "Submit Issue…",
+  "@actionSubmitIssue": {
+    "description": "Action label for the beta issue reporter command (Help menu, command palette, About box)."
+  },
+  "aboutButtonSubmitIssue": "Submit Issue",
+  "@aboutButtonSubmitIssue": {
+    "description": "About dialog action button that opens the beta issue reporter."
+  },
+  "issueReporterTitle": "Submit Issue",
+  "@issueReporterTitle": {
+    "description": "Title of the beta issue reporter dialog, and the fallback GitHub issue title when the summary is blank."
+  },
+  "issueReporterTitleFieldLabel": "Issue Summary",
+  "@issueReporterTitleFieldLabel": {
+    "description": "Label of the issue reporter's free-text summary field."
+  },
+  "issueReporterTitleFieldHint": "Briefly describe what went wrong",
+  "@issueReporterTitleFieldHint": {
+    "description": "Hint shown inside the issue reporter's empty summary field."
+  },
+  "issueReporterPrivacyNotice": "More context helps reproduce your issue. Review and toggle off anything you'd rather not share. No file contents or file paths are ever included.",
+  "@issueReporterPrivacyNotice": {
+    "description": "Privacy callout above the issue reporter's category tiles."
+  },
+  "issueReporterPreviewHeader": "Preview issue body",
+  "@issueReporterPreviewHeader": {
+    "description": "Header of the issue reporter's collapsible markdown preview disclosure."
+  },
+  "issueReporterCategoryAppEnv": "App & Environment",
+  "@issueReporterCategoryAppEnv": {
+    "description": "Title of the always-on App and Environment category tile in the issue reporter."
+  },
+  "issueReporterCategoryAppEnvDescription": "Version, build SHA, platform, OS, screen DPI, locale, SDK versions.",
+  "@issueReporterCategoryAppEnvDescription": {
+    "description": "Summary of what the App and Environment category contributes to the report."
+  },
+  "issueReporterCategorySession": "Session State",
+  "@issueReporterCategorySession": {
+    "description": "Title of the Session State category tile in the issue reporter."
+  },
+  "issueReporterCategorySessionDescription": "Engine names and versions, violation and waiver counts — never file paths or source contents.",
+  "@issueReporterCategorySessionDescription": {
+    "description": "Summary of what the Session State category contributes to a LintCrux report."
+  },
+  "issueReporterCategoryLog": "Diagnostics",
+  "@issueReporterCategoryLog": {
+    "description": "Title of the Diagnostics category tile in the issue reporter."
+  },
+  "issueReporterCategoryLogDescription": "Recent warnings and errors captured this session.",
+  "@issueReporterCategoryLogDescription": {
+    "description": "Summary of what the Diagnostics category contributes to the report."
+  },
+  "issueReporterCategoryScreenshot": "Screenshot",
+  "@issueReporterCategoryScreenshot": {
+    "description": "Title of the Screenshot category tile in the issue reporter (desktop only)."
+  },
+  "issueReporterCategoryScreenshotDescription": "A picture of the app window, saved so you can attach it.",
+  "@issueReporterCategoryScreenshotDescription": {
+    "description": "Summary of what the Screenshot category contributes to the report."
+  },
+  "issueReporterLockedCategorySemantics": "Always included",
+  "@issueReporterLockedCategorySemantics": {
+    "description": "Screen-reader description of the lock icon on the always-on App and Environment tile."
+  },
+  "issueReporterSubmitButton": "Submit",
+  "@issueReporterSubmitButton": {
+    "description": "Label of the issue reporter's submit action."
+  },
+  "issueReporterCancelButton": "Cancel",
+  "@issueReporterCancelButton": {
+    "description": "Label of the issue reporter's cancel action."
+  },
+  "issueReporterOpenedToast": "GitHub issue opened — paste the report from your clipboard into the body, then drag in the screenshot.",
+  "@issueReporterOpenedToast": {
+    "description": "Toast shown after submission when the report did not fit in the GitHub URL and must be pasted from the clipboard."
+  },
+  "issueReporterOpenedToastPrefilled": "GitHub issue opened with the report pre-filled — drag in the screenshot if one was captured.",
+  "@issueReporterOpenedToastPrefilled": {
+    "description": "Toast shown after submission when the report was pre-filled into the GitHub new-issue URL."
+  },
+  "issueReporterScreenshotSaved": "Screenshot saved to {path}",
+  "@issueReporterScreenshotSaved": {
+    "description": "Confirmation appended to the submission toast naming where the screenshot PNG was written.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "issueReporterEmptyLogPlaceholder": "(no log entries captured)",
+  "@issueReporterEmptyLogPlaceholder": {
+    "description": "Placeholder rendered in the Diagnostics category when the log ring buffer captured nothing."
+  },
+  "issueReporterEmptySessionLogPlaceholder": "(no errors or warnings logged this session)",
+  "@issueReporterEmptySessionLogPlaceholder": {
+    "description": "Placeholder rendered under the session-log heading when nothing was logged this session."
+  },
+  "betaExpiryBannerMessage": "{days, plural, =1{LintCrux Beta expires in 1 day. Download the latest build.} other{LintCrux Beta expires in {days} days. Download the latest build.}}",
+  "@betaExpiryBannerMessage": {
+    "description": "Dismissible banner shown while the beta build is inside the warning window of its hard expiry date.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "betaExpiryBannerAction": "Download",
+  "@betaExpiryBannerAction": {
+    "description": "Inline action on the beta-expiry warning banner that opens the download page."
+  },
+  "betaExpiryDismissLabel": "Dismiss",
+  "@betaExpiryDismissLabel": {
+    "description": "Accessible name of the beta-expiry warning banner's dismiss button."
+  },
+  "betaExpiryExpiredTitle": "Beta build expired",
+  "@betaExpiryExpiredTitle": {
+    "description": "Title of the blocking modal shown once the beta build has passed its hard expiry date."
+  },
+  "betaExpiryExpiredBody": "This LintCrux Beta build has reached its expiration date. Download the latest build to keep using LintCrux.",
+  "@betaExpiryExpiredBody": {
+    "description": "Body of the blocking beta-expired modal explaining why the build stopped working."
+  },
+  "betaExpiryExpiredAction": "Download latest build",
+  "@betaExpiryExpiredAction": {
+    "description": "Primary action of the blocking beta-expired modal; opens the download page."
+  },
+  "betaExpiryExpiredQuit": "Quit LintCrux",
+  "@betaExpiryExpiredQuit": {
+    "description": "Secondary action of the blocking beta-expired modal; terminates the application."
+  },
+  "actionCategoryFileMnemonic": "&File",
+  "@actionCategoryFileMnemonic": {
+    "description": "File menu title with the & Alt-accelerator marker"
+  },
+  "actionCategoryEditMnemonic": "&Edit",
+  "@actionCategoryEditMnemonic": {
+    "description": "Edit menu title with the & Alt-accelerator marker"
+  },
+  "actionCategoryViewMnemonic": "&View",
+  "@actionCategoryViewMnemonic": {
+    "description": "View menu title with the & Alt-accelerator marker"
+  },
+  "actionCategoryNavigateMnemonic": "&Navigate",
+  "@actionCategoryNavigateMnemonic": {
+    "description": "Navigate menu title with the & Alt-accelerator marker"
+  },
+  "actionCategorySearchMnemonic": "&Search",
+  "@actionCategorySearchMnemonic": {
+    "description": "Search menu title with the & Alt-accelerator marker"
+  },
+  "actionCategoryToolsMnemonic": "&Tools",
+  "@actionCategoryToolsMnemonic": {
+    "description": "Tools menu title with the & Alt-accelerator marker"
+  },
+  "actionCategoryHelpMnemonic": "&Help",
+  "@actionCategoryHelpMnemonic": {
+    "description": "Help menu title with the & Alt-accelerator marker"
+  },
+  "actionCategoryEdit": "Edit",
+  "@actionCategoryEdit": {
+    "description": "Edit menu title in the desktop menu bar"
+  },
+  "menuWindow": "Window",
+  "@menuWindow": {
+    "description": "Title of the standard macOS Window menu"
+  },
+  "actionExit": "Exit",
+  "@actionExit": {
+    "description": "Windows/Linux label for the quit action at the bottom of the File menu; macOS uses actionQuit instead"
+  },
+  "actionOpenDocumentation": "Documentation",
+  "@actionOpenDocumentation": {
+    "description": "Help menu label for the action that opens the online LintCrux documentation at docs.lintcrux.app"
+  },
+  "accessibilityViolationRow": "{severity} violation, rule {rule}, file {file} line {line}: {message}",
+  "@accessibilityViolationRow": {
+    "description": "Screen-reader label for one violation table row. The row renders five separate Text cells, which a screen reader announces as five disconnected fragments with no column context; this reads the row as one sentence instead.",
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "rule": {
+        "type": "String"
+      },
+      "file": {
+        "type": "String"
+      },
+      "line": {
+        "type": "int"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "accessibilityToolbarRegion": "Toolbar",
+  "@accessibilityToolbarRegion": {
+    "description": "Screen-reader label for the application toolbar region"
+  },
+  "accessibilityStatusBarRegion": "Status bar",
+  "@accessibilityStatusBarRegion": {
+    "description": "Semantic region label for the status bar at the bottom of the window, used by screen readers"
+  },
+  "accessibilityViolationTableKeyboardHint": "Up and Down move between violations. Enter opens the violation in the editor, and Space toggles its check box.",
+  "@accessibilityViolationTableKeyboardHint": {
+    "description": "Keyboard instructions spoken by a screen reader once, when focus enters the rows of the violation table. Home and End also work; the sentence names the keys a user needs first."
+  },
+  "toolbarOverflowActions": "Actions",
+  "@toolbarOverflowActions": {
+    "description": "Tooltip on the toolbar's trailing overflow button, which opens the full action list"
+  },
+  "toolbarExportCluster": "Export Report",
+  "@toolbarExportCluster": {
+    "description": "Tooltip on the toolbar grouped export button, whose siblings are the SARIF / JSON / CSV / HTML export actions"
+  },
+  "statusBarBusyLintRun": "Running lint engines",
+  "@statusBarBusyLintRun": {
+    "description": "Accessibility label on the status-bar busy indicator while the lint engines are running."
+  },
+  "statusBarNoProject": "No project open",
+  "@statusBarNoProject": {
+    "description": "Status-bar idle label when no project tab is open. Mirrors NetCrux statusBarNoDesign so every product keeps a bottom bar that says something rather than rendering blank."
+  },
+  "dockTabDetails": "Details",
+  "@dockTabDetails": {
+    "description": "Right-dock tab label for the violation-details inspector."
+  },
+  "dockTabRules": "Rules",
+  "@dockTabRules": {
+    "description": "Left-dock header label for the rule browser."
+  },
+  "dockTabSource": "Source",
+  "@dockTabSource": {
+    "description": "Bottom-dock header label for the source-preview pane."
+  },
+  "dockTabCrossProbe": "Cross-Probe",
+  "@dockTabCrossProbe": {
+    "description": "Right-dock tab label for the docked cross-probe panel."
+  },
+  "dockCollapseTooltip": "Hide Panel",
+  "@dockCollapseTooltip": {
+    "description": "Tooltip on the dock strip button that hides the whole region (VSCode panel-close)."
+  },
+  "accessibilityRightDockRegion": "Details dock",
+  "@accessibilityRightDockRegion": {
+    "description": "Accessibility label announced for the right dock region."
+  },
+  "accessibilityLeftDockRegion": "Browser dock",
+  "@accessibilityLeftDockRegion": {
+    "description": "Accessibility label announced for the left dock region."
+  },
+  "accessibilityBottomDockRegion": "Panel dock",
+  "@accessibilityBottomDockRegion": {
+    "description": "Accessibility label announced for the bottom dock region."
+  },
+  "settingsLanguageLabel": "Language",
+  "@settingsLanguageLabel": {
+    "description": "Label for the UI language picker in Appearance settings."
+  },
+  "settingsLanguageDescription": "Language used for the application interface",
+  "@settingsLanguageDescription": {
+    "description": "Description for the UI language picker."
+  },
+  "settingsCxpSectionTitle": "CXP Cross-Probe",
+  "@settingsCxpSectionTitle": {
+    "description": "Settings category title for CXP cross-probe configuration."
+  },
+  "settingsAutoReloadDescription": "How LintCrux responds when a loaded project changes on disk",
+  "@settingsAutoReloadDescription": {
+    "description": "Description for the auto-reload segmented control."
+  },
+  "settingsCxpPortError": "Enter a port between 1 and 65535.",
+  "@settingsCxpPortError": {
+    "description": "Error under the CXP port field for an invalid value."
+  },
+  "tabContextMenuRevealInFinder": "Reveal in Finder",
+  "@tabContextMenuRevealInFinder": {
+    "description": "Tab context-menu reveal label on macOS."
+  },
+  "tabContextMenuRevealInExplorer": "Reveal in Explorer",
+  "@tabContextMenuRevealInExplorer": {
+    "description": "Tab context-menu reveal label on Windows."
+  },
+  "tabContextMenuRevealInFiles": "Reveal in Files",
+  "@tabContextMenuRevealInFiles": {
+    "description": "Tab context-menu reveal label on Linux."
+  },
+  "helpLinkLearnMore": "Learn more",
+  "@helpLinkLearnMore": {
+    "description": "Default tooltip shown on help icon buttons that open documentation pages"
+  },
+  "telemetryConsentTitle": "Help make LintCrux better",
+  "@telemetryConsentTitle": {
+    "description": "Title of the one-time first-launch telemetry disclosure"
+  },
+  "telemetryConsentBody": "Anonymous usage and error counts help decide what to build and fix next. Never your files, your designs, or anything that identifies you.",
+  "@telemetryConsentBody": {
+    "description": "The whole of the first-launch disclosure prose: why the data is wanted, and the categories never collected"
+  },
+  "telemetryConsentLearnMore": "See exactly what's collected",
+  "@telemetryConsentLearnMore": {
+    "description": "Label of the link to the suite telemetry page, where the exhaustive field list lives"
+  },
+  "telemetryConsentToggleLabel": "Send anonymous usage statistics",
+  "@telemetryConsentToggleLabel": {
+    "description": "Label of the telemetry switch in the first-launch disclosure"
+  },
+  "telemetryConsentContinue": "Continue",
+  "@telemetryConsentContinue": {
+    "description": "Label of the single confirming button in the first-launch disclosure"
+  },
+  "settingsPrivacySection": "Privacy",
+  "@settingsPrivacySection": {
+    "description": "Settings category title for the privacy (telemetry) section"
+  },
+  "settingsTelemetryLabel": "Send anonymous usage statistics",
+  "@settingsTelemetryLabel": {
+    "description": "Label of the telemetry switch in Settings > Privacy"
+  },
+  "settingsTelemetryDescription": "Feature, engine, and error counters, app and OS version, form factor, language, and license tier. Never file names, rule identifiers, or the text of any lint or error message.",
+  "@settingsTelemetryDescription": {
+    "description": "Description under the telemetry switch in Settings > Privacy"
+  },
+  "settingsTelemetryDocsLabel": "Telemetry documentation",
+  "@settingsTelemetryDocsLabel": {
+    "description": "Label of the telemetry documentation row in Settings > Privacy"
+  },
+  "settingsTelemetryDocsDescription": "The exact list of fields, the never-collect list, and the source that sends them.",
+  "@settingsTelemetryDocsDescription": {
+    "description": "Description of the telemetry documentation row in Settings > Privacy"
+  },
+  "diagnosticsCloseDrawer": "Close diagnostics",
+  "@diagnosticsCloseDrawer": {
+    "description": "Tooltip on the close button in the tab diagnostics drawer header."
+  },
+  "settingsDiagnosticsEnabledLabel": "Enable diagnostics",
+  "@settingsDiagnosticsEnabledLabel": {
+    "description": "Settings > General switch label (release builds only) that makes the Tab Diagnostics drawer and the App Diagnostics dialog available."
+  },
+  "settingsDiagnosticsEnabledDescription": "Makes Tab Diagnostics and App Diagnostics available in the Tools menu. Always on in debug and profile builds.",
+  "@settingsDiagnosticsEnabledDescription": {
+    "description": "Settings > General description under the Enable diagnostics switch."
+  },
+  "incomingFileNotSupported": "LintCrux cannot open {fileName}.",
+  "@incomingFileNotSupported": {
+    "description": "Snackbar shown when macOS opens LintCrux with a file it has no way to open (for example Open With on a file type LintCrux does not handle). The placeholder is the file's name.",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "diagnosticsDisabledSnack": "Diagnostics are turned off. Turn them on in Settings > {section}.",
+  "@diagnosticsDisabledSnack": {
+    "description": "Snackbar shown when Tab Diagnostics or App Diagnostics is invoked in a release build with diagnostics off, naming where to turn them on. The section placeholder is the localized title of the Settings category that holds the switch (General).",
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "inspectorClearSelection": "Back to engine status",
+  "@inspectorClearSelection": {
+    "description": "Tooltip on the button that clears the selected violation and restores the engine-status view."
+  },
+  "dockTabSources": "Sources",
+  "@dockTabSources": {
+    "description": "Left dock tab label for the project source-file list."
+  },
+  "sourcesPanelEmpty": "No source files in this project.",
+  "@sourcesPanelEmpty": {
+    "description": "Shown when a project is open but declares no source files."
+  },
+  "sourcesPanelNoProject": "Open a project to see its source files.",
+  "@sourcesPanelNoProject": {
+    "description": "Shown in the sources panel when no project is open."
+  },
+  "sourcesRemoveTooltip": "Remove from project",
+  "@sourcesRemoveTooltip": {
+    "description": "Tooltip on the per-file remove button in the sources panel."
+  },
+  "sourcesRemoveConfirmTitle": "Remove source file?",
+  "@sourcesRemoveConfirmTitle": {
+    "description": "Title of the confirmation dialog for removing a source file from a project."
+  },
+  "sourcesRemoveConfirmBody": "{file} will be removed from this project. The file itself is not deleted.",
+  "@sourcesRemoveConfirmBody": {
+    "description": "Body of the remove-source confirmation. Says the file on disk is untouched.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesRemoveConfirmAction": "Remove",
+  "@sourcesRemoveConfirmAction": {
+    "description": "Confirm button label for removing a source file."
+  },
+  "sourcesRemoved": "Removed {file} from {project}.",
+  "@sourcesRemoved": {
+    "description": "Snackbar after a source file is removed from a project.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      },
+      "project": {
+        "type": "String"
+      }
+    }
+  },
+  "sourcesCount": "{count, plural, =1{1 source file} other{{count} source files}}",
+  "@sourcesCount": {
+    "description": "Header count of source files in the sources panel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sourcesRemoveNotFound": "{file} is not listed in this project's file — nothing was changed.",
+  "@sourcesRemoveNotFound": {
+    "description": "Error snackbar when a removal finds no matching entry in the project file — reported rather than reporting a no-op success.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "rulesPanelSearchHint": "Search rules…",
+  "@rulesPanelSearchHint": {
+    "description": "Placeholder in the rule browser's search field."
+  },
+  "rulesPanelAllEngines": "All engines",
+  "@rulesPanelAllEngines": {
+    "description": "Engine filter entry meaning no engine filter."
+  },
+  "rulesPanelEmpty": "No rules match.",
+  "@rulesPanelEmpty": {
+    "description": "Shown when the search or engine filter matches no rules."
+  },
+  "rulesPanelCount": "{count, plural, =1{1 rule} other{{count} rules}}",
+  "@rulesPanelCount": {
+    "description": "Count of rules currently listed in the rule browser.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "rulesPanelLearnMore": "Documentation",
+  "@rulesPanelLearnMore": {
+    "description": "Tooltip on the button opening a rule's upstream documentation."
+  },
+  "rulesPanelLoadFailed": "Rule database unavailable.",
+  "@rulesPanelLoadFailed": {
+    "description": "Shown when the bundled rule database fails to load."
+  },
+  "settingsTelemetryInstallationIdLabel": "Installation ID",
+  "@settingsTelemetryInstallationIdLabel": {
+    "description": "Title of the Settings > Privacy row showing this installation id."
+  },
+  "settingsTelemetryInstallationIdDescription": "The only identifier attached to what is collected. It is random, and not linked to you. Send it to support if you want the data from this installation deleted.",
+  "@settingsTelemetryInstallationIdDescription": {
+    "description": "Explains what the installation id is for. It is the only handle on this installation data, so the deletion path the privacy policy promises depends on the user being able to read it."
+  },
+  "settingsTelemetryInstallationIdCopy": "Copy",
+  "@settingsTelemetryInstallationIdCopy": {
+    "description": "Label of the button that copies the installation id to the clipboard."
+  },
+  "settingsTelemetryInstallationIdCopied": "Installation ID copied.",
+  "@settingsTelemetryInstallationIdCopied": {
+    "description": "Confirmation shown after the installation id is copied."
+  }
+}

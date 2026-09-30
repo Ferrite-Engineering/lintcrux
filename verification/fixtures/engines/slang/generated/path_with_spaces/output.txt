@@ -1,0 +1,8 @@
+[
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'foo'",
+    "location": "a dir/m.sv:4:2",
+    "symbolPath": "m"
+  }
+]

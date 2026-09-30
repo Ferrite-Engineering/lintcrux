@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "ghdl"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "1970-01-01T00:00:00.000Z",
+          "endTimeUtc": "1970-01-01T00:00:00.000Z",
+          "toolExecutionNotifications": [
+            {
+              "level": "note",
+              "message": {
+                "text": "ghdl:error: compilation error"
+              }
+            }
+          ]
+        }
+      ],
+      "automationDetails": {
+        "id": "gen/ghdl/ghdl_6_0_0_analyse"
+      },
+      "results": [
+        {
+          "ghdl.flag": "-Whide",
+          "ghdl.continuation": [
+            "    variable rst : integer;",
+            "             ^"
+          ],
+          "ruleId": "hide",
+          "level": "warning",
+          "message": {
+            "text": "declaration of \"rst\" hides port \"rst\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/work/demo.vhd"
+                },
+                "region": {
+                  "startLine": 17,
+                  "startColumn": 14
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ghdl.continuation": [
+            "  dout <= bad_signal;",
+            "          ^"
+          ],
+          "ruleId": "UNCLASSIFIED",
+          "level": "error",
+          "message": {
+            "text": "no declaration for \"bad_signal\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/work/demo.vhd"
+                },
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 11
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ghdl.flag": "-Wunused",
+          "ghdl.continuation": [
+            "  shared variable shared_count : integer := 0;",
+            "                  ^"
+          ],
+          "ruleId": "unused",
+          "level": "warning",
+          "message": {
+            "text": "variable \"shared_count\" is never referenced"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/work/demo.vhd"
+                },
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 19
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ghdl.flag": "-Wunused",
+          "ghdl.continuation": [
+            "  signal unused_sig : std_logic;",
+            "         ^"
+          ],
+          "ruleId": "unused",
+          "level": "warning",
+          "message": {
+            "text": "signal \"unused_sig\" is never referenced"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/work/demo.vhd"
+                },
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 10
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

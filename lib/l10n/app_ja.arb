@@ -1,0 +1,1623 @@
+{
+  "@@locale": "ja",
+  "settingsShortcutsSection": "キーボードショートカット",
+  "@settingsShortcutsSection": {
+    "description": "Settings category title for the keyboard shortcuts editor"
+  },
+  "settingsShortcutsDescription": "鉛筆アイコンを押してショートカットを変更し、新しいキーを押します。エクスポートとインポートでキー割り当てを他のユーザーと共有できます。",
+  "@settingsShortcutsDescription": {
+    "description": "Intro note above the editable shortcuts list"
+  },
+  "settingsShortcutNotBound": "—",
+  "@settingsShortcutNotBound": {
+    "description": "Placeholder shown when an action has no key binding"
+  },
+  "settingsShortcutNotBoundSpoken": "ショートカットなし",
+  "@settingsShortcutNotBoundSpoken": {
+    "description": "What a screen reader says for an action with no key binding. The visual placeholder is a dash, which is not spoken."
+  },
+  "settingsShortcutsKeyboardHint": "上下キーでショートカット間を移動します。Enter で変更、Delete で削除、Shift+Delete で既定値に戻します。",
+  "@settingsShortcutsKeyboardHint": {
+    "description": "Keyboard instructions for the shortcut list in Settings > Keyboard Shortcuts. Shown under the description and spoken once by a screen reader when focus enters the list."
+  },
+  "settingsShortcutsImport": "インポート…",
+  "@settingsShortcutsImport": {
+    "description": "Button that imports a shared .crux-keymap shortcut file"
+  },
+  "settingsShortcutsExport": "エクスポート…",
+  "@settingsShortcutsExport": {
+    "description": "Button that exports shortcut customizations to a .crux-keymap file"
+  },
+  "settingsShortcutsResetAll": "すべてリセット",
+  "@settingsShortcutsResetAll": {
+    "description": "Button/confirm action restoring every shortcut to its default"
+  },
+  "settingsShortcutEditTooltip": "ショートカットを変更",
+  "@settingsShortcutEditTooltip": {
+    "description": "Tooltip for the per-action capture button"
+  },
+  "settingsShortcutUnbindTooltip": "ショートカットを削除",
+  "@settingsShortcutUnbindTooltip": {
+    "description": "Tooltip for the per-action unbind button"
+  },
+  "settingsShortcutResetTooltip": "デフォルトに戻す",
+  "@settingsShortcutResetTooltip": {
+    "description": "Tooltip for the per-action reset button"
+  },
+  "settingsShortcutCapturePrompt": "新しいショートカットを押してください…（Esc でキャンセル）",
+  "@settingsShortcutCapturePrompt": {
+    "description": "Prompt shown while capturing a new chord"
+  },
+  "settingsShortcutConflict": "{actions} でも使用されています",
+  "@settingsShortcutConflict": {
+    "description": "Warning under an action whose chord collides with others",
+    "placeholders": {
+      "actions": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictWins": "{others} より優先されます",
+  "@settingsShortcutConflictWins": {
+    "description": "Conflict warning on the row whose shortcut fires; lists the shadowed actions sharing the chord",
+    "placeholders": {
+      "others": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictShadowed": "{winner} に隠れて発動しません",
+  "@settingsShortcutConflictShadowed": {
+    "description": "Conflict warning on a shadowed row whose shortcut will not fire; names the winning action",
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictSummary": "{count, plural, =1{1 件のショートカット競合があります} other{{count} 件のショートカット競合があります}}",
+  "@settingsShortcutConflictSummary": {
+    "description": "Summary banner above the shortcut list showing how many chords are in conflict",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsShortcutResetAllTitle": "すべてのショートカットをリセットしますか？",
+  "@settingsShortcutResetAllTitle": {
+    "description": "Title of the reset-all confirmation dialog"
+  },
+  "settingsShortcutResetAllBody": "すべてのキーボードショートカットがデフォルトに戻り、カスタマイズは削除されます。",
+  "@settingsShortcutResetAllBody": {
+    "description": "Body of the reset-all confirmation dialog"
+  },
+  "settingsShortcutResetAllCancel": "キャンセル",
+  "@settingsShortcutResetAllCancel": {
+    "description": "Cancel button in the reset-all confirmation dialog"
+  },
+  "settingsShortcutExportSuccess": "キーボードショートカットをエクスポートしました。",
+  "@settingsShortcutExportSuccess": {
+    "description": "Snackbar after a successful keymap export"
+  },
+  "settingsShortcutExportFailure": "ショートカットをエクスポートできませんでした: {error}",
+  "@settingsShortcutExportFailure": {
+    "description": "Snackbar when keymap export fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutImportEmpty": "そのファイルにはショートカットのカスタマイズが含まれていません。",
+  "@settingsShortcutImportEmpty": {
+    "description": "Snackbar when an imported keymap has no customizations"
+  },
+  "settingsShortcutImportSuccess": "{count, plural, =0{ショートカットのカスタマイズはインポートされませんでした。} =1{1 件のカスタムショートカットをインポートしました。} other{{count} 件のカスタムショートカットをインポートしました。}}",
+  "@settingsShortcutImportSuccess": {
+    "description": "Snackbar after a successful keymap import",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsShortcutImportFailure": "ショートカットをインポートできませんでした: {error}",
+  "@settingsShortcutImportFailure": {
+    "description": "Snackbar when keymap import fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutImportFailureNewerVersion": "このキーマップは新しいバージョンのLintCruxで保存されているため、インポートできません。LintCruxを更新してから再試行してください。",
+  "@settingsShortcutImportFailureNewerVersion": {
+    "description": "Snackbar when a keymap file declares a schema version this build does not support, meaning it was written by a newer LintCrux release. Distinct from the generic invalid-file message."
+  },
+  "settingsShortcutsPresetLabel": "プリセット",
+  "@settingsShortcutsPresetLabel": {
+    "description": "Label for the keymap preset chooser above the editable shortcut list"
+  },
+  "settingsShortcutsPresetDescription": "キーバインドのセットを読み込みます。読み込み後も個別のショートカットをカスタマイズできます。",
+  "@settingsShortcutsPresetDescription": {
+    "description": "Description under the keymap preset chooser"
+  },
+  "settingsShortcutsPresetLintCrux": "LintCrux（デフォルト）",
+  "@settingsShortcutsPresetLintCrux": {
+    "description": "Name of the default LintCrux keymap preset in the preset chooser"
+  },
+  "settingsShortcutsPresetCustom": "カスタム",
+  "@settingsShortcutsPresetCustom": {
+    "description": "Shown in the preset chooser when the user's bindings match no built-in preset"
+  },
+  "appTitle": "LintCrux",
+  "@appTitle": {
+    "description": "Application title shown in the window title bar and About box."
+  },
+  "actionCategoryApp": "LintCrux",
+  "@actionCategoryApp": {
+    "description": "Browsable category for the host-application menu (Quit, Settings, Preferences). Renders as the macOS app menu and the branded leading menu on Linux/Windows."
+  },
+  "actionCategoryFile": "ファイル",
+  "@actionCategoryFile": {
+    "description": "Browsable category grouping file operations (Open Project, Open Sources, Reset Workspace)."
+  },
+  "actionCategoryView": "表示",
+  "@actionCategoryView": {
+    "description": "Browsable category grouping view operations (toggle theme, panel visibility)."
+  },
+  "actionCategoryNavigate": "ナビゲーション",
+  "@actionCategoryNavigate": {
+    "description": "Browsable category grouping navigation actions (jump-to, next/previous violation)."
+  },
+  "actionCategorySearch": "検索",
+  "@actionCategorySearch": {
+    "description": "Browsable category grouping search and find operations."
+  },
+  "actionCategoryTools": "ツール",
+  "@actionCategoryTools": {
+    "description": "Browsable category grouping tools and analyses (run engines, cancel run, diagnostics)."
+  },
+  "actionCategoryHelp": "ヘルプ",
+  "@actionCategoryHelp": {
+    "description": "Browsable category grouping help-related actions (About, command palette, documentation)."
+  },
+  "actionOpenProject": "プロジェクトを開く…",
+  "@actionOpenProject": {
+    "description": "Menu / command palette label for the action that opens a .lintcrux project file."
+  },
+  "actionOpenSources": "ソースファイルを開く…",
+  "@actionOpenSources": {
+    "description": "Menu / command palette label for the action that opens raw Verilog/SystemVerilog/VHDL source files."
+  },
+  "actionQuit": "LintCrux を終了",
+  "@actionQuit": {
+    "description": "Menu / command palette label for the action that quits the app."
+  },
+  "actionRunAllEngines": "すべてのエンジンを実行",
+  "@actionRunAllEngines": {
+    "description": "Menu / command palette label for the action that invokes every enabled lint engine against the active project."
+  },
+  "actionCancelRun": "実行をキャンセル",
+  "@actionCancelRun": {
+    "description": "Menu / command palette label for the action that cancels an in-progress lint run."
+  },
+  "actionToggleTheme": "テーマを切り替え",
+  "@actionToggleTheme": {
+    "description": "Menu / command palette label for the action that flips between light and dark theme."
+  },
+  "actionOpenCommandPalette": "コマンドパレット…",
+  "@actionOpenCommandPalette": {
+    "description": "Menu / command palette label for the action that opens the VS Code-style command palette."
+  },
+  "commandPaletteSearchHint": "コマンドを検索…",
+  "@commandPaletteSearchHint": {
+    "description": "Placeholder hint text in the command palette search field"
+  },
+  "commandPaletteNoResults": "コマンドが見つかりません",
+  "@commandPaletteNoResults": {
+    "description": "Message displayed in the command palette when the search query matches no actions"
+  },
+  "actionFocusSearch": "違反を検索…",
+  "@actionFocusSearch": {
+    "description": "Menu / command palette label for the action that opens the Find-in-Violations search dialog (substring / glob / regex over rule id + message; picking a result selects the violation)."
+  },
+  "actionOpenSettings": "設定…",
+  "@actionOpenSettings": {
+    "description": "Menu / command palette label for the action that opens the settings screen."
+  },
+  "actionResetWorkspace": "ワークスペースをリセット…",
+  "@actionResetWorkspace": {
+    "description": "Menu / command palette label for the action that empties the current workspace."
+  },
+  "actionOpenAbout": "LintCrux について",
+  "@actionOpenAbout": {
+    "description": "Menu / command palette label for the action that shows the About box."
+  },
+  "actionOpenCrossProbePanel": "クロスプローブピア",
+  "@actionOpenCrossProbePanel": {
+    "description": "Menu / command palette label for the action that opens the cross-probe panel showing connected CXP peers and recent cross-probe events."
+  },
+  "actionOpenWaiverReview": "ウェイバーをレビュー…",
+  "@actionOpenWaiverReview": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the managed-waiver review screen for the active project."
+  },
+  "actionSetBaseline": "現在の実行からベースラインを設定…",
+  "@actionSetBaseline": {
+    "description": "Menu / command palette label for the Pro-tier action that snapshots the current run's violations as the project baseline."
+  },
+  "actionClearBaseline": "ベースラインをクリア",
+  "@actionClearBaseline": {
+    "description": "Menu / command palette label for the Pro-tier action that clears the project's active baseline."
+  },
+  "actionOpenBaselineComparison": "ベースラインの差分を表示…",
+  "@actionOpenBaselineComparison": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the baseline-vs-current comparison screen."
+  },
+  "actionShowRuleTrendChart": "ルールトレンドチャートを表示…",
+  "@actionShowRuleTrendChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the per-rule trend chart."
+  },
+  "actionShowSeverityClassDriftChart": "重大度ドリフトチャートを表示…",
+  "@actionShowSeverityClassDriftChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the severity-class drift chart."
+  },
+  "actionShowProjectTrendChart": "プロジェクトトレンドチャートを表示…",
+  "@actionShowProjectTrendChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the project trend chart."
+  },
+  "actionShowCalendarHeatmap": "カレンダーヒートマップを表示…",
+  "@actionShowCalendarHeatmap": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the calendar heatmap screen (GitHub-style contributions grid of per-day violation activity)."
+  },
+  "actionConfigureTrendRetention": "トレンド保持期間を設定…",
+  "@actionConfigureTrendRetention": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the trend retention configuration UI."
+  },
+  "actionOpenBookmarksManager": "ブックマークした違反を表示…",
+  "@actionOpenBookmarksManager": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the violation-bookmark management panel."
+  },
+  "actionToggleBookmarkForCurrentViolation": "ブックマークを切り替え",
+  "@actionToggleBookmarkForCurrentViolation": {
+    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the Pro-tier action that toggles a bookmark on the selected violation."
+  },
+  "actionRunVeribleDryRun": "Verible 自動修正のドライランを実行…",
+  "@actionRunVeribleDryRun": {
+    "description": "Menu / command palette label for the Pro-tier action that invokes Verible in dry-run mode and opens the FixReviewDialog with the proposed fixes."
+  },
+  "actionApplyVeribleFixes": "Verible 修正を確認…",
+  "@actionApplyVeribleFixes": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Verible fix review dialog on a fresh dry-run batch. Applying is confirmed by the user inside that dialog — the action itself never applies fixes unattended. The trailing ellipsis marks that further interaction follows."
+  },
+  "actionConfigureVeribleBinary": "Verible バイナリを構成…",
+  "@actionConfigureVeribleBinary": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Settings → External Tools → Verible section."
+  },
+  "actionClearLintCache": "リントキャッシュをクリア…",
+  "@actionClearLintCache": {
+    "description": "Menu / command palette label for the Pro-tier action that wipes every cached lint result for the active project after a confirmation dialog."
+  },
+  "actionOpenLintCacheStats": "リントキャッシュ統計を表示…",
+  "@actionOpenLintCacheStats": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Settings → Lint Cache section scrolled to the live-stats panel."
+  },
+  "actionForceLintRunWithoutCache": "リントを実行（キャッシュをバイパス）",
+  "@actionForceLintRunWithoutCache": {
+    "description": "Menu / command palette label for the Pro-tier action that runs lint once with the cache bypassed in both directions for that single invocation."
+  },
+  "crossProbePanelTitle": "クロスプローブピア",
+  "@crossProbePanelTitle": {
+    "description": "Title of the cross-probe panel."
+  },
+  "crossProbePanelServerStopped": "クロスプローブサーバーは無効です。",
+  "@crossProbePanelServerStopped": {
+    "description": "Status text shown in the cross-probe panel when the CXP server is disabled in Settings."
+  },
+  "crossProbePanelPeersHeader": "検出されたピア",
+  "@crossProbePanelPeersHeader": {
+    "description": "Header above the discovered-peers list in the cross-probe panel."
+  },
+  "crossProbePanelPeersEmpty": "ピアはまだ検出されていません。",
+  "@crossProbePanelPeersEmpty": {
+    "description": "Empty-state text shown when no CXP peers have been discovered."
+  },
+  "crossProbePanelEventsHeader": "最近のイベント",
+  "@crossProbePanelEventsHeader": {
+    "description": "Header above the rolling event log in the cross-probe panel."
+  },
+  "crossProbePanelEventsEmpty": "クロスプローブイベントはまだありません。",
+  "@crossProbePanelEventsEmpty": {
+    "description": "Empty-state text shown when the cross-probe event log is empty."
+  },
+  "crossProbePanelClearEvents": "イベントを消去",
+  "@crossProbePanelClearEvents": {
+    "description": "Button that clears the cross-probe event log."
+  },
+  "crossProbePanelClose": "閉じる",
+  "@crossProbePanelClose": {
+    "description": "Button that closes the cross-probe panel dialog."
+  },
+  "settingsCxpEnabledLabel": "CXP サーバーを有効化",
+  "@settingsCxpEnabledLabel": {
+    "description": "Label of the toggle controlling whether the CXP cross-probe server starts at boot."
+  },
+  "settingsCxpEnabledDescription": "他の Crux ツール (WaveCrux、NetCrux、SimCrux) が LintCrux を検出してクロスプローブ要求を送信できるようにします。",
+  "@settingsCxpEnabledDescription": {
+    "description": "Helper text explaining what the cross-probe server does."
+  },
+  "settingsCxpPortLabel": "CXP ポート",
+  "@settingsCxpPortLabel": {
+    "description": "Label of the port input for the CXP server."
+  },
+  "settingsCxpPortDescription": "デフォルト 54324",
+  "@settingsCxpPortDescription": {
+    "description": "Hint text for the CXP port input showing the suite default."
+  },
+  "violationColumnSeverity": "重大度",
+  "@violationColumnSeverity": {
+    "description": "Header label for the severity column in the violation table."
+  },
+  "violationColumnEngine": "エンジン",
+  "@violationColumnEngine": {
+    "description": "Header label for the engine column in the violation table."
+  },
+  "violationColumnRule": "ルール",
+  "@violationColumnRule": {
+    "description": "Header label for the rule-id column in the violation table."
+  },
+  "violationColumnFile": "ファイル",
+  "@violationColumnFile": {
+    "description": "Header label for the file column in the violation table."
+  },
+  "violationColumnLine": "行",
+  "@violationColumnLine": {
+    "description": "Header label for the line-number column in the violation table."
+  },
+  "violationColumnMessage": "メッセージ",
+  "@violationColumnMessage": {
+    "description": "Header label for the violation-message column in the violation table."
+  },
+  "violationFilterRuleHint": "ルールまたはメッセージでフィルター…",
+  "@violationFilterRuleHint": {
+    "description": "Placeholder text in the rule / message substring filter input above the violation table."
+  },
+  "violationFilterFileHint": "ファイル glob でフィルター（例: **/top.sv）…",
+  "@violationFilterFileHint": {
+    "description": "Placeholder text in the file-path glob filter input above the violation table."
+  },
+  "violationStatusEmpty": "違反はありません。",
+  "@violationStatusEmpty": {
+    "description": "Body text shown in the violation table when no engines have produced any violations and no run is in progress."
+  },
+  "violationStatusFiltered": "現在のフィルターに一致する違反はありません。",
+  "@violationStatusFiltered": {
+    "description": "Body text shown in the violation table when violations exist but the active filters exclude all of them."
+  },
+  "violationStatusSummary": "合計 {total} · エラー {errors} · 警告 {warnings} · 注記 {notes} · ウェイバー済み {waived}",
+  "@violationStatusSummary": {
+    "description": "Status-bar summary text below the violation table. Renders live counts of total, error, warning, note, and waived violations.",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      },
+      "warnings": {
+        "type": "int"
+      },
+      "notes": {
+        "type": "int"
+      },
+      "waived": {
+        "type": "int"
+      }
+    }
+  },
+  "severityFatal": "致命的",
+  "@severityFatal": {
+    "description": "Display label for the Fatal severity in filter chips and the severity column tooltip."
+  },
+  "severityError": "エラー",
+  "@severityError": {
+    "description": "Display label for the Error severity in filter chips and the severity column tooltip."
+  },
+  "severityWarning": "警告",
+  "@severityWarning": {
+    "description": "Display label for the Warning severity in filter chips and the severity column tooltip."
+  },
+  "severityNote": "注記",
+  "@severityNote": {
+    "description": "Display label for the Note severity in filter chips and the severity column tooltip."
+  },
+  "severityNone": "未分類",
+  "@severityNone": {
+    "description": "Display label for the None severity (unclassified output) in filter chips and the severity column tooltip."
+  },
+  "inspectorEmpty": "詳細を表示する違反を選択してください。",
+  "inspectorEngineStatusHeader": "エンジン状態",
+  "inspectorEnginePhaseIdle": "待機中",
+  "inspectorEnginePhaseRunning": "実行中",
+  "inspectorEnginePhaseCompleted": "完了",
+  "inspectorEnginePhaseFailed": "失敗",
+  "inspectorEnginePhaseUnavailable": "バイナリが利用できません",
+  "inspectorEnginePhaseCancelled": "キャンセルされました",
+  "inspectorEngineConfigureHint": "不足しているバイナリをインストールするか、設定 > エンジンでカスタムパスを設定してください。",
+  "@inspectorEmpty": {
+    "description": "Empty-state body shown in the inspector pane when no violation is selected."
+  },
+  "inspectorRuleHeader": "ルール",
+  "@inspectorRuleHeader": {
+    "description": "Section header in the inspector pane above the engine-namespaced rule id and severity badge."
+  },
+  "inspectorMessageHeader": "メッセージ",
+  "@inspectorMessageHeader": {
+    "description": "Section header in the inspector pane above the full engine-supplied message."
+  },
+  "inspectorLocationHeader": "場所",
+  "@inspectorLocationHeader": {
+    "description": "Section header in the inspector pane above the file:line:col."
+  },
+  "inspectorMetadataHeader": "ルールの詳細",
+  "@inspectorMetadataHeader": {
+    "description": "Section header in the inspector pane above the rule-database metadata block (tags + help url)."
+  },
+  "inspectorTagsLabel": "タグ",
+  "@inspectorTagsLabel": {
+    "description": "Label rendered to the left of the rule's tag chips in the inspector pane."
+  },
+  "inspectorRelatedLocationsHeader": "関連する場所",
+  "@inspectorRelatedLocationsHeader": {
+    "description": "Section header in the inspector pane above the list of additional locations associated with the violation."
+  },
+  "inspectorOpenInEditor": "エディターで開く",
+  "@inspectorOpenInEditor": {
+    "description": "Button label that launches the user's editor at the violation's primary location."
+  },
+  "inspectorHelpUrlLabel": "詳細を見る",
+  "@inspectorHelpUrlLabel": {
+    "description": "Button label that opens the rule's help URL in the user's browser."
+  },
+  "sourcePreviewEmpty": "ソースをプレビューする違反を選択してください。",
+  "@sourcePreviewEmpty": {
+    "description": "Empty-state body shown in the source preview pane when no violation is selected."
+  },
+  "sourcePreviewFileMissing": "ソースを読み込めません: {file}",
+  "@sourcePreviewFileMissing": {
+    "description": "Error body shown in the source preview pane when the selected violation's file cannot be read.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "editorLaunchFailed": "エディターを起動できません ({command})。",
+  "@editorLaunchFailed": {
+    "description": "Snackbar text shown when click-to-source fails because the configured editor binary is not on PATH or could not be started.",
+    "placeholders": {
+      "command": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsEditorPresetVsCode": "Visual Studio Code",
+  "@settingsEditorPresetVsCode": {
+    "description": "Settings → Editors radio label for the VS Code preset."
+  },
+  "settingsEditorPresetSublime": "Sublime Text",
+  "@settingsEditorPresetSublime": {
+    "description": "Settings → Editors radio label for the Sublime Text preset."
+  },
+  "settingsEditorPresetVim": "Vim / Neovim",
+  "@settingsEditorPresetVim": {
+    "description": "Settings → Editors radio label for the Vim / Neovim preset."
+  },
+  "settingsEditorPresetEmacs": "Emacs",
+  "@settingsEditorPresetEmacs": {
+    "description": "Settings → Editors radio label for the Emacs preset."
+  },
+  "settingsEditorPresetCustom": "カスタム",
+  "@settingsEditorPresetCustom": {
+    "description": "Settings → Editors radio label for the custom executable + arg template."
+  },
+  "settingsEditorExecutableLabel": "実行ファイル",
+  "@settingsEditorExecutableLabel": {
+    "description": "Label of the executable text input under Settings → Editors."
+  },
+  "settingsEditorArgsTemplateLabel": "引数テンプレート",
+  "@settingsEditorArgsTemplateLabel": {
+    "description": "Label of the args template text input under Settings → Editors. Tooltip explains that {file}, {line}, and {column} are substituted."
+  },
+  "settingsEditorTemplateHelp": "{file}、{line}、{column} をプレースホルダとして使用します。",
+  "@settingsEditorTemplateHelp": {
+    "description": "Helper text shown beneath the args template input under Settings → Editors."
+  },
+  "settingsGeneralSection": "一般",
+  "@settingsGeneralSection": {
+    "description": "Section header for the General group in Settings."
+  },
+  "settingsAppearanceSection": "外観",
+  "@settingsAppearanceSection": {
+    "description": "Section header for the Appearance group in Settings."
+  },
+  "settingsEnginesSection": "エンジン",
+  "@settingsEnginesSection": {
+    "description": "Section header for the Engines group in Settings."
+  },
+  "settingsEditorsSection": "エディター",
+  "@settingsEditorsSection": {
+    "description": "Section header for the Editors group in Settings."
+  },
+  "settingsAutoReloadLabel": "ソース変更時に自動再読み込み",
+  "@settingsAutoReloadLabel": {
+    "description": "Settings → General label for the AutoReloadMode toggle."
+  },
+  "settingsAutoReloadAuto": "自動的に再実行する",
+  "@settingsAutoReloadAuto": {
+    "description": "Settings → General option for AutoReloadMode.auto."
+  },
+  "settingsAutoReloadPrompt": "確認する",
+  "@settingsAutoReloadPrompt": {
+    "description": "Settings → General option for AutoReloadMode.prompt."
+  },
+  "settingsAutoReloadOff": "何もしない",
+  "@settingsAutoReloadOff": {
+    "description": "Settings → General option for AutoReloadMode.off."
+  },
+  "autoReloadPromptMessage": "ソースファイルが変更されました。変更を反映するためにエンジンを再実行しますか？",
+  "@autoReloadPromptMessage": {
+    "description": "Snackbar shown in a project tab when a watched source file changed and Settings > General > Auto-reload on source change is set to Prompt me first."
+  },
+  "autoReloadActionRerun": "今すぐ再実行",
+  "@autoReloadActionRerun": {
+    "description": "Action on the source-changed snackbar that re-runs the tab's engines."
+  },
+  "engineConfigSeverityOverridesHeader": "ルールごとの重大度の上書き",
+  "@engineConfigSeverityOverridesHeader": {
+    "description": "Section header in the engine config screen above the rule-list with severity dropdowns."
+  },
+  "engineConfigOverrideBadge": "上書き済み",
+  "@engineConfigOverrideBadge": {
+    "description": "Short badge shown next to a rule whose severity has been overridden by the user."
+  },
+  "searchDialogTitle": "違反を検索",
+  "@searchDialogTitle": {
+    "description": "Title bar of the search-violations modal overlay."
+  },
+  "searchDialogHint": "ルールまたはメッセージを検索",
+  "@searchDialogHint": {
+    "description": "Placeholder text in the search-violations input."
+  },
+  "searchModeSubstring": "部分文字列",
+  "@searchModeSubstring": {
+    "description": "Search-mode toggle label for substring matching."
+  },
+  "searchModeGlob": "Glob",
+  "@searchModeGlob": {
+    "description": "Search-mode toggle label for glob matching."
+  },
+  "searchModeRegex": "正規表現",
+  "@searchModeRegex": {
+    "description": "Search-mode toggle label for regex matching."
+  },
+  "searchNoResults": "一致するものはありません。",
+  "@searchNoResults": {
+    "description": "Empty-state body shown in the search dialog when no violations match the active pattern."
+  },
+  "exportSuccess": "{n} 件の違反を {path} にエクスポートしました",
+  "@exportSuccess": {
+    "description": "Snackbar text shown after a successful export.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyCanvasTitle": "LintCrux へようこそ",
+  "@emptyCanvasTitle": {
+    "description": "Headline rendered in the empty-canvas state when no tabs are open."
+  },
+  "diagnosticsTabDrawerTitle": "タブ診断",
+  "@diagnosticsTabDrawerTitle": {
+    "description": "Title of the per-tab diagnostics drawer."
+  },
+  "diagnosticsAppDialogTitle": "アプリ診断",
+  "@diagnosticsAppDialogTitle": {
+    "description": "Title of the process-wide diagnostics dialog."
+  },
+  "diagnosticsSectionEngines": "エンジン",
+  "@diagnosticsSectionEngines": {
+    "description": "Section header in the Tab Diagnostics drawer above the per-engine status block."
+  },
+  "diagnosticsSectionProjectInfo": "プロジェクト情報",
+  "@diagnosticsSectionProjectInfo": {
+    "description": "Section header in the Tab Diagnostics drawer above the project-info block."
+  },
+  "diagnosticsSectionViolationStats": "違反の統計",
+  "@diagnosticsSectionViolationStats": {
+    "description": "Section header in the Tab Diagnostics drawer above the per-severity / per-engine / per-rule violation counts."
+  },
+  "diagnosticsCopyTabReport": "タブ診断レポートをコピー",
+  "@diagnosticsCopyTabReport": {
+    "description": "Action label that copies the active tab's diagnostics report to the clipboard."
+  },
+  "diagnosticsCopyFullReport": "フル診断レポートをコピー",
+  "@diagnosticsCopyFullReport": {
+    "description": "Action label that copies the full app diagnostics report to the clipboard."
+  },
+  "settingsTitle": "設定",
+  "@settingsTitle": {
+    "description": "AppBar title for the multi-section Settings screen."
+  },
+  "settingsClose": "閉じる",
+  "@settingsClose": {
+    "description": "Tooltip for the back/close button in the Settings screen AppBar."
+  },
+  "settingsGeneralDefaultSortLabel": "デフォルトのソート列",
+  "@settingsGeneralDefaultSortLabel": {
+    "description": "Settings → General label for the default-sort-column dropdown that controls the initial sort of the violation table."
+  },
+  "settingsGeneralDefaultSortSeverity": "重大度",
+  "@settingsGeneralDefaultSortSeverity": {
+    "description": "Settings → General option for the 'Severity' default sort column."
+  },
+  "settingsGeneralDefaultSortEngine": "エンジン",
+  "@settingsGeneralDefaultSortEngine": {
+    "description": "Settings → General option for the 'Engine' default sort column."
+  },
+  "settingsGeneralDefaultSortRule": "ルール",
+  "@settingsGeneralDefaultSortRule": {
+    "description": "Settings → General option for the 'Rule' default sort column."
+  },
+  "settingsGeneralDefaultSortFile": "ファイル",
+  "@settingsGeneralDefaultSortFile": {
+    "description": "Settings → General option for the 'File' default sort column."
+  },
+  "settingsGeneralDefaultFilterLabel": "起動時のデフォルトフィルター",
+  "@settingsGeneralDefaultFilterLabel": {
+    "description": "Settings → General label for the saved-filter-preset dropdown that controls which filter set is active on app launch."
+  },
+  "settingsGeneralDefaultFilterNone": "なし — 全違反を表示",
+  "@settingsGeneralDefaultFilterNone": {
+    "description": "Settings → General dropdown option indicating no default filter preset is selected."
+  },
+  "settingsEditorsHeader": "クリックジャンプ用エディター",
+  "@settingsEditorsHeader": {
+    "description": "Settings → Editors section heading above the preset radios."
+  },
+  "settingsEditorsLivePreviewLabel": "ライブプレビュー",
+  "@settingsEditorsLivePreviewLabel": {
+    "description": "Settings → Editors label above the line that previews the fully expanded shell command for a sample file."
+  },
+  "settingsEditorsLivePreviewSample": "サンプル: src/example.sv:42:13",
+  "@settingsEditorsLivePreviewSample": {
+    "description": "Settings → Editors caption indicating which sample file + line + column the preview row substitutes."
+  },
+  "settingsEditorsResetButton": "デフォルト(VS Code)に戻す",
+  "@settingsEditorsResetButton": {
+    "description": "Settings → Editors button that restores the click-to-source editor command to the VS Code preset."
+  },
+  "filterPresetSaveAction": "現在のフィルターをプリセットとして保存…",
+  "@filterPresetSaveAction": {
+    "description": "Filter-preset dropdown action that opens a name-input dialog to save the current filters as a new named preset."
+  },
+  "filterPresetManageAction": "プリセットを管理…",
+  "@filterPresetManageAction": {
+    "description": "Filter-preset dropdown action that opens the manage-presets dialog (delete, rename)."
+  },
+  "filterPresetDropdownLabel": "フィルタープリセット",
+  "@filterPresetDropdownLabel": {
+    "description": "Label above the filter-preset dropdown that appears above the violation table."
+  },
+  "filterPresetNoneLabel": "なし",
+  "@filterPresetNoneLabel": {
+    "description": "Filter-preset dropdown entry representing 'no preset active' (i.e. filters are whatever the user has manually applied)."
+  },
+  "filterPresetSaveDialogTitle": "フィルタープリセットを保存",
+  "@filterPresetSaveDialogTitle": {
+    "description": "Title of the dialog that prompts for a preset name when saving current filters as a new preset."
+  },
+  "filterPresetNameLabel": "プリセット名",
+  "@filterPresetNameLabel": {
+    "description": "Input field label in the save-filter-preset dialog."
+  },
+  "filterPresetManageDialogTitle": "フィルタープリセットの管理",
+  "@filterPresetManageDialogTitle": {
+    "description": "Title of the dialog that lists existing filter presets with delete affordances."
+  },
+  "filterPresetEmptyState": "保存されたプリセットがありません。フィルターを設定して「現在のフィルターをプリセットとして保存…」を選択してください。",
+  "@filterPresetEmptyState": {
+    "description": "Empty-state body text in the manage-filter-presets dialog when the user has not yet saved any presets."
+  },
+  "filterPresetDeleteTooltip": "プリセットを削除",
+  "@filterPresetDeleteTooltip": {
+    "description": "Tooltip on the trash icon next to each preset in the manage-filter-presets dialog."
+  },
+  "filterPresetSaveButton": "保存",
+  "@filterPresetSaveButton": {
+    "description": "Confirm button label in the save-filter-preset dialog."
+  },
+  "filterPresetCancelButton": "キャンセル",
+  "@filterPresetCancelButton": {
+    "description": "Cancel button label in the save-filter-preset / manage-presets dialogs."
+  },
+  "filterPresetDoneButton": "完了",
+  "@filterPresetDoneButton": {
+    "description": "Close button label in the manage-filter-presets dialog."
+  },
+  "actionSaveSession": "セッションを保存…",
+  "@actionSaveSession": {
+    "description": "Menu / command palette label for the action that saves a .lintcrux-session file."
+  },
+  "actionOpenSession": "セッションを開く…",
+  "@actionOpenSession": {
+    "description": "Menu / command palette label for the action that opens a .lintcrux-session file."
+  },
+  "actionImportSarif": "SARIF レポートをインポート…",
+  "@actionImportSarif": {
+    "description": "Menu / command palette / toolbar / welcome label for the desktop action that imports a CI-generated SARIF report into a read-only viewer without re-running engines."
+  },
+  "actionExportSarif": "違反を SARIF としてエクスポート…",
+  "@actionExportSarif": {
+    "description": "Menu / command palette label for the action that exports the current violation set as SARIF 2.1.0."
+  },
+  "actionExportJson": "違反を JSON としてエクスポート…",
+  "@actionExportJson": {
+    "description": "Menu / command palette label for the action that exports the current violation set as JSON."
+  },
+  "actionExportCsv": "違反を CSV としてエクスポート…",
+  "@actionExportCsv": {
+    "description": "Menu / command palette label for the action that exports the current violation set as CSV (RFC 4180 quoting)."
+  },
+  "actionExportHtml": "違反を HTML としてエクスポート…",
+  "@actionExportHtml": {
+    "description": "Menu / command palette label for the action that exports the current violation set as a single-page HTML dashboard."
+  },
+  "actionOpenTabDiagnostics": "タブ診断…",
+  "@actionOpenTabDiagnostics": {
+    "description": "Menu / command palette label for the action that opens the per-tab diagnostics drawer."
+  },
+  "actionOpenAppDiagnostics": "アプリ診断…",
+  "@actionOpenAppDiagnostics": {
+    "description": "Menu / command palette label for the action that opens the process-wide diagnostics dialog."
+  },
+  "actionSaveFilterPreset": "フィルタープリセットを保存…",
+  "@actionSaveFilterPreset": {
+    "description": "Menu / command palette label for the action that opens the save-filter-preset dialog."
+  },
+  "actionManageFilterPresets": "フィルタープリセットを管理…",
+  "@actionManageFilterPresets": {
+    "description": "Menu / command palette label for the action that opens the manage-filter-presets dialog."
+  },
+  "actionImportVivadoFilelist": "Vivado ファイルリストをインポート…",
+  "@actionImportVivadoFilelist": {
+    "description": "Menu / command palette label for the action that imports a Vivado-style `.f` filelist into a new .lintcrux project."
+  },
+  "actionImportEdam": "FuseSoC EDAM をインポート…",
+  "@actionImportEdam": {
+    "description": "Menu / command palette label for the action that imports a FuseSoC/Edalize EDAM (.eda.yml) file into a new .lintcrux project."
+  },
+  "filelistImportError": "ファイルリストをインポートできませんでした: {message}",
+  "@filelistImportError": {
+    "description": "Snackbar shown after a failed filelist import. Includes the underlying FilelistImportException message.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "edamImportError": "EDAM ファイルをインポートできませんでした: {message}",
+  "@edamImportError": {
+    "description": "Snackbar shown after a failed EDAM import. Includes the underlying EdamImportException message.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigBinaryOverridesHeader": "エンジンバイナリのパス",
+  "@engineConfigBinaryOverridesHeader": {
+    "description": "Section header for the per-engine binary-path override list in Settings → Engines."
+  },
+  "engineConfigBinaryOverridesHelp": "各エンジンバイナリの取得元を選択します。自動検出は PATH を検索します。バンドルは LintCrux に同梱されるプラットフォーム別バイナリ用の予約項目ですが、現時点で同梱されているエンジンはありません。そのため LINTCRUX_BUNDLED_BIN_DIR がバイナリのディレクトリを指していない限り、バンドルも PATH にフォールバックします。カスタムは明示的な絶対パスを受け付けます。",
+  "@engineConfigBinaryOverridesHelp": {
+    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the three modes, including that Bundled resolves nothing today because no engine binaries ship with the app."
+  },
+  "engineConfigBinarySourceAuto": "自動検出",
+  "@engineConfigBinarySourceAuto": {
+    "description": "Label for the auto-detect segment of the binary-source SegmentedButton (Settings → Engines)."
+  },
+  "engineConfigBinarySourceBundled": "バンドル",
+  "@engineConfigBinarySourceBundled": {
+    "description": "Label for the bundled-binary segment of the binary-source SegmentedButton."
+  },
+  "engineConfigBinarySourceCustom": "カスタム",
+  "@engineConfigBinarySourceCustom": {
+    "description": "Label for the custom-path segment of the binary-source SegmentedButton."
+  },
+  "engineConfigBinaryPathLabel": "バイナリのパス",
+  "@engineConfigBinaryPathLabel": {
+    "description": "Label for the custom binary-path text field shown when 'Custom' is selected."
+  },
+  "engineConfigBinaryProbeButton": "確認",
+  "@engineConfigBinaryProbeButton": {
+    "description": "Label for the button that runs `<binary> --version` against the entered custom path and surfaces the detected version."
+  },
+  "engineConfigBinaryProbing": "確認中…",
+  "@engineConfigBinaryProbing": {
+    "description": "Status text shown while the version probe is in flight."
+  },
+  "engineConfigBinaryProbeSuccess": "検出: {version}",
+  "@engineConfigBinaryProbeSuccess": {
+    "description": "Status text shown after a successful version probe. Includes the detected version string verbatim.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigBinaryProbeFailure": "バージョンを検出できませんでした — バイナリが存在しないか互換性がない可能性があります。",
+  "@engineConfigBinaryProbeFailure": {
+    "description": "Status text shown when the version probe returned null / exited non-zero."
+  },
+  "yosysDiagnosticsSectionTitle": "Yosys 診断",
+  "@yosysDiagnosticsSectionTitle": {
+    "description": "Section header in the Tab Diagnostics drawer above the raw YosysDiagnostic list captured during the most recent run."
+  },
+  "yosysDiagnosticsEmpty": "直近の実行に Yosys 診断はありません。",
+  "@yosysDiagnosticsEmpty": {
+    "description": "Placeholder text shown when the Yosys engine produced no diagnostics (or the engine was disabled / unavailable)."
+  },
+  "yosysDiagnosticsSeverityError": "エラー",
+  "@yosysDiagnosticsSeverityError": {
+    "description": "Filter-chip label for the 'error' severity in the Yosys Diagnostics section. Plural label because the chip filters every row of that severity."
+  },
+  "yosysDiagnosticsSeverityWarning": "警告",
+  "@yosysDiagnosticsSeverityWarning": {
+    "description": "Filter-chip label for the 'warning' severity in the Yosys Diagnostics section."
+  },
+  "yosysDiagnosticsSeverityInfo": "情報",
+  "@yosysDiagnosticsSeverityInfo": {
+    "description": "Filter-chip label for the 'info' severity in the Yosys Diagnostics section."
+  },
+  "webModeAppBarTitle": "LintCrux ビューアー",
+  "@webModeAppBarTitle": {
+    "description": "App bar title on the web read-only landing screen — communicates that this is the read-only browser viewer, not the full desktop LintCrux."
+  },
+  "webModeHeadline": "読み取り専用 SARIF ビューアー",
+  "@webModeHeadline": {
+    "description": "Hero headline on the web read-only landing screen — sets the expectation that this is a viewer, not a runner."
+  },
+  "webModeBody": "SARIF レポートをアップロードするか、ホストされたレポートの URL を貼り付けてください。ブラウザビューアーは違反テーブル、フィルターチップ、インスペクター、ソースプレビューをデスクトップダッシュボードと同じように表示しますが、リントエンジンの実行やプロジェクト設定の変更はできません。",
+  "@webModeBody": {
+    "description": "Body text on the web read-only landing screen explaining the two ingestion paths and the read-only limitation."
+  },
+  "webModeOpenFileButton": "SARIF ファイルを開く…",
+  "@webModeOpenFileButton": {
+    "description": "Button label for the file-picker upload path on the web landing screen."
+  },
+  "webModeUrlPrompt": "または、ホストされた SARIF レポートを URL で開きます:",
+  "@webModeUrlPrompt": {
+    "description": "Label above the URL input field on the web landing screen."
+  },
+  "webModeUrlFieldLabel": "SARIF URL",
+  "@webModeUrlFieldLabel": {
+    "description": "Floating label of the URL input field on the web landing screen."
+  },
+  "webModeUrlOpenButton": "開く",
+  "@webModeUrlOpenButton": {
+    "description": "Button label next to the URL input field — fetches and opens the SARIF document at the given URL."
+  },
+  "webModeInvalidUrl": "有効な http または https URL を入力してください。",
+  "@webModeInvalidUrl": {
+    "description": "Error message shown when the URL field contains a value that is not a parseable http/https URI."
+  },
+  "webModeFooterNote": "エンジン編成、ファイル監視、プロジェクト設定、ウェイバーはデスクトップ専用の機能です。リントエンジンをローカルで実行するには、lintcrux.app/download からデスクトップアプリをインストールしてください。",
+  "@webModeFooterNote": {
+    "description": "Footer note on the web read-only landing screen — clarifies that the browser viewer is observation-only and points users to the desktop app for engine orchestration."
+  },
+  "webViewerAppBarTitle": "SARIF を表示",
+  "@webViewerAppBarTitle": {
+    "description": "App bar title on the web read-only viewer screen — descriptive prefix; the loaded source name renders to its right."
+  },
+  "webViewerNoSource": "(ソースが読み込まれていません)",
+  "@webViewerNoSource": {
+    "description": "Placeholder rendered in the viewer subtitle when no SARIF source is loaded yet (the user navigated directly to /web/viewer without going through the landing screen)."
+  },
+  "webViewerOpenAnotherButton": "別のファイルを開く",
+  "@webViewerOpenAnotherButton": {
+    "description": "App bar action label on the web viewer screen — returns the user to the landing screen to upload a different SARIF report."
+  },
+  "importSarifFailed": "SARIF レポートをインポートできませんでした: {error}",
+  "@importSarifFailed": {
+    "description": "Snackbar shown on the desktop when importing a SARIF report fails (malformed / truncated / unreadable file). The previously-loaded report, if any, is left intact.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importSarifViewerTitle": "インポートした SARIF レポート",
+  "@importSarifViewerTitle": {
+    "description": "App bar title on the desktop read-only imported-SARIF viewer screen — descriptive prefix; the imported file name renders to its right."
+  },
+  "importSarifViewerNoSource": "(レポート未インポート)",
+  "@importSarifViewerNoSource": {
+    "description": "Placeholder rendered in the imported-SARIF viewer subtitle when no report has been imported yet."
+  },
+  "importSarifViewerBackButton": "ワークスペースに戻る",
+  "@importSarifViewerBackButton": {
+    "description": "App bar action on the desktop imported-SARIF viewer that returns the user to the project workspace."
+  },
+  "importSarifViewerImportAnotherButton": "別のレポートをインポート…",
+  "@importSarifViewerImportAnotherButton": {
+    "description": "App bar action on the desktop imported-SARIF viewer that opens the file picker to import a different SARIF report."
+  },
+  "viewerTabBarCloseTabTooltip": "タブを閉じる",
+  "@viewerTabBarCloseTabTooltip": {
+    "description": "Tooltip rendered over the per-chip close (×) button."
+  },
+  "tabChipCloseTooltip": "{name} を閉じる",
+  "@tabChipCloseTooltip": {
+    "description": "See app_en.arb for description",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "viewerTabBarScrollTabsLeftTooltip": "タブを左にスクロール",
+  "@viewerTabBarScrollTabsLeftTooltip": {
+    "description": "Tooltip on the chevron that scrolls the tab strip toward its start."
+  },
+  "viewerTabBarScrollTabsRightTooltip": "タブを右にスクロール",
+  "@viewerTabBarScrollTabsRightTooltip": {
+    "description": "Tooltip on the chevron that scrolls the tab strip toward its end."
+  },
+  "diagnosticsCloseTooltip": "閉じる",
+  "@diagnosticsCloseTooltip": {
+    "description": "Tooltip on the close (×) button in the App Diagnostics dialog."
+  },
+  "viewerTabBarNewTabTooltip": "新しいタブ",
+  "@viewerTabBarNewTabTooltip": {
+    "description": "Tooltip rendered over the trailing \"+\" new-tab button."
+  },
+  "viewerTabBarNewTabDefaultDisplayName": "新しいタブ",
+  "@viewerTabBarNewTabDefaultDisplayName": {
+    "description": "Default display name used when the user creates an empty new tab via the trailing \"+\" button."
+  },
+  "viewerTabBarUnnamedTabFallback": "(名称未設定のタブ)",
+  "@viewerTabBarUnnamedTabFallback": {
+    "description": "Fallback rendered in place of a tab's display name when the host hands in a blank string."
+  },
+  "viewerTabBarCloseTabMenuItem": "タブを閉じる",
+  "@viewerTabBarCloseTabMenuItem": {
+    "description": "Tab chip context-menu item that closes the tab."
+  },
+  "viewerTabBarCloseOtherTabsMenuItem": "他のタブを閉じる",
+  "@viewerTabBarCloseOtherTabsMenuItem": {
+    "description": "Tab chip context-menu item that closes every tab except the right-clicked one."
+  },
+  "viewerTabBarCloseTabsToTheRightMenuItem": "右側のタブを閉じる",
+  "@viewerTabBarCloseTabsToTheRightMenuItem": {
+    "description": "Tab chip context-menu item that closes every tab to the right of the right-clicked one."
+  },
+  "viewerTabBarMoveToNewWindowMenuItem": "新しいウィンドウへ移動",
+  "@viewerTabBarMoveToNewWindowMenuItem": {
+    "description": "Tab chip context-menu item that detaches the tab into its own window. Disabled until Flutter multi-window stabilizes."
+  },
+  "viewerTabBarMultiWindowUnavailableTooltip": "Flutter のマルチウィンドウが安定版になると利用可能",
+  "@viewerTabBarMultiWindowUnavailableTooltip": {
+    "description": "Tooltip shown next to the disabled \"Move to New Window\" menu item."
+  },
+  "viewerTabBarActivePaneAccessibilityLabel": "アクティブなペイン",
+  "@viewerTabBarActivePaneAccessibilityLabel": {
+    "description": "Accessibility label rendered on the surrounding container of the active pane so screen readers announce focus changes."
+  },
+  "viewerTabBarDragToPaneAccessibilityHint": "ここにドロップしてタブをこのペインに移動",
+  "@viewerTabBarDragToPaneAccessibilityHint": {
+    "description": "Accessibility hint announced while a tab is being dragged toward another pane's tab bar."
+  },
+  "viewerTabBarReorderHandleTooltip": "ドラッグして並べ替え",
+  "@viewerTabBarReorderHandleTooltip": {
+    "description": "Tooltip describing the leading drag handle on each chip."
+  },
+  "emptyCanvasSubtitle": "プロジェクトを開いてリントを開始するか、保存済みセッションを復元するか、名前付きワークスペースを読み込みます。",
+  "@emptyCanvasSubtitle": {
+    "description": "One-line subtitle below the empty-canvas headline."
+  },
+  "emptyCanvasVersion": "バージョン {version}",
+  "@emptyCanvasVersion": {
+    "description": "Muted version line under the empty-canvas (welcome) subtitle. The only always-visible version indicator on web, where there is no native menu bar to host an About entry point.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyCanvasSuiteFooter": "EDACrux 製品スイートの一員 — edacrux.app",
+  "@emptyCanvasSuiteFooter": {
+    "description": "Suite-membership line at the foot of the empty-canvas (welcome) screen. The whole line is a link to the EDACrux suite site. \"edacrux.app\" must appear verbatim — the widget splits the sentence around it to underline the domain — but a translation that drops it still renders and is still followable, just without an underlined segment. \"EDACrux\" is one word and is never translated."
+  },
+  "emptyCanvasPeersHeading": "EDACrux の他の製品",
+  "@emptyCanvasPeersHeading": {
+    "description": "Section header above the three sibling-product rows at the foot of the empty-canvas (welcome) screen. Rendered upper-case in English as a small letter-spaced label, matching the \"RECENT FILES\" headers above it; a locale whose script has no case simply reads as a label. \"EDACrux\" is one word and is never translated."
+  },
+  "emptyCanvasPeerWaveCrux": "違反が起きる瞬間を見る。ルールに触れた実行の波形を開く。",
+  "@emptyCanvasPeerWaveCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing WaveCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what WaveCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasPeerNetCrux": "指摘が指す論理を確認。違反を回路図へクロスプローブ。",
+  "@emptyCanvasPeerNetCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing NetCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what NetCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasPeerSimCrux": "読むだけでなく実行する。lint したソースでリグレッションを起動。",
+  "@emptyCanvasPeerSimCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing SimCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what SimCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasOpenProjectButton": "プロジェクトを開く…",
+  "@emptyCanvasOpenProjectButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux` project file."
+  },
+  "emptyCanvasOpenSessionButton": "セッションを開く…",
+  "@emptyCanvasOpenSessionButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux-session` file."
+  },
+  "emptyCanvasOpenWorkspaceButton": "ワークスペースを開く…",
+  "@emptyCanvasOpenWorkspaceButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux-workspace` file."
+  },
+  "emptyCanvasNewProjectButton": "新規プロジェクト…",
+  "@emptyCanvasNewProjectButton": {
+    "description": "Empty-canvas button that creates a new `.lintcrux` project."
+  },
+  "emptyCanvasRecentProjectsHeading": "最近のプロジェクト",
+  "@emptyCanvasRecentProjectsHeading": {
+    "description": "Section heading above the recent-projects list on the empty-canvas state."
+  },
+  "emptyCanvasRecentWorkspacesHeading": "最近のワークスペース",
+  "@emptyCanvasRecentWorkspacesHeading": {
+    "description": "Section heading above the recent-workspaces list on the empty-canvas state."
+  },
+  "emptyCanvasNoRecentProjects": "最近のプロジェクトはまだありません。",
+  "@emptyCanvasNoRecentProjects": {
+    "description": "Placeholder shown in the recent-projects section when the list is empty."
+  },
+  "emptyCanvasNoRecentWorkspaces": "最近のワークスペースはまだありません。",
+  "@emptyCanvasNoRecentWorkspaces": {
+    "description": "Placeholder shown in the recent-workspaces section when the list is empty."
+  },
+  "actionNewWorkspace": "新規ワークスペース",
+  "@actionNewWorkspace": {
+    "description": "Menu / command palette label for the action that closes the current workspace and starts a fresh empty one."
+  },
+  "actionSaveWorkspaceAs": "ワークスペースに名前を付けて保存…",
+  "@actionSaveWorkspaceAs": {
+    "description": "Menu / command palette label for the action that saves the current workspace under a user-chosen filename."
+  },
+  "actionOpenWorkspace": "ワークスペースを開く…",
+  "@actionOpenWorkspace": {
+    "description": "Menu / command palette label for the action that loads a `.lintcrux-workspace` file, replacing the current workspace."
+  },
+  "actionSplitPaneRight": "ペインを右に分割",
+  "@actionSplitPaneRight": {
+    "description": "Menu / command palette label for the action that splits the active pane horizontally."
+  },
+  "actionClosePane": "ペインを閉じる",
+  "@actionClosePane": {
+    "description": "Menu / command palette label for the action that closes the active pane, merging its tabs into the surviving pane."
+  },
+  "actionFocusOtherPane": "もう一方のペインにフォーカス",
+  "@actionFocusOtherPane": {
+    "description": "Menu / command palette label for the action that toggles focus to the non-active pane."
+  },
+  "actionMoveTabToOtherPane": "タブをもう一方のペインに移動",
+  "@actionMoveTabToOtherPane": {
+    "description": "Menu / command palette label for the action that moves the active tab to the other pane."
+  },
+  "actionNewTab": "新しいタブ",
+  "@actionNewTab": {
+    "description": "Menu / command palette label for the action that creates a new empty tab in the active pane."
+  },
+  "actionCloseTab": "タブを閉じる",
+  "@actionCloseTab": {
+    "description": "Menu / command palette label for the action that closes the active tab."
+  },
+  "actionNextTab": "次のタブ",
+  "@actionNextTab": {
+    "description": "Menu / command palette label for the action that activates the next tab in the active pane."
+  },
+  "actionPreviousTab": "前のタブ",
+  "@actionPreviousTab": {
+    "description": "Menu / command palette label for the action that activates the previous tab in the active pane."
+  },
+  "workspaceLoadFailed": "ワークスペースの読み込みに失敗しました: {message}",
+  "@workspaceLoadFailed": {
+    "description": "Snackbar message shown when loading a `.lintcrux-workspace` file fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "filePickerFailed": "ファイルピッカーを開けませんでした: {error}",
+  "@filePickerFailed": {
+    "description": "Snackbar shown when the file picker throws (e.g. macOS rejects an unknown extension, or the OS file-selector plugin returns an error). Surfaces the underlying error so file-open failures are not silent.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "openProjectLegacyManifestName": "この設計のマニフェストは旧ファイル名 .crux-project のままです。{suggestedName} に名前を変更してください。今後のリリースでは旧ファイル名は読み込まれません。",
+  "@openProjectLegacyManifestName": {
+    "description": "Info snackbar shown once after opening a design manifest still named with the legacy bare .crux-project file name. suggestedName is the <design>.crux-project file name to rename it to. Keep .crux-project and the placeholder verbatim.",
+    "placeholders": {
+      "suggestedName": {
+        "type": "String"
+      }
+    }
+  },
+  "openProjectAmbiguousManifests": "設計を開けませんでした。{directory} に設計マニフェストが複数あります（{names}）。設計フォルダーに置けるマニフェストは 1 つだけです。不要なものを削除するか統合してください。",
+  "@openProjectAmbiguousManifests": {
+    "description": "Error snackbar shown when opening a design manifest whose folder holds more than one manifest, so nothing is opened. directory is the folder path; names lists the manifest file names, comma-separated. Keep the placeholders verbatim.",
+    "placeholders": {
+      "directory": {
+        "type": "String"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "filePickerOpenProjectButton": "プロジェクトを開く",
+  "@filePickerOpenProjectButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux project file. On macOS this is `NSOpenPanel.prompt`; the rendered text appears on the picker's confirm button so the user can distinguish Open Project / Open Session / Open Workspace pickers from each other."
+  },
+  "filePickerImportSarifButton": "レポートをインポート",
+  "@filePickerImportSarifButton": {
+    "description": "Action button label rendered by the OS file picker when importing a SARIF report via LintcruxAction.importSarif."
+  },
+  "filePickerOpenSessionButton": "セッションを開く",
+  "@filePickerOpenSessionButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux-session file."
+  },
+  "filePickerOpenWorkspaceButton": "ワークスペースを開く",
+  "@filePickerOpenWorkspaceButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux-workspace file."
+  },
+  "filePickerImportFilelistButton": "インポート",
+  "@filePickerImportFilelistButton": {
+    "description": "Action button label rendered by the OS file picker when importing a .f Vivado-style filelist."
+  },
+  "filePickerImportEdamButton": "インポート",
+  "@filePickerImportEdamButton": {
+    "description": "Action button label rendered by the OS file picker when importing a FuseSoC/Edalize EDAM (.eda.yml) file."
+  },
+  "filePickerCreateProjectButton": "プロジェクトを作成",
+  "@filePickerCreateProjectButton": {
+    "description": "Action button label rendered by the OS save-file picker when creating a new .lintcrux project from the Welcome screen's New Project… button or the New Tab shortcut."
+  },
+  "filePickerSaveWorkspaceButton": "ワークスペースを保存",
+  "@filePickerSaveWorkspaceButton": {
+    "description": "Action button label rendered by the OS save-file picker when saving the active workspace as a new .lintcrux-workspace file via `LintcruxAction.saveWorkspaceAs`."
+  },
+  "filePickerExportSessionButton": "セッションをエクスポート",
+  "@filePickerExportSessionButton": {
+    "description": "Action button label rendered by the OS save-file picker when exporting the active tab as a .lintcrux-session file via `LintcruxAction.exportTabAsSession` / `LintcruxAction.saveSession`."
+  },
+  "filePickerOpenSourcesButton": "プロジェクトに追加",
+  "@filePickerOpenSourcesButton": {
+    "description": "Action button label rendered by the OS file picker when picking HDL source files to add to the active project via `LintcruxAction.openSources`."
+  },
+  "openSourcesNoActiveProject": "先にプロジェクトを開くか作成してから、ソースファイルを追加してください。",
+  "@openSourcesNoActiveProject": {
+    "description": "Snackbar shown when the user invokes Open Sources (Cmd/Ctrl+Shift+O) without an active project tab. Hints that source files attach to a project."
+  },
+  "exportSessionNoActiveTab": "セッションをエクスポートする前にプロジェクトタブを開いてください。",
+  "@exportSessionNoActiveTab": {
+    "description": "Snackbar shown when the user invokes Export Tab as Session / Save Session without an active project tab."
+  },
+  "openSourcesAdded": "{count} 個のソースファイルを {projectName} に追加しました。",
+  "@openSourcesAdded": {
+    "description": "Snackbar shown after the user picks one or more HDL source files and they are appended to the active project's sourceFiles list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "projectName": {
+        "type": "String"
+      }
+    }
+  },
+  "saveWorkspaceFailed": "ワークスペースの保存に失敗しました: {message}",
+  "@saveWorkspaceFailed": {
+    "description": "Snackbar shown when saving the workspace via `LintcruxAction.saveWorkspaceAs` fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "saveSessionFailed": "セッションのエクスポートに失敗しました: {message}",
+  "@saveSessionFailed": {
+    "description": "Snackbar shown when exporting the active tab as a .lintcrux-session via `LintcruxAction.exportTabAsSession` fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionSaved": "セッションを {path} に保存しました。",
+  "@sessionSaved": {
+    "description": "Snackbar shown after a session is successfully exported.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceSaved": "ワークスペースを {path} に保存しました。",
+  "@workspaceSaved": {
+    "description": "Snackbar shown after the workspace is successfully saved.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceResetConfirmTitle": "ワークスペースをリセットしますか？",
+  "@workspaceResetConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before `File → Reset Workspace` empties every open tab."
+  },
+  "workspaceResetConfirmBody": "開いているすべてのタブが閉じられます。元に戻すことはできませんが、自動保存されたワークスペースファイルが置き換えられるだけで、元のプロジェクトファイルはディスク上に残ります。",
+  "@workspaceResetConfirmBody": {
+    "description": "Body text of the confirmation dialog shown before `File → Reset Workspace`."
+  },
+  "workspaceResetConfirmAction": "リセット",
+  "@workspaceResetConfirmAction": {
+    "description": "Confirmation button label on the reset-workspace dialog."
+  },
+  "dialogCancel": "キャンセル",
+  "@dialogCancel": {
+    "description": "Generic cancel button label used by workspace confirmation dialogs and other modal dialogs."
+  },
+  "menuItemTierSuffix": " ({tier})",
+  "@menuItemTierSuffix": {
+    "description": "Suffix appended to a native menu-bar item's label to mark the license tier it requires; the placeholder is the short PRO/ENT badge text. The platform menu bar can only render a string label (no badge widget), so tier is shown as a parenthetical suffix there.",
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "tierBadgePro": "PRO",
+  "@tierBadgePro": {
+    "description": "Short visual label for the Pro-tier badge chip rendered next to Pro features in menus, palette entries, and panel headers."
+  },
+  "tierBadgeProSemantic": "Pro ティア機能",
+  "@tierBadgeProSemantic": {
+    "description": "Screen-reader phrase rendered on the Pro-tier badge chip."
+  },
+  "tierBadgeEnterprise": "ENT",
+  "@tierBadgeEnterprise": {
+    "description": "Short visual label for the Enterprise-tier badge chip rendered next to Enterprise features."
+  },
+  "tierBadgeEnterpriseSemantic": "Enterprise ティア機能",
+  "@tierBadgeEnterpriseSemantic": {
+    "description": "Screen-reader phrase rendered on the Enterprise-tier badge chip."
+  },
+  "editionMenuLine": "{edition} エディション — {identity}",
+  "editionMenuLineOrganization": "{edition} エディション — 組織によるライセンス",
+  "editionNameEducational": "教育",
+  "editionNamePro": "Pro",
+  "editionNameEnterprise": "Enterprise",
+  "editionBadgeEduSemantic": "教育版エディション",
+  "editionBadgeProSemantic": "Pro エディション",
+  "editionBadgeEnterpriseSemantic": "Enterprise エディション",
+  "tierBadgeEdu": "EDU",
+  "@tierBadgeEdu": {
+    "description": "Short visual label for the Educational license badge chip shown on user-status surfaces when the active license is EDU."
+  },
+  "tierBadgeEduSemantic": "教育用ライセンス",
+  "@tierBadgeEduSemantic": {
+    "description": "Screen-reader phrase rendered on the Educational license badge chip."
+  },
+  "actionCloseActiveProject": "アクティブプロジェクトを閉じる",
+  "@actionCloseActiveProject": {
+    "description": "Menu / command palette label for the action that closes the currently-active project tab in the multi-project workspace."
+  },
+  "actionSwitchProject": "プロジェクトを切り替え…",
+  "@actionSwitchProject": {
+    "description": "Menu / command palette label for the action that opens the project switcher dialog (Cmd/Ctrl+P). Lets the user pick from open and recently-closed projects."
+  },
+  "actionReopenRecentProject": "最近のプロジェクトを再度開く",
+  "@actionReopenRecentProject": {
+    "description": "Menu / command palette label for the action that re-opens the most-recently-closed project from the recent-projects list."
+  },
+  "actionPinActiveProject": "プロジェクトタブを固定",
+  "@actionPinActiveProject": {
+    "description": "Menu / command palette label for the Pro-tier action that pins (or unpins) the active project tab. Pinned tabs survive Close-All-Projects actions."
+  },
+  "actionCloseAllTabs": "すべてのタブを閉じる",
+  "@actionCloseAllTabs": {
+    "description": "Menu / command palette label for the open-core action that closes every open workspace tab."
+  },
+  "closeAllTabsConfirmTitle": "すべてのタブを閉じますか？",
+  "@closeAllTabsConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before `File → Close All Tabs` closes every open tab."
+  },
+  "closeAllTabsConfirmBody": "開いているワークスペースタブがすべて閉じられます。",
+  "@closeAllTabsConfirmBody": {
+    "description": "Body of the confirmation dialog shown before `File → Close All Tabs`."
+  },
+  "closeAllTabsConfirmConfirm": "すべて閉じる",
+  "@closeAllTabsConfirmConfirm": {
+    "description": "Confirmation button label on the close-all-tabs dialog."
+  },
+  "actionCloseAllProjects": "すべてのプロジェクトを閉じる",
+  "@actionCloseAllProjects": {
+    "description": "Menu / command palette label for the Pro-tier action that closes every open project except pinned ones."
+  },
+  "actionSearchAcrossProjects": "プロジェクト横断検索…",
+  "@actionSearchAcrossProjects": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the cross-project violation-search dialog (Cmd/Ctrl+Shift+F)."
+  },
+  "configLoadFailedTitle": "プロジェクトを読み込めませんでした",
+  "configLoadFailedPathLabel": "プロジェクトファイル",
+  "configLoadFailedReasonLabel": "理由",
+  "configLoadFailedHint": "ファイル > プロジェクトを開く… で別の .lintcrux ファイルを選択するか、上記のパスを修正して再読み込みしてください。",
+  "runEnginesNoActiveProject": "リントエンジンを実行するには、まずプロジェクトを開いてください。",
+  "@runEnginesNoActiveProject": {
+    "description": "Snackbar shown when the user invokes Run All Engines (F5) with no active project tab."
+  },
+  "runEnginesAlreadyRunning": "リント実行が進行中です。",
+  "@runEnginesAlreadyRunning": {
+    "description": "Snackbar shown when the user invokes Run All Engines (F5) while the current tab's runner is mid-run."
+  },
+  "cancelRunNoActiveRun": "進行中のリント実行はありません。",
+  "@cancelRunNoActiveRun": {
+    "description": "Snackbar shown when the user invokes Cancel Run (Esc) with nothing in flight."
+  },
+  "aboutDialogTitle": "LintCrux について",
+  "@aboutDialogTitle": {
+    "description": "Title of the About dialog / screen."
+  },
+  "aboutTagline": "ハードウェアエンジニアのためのモダンな HDL リント・スタイルビューアー",
+  "@aboutTagline": {
+    "description": "One-line product tagline shown under the app name in the About header."
+  },
+  "aboutBetaChip": "パブリックベータ",
+  "@aboutBetaChip": {
+    "description": "Label on the public-beta chip in the About header."
+  },
+  "aboutEditionOpenCore": "オープンコア",
+  "@aboutEditionOpenCore": {
+    "description": "Edition label for the open-core build; hides the edition chip when matched."
+  },
+  "aboutSectionVersion": "バージョン",
+  "@aboutSectionVersion": {
+    "description": "Header / row label for the version sub-section in the About dialog."
+  },
+  "aboutBuildNumber": "ビルド",
+  "@aboutBuildNumber": {
+    "description": "Row label for the platform build number in the About dialog."
+  },
+  "aboutGitSha": "コミット",
+  "@aboutGitSha": {
+    "description": "Row label for the short git SHA in the About dialog."
+  },
+  "aboutSectionPlatform": "プラットフォーム",
+  "@aboutSectionPlatform": {
+    "description": "Header for the platform sub-section in the About dialog."
+  },
+  "aboutOperatingSystem": "OS",
+  "@aboutOperatingSystem": {
+    "description": "Row label for the host operating system in the About dialog."
+  },
+  "aboutArchitecture": "アーキテクチャ",
+  "@aboutArchitecture": {
+    "description": "Row label for the CPU architecture in the About dialog."
+  },
+  "aboutFlutterVersion": "Flutter",
+  "@aboutFlutterVersion": {
+    "description": "Row label for the Flutter SDK version in the About dialog."
+  },
+  "aboutDartVersion": "Dart",
+  "@aboutDartVersion": {
+    "description": "Row label for the Dart SDK version in the About dialog."
+  },
+  "aboutButtonVisitWebsite": "ウェブサイトを開く",
+  "@aboutButtonVisitWebsite": {
+    "description": "About-dialog action button that opens the company website."
+  },
+  "aboutButtonDocs": "ドキュメント",
+  "@aboutButtonDocs": {
+    "description": "About-dialog action button that opens the LintCrux documentation site."
+  },
+  "aboutButtonPrivacy": "プライバシーポリシー",
+  "@aboutButtonPrivacy": {
+    "description": "About-dialog action button that opens the LintCrux privacy policy."
+  },
+  "aboutButtonTerms": "利用規約",
+  "@aboutButtonTerms": {
+    "description": "About-dialog action button that opens the LintCrux terms of service."
+  },
+  "aboutButtonCopyVersionInfo": "バージョン情報をコピー",
+  "@aboutButtonCopyVersionInfo": {
+    "description": "About-dialog action button that copies the structured version paragraph."
+  },
+  "aboutCopiedConfirmation": "バージョン情報をコピーしました",
+  "@aboutCopiedConfirmation": {
+    "description": "Snackbar confirmation shown after Copy Version Info copies to the clipboard."
+  },
+  "aboutCompanyName": "Ferrite Engineering",
+  "@aboutCompanyName": {
+    "description": "Company tagline shown on the first line of the About branding banner."
+  },
+  "filePickerExportButton": "エクスポート",
+  "exportFailed": "エクスポートに失敗しました: {error}",
+  "snackFeatureRequiresPro": "{feature} には LintCrux Pro が必要です。",
+  "snackFeatureNotAvailableYet": "{feature} はまだ利用できません。",
+  "engineConfigSeverityOff": "オフ",
+  "diagnosticsNoProjectLoaded": "プロジェクトが読み込まれていません。",
+  "filePickerTypeProjectLabel": "LintCrux プロジェクト",
+  "filePickerTypeSourcesLabel": "HDL ソース",
+  "filePickerTypeFilelistLabel": "Vivado ファイルリスト",
+  "filePickerTypeEdamLabel": "FuseSoC EDAM",
+  "filePickerTypeSessionLabel": "LintCrux セッション",
+  "filePickerTypeWorkspaceLabel": "LintCrux ワークスペース",
+  "updateBannerMessage": "LintCrux {version} が利用可能です。",
+  "updateViewChangesAction": "変更内容を表示",
+  "updateNowAction": "今すぐ更新",
+  "updateDismissLabel": "閉じる",
+  "updateCheckInProgress": "更新を確認しています…",
+  "updateCheckUpToDate": "最新バージョン（{version}）を使用しています。",
+  "updateCheckFailed": "更新を確認できませんでした。",
+  "actionCheckForUpdates": "更新を確認",
+  "settingsRestoreTabsOnLaunchLabel": "起動時にタブを復元",
+  "settingsRestoreTabsOnLaunchDescription": "LintCrux を前回終了したときに開いていたプロジェクトタブを再度開きます。オフにすると、LintCrux は空のワークスペースで起動します。保存されたセッションはディスク上に残るため、再度オンにすれば復元されます。",
+  "settingsAutoCheckUpdatesLabel": "更新を自動的に確認",
+  "settingsAutoCheckUpdatesDescription": "起動時および 1 日 1 回、新しいバージョンを確認します。送信されるのはアプリのバージョンと OS のみで、プロジェクト、ソース、違反のデータが送信されることはありません。",
+  "aboutButtonCheckForUpdates": "更新を確認",
+  "actionSubmitIssue": "問題を報告…",
+  "aboutButtonSubmitIssue": "問題を報告",
+  "issueReporterTitle": "問題を報告",
+  "issueReporterTitleFieldLabel": "問題の概要",
+  "issueReporterTitleFieldHint": "発生した問題を簡潔に説明してください",
+  "issueReporterPrivacyNotice": "情報が多いほど問題の再現に役立ちます。共有したくない項目はオフにしてください。ファイルの内容やファイルパスが含まれることはありません。",
+  "issueReporterPreviewHeader": "Issue 本文をプレビュー",
+  "issueReporterCategoryAppEnv": "アプリと環境",
+  "issueReporterCategoryAppEnvDescription": "バージョン、ビルド SHA、プラットフォーム、OS、画面 DPI、ロケール、SDK バージョン。",
+  "issueReporterCategorySession": "セッション状態",
+  "issueReporterCategorySessionDescription": "エンジン名とバージョン、違反数と免除数のみ — ファイルパスやソースの内容は含まれません。",
+  "issueReporterCategoryLog": "診断情報",
+  "issueReporterCategoryLogDescription": "このセッションで記録された最近の警告とエラー。",
+  "issueReporterCategoryScreenshot": "スクリーンショット",
+  "issueReporterCategoryScreenshotDescription": "添付できるように保存されたアプリウィンドウの画像。",
+  "issueReporterLockedCategorySemantics": "常に含まれます",
+  "issueReporterSubmitButton": "送信",
+  "issueReporterCancelButton": "キャンセル",
+  "issueReporterOpenedToast": "GitHub の Issue を開きました — クリップボードから本文に貼り付け、スクリーンショットをドラッグしてください。",
+  "issueReporterOpenedToastPrefilled": "レポートを事前入力した状態で GitHub の Issue を開きました — スクリーンショットがある場合はドラッグして添付してください。",
+  "issueReporterScreenshotSaved": "スクリーンショットを {path} に保存しました",
+  "issueReporterEmptyLogPlaceholder": "（ログエントリは記録されていません）",
+  "issueReporterEmptySessionLogPlaceholder": "（このセッションでエラーや警告は記録されていません）",
+  "betaExpiryBannerMessage": "{days, plural, =1{LintCrux ベータ版はあと 1 日で期限切れになります。最新ビルドをダウンロードしてください。} other{LintCrux ベータ版はあと {days} 日で期限切れになります。最新ビルドをダウンロードしてください。}}",
+  "betaExpiryBannerAction": "ダウンロード",
+  "betaExpiryDismissLabel": "閉じる",
+  "betaExpiryExpiredTitle": "ベータ版の有効期限が切れました",
+  "betaExpiryExpiredBody": "この LintCrux ベータ版は有効期限に達しました。LintCrux を引き続き使用するには、最新ビルドをダウンロードしてください。",
+  "betaExpiryExpiredAction": "最新ビルドをダウンロード",
+  "betaExpiryExpiredQuit": "LintCrux を終了",
+  "crossProbeSendTooltip": "この相手に選択項目を送信",
+  "crossProbeUnreachableTitle": "到達できない相手",
+  "crossProbeSendFailed": "{peer} へのクロスプローブは完了しませんでした",
+  "crossProbeSendRefused": "{peer} へのクロスプローブ: {reason}",
+  "toolbarToggleCrossProbe": "クロスプローブパネル",
+  "settingsRequestAttentionOnCrossProbeLabel": "クロスプローブ時に注意を要求",
+  "settingsRequestAttentionOnCrossProbeDescription": "クロスプローブ受信時にDockをバウンス（またはタスクバーを点滅）。フォーカスは奪いません。",
+  "settingsBroadcastSelectionOnCrossProbeLabel": "選択を自動的にブロードキャスト",
+  "settingsBroadcastSelectionOnCrossProbeDescription": "選択と同時に、接続中のピアへ選択内容を通知します（ライブクロスプローブ）。オフの場合は、明示的な送信のみが共有されます。",
+  "settingsCxpStatus": "CXP ステータス",
+  "settingsCxpStatusRunning": "ポート {port} で実行中",
+  "settingsCxpStatusStopped": "停止",
+  "settingsCxpPeersConnected": "{count, plural, =0{接続中のピアなし} =1{1 個のピアが接続中} other{{count} 個のピアが接続中}}",
+  "actionCategoryFileMnemonic": "ファイル(&F)",
+  "actionCategoryEditMnemonic": "編集(&E)",
+  "actionCategoryViewMnemonic": "表示(&V)",
+  "actionCategoryNavigateMnemonic": "ナビゲーション(&N)",
+  "actionCategorySearchMnemonic": "検索(&S)",
+  "actionCategoryToolsMnemonic": "ツール(&T)",
+  "actionCategoryHelpMnemonic": "ヘルプ(&H)",
+  "actionCategoryEdit": "編集",
+  "menuWindow": "ウインドウ",
+  "actionExit": "終了",
+  "actionOpenDocumentation": "ドキュメント",
+  "accessibilityViolationRow": "{severity}の指摘、ルール {rule}、ファイル {file} {line} 行目: {message}",
+  "@accessibilityViolationRow": {
+    "description": "Screen-reader label for one violation table row.",
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "rule": {
+        "type": "String"
+      },
+      "file": {
+        "type": "String"
+      },
+      "line": {
+        "type": "int"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "accessibilityToolbarRegion": "ツールバー",
+  "accessibilityStatusBarRegion": "ステータスバー",
+  "accessibilityViolationTableKeyboardHint": "上下キーで違反間を移動します。Enter で違反をエディターで開き、Space でチェックボックスを切り替えます。",
+  "toolbarOverflowActions": "アクション",
+  "toolbarExportCluster": "レポートをエクスポート",
+  "statusBarBusyLintRun": "Lint エンジンを実行中",
+  "statusBarNoProject": "プロジェクトが開かれていません",
+  "dockTabDetails": "詳細",
+  "dockTabRules": "ルール",
+  "dockTabSource": "ソース",
+  "dockTabCrossProbe": "クロスプローブ",
+  "dockCollapseTooltip": "パネルを隠す",
+  "accessibilityRightDockRegion": "詳細ドック",
+  "accessibilityLeftDockRegion": "ブラウザードック",
+  "accessibilityBottomDockRegion": "パネルドック",
+  "settingsLanguageLabel": "言語",
+  "settingsLanguageDescription": "アプリケーションインターフェースに使用する言語",
+  "settingsCxpSectionTitle": "CXP クロスプローブ",
+  "settingsAutoReloadDescription": "読み込んだプロジェクトがディスク上で変更されたときの LintCrux の動作",
+  "settingsCxpPortError": "1 から 65535 の範囲でポートを入力してください。",
+  "tabContextMenuRevealInFinder": "Finder で表示",
+  "tabContextMenuRevealInExplorer": "エクスプローラーで表示",
+  "tabContextMenuRevealInFiles": "ファイルマネージャーで表示",
+  "helpLinkLearnMore": "詳細を見る",
+  "telemetryConsentTitle": "LintCrux の改善にご協力ください",
+  "telemetryConsentBody": "匿名の利用回数とエラー回数は、次に何を作り、何を直すかを決める手がかりになります。ファイル、設計データ、個人を特定できる情報は一切収集しません。",
+  "telemetryConsentLearnMore": "収集する項目を詳しく見る",
+  "telemetryConsentToggleLabel": "匿名の利用統計を送信する",
+  "telemetryConsentContinue": "続ける",
+  "settingsPrivacySection": "プライバシー",
+  "settingsTelemetryLabel": "匿名の利用統計を送信する",
+  "settingsTelemetryDescription": "機能・エンジン・エラーの回数、アプリと OS のバージョン、フォームファクター、言語、ライセンスティア。ファイル名、ルール識別子、lint メッセージやエラーメッセージの本文は決して含みません。",
+  "settingsTelemetryDocsLabel": "テレメトリのドキュメント",
+  "settingsTelemetryDocsDescription": "送信するフィールドの正確な一覧、決して収集しない項目の一覧、そしてそれを送信するソースコード。",
+  "diagnosticsCloseDrawer": "診断を閉じる",
+  "settingsDiagnosticsEnabledLabel": "診断を有効にする",
+  "settingsDiagnosticsEnabledDescription": "［ツール］メニューでタブ診断とアプリ診断を使えるようにします。デバッグビルドとプロファイルビルドでは常に有効です。",
+  "incomingFileNotSupported": "LintCrux では {fileName} を開けません。",
+  "diagnosticsDisabledSnack": "診断は無効になっています。設定 > {section}で有効にしてください。",
+  "inspectorClearSelection": "エンジンステータスに戻る",
+  "dockTabSources": "ソース",
+  "sourcesPanelEmpty": "このプロジェクトにソースファイルはありません。",
+  "sourcesPanelNoProject": "プロジェクトを開くとソースファイルが表示されます。",
+  "sourcesRemoveTooltip": "プロジェクトから削除",
+  "sourcesRemoveConfirmTitle": "ソースファイルを削除しますか？",
+  "sourcesRemoveConfirmBody": "{file} をこのプロジェクトから削除します。ファイル自体は削除されません。",
+  "sourcesRemoveConfirmAction": "削除",
+  "sourcesRemoved": "{project} から {file} を削除しました。",
+  "sourcesCount": "{count, plural, =1{1 個のソースファイル} other{{count} 個のソースファイル}}",
+  "sourcesRemoveNotFound": "{file} はこのプロジェクトファイルに記載されていません。変更は行われませんでした。",
+  "rulesPanelSearchHint": "ルールを検索…",
+  "rulesPanelAllEngines": "すべてのエンジン",
+  "rulesPanelEmpty": "一致するルールがありません。",
+  "rulesPanelCount": "{count, plural, =1{1 件のルール} other{{count} 件のルール}}",
+  "rulesPanelLearnMore": "ドキュメント",
+  "rulesPanelLoadFailed": "ルールデータベースを利用できません。",
+  "settingsTelemetryInstallationIdLabel": "インストール ID",
+  "settingsTelemetryInstallationIdDescription": "収集されるデータに付与される唯一の識別子です。ランダムな値で、あなた個人とは結び付いていません。このインストールのデータ削除をご希望の場合は、サポートまでお送りください。",
+  "settingsTelemetryInstallationIdCopy": "コピー",
+  "settingsTelemetryInstallationIdCopied": "インストール ID をコピーしました。"
+}

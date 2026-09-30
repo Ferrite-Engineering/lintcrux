@@ -1,0 +1,18 @@
+{
+  "seed": 91303509,
+  "total": 50000,
+  "distinctFiles": 500,
+  "bySeverity": {
+    "error": 10042,
+    "note": 10045,
+    "warning": 29913
+  },
+  "byEngine": {
+    "svlint": 5199,
+    "verible": 9355,
+    "verilator": 22288,
+    "slang": 7151,
+    "ghdl": 6007
+  },
+  "distinctRules": 15
+}

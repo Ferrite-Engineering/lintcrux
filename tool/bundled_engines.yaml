@@ -1,0 +1,247 @@
+# Version pins for the lint-engine binaries that LintCrux ships inside
+# its release distribution.
+#
+# Pull-request reviewers consult this file when bumping engine versions
+# so a change in behavior (new rule, removed rule, format-only output
+# change) is visible in code review. The CI helper at
+# `.github/workflows/bundled-engines.yml` consumes this manifest to
+# download + cache each binary per OS / arch.
+#
+# Release builds resolve binaries through
+# `BundledBinaryResolver.resolve(engineId)` — see
+# `lib/services/engines/bundled_binary_resolver.dart`. Debug builds
+# always shell out to `PATH` so contributors using locally-built
+# engines pick them up automatically.
+#
+# Layout of the cache directory the helper writes (and the layout
+# `BundledBinaryResolver` expects under `LINTCRUX_BUNDLED_BIN_DIR`):
+#
+#   <root>/linux-x86_64/verilator
+#   <root>/linux-x86_64/verible
+#   <root>/linux-x86_64/slang
+#   <root>/macos-universal/verilator
+#   <root>/macos-universal/verible
+#   <root>/macos-universal/slang
+#   <root>/windows-x86_64/verilator.exe
+#   <root>/windows-x86_64/verible.exe
+#   <root>/windows-x86_64/slang.exe
+#
+# The layout is unchanged by how a binary is *obtained*: an engine
+# installed from a package manager is copied into the same directory as
+# one unpacked from a release archive.
+#
+# Schema version. Bump when the schema below changes incompatibly.
+#
+#   1 → 2: `sources` became optional, and the `install` key was added
+#          for engines whose upstream publishes no downloadable binary
+#          at all (see `verilator`). An engine declares exactly one of
+#          the two. Enforced by
+#          `test/static/bundled_engines_manifest_test.dart`.
+schemaVersion: 2
+
+# Each engine carries:
+#   id          — the LintEngine.id the resolver keys on
+#   version     — pinned semver; bumped intentionally with the engine
+#   nminus1Version — used by the cross-version validation harness
+#                    when the env var `*_NMINUS1_BIN` is
+#                    unset and the harness needs a fallback target.
+#   sources     — per-platform download URL templates. `${version}` is
+#                 substituted at fetch time. `null` means upstream
+#                 publishes no asset for that platform; every `null`
+#                 carries a comment saying why.
+#   install     — mutually exclusive with `sources`. `package-manager`
+#                 means upstream publishes NO downloadable binary for
+#                 any platform, so a download URL is not a thing that
+#                 can exist and none is written down. CI and users
+#                 obtain the engine from apt / Homebrew / a source
+#                 build instead.
+#
+# Every URL template in this file is checked against upstream for real.
+# `test/static/bundled_engines_manifest_test.dart` HEAD-sweeps every
+# generated URL when `LINTCRUX_CHECK_ENGINE_URLS=1` (the `preflight` job
+# in `.github/workflows/bundled-engines.yml` sets it). A template that
+# cannot be made to resolve does not belong here — delete it and say
+# why, rather than leaving a plausible-looking 404 behind.
+#
+# Nothing in this file changes the engine posture: engines stay
+# arm's-length subprocesses the user installs, and no engine binary is
+# bundled into a shipped build today.
+
+engines:
+  # Verilator — obtained from a package manager, deliberately with no
+  # `sources` block.
+  #
+  # Upstream publishes ZERO GitHub release assets. Not "none for some
+  # platform" — the repository has no releases at all, only tags:
+  #
+  #   gh api repos/verilator/verilator/releases   →  []
+  #   gh api repos/verilator/verilator/tags       →  v5.050, v5.048, …
+  #
+  # Verilator is distributed as source and via distro packages
+  # (`apt-get install verilator`, `brew install verilator`), which is
+  # exactly what `.github/workflows/bundled-engines.yml` does. Any
+  # `https://github.com/verilator/verilator/releases/download/...` URL
+  # is a fiction; the previous three templates here all 404'd because
+  # the assets they named have never existed.
+  #
+  # `version` / `nminus1Version` still pin real upstream *tags*. They
+  # name which build to install or compile, and feed the cross-version
+  # harness via `VERILATOR_NMINUS1_BIN`; they are not dereferenced into
+  # a download.
+  - id: verilator
+    version: "5.024"
+    nminus1Version: "5.022"
+    install: package-manager
+
+  - id: verible
+    # Verible tags embed the upstream commit hash: v0.0-<commits>-g<sha8>.
+    # The hash is NOT derivable from the commit count — it must be copied
+    # from the actual upstream release. Verify with:
+    #   gh api repos/chipsalliance/verible/releases --jq '.[].tag_name'
+    # `v0.0-3793-g27720255` is the release immediately preceding 3795
+    # upstream, which is what makes it the correct N-1 target.
+    version: "v0.0-3795-gf4d72375"
+    nminus1Version: "v0.0-3793-g27720255"
+    sources:
+      linux-x86_64: "https://github.com/chipsalliance/verible/releases/download/${version}/verible-${version}-linux-static-x86_64.tar.gz"
+      macos-universal: "https://github.com/chipsalliance/verible/releases/download/${version}/verible-${version}-macOS.tar.gz"
+      windows-x86_64: "https://github.com/chipsalliance/verible/releases/download/${version}/verible-${version}-win64.zip"
+
+  # Slang — upstream cut its first binary release assets at v11.0.
+  # Every tag from v1.0 through v10.0 is source-only (v2.0 shipped a
+  # lone source zip; the v0.x line shipped differently-named archives).
+  # Verify with:
+  #   gh api repos/MikePopoloski/slang/releases --paginate \
+  #     --jq '.[] | "\(.tag_name) :: \(.assets | map(.name) | join(" "))"'
+  #
+  # The old 6.0 / 5.0 pins named releases that carry no assets at all,
+  # so all four generated URLs 404'd. The asset *names* the templates
+  # below assume were always right — only the pin was unreachable.
+  #
+  # Exercised end-to-end against the real binary
+  # (`slang version 11.0.0+7ddf4059f`, macOS arm64), not just
+  # downloaded. Two adapter defects only a real run could surface:
+  # `--json-diagnostics` is not a slang flag and never has been, and
+  # the JSON payload is one pretty-printed array with a
+  # `"file:line:col"` location *string*. See
+  # `test/fixtures/engines/slang/captured/`.
+  #
+  # Rule-database assessment for the 6.0 → 11.0 bump (2026-08-03).
+  # `lib/data/rules/slang.json` holds 246 rules. That is an exact
+  # set-equality match with the 246 distinct `warning` option names in
+  # upstream's `scripts/diagnostics.txt` at tag v11.0, and all 246 were
+  # fed to the real binary one at a time: none drew
+  # `-Wunknown-warning-option`. No phantoms, no gaps — the DB needed no
+  # correction. Regenerate/re-check with:
+  #   curl -sSL https://raw.githubusercontent.com/MikePopoloski/slang/v11.0/scripts/diagnostics.txt \
+  #     | awk '/^warning /{print $2}' | sort -u
+  #
+  # What a user notices moving off the old 6.0 pin: the warning
+  # vocabulary roughly doubled. v6.0 defines 119 warnings, v10.0 defines
+  # 167, v11.0 defines 246. Exactly one name left the warning list in
+  # that span — `unconnected-port`, which is a warning through v10.0 and
+  # becomes a *group* of three
+  # (`unconnected-{input,output,inout}-port`) in v11.0. `-Wunconnected-
+  # port` is still accepted by the v11.0 binary (groups are valid `-W`
+  # names), so no configured selection breaks; it simply stops appearing
+  # as a `optionName` on any diagnostic, and so is deliberately absent
+  # from `slang.json`, which catalogues emittable rule ids rather than
+  # accepted CLI spellings. The other 245 additions are pure gain.
+  #
+  # Output format is unchanged in the only sense that matters here:
+  # `JsonDiagnosticClient` is byte-identical from v8.0 through v11.0,
+  # and v6.0 had no JSON mode at all — under the old pin the adapter's
+  # JSON path could never have worked even with the right flag name.
+  #
+  # The N-1 pin (10.0) is **not runtime-verified and cannot be**: v11.0
+  # is upstream's first tag with any binary release assets, so there is
+  # no slang 10.0 binary to run, on macOS or anywhere else, short of a
+  # source build. Assessed from v10.0's `diagnostics.txt` instead: 167
+  # warnings, 166 of them present in `slang.json` (the miss is
+  # `unconnected-port`, above). A user pinned to 10.0 therefore sees 80
+  # rules in the severity-override list their binary will never emit,
+  # and no entry for the one it can emit that 11.0 cannot. Both are
+  # cosmetic: the DB is a metadata lookup and unknown ids degrade to
+  # engine-supplied text.
+  - id: slang
+    version: "11.0"
+    nminus1Version: "10.0"
+    sources:
+      linux-x86_64: "https://github.com/MikePopoloski/slang/releases/download/v${version}/slang-linux-x86_64.tar.gz"
+      # No macOS asset we can use: upstream publishes
+      # `slang-macos-arm64.tar.gz` only. There is no universal (or
+      # x86_64) macOS build to point at, and naming the arm64 archive
+      # under a `macos-universal` key would misdescribe what it is.
+      macos-universal: null
+      windows-x86_64: "https://github.com/MikePopoloski/slang/releases/download/v${version}/slang-windows-x86_64.zip"
+
+  # GHDL — the binary is fetched + cached so the `GhdlEngine` lint
+  # adapter plugs into a pre-tested availability seam. See the README's
+  # "Bundled lint-engine binaries" section and
+  # `GhdlAvailabilityService`.
+  #
+  # Upstream does publish per-platform binaries, but renamed them
+  # between the 4.x and 5.x lines: 4.1.0 shipped
+  # `ghdl-gha-ubuntu-22.04-mcode.tgz` (no version in the filename at
+  # all), while 5.x/6.x ship `ghdl-<backend>-<version>-<os>-<arch>`.
+  # The old templates assumed a third naming scheme that upstream has
+  # never used, so every generated URL 404'd. Verify with:
+  #   gh api repos/ghdl/ghdl/releases --jq \
+  #     '.[] | "\(.tag_name) :: \(.assets | map(.name) | join(" "))"'
+  #
+  # Exercised end-to-end against the real binary
+  # (`GHDL 6.0.0 (6.0.0.r0.ge589c698c) [Dunoon edition]`) and against
+  # the N-1 pin (`GHDL 5.1.1`, from
+  # `ghdl-llvm-5.1.1-macos15-aarch64.tar.gz`). Both print
+  # `file:line:col:severity:` with NO space before the severity word,
+  # which the adapter had not been written for. All nine flags in
+  # `GhdlEngine.defaultWarnFlags` are accepted by both, and both list
+  # the same 38 warnings under `ghdl help-warnings`. See
+  # `test/fixtures/engines/ghdl/captured/`.
+  #
+  # Rule-database assessment for the 4.1.0 → 6.0.0 bump (2026-08-03).
+  # `lib/data/rules/ghdl.json` holds 38 rules. Re-derived from
+  # `ghdl help-warnings` on both pinned versions and compared as sets:
+  # exact match on 6.0.0 and on 5.1.1, with the `default-on` tag
+  # agreeing with the binary's `*` marker for all 38. Nothing needed
+  # correction. The four `-Wall` / `-Werror` / `-Wno-error` / `-Wno-xxx`
+  # entries in that output are the "Special warning option" block, not
+  # warnings, and are correctly absent from the DB.
+  #
+  # What a user notices moving off the old 4.1.0 pin: one new warning,
+  # `open-assoc` ("open individual association"), on by default. 4.1.0
+  # lists 37 warnings; 5.1.1 and 6.0.0 list the same 38. No warning was
+  # removed or renamed across the two majors, so no configured
+  # `--warn-*` selection breaks.
+  #
+  # Output format is unchanged across all three. 4.1.0 was fetched
+  # (`ghdl-macos-11-mcode.tgz`, x86_64 under Rosetta) and run against
+  # `test/fixtures/projects/vhdl/basic_warnings/design.vhd` alongside
+  # 5.1.1 and 6.0.0: byte-identical diagnostics, including the
+  # no-space-before-severity form the adapter now parses and the
+  # caret-continuation lines with no `NN |` gutter. The parser defect
+  # that made GHDL report zero violations was never version-specific —
+  # it never matched any GHDL release.
+  - id: ghdl
+    version: "6.0.0"
+    nminus1Version: "5.1.1"
+    sources:
+      linux-x86_64: "https://github.com/ghdl/ghdl/releases/download/v${version}/ghdl-mcode-${version}-ubuntu24.04-x86_64.tar.gz"
+      # No macOS asset we can use: the only macOS builds upstream ships
+      # are `ghdl-llvm-${version}-macos1[45]-aarch64.tar.gz`. The last
+      # x86_64 macOS build was `ghdl-mcode-5.1.1-macos13-x86_64.tar.gz`
+      # and 6.0.0 dropped it, so no universal binary exists to pin.
+      macos-universal: null
+      windows-x86_64: "https://github.com/ghdl/ghdl/releases/download/v${version}/ghdl-mcode-${version}-mingw64.zip"
+
+  # Svlint — lightweight SystemVerilog linter. The engine
+  # prefers `--output-format=json`; the parser falls back to text
+  # parsing for older builds. Configuration is picked up from
+  # `.svlint.toml` at the project root.
+  - id: svlint
+    version: "0.9.3"
+    nminus1Version: "0.9.1"
+    sources:
+      linux-x86_64: "https://github.com/dalance/svlint/releases/download/v${version}/svlint-v${version}-x86_64-lnx.zip"
+      macos-universal: "https://github.com/dalance/svlint/releases/download/v${version}/svlint-v${version}-x86_64-mac.zip"
+      windows-x86_64: "https://github.com/dalance/svlint/releases/download/v${version}/svlint-v${version}-x86_64-win.zip"

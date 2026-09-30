@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "name": "cdc_capture",
+  "rootPath": ".",
+  "sourceFiles": [
+    "cdc_capture.v"
+  ],
+  "includePaths": [],
+  "defines": {},
+  "language": "verilog",
+  "enabledEngineIds": [
+    "verilator"
+  ],
+  "severityOverrides": {},
+  "perEngineOptions": {},
+  "filterPresets": [],
+  "sourceFileLanguages": {},
+  "customRegexRules": []
+}

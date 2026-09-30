@@ -1,0 +1,1 @@
+%Warning-UNUSED: cpu.sv:30:5: Signal is not used: 'tmp'

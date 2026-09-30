@@ -1,0 +1,1 @@
+ghdl -a --warn-unused legacy.vhd  # hypothetical spaced build

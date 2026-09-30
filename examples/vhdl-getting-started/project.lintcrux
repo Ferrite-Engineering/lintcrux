@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "name": "vhdl-getting-started",
+  "rootPath": ".",
+  "language": "vhdl",
+  "sourceFiles": ["counter.vhd"],
+  "enabledEngineIds": ["ghdl"],
+  "perEngineOptions": {
+    "ghdl": {
+      "warnFlags": ["unused", "hide", "binding", "reserved", "shared"]
+    }
+  }
+}

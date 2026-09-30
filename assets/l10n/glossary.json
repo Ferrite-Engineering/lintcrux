@@ -1,0 +1,73 @@
+{
+  "version": "1.0",
+  "description": "Terminology mapping for LintCrux localization. Auto-generated from .claude/instructions.md (canonical suite house style: wavecrux/.claude/instructions.md). suite_wide_terms apply to every Crux app (2026-07-18 rulings).",
+  "terms": {
+    "lint": { "en": "lint", "zh": "Lint", "ja": "リント", "ko": "린트" },
+    "lint_engine": { "en": "lint engine", "zh": "Lint 引擎", "ja": "リントエンジン", "ko": "린트 엔진" },
+    "lint_cache": { "en": "lint cache", "zh": "Lint 缓存", "ja": "リントキャッシュ", "ko": "린트 캐시" },
+    "violation": { "en": "violation", "zh": "违规", "ja": "違反", "ko": "위반" },
+    "waiver": { "en": "waiver", "zh": "豁免", "ja": "ウェイバー", "ko": "면제" },
+    "severity": { "en": "severity", "zh": "严重程度", "ja": "重大度", "ko": "심각도" },
+    "severity_note": { "en": "Note (severity)", "zh": "提示", "ja": "注記", "ko": "참고" },
+    "severity_unclassified": { "en": "Unclassified (severity)", "zh": "未分类", "ja": "未分類", "ko": "미분류" },
+    "severity_drift_chart": { "en": "severity drift chart", "zh": "严重性漂移图", "ja": "重大度ドリフトチャート", "ko": "심각도 추이 차트" },
+    "rule": { "en": "rule", "zh": "规则", "ja": "ルール", "ko": "규칙" },
+    "baseline": { "en": "baseline", "zh": "基线", "ja": "ベースライン", "ko": "기준선" },
+    "engine": { "en": "engine", "zh": "引擎", "ja": "エンジン", "ko": "엔진" },
+    "bookmark": { "en": "bookmark", "zh": "书签", "ja": "ブックマーク", "ko": "북마크" },
+    "stale_bookmark": { "en": "stale", "zh": "陈旧", "ja": "古い", "ko": "오래됨" },
+    "dry_run": { "en": "dry-run", "zh": "试运行", "ja": "ドライラン", "ko": "드라이런" },
+    "filter": { "en": "filter", "zh": "筛选器", "ja": "フィルター", "ko": "필터" },
+    "filter_preset": { "en": "filter preset", "zh": "筛选预设", "ja": "フィルタープリセット", "ko": "필터 프리셋" },
+    "glob": { "en": "glob", "zh": "glob", "ja": "glob", "ko": "glob" },
+    "filelist": { "en": "filelist", "zh": "文件列表", "ja": "ファイルリスト", "ko": "파일 리스트" },
+    "custom": { "en": "custom", "zh": "自定义", "ja": "カスタム", "ko": "사용자 정의" },
+    "bundled": { "en": "bundled", "zh": "内置", "ja": "バンドル", "ko": "번들" },
+    "pragma": { "en": "pragma", "zh": "编译指示", "ja": "プラグマ", "ko": "프래그마" },
+    "line": { "en": "line (source)", "zh": "行", "ja": "行", "ko": "라인" },
+    "cancel_run": { "en": "cancel run", "zh": "取消运行", "ja": "実行をキャンセル", "ko": "실행 중단" },
+    "peer": { "en": "peer (CXP)", "zh": "对等端", "ja": "ピア", "ko": "피어" },
+    "diagnostics": { "en": "diagnostics", "zh": "诊断", "ja": "診断", "ko": "진단" }
+  },
+  "suite_wide_terms": {
+    "description": "Identical renderings required in every Crux app (core + Pro overlays). App-local glossaries may add terms but never override these.",
+    "cross_probe": { "en": "cross-probe", "zh": "交叉探测", "ja": "クロスプローブ", "ko": "교차 프로브" },
+    "remote_control": { "en": "Remote Control", "zh": "远程控制", "ja": "リモートコントロール", "ko": "원격 제어" },
+    "waiver": { "en": "waiver", "zh": "豁免", "ja": "ウェイバー", "ko": "면제" },
+    "workspace": { "en": "workspace", "zh": "工作区", "ja": "ワークスペース", "ko": "워크스페이스" },
+    "preset": { "en": "preset", "zh": "预设", "ja": "プリセット", "ko": "프리셋" },
+    "editor": { "en": "editor", "zh": "编辑器", "ja": "エディター", "ko": "에디터" },
+    "viewer": { "en": "viewer", "zh": "查看器", "ja": "ビューアー", "ko": "뷰어" },
+    "open_core_edition": { "en": "open-core", "zh": "开放核心版", "ja": "オープンコア", "ko": "오픈 코어" },
+    "command_palette": { "en": "command palette", "zh": "命令面板", "ja": "コマンドパレット", "ko": "명령 팔레트" },
+    "panel": { "en": "panel", "zh": "面板", "ja": "パネル", "ko": "패널" },
+    "pane": { "en": "pane", "zh": "窗格", "ja": "ペイン", "ko": "창" }
+  },
+  "acronyms": {
+    "description": "Never translate these values",
+    "list": [
+      "VCD", "FST", "GHW", "LXT", "LXT2", "FSDB", "PCAP", "CSV", "JSON",
+      "XML", "YAML", "HTML", "SVG", "PNG", "RGB", "LED", "LCD", "OLED",
+      "FSM", "RTL", "API", "SDK", "ABI", "CLI", "GUI", "WASM", "TCP", "UDP",
+      "HTTP", "JSON-RPC", "CXP", "WCP", "SARIF", "SPI", "I2C", "I²C", "UART",
+      "AXI", "AXI4", "AXI4-Lite", "APB", "AHB", "AHB-Lite", "Wishbone",
+      "JTAG", "MDIO", "CAN", "CAN-FD", "USB", "PCIe", "Ethernet", "MII",
+      "RMII", "GMII", "RGMII", "AXIS", "RISC-V", "RV32", "RV64", "Cocotb",
+      "GTKWave", "Synopsys"
+    ]
+  },
+  "brands": {
+    "description": "Product / brand names — never translate, always Latin script (2026-07-18 ruling; 'Stage' never becomes 舞台 / ステージ / 스테이지)",
+    "list": [
+      "WaveCrux", "NetCrux", "LintCrux", "SimCrux", "EDACrux",
+      "Ferrite Engineering", "Stage", "Stage Pro", "Rive",
+      "Yosys", "Verible", "Verilator", "svlint", "GHDL", "Icarus Verilog",
+      "FuseSoC", "Vivado", "Quartus"
+    ]
+  },
+  "pluralization_rules": {
+    "zh": { "singular": "=1{1个%s}", "plural": "other{{count}个%s}" },
+    "ja": { "singular": "=1{1%s}", "plural": "other{{count}%s}" },
+    "ko": { "singular": "=1{1개 %s}", "plural": "other{{count}개 %s}" }
+  }
+}

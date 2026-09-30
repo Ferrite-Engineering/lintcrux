@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "name": "multi_engine",
+  "rootPath": "test/fixtures/projects/multi_engine",
+  "language": "systemverilog",
+  "sourceFiles": ["multi_engine.sv"],
+  "enabledEngineIds": ["verilator", "verible", "slang"]
+}

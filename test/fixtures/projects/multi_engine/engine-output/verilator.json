@@ -1,0 +1,28 @@
+{
+  "engineId": "verilator",
+  "invocations": [
+    {
+      "executable": "verilator",
+      "arguments": [
+        "--lint-only",
+        "-Wall",
+        "multi_engine.sv"
+      ],
+      "exitCode": 1,
+      "stdout": [],
+      "stderr": [
+        "%Warning-UNUSEDSIGNAL: multi_engine.sv:21:8: Signal is not driven, nor used: 'tabbed'",
+        "                                           : ... note: In instance 'multi_engine'",
+        "   21 |  logic tabbed;  ",
+        "      |        ^~~~~~",
+        "                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.050",
+        "                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.",
+        "%Warning-UNUSEDSIGNAL: multi_engine.sv:22:9: Signal is not used: 'unread_sig'",
+        "                                           : ... note: In instance 'multi_engine'",
+        "   22 |   logic unread_sig;      ",
+        "      |         ^~~~~~~~~~",
+        "%Error: Exiting due to 2 warning(s)"
+      ]
+    }
+  ]
+}

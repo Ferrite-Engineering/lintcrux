@@ -1,0 +1,1 @@
+%Warning-UNUSEDSIGNAL: 日本語.sv:5:1: Signal is not used: 'クロック'

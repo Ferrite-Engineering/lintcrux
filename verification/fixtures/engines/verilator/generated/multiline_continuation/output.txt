@@ -1,0 +1,4 @@
+%Warning-WIDTH: alu.sv:88:7: Operator ASSIGNW expects 32 bits but got 16
+                              : ... In instance top.alu
+   88 |   assign y = a + b;
+      |            ^

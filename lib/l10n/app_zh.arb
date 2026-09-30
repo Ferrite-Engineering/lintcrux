@@ -1,0 +1,1623 @@
+{
+  "@@locale": "zh",
+  "settingsShortcutsSection": "键盘快捷键",
+  "@settingsShortcutsSection": {
+    "description": "Settings category title for the keyboard shortcuts editor"
+  },
+  "settingsShortcutsDescription": "点击铅笔图标可更改快捷键，然后按下新的按键。使用“导出”和“导入”可与他人共享您的快捷键配置。",
+  "@settingsShortcutsDescription": {
+    "description": "Intro note above the editable shortcuts list"
+  },
+  "settingsShortcutNotBound": "—",
+  "@settingsShortcutNotBound": {
+    "description": "Placeholder shown when an action has no key binding"
+  },
+  "settingsShortcutNotBoundSpoken": "无快捷键",
+  "@settingsShortcutNotBoundSpoken": {
+    "description": "What a screen reader says for an action with no key binding. The visual placeholder is a dash, which is not spoken."
+  },
+  "settingsShortcutsKeyboardHint": "使用上下方向键在快捷键之间移动。按 Enter 更改所选快捷键，按 Delete 移除，按 Shift+Delete 恢复默认值。",
+  "@settingsShortcutsKeyboardHint": {
+    "description": "Keyboard instructions for the shortcut list in Settings > Keyboard Shortcuts. Shown under the description and spoken once by a screen reader when focus enters the list."
+  },
+  "settingsShortcutsImport": "导入…",
+  "@settingsShortcutsImport": {
+    "description": "Button that imports a shared .crux-keymap shortcut file"
+  },
+  "settingsShortcutsExport": "导出…",
+  "@settingsShortcutsExport": {
+    "description": "Button that exports shortcut customizations to a .crux-keymap file"
+  },
+  "settingsShortcutsResetAll": "全部重置",
+  "@settingsShortcutsResetAll": {
+    "description": "Button/confirm action restoring every shortcut to its default"
+  },
+  "settingsShortcutEditTooltip": "更改快捷键",
+  "@settingsShortcutEditTooltip": {
+    "description": "Tooltip for the per-action capture button"
+  },
+  "settingsShortcutUnbindTooltip": "移除快捷键",
+  "@settingsShortcutUnbindTooltip": {
+    "description": "Tooltip for the per-action unbind button"
+  },
+  "settingsShortcutResetTooltip": "恢复默认",
+  "@settingsShortcutResetTooltip": {
+    "description": "Tooltip for the per-action reset button"
+  },
+  "settingsShortcutCapturePrompt": "按下新的快捷键…（按 Esc 取消）",
+  "@settingsShortcutCapturePrompt": {
+    "description": "Prompt shown while capturing a new chord"
+  },
+  "settingsShortcutConflict": "同时被 {actions} 使用",
+  "@settingsShortcutConflict": {
+    "description": "Warning under an action whose chord collides with others",
+    "placeholders": {
+      "actions": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictWins": "优先于 {others}",
+  "@settingsShortcutConflictWins": {
+    "description": "Conflict warning on the row whose shortcut fires; lists the shadowed actions sharing the chord",
+    "placeholders": {
+      "others": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictShadowed": "不会触发 —— 被 {winner} 屏蔽",
+  "@settingsShortcutConflictShadowed": {
+    "description": "Conflict warning on a shadowed row whose shortcut will not fire; names the winning action",
+    "placeholders": {
+      "winner": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutConflictSummary": "{count, plural, =1{有 1 个快捷键冲突需要处理} other{有 {count} 个快捷键冲突需要处理}}",
+  "@settingsShortcutConflictSummary": {
+    "description": "Summary banner above the shortcut list showing how many chords are in conflict",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsShortcutResetAllTitle": "重置所有快捷键？",
+  "@settingsShortcutResetAllTitle": {
+    "description": "Title of the reset-all confirmation dialog"
+  },
+  "settingsShortcutResetAllBody": "所有键盘快捷键都将恢复为默认值，您的自定义设置将被移除。",
+  "@settingsShortcutResetAllBody": {
+    "description": "Body of the reset-all confirmation dialog"
+  },
+  "settingsShortcutResetAllCancel": "取消",
+  "@settingsShortcutResetAllCancel": {
+    "description": "Cancel button in the reset-all confirmation dialog"
+  },
+  "settingsShortcutExportSuccess": "键盘快捷键已导出。",
+  "@settingsShortcutExportSuccess": {
+    "description": "Snackbar after a successful keymap export"
+  },
+  "settingsShortcutExportFailure": "无法导出快捷键：{error}",
+  "@settingsShortcutExportFailure": {
+    "description": "Snackbar when keymap export fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutImportEmpty": "该文件不包含任何快捷键自定义设置。",
+  "@settingsShortcutImportEmpty": {
+    "description": "Snackbar when an imported keymap has no customizations"
+  },
+  "settingsShortcutImportSuccess": "{count, plural, =0{未导入任何快捷键自定义设置。} =1{已导入 1 个自定义快捷键。} other{已导入 {count} 个自定义快捷键。}}",
+  "@settingsShortcutImportSuccess": {
+    "description": "Snackbar after a successful keymap import",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsShortcutImportFailure": "无法导入快捷键：{error}",
+  "@settingsShortcutImportFailure": {
+    "description": "Snackbar when keymap import fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShortcutImportFailureNewerVersion": "此键位映射由较新版本的 LintCrux 保存，无法导入。请更新 LintCrux 后重试。",
+  "@settingsShortcutImportFailureNewerVersion": {
+    "description": "Snackbar when a keymap file declares a schema version this build does not support, meaning it was written by a newer LintCrux release. Distinct from the generic invalid-file message."
+  },
+  "settingsShortcutsPresetLabel": "预设",
+  "@settingsShortcutsPresetLabel": {
+    "description": "Label for the keymap preset chooser above the editable shortcut list"
+  },
+  "settingsShortcutsPresetDescription": "加载一整套按键绑定。之后您仍可自定义单个快捷键。",
+  "@settingsShortcutsPresetDescription": {
+    "description": "Description under the keymap preset chooser"
+  },
+  "settingsShortcutsPresetLintCrux": "LintCrux（默认）",
+  "@settingsShortcutsPresetLintCrux": {
+    "description": "Name of the default LintCrux keymap preset in the preset chooser"
+  },
+  "settingsShortcutsPresetCustom": "自定义",
+  "@settingsShortcutsPresetCustom": {
+    "description": "Shown in the preset chooser when the user's bindings match no built-in preset"
+  },
+  "appTitle": "LintCrux",
+  "@appTitle": {
+    "description": "Application title shown in the window title bar and About box."
+  },
+  "actionCategoryApp": "LintCrux",
+  "@actionCategoryApp": {
+    "description": "Browsable category for the host-application menu (Quit, Settings, Preferences). Renders as the macOS app menu and the branded leading menu on Linux/Windows."
+  },
+  "actionCategoryFile": "文件",
+  "@actionCategoryFile": {
+    "description": "Browsable category grouping file operations (Open Project, Open Sources, Reset Workspace)."
+  },
+  "actionCategoryView": "视图",
+  "@actionCategoryView": {
+    "description": "Browsable category grouping view operations (toggle theme, panel visibility)."
+  },
+  "actionCategoryNavigate": "导航",
+  "@actionCategoryNavigate": {
+    "description": "Browsable category grouping navigation actions (jump-to, next/previous violation)."
+  },
+  "actionCategorySearch": "搜索",
+  "@actionCategorySearch": {
+    "description": "Browsable category grouping search and find operations."
+  },
+  "actionCategoryTools": "工具",
+  "@actionCategoryTools": {
+    "description": "Browsable category grouping tools and analyses (run engines, cancel run, diagnostics)."
+  },
+  "actionCategoryHelp": "帮助",
+  "@actionCategoryHelp": {
+    "description": "Browsable category grouping help-related actions (About, command palette, documentation)."
+  },
+  "actionOpenProject": "打开项目…",
+  "@actionOpenProject": {
+    "description": "Menu / command palette label for the action that opens a .lintcrux project file."
+  },
+  "actionOpenSources": "打开源文件…",
+  "@actionOpenSources": {
+    "description": "Menu / command palette label for the action that opens raw Verilog/SystemVerilog/VHDL source files."
+  },
+  "actionQuit": "退出 LintCrux",
+  "@actionQuit": {
+    "description": "Menu / command palette label for the action that quits the app."
+  },
+  "actionRunAllEngines": "运行所有引擎",
+  "@actionRunAllEngines": {
+    "description": "Menu / command palette label for the action that invokes every enabled lint engine against the active project."
+  },
+  "actionCancelRun": "取消运行",
+  "@actionCancelRun": {
+    "description": "Menu / command palette label for the action that cancels an in-progress lint run."
+  },
+  "actionToggleTheme": "切换主题",
+  "@actionToggleTheme": {
+    "description": "Menu / command palette label for the action that flips between light and dark theme."
+  },
+  "actionOpenCommandPalette": "命令面板…",
+  "@actionOpenCommandPalette": {
+    "description": "Menu / command palette label for the action that opens the VS Code-style command palette."
+  },
+  "commandPaletteSearchHint": "搜索命令…",
+  "@commandPaletteSearchHint": {
+    "description": "Placeholder hint text in the command palette search field"
+  },
+  "commandPaletteNoResults": "未找到命令",
+  "@commandPaletteNoResults": {
+    "description": "Message displayed in the command palette when the search query matches no actions"
+  },
+  "actionFocusSearch": "在违规中查找…",
+  "@actionFocusSearch": {
+    "description": "Menu / command palette label for the action that opens the Find-in-Violations search dialog (substring / glob / regex over rule id + message; picking a result selects the violation)."
+  },
+  "actionOpenSettings": "设置…",
+  "@actionOpenSettings": {
+    "description": "Menu / command palette label for the action that opens the settings screen."
+  },
+  "actionResetWorkspace": "重置工作区…",
+  "@actionResetWorkspace": {
+    "description": "Menu / command palette label for the action that empties the current workspace."
+  },
+  "actionOpenAbout": "关于 LintCrux",
+  "@actionOpenAbout": {
+    "description": "Menu / command palette label for the action that shows the About box."
+  },
+  "actionOpenCrossProbePanel": "交叉探测对等端",
+  "@actionOpenCrossProbePanel": {
+    "description": "Menu / command palette label for the action that opens the cross-probe panel showing connected CXP peers and recent cross-probe events."
+  },
+  "actionOpenWaiverReview": "审阅豁免…",
+  "@actionOpenWaiverReview": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the managed-waiver review screen for the active project."
+  },
+  "actionSetBaseline": "从当前运行设置基线…",
+  "@actionSetBaseline": {
+    "description": "Menu / command palette label for the Pro-tier action that snapshots the current run's violations as the project baseline."
+  },
+  "actionClearBaseline": "清除基线",
+  "@actionClearBaseline": {
+    "description": "Menu / command palette label for the Pro-tier action that clears the project's active baseline."
+  },
+  "actionOpenBaselineComparison": "查看基线差异…",
+  "@actionOpenBaselineComparison": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the baseline-vs-current comparison screen."
+  },
+  "actionShowRuleTrendChart": "显示规则趋势图…",
+  "@actionShowRuleTrendChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the per-rule trend chart."
+  },
+  "actionShowSeverityClassDriftChart": "显示严重性漂移图…",
+  "@actionShowSeverityClassDriftChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the severity-class drift chart."
+  },
+  "actionShowProjectTrendChart": "显示项目趋势图…",
+  "@actionShowProjectTrendChart": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the project trend chart."
+  },
+  "actionShowCalendarHeatmap": "显示日历热图…",
+  "@actionShowCalendarHeatmap": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the calendar heatmap screen (GitHub-style contributions grid of per-day violation activity)."
+  },
+  "actionConfigureTrendRetention": "配置趋势保留期…",
+  "@actionConfigureTrendRetention": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the trend retention configuration UI."
+  },
+  "actionOpenBookmarksManager": "显示已加书签的违规…",
+  "@actionOpenBookmarksManager": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the violation-bookmark management panel."
+  },
+  "actionToggleBookmarkForCurrentViolation": "切换书签",
+  "@actionToggleBookmarkForCurrentViolation": {
+    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the Pro-tier action that toggles a bookmark on the selected violation."
+  },
+  "actionRunVeribleDryRun": "运行 Verible 自动修复试运行…",
+  "@actionRunVeribleDryRun": {
+    "description": "Menu / command palette label for the Pro-tier action that invokes Verible in dry-run mode and opens the FixReviewDialog with the proposed fixes."
+  },
+  "actionApplyVeribleFixes": "审阅 Verible 修复…",
+  "@actionApplyVeribleFixes": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Verible fix review dialog on a fresh dry-run batch. Applying is confirmed by the user inside that dialog — the action itself never applies fixes unattended. The trailing ellipsis marks that further interaction follows."
+  },
+  "actionConfigureVeribleBinary": "配置 Verible 二进制…",
+  "@actionConfigureVeribleBinary": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Settings → External Tools → Verible section."
+  },
+  "actionClearLintCache": "清空 Lint 缓存…",
+  "@actionClearLintCache": {
+    "description": "Menu / command palette label for the Pro-tier action that wipes every cached lint result for the active project after a confirmation dialog."
+  },
+  "actionOpenLintCacheStats": "显示 Lint 缓存统计…",
+  "@actionOpenLintCacheStats": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the Settings → Lint Cache section scrolled to the live-stats panel."
+  },
+  "actionForceLintRunWithoutCache": "运行 Lint（绕过缓存）",
+  "@actionForceLintRunWithoutCache": {
+    "description": "Menu / command palette label for the Pro-tier action that runs lint once with the cache bypassed in both directions for that single invocation."
+  },
+  "crossProbePanelTitle": "交叉探测对等端",
+  "@crossProbePanelTitle": {
+    "description": "Title of the cross-probe panel."
+  },
+  "crossProbePanelServerStopped": "交叉探测服务器已禁用。",
+  "@crossProbePanelServerStopped": {
+    "description": "Status text shown in the cross-probe panel when the CXP server is disabled in Settings."
+  },
+  "crossProbePanelPeersHeader": "发现的对等端",
+  "@crossProbePanelPeersHeader": {
+    "description": "Header above the discovered-peers list in the cross-probe panel."
+  },
+  "crossProbePanelPeersEmpty": "尚未发现对等端。",
+  "@crossProbePanelPeersEmpty": {
+    "description": "Empty-state text shown when no CXP peers have been discovered."
+  },
+  "crossProbePanelEventsHeader": "最近事件",
+  "@crossProbePanelEventsHeader": {
+    "description": "Header above the rolling event log in the cross-probe panel."
+  },
+  "crossProbePanelEventsEmpty": "尚无交叉探测事件。",
+  "@crossProbePanelEventsEmpty": {
+    "description": "Empty-state text shown when the cross-probe event log is empty."
+  },
+  "crossProbePanelClearEvents": "清除事件",
+  "@crossProbePanelClearEvents": {
+    "description": "Button that clears the cross-probe event log."
+  },
+  "crossProbePanelClose": "关闭",
+  "@crossProbePanelClose": {
+    "description": "Button that closes the cross-probe panel dialog."
+  },
+  "settingsCxpEnabledLabel": "启用 CXP 服务器",
+  "@settingsCxpEnabledLabel": {
+    "description": "Label of the toggle controlling whether the CXP cross-probe server starts at boot."
+  },
+  "settingsCxpEnabledDescription": "让其他 Crux 工具(WaveCrux、NetCrux、SimCrux)发现 LintCrux 并发送交叉探测请求。",
+  "@settingsCxpEnabledDescription": {
+    "description": "Helper text explaining what the cross-probe server does."
+  },
+  "settingsCxpPortLabel": "CXP 端口",
+  "@settingsCxpPortLabel": {
+    "description": "Label of the port input for the CXP server."
+  },
+  "settingsCxpPortDescription": "默认 54324",
+  "@settingsCxpPortDescription": {
+    "description": "Hint text for the CXP port input showing the suite default."
+  },
+  "violationColumnSeverity": "严重程度",
+  "@violationColumnSeverity": {
+    "description": "Header label for the severity column in the violation table."
+  },
+  "violationColumnEngine": "引擎",
+  "@violationColumnEngine": {
+    "description": "Header label for the engine column in the violation table."
+  },
+  "violationColumnRule": "规则",
+  "@violationColumnRule": {
+    "description": "Header label for the rule-id column in the violation table."
+  },
+  "violationColumnFile": "文件",
+  "@violationColumnFile": {
+    "description": "Header label for the file column in the violation table."
+  },
+  "violationColumnLine": "行",
+  "@violationColumnLine": {
+    "description": "Header label for the line-number column in the violation table."
+  },
+  "violationColumnMessage": "消息",
+  "@violationColumnMessage": {
+    "description": "Header label for the violation-message column in the violation table."
+  },
+  "violationFilterRuleHint": "按规则或消息过滤…",
+  "@violationFilterRuleHint": {
+    "description": "Placeholder text in the rule / message substring filter input above the violation table."
+  },
+  "violationFilterFileHint": "按文件 glob 筛选（例如 **/top.sv）…",
+  "@violationFilterFileHint": {
+    "description": "Placeholder text in the file-path glob filter input above the violation table."
+  },
+  "violationStatusEmpty": "无违规。",
+  "@violationStatusEmpty": {
+    "description": "Body text shown in the violation table when no engines have produced any violations and no run is in progress."
+  },
+  "violationStatusFiltered": "没有违规匹配当前筛选器。",
+  "@violationStatusFiltered": {
+    "description": "Body text shown in the violation table when violations exist but the active filters exclude all of them."
+  },
+  "violationStatusSummary": "共 {total} · 错误 {errors} · 警告 {warnings} · 提示 {notes} · 已豁免 {waived}",
+  "@violationStatusSummary": {
+    "description": "Status-bar summary text below the violation table. Renders live counts of total, error, warning, note, and waived violations.",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      },
+      "warnings": {
+        "type": "int"
+      },
+      "notes": {
+        "type": "int"
+      },
+      "waived": {
+        "type": "int"
+      }
+    }
+  },
+  "severityFatal": "致命",
+  "@severityFatal": {
+    "description": "Display label for the Fatal severity in filter chips and the severity column tooltip."
+  },
+  "severityError": "错误",
+  "@severityError": {
+    "description": "Display label for the Error severity in filter chips and the severity column tooltip."
+  },
+  "severityWarning": "警告",
+  "@severityWarning": {
+    "description": "Display label for the Warning severity in filter chips and the severity column tooltip."
+  },
+  "severityNote": "提示",
+  "@severityNote": {
+    "description": "Display label for the Note severity in filter chips and the severity column tooltip."
+  },
+  "severityNone": "未分类",
+  "@severityNone": {
+    "description": "Display label for the None severity (unclassified output) in filter chips and the severity column tooltip."
+  },
+  "inspectorEmpty": "选择一条违规以查看详细信息。",
+  "inspectorEngineStatusHeader": "引擎状态",
+  "inspectorEnginePhaseIdle": "待处理",
+  "inspectorEnginePhaseRunning": "运行中",
+  "inspectorEnginePhaseCompleted": "已完成",
+  "inspectorEnginePhaseFailed": "失败",
+  "inspectorEnginePhaseUnavailable": "二进制文件不可用",
+  "inspectorEnginePhaseCancelled": "已取消",
+  "inspectorEngineConfigureHint": "请安装缺失的二进制文件，或在 设置 > 引擎 中设置自定义路径。",
+  "@inspectorEmpty": {
+    "description": "Empty-state body shown in the inspector pane when no violation is selected."
+  },
+  "inspectorRuleHeader": "规则",
+  "@inspectorRuleHeader": {
+    "description": "Section header in the inspector pane above the engine-namespaced rule id and severity badge."
+  },
+  "inspectorMessageHeader": "消息",
+  "@inspectorMessageHeader": {
+    "description": "Section header in the inspector pane above the full engine-supplied message."
+  },
+  "inspectorLocationHeader": "位置",
+  "@inspectorLocationHeader": {
+    "description": "Section header in the inspector pane above the file:line:col."
+  },
+  "inspectorMetadataHeader": "规则详情",
+  "@inspectorMetadataHeader": {
+    "description": "Section header in the inspector pane above the rule-database metadata block (tags + help url)."
+  },
+  "inspectorTagsLabel": "标签",
+  "@inspectorTagsLabel": {
+    "description": "Label rendered to the left of the rule's tag chips in the inspector pane."
+  },
+  "inspectorRelatedLocationsHeader": "相关位置",
+  "@inspectorRelatedLocationsHeader": {
+    "description": "Section header in the inspector pane above the list of additional locations associated with the violation."
+  },
+  "inspectorOpenInEditor": "在编辑器中打开",
+  "@inspectorOpenInEditor": {
+    "description": "Button label that launches the user's editor at the violation's primary location."
+  },
+  "inspectorHelpUrlLabel": "了解更多",
+  "@inspectorHelpUrlLabel": {
+    "description": "Button label that opens the rule's help URL in the user's browser."
+  },
+  "sourcePreviewEmpty": "选择一条违规以预览源代码。",
+  "@sourcePreviewEmpty": {
+    "description": "Empty-state body shown in the source preview pane when no violation is selected."
+  },
+  "sourcePreviewFileMissing": "无法读取源文件：{file}",
+  "@sourcePreviewFileMissing": {
+    "description": "Error body shown in the source preview pane when the selected violation's file cannot be read.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "editorLaunchFailed": "无法启动编辑器({command})。",
+  "@editorLaunchFailed": {
+    "description": "Snackbar text shown when click-to-source fails because the configured editor binary is not on PATH or could not be started.",
+    "placeholders": {
+      "command": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsEditorPresetVsCode": "Visual Studio Code",
+  "@settingsEditorPresetVsCode": {
+    "description": "Settings → Editors radio label for the VS Code preset."
+  },
+  "settingsEditorPresetSublime": "Sublime Text",
+  "@settingsEditorPresetSublime": {
+    "description": "Settings → Editors radio label for the Sublime Text preset."
+  },
+  "settingsEditorPresetVim": "Vim / Neovim",
+  "@settingsEditorPresetVim": {
+    "description": "Settings → Editors radio label for the Vim / Neovim preset."
+  },
+  "settingsEditorPresetEmacs": "Emacs",
+  "@settingsEditorPresetEmacs": {
+    "description": "Settings → Editors radio label for the Emacs preset."
+  },
+  "settingsEditorPresetCustom": "自定义",
+  "@settingsEditorPresetCustom": {
+    "description": "Settings → Editors radio label for the custom executable + arg template."
+  },
+  "settingsEditorExecutableLabel": "可执行文件",
+  "@settingsEditorExecutableLabel": {
+    "description": "Label of the executable text input under Settings → Editors."
+  },
+  "settingsEditorArgsTemplateLabel": "参数模板",
+  "@settingsEditorArgsTemplateLabel": {
+    "description": "Label of the args template text input under Settings → Editors. Tooltip explains that {file}, {line}, and {column} are substituted."
+  },
+  "settingsEditorTemplateHelp": "使用 {file}、{line}、{column} 作为占位符。",
+  "@settingsEditorTemplateHelp": {
+    "description": "Helper text shown beneath the args template input under Settings → Editors."
+  },
+  "settingsGeneralSection": "通用",
+  "@settingsGeneralSection": {
+    "description": "Section header for the General group in Settings."
+  },
+  "settingsAppearanceSection": "外观",
+  "@settingsAppearanceSection": {
+    "description": "Section header for the Appearance group in Settings."
+  },
+  "settingsEnginesSection": "引擎",
+  "@settingsEnginesSection": {
+    "description": "Section header for the Engines group in Settings."
+  },
+  "settingsEditorsSection": "编辑器",
+  "@settingsEditorsSection": {
+    "description": "Section header for the Editors group in Settings."
+  },
+  "settingsAutoReloadLabel": "源文件变更时自动重新加载",
+  "@settingsAutoReloadLabel": {
+    "description": "Settings → General label for the AutoReloadMode toggle."
+  },
+  "settingsAutoReloadAuto": "自动重新运行",
+  "@settingsAutoReloadAuto": {
+    "description": "Settings → General option for AutoReloadMode.auto."
+  },
+  "settingsAutoReloadPrompt": "先询问我",
+  "@settingsAutoReloadPrompt": {
+    "description": "Settings → General option for AutoReloadMode.prompt."
+  },
+  "settingsAutoReloadOff": "不做任何操作",
+  "@settingsAutoReloadOff": {
+    "description": "Settings → General option for AutoReloadMode.off."
+  },
+  "autoReloadPromptMessage": "源文件已更改。是否重新运行引擎以采纳这些更改？",
+  "@autoReloadPromptMessage": {
+    "description": "Snackbar shown in a project tab when a watched source file changed and Settings > General > Auto-reload on source change is set to Prompt me first."
+  },
+  "autoReloadActionRerun": "立即重新运行",
+  "@autoReloadActionRerun": {
+    "description": "Action on the source-changed snackbar that re-runs the tab's engines."
+  },
+  "engineConfigSeverityOverridesHeader": "按规则的严重程度覆盖",
+  "@engineConfigSeverityOverridesHeader": {
+    "description": "Section header in the engine config screen above the rule-list with severity dropdowns."
+  },
+  "engineConfigOverrideBadge": "已覆盖",
+  "@engineConfigOverrideBadge": {
+    "description": "Short badge shown next to a rule whose severity has been overridden by the user."
+  },
+  "searchDialogTitle": "搜索违规",
+  "@searchDialogTitle": {
+    "description": "Title bar of the search-violations modal overlay."
+  },
+  "searchDialogHint": "搜索规则或消息",
+  "@searchDialogHint": {
+    "description": "Placeholder text in the search-violations input."
+  },
+  "searchModeSubstring": "子字符串",
+  "@searchModeSubstring": {
+    "description": "Search-mode toggle label for substring matching."
+  },
+  "searchModeGlob": "Glob",
+  "@searchModeGlob": {
+    "description": "Search-mode toggle label for glob matching."
+  },
+  "searchModeRegex": "正则",
+  "@searchModeRegex": {
+    "description": "Search-mode toggle label for regex matching."
+  },
+  "searchNoResults": "未找到匹配项。",
+  "@searchNoResults": {
+    "description": "Empty-state body shown in the search dialog when no violations match the active pattern."
+  },
+  "exportSuccess": "已导出 {n} 条违规到 {path}",
+  "@exportSuccess": {
+    "description": "Snackbar text shown after a successful export.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyCanvasTitle": "欢迎使用 LintCrux",
+  "@emptyCanvasTitle": {
+    "description": "Headline rendered in the empty-canvas state when no tabs are open."
+  },
+  "diagnosticsTabDrawerTitle": "标签页诊断",
+  "@diagnosticsTabDrawerTitle": {
+    "description": "Title of the per-tab diagnostics drawer."
+  },
+  "diagnosticsAppDialogTitle": "应用诊断",
+  "@diagnosticsAppDialogTitle": {
+    "description": "Title of the process-wide diagnostics dialog."
+  },
+  "diagnosticsSectionEngines": "引擎",
+  "@diagnosticsSectionEngines": {
+    "description": "Section header in the Tab Diagnostics drawer above the per-engine status block."
+  },
+  "diagnosticsSectionProjectInfo": "项目信息",
+  "@diagnosticsSectionProjectInfo": {
+    "description": "Section header in the Tab Diagnostics drawer above the project-info block."
+  },
+  "diagnosticsSectionViolationStats": "违规统计",
+  "@diagnosticsSectionViolationStats": {
+    "description": "Section header in the Tab Diagnostics drawer above the per-severity / per-engine / per-rule violation counts."
+  },
+  "diagnosticsCopyTabReport": "复制标签页诊断报告",
+  "@diagnosticsCopyTabReport": {
+    "description": "Action label that copies the active tab's diagnostics report to the clipboard."
+  },
+  "diagnosticsCopyFullReport": "复制完整诊断报告",
+  "@diagnosticsCopyFullReport": {
+    "description": "Action label that copies the full app diagnostics report to the clipboard."
+  },
+  "settingsTitle": "设置",
+  "@settingsTitle": {
+    "description": "AppBar title for the multi-section Settings screen."
+  },
+  "settingsClose": "关闭",
+  "@settingsClose": {
+    "description": "Tooltip for the back/close button in the Settings screen AppBar."
+  },
+  "settingsGeneralDefaultSortLabel": "默认排序列",
+  "@settingsGeneralDefaultSortLabel": {
+    "description": "Settings → General label for the default-sort-column dropdown that controls the initial sort of the violation table."
+  },
+  "settingsGeneralDefaultSortSeverity": "严重程度",
+  "@settingsGeneralDefaultSortSeverity": {
+    "description": "Settings → General option for the 'Severity' default sort column."
+  },
+  "settingsGeneralDefaultSortEngine": "引擎",
+  "@settingsGeneralDefaultSortEngine": {
+    "description": "Settings → General option for the 'Engine' default sort column."
+  },
+  "settingsGeneralDefaultSortRule": "规则",
+  "@settingsGeneralDefaultSortRule": {
+    "description": "Settings → General option for the 'Rule' default sort column."
+  },
+  "settingsGeneralDefaultSortFile": "文件",
+  "@settingsGeneralDefaultSortFile": {
+    "description": "Settings → General option for the 'File' default sort column."
+  },
+  "settingsGeneralDefaultFilterLabel": "启动时的默认筛选集",
+  "@settingsGeneralDefaultFilterLabel": {
+    "description": "Settings → General label for the saved-filter-preset dropdown that controls which filter set is active on app launch."
+  },
+  "settingsGeneralDefaultFilterNone": "无 — 显示全部违规",
+  "@settingsGeneralDefaultFilterNone": {
+    "description": "Settings → General dropdown option indicating no default filter preset is selected."
+  },
+  "settingsEditorsHeader": "点击跳转源代码 — 编辑器",
+  "@settingsEditorsHeader": {
+    "description": "Settings → Editors section heading above the preset radios."
+  },
+  "settingsEditorsLivePreviewLabel": "实时预览",
+  "@settingsEditorsLivePreviewLabel": {
+    "description": "Settings → Editors label above the line that previews the fully expanded shell command for a sample file."
+  },
+  "settingsEditorsLivePreviewSample": "示例：src/example.sv:42:13",
+  "@settingsEditorsLivePreviewSample": {
+    "description": "Settings → Editors caption indicating which sample file + line + column the preview row substitutes."
+  },
+  "settingsEditorsResetButton": "重置为默认(VS Code)",
+  "@settingsEditorsResetButton": {
+    "description": "Settings → Editors button that restores the click-to-source editor command to the VS Code preset."
+  },
+  "filterPresetSaveAction": "将当前筛选保存为预设…",
+  "@filterPresetSaveAction": {
+    "description": "Filter-preset dropdown action that opens a name-input dialog to save the current filters as a new named preset."
+  },
+  "filterPresetManageAction": "管理预设…",
+  "@filterPresetManageAction": {
+    "description": "Filter-preset dropdown action that opens the manage-presets dialog (delete, rename)."
+  },
+  "filterPresetDropdownLabel": "筛选预设",
+  "@filterPresetDropdownLabel": {
+    "description": "Label above the filter-preset dropdown that appears above the violation table."
+  },
+  "filterPresetNoneLabel": "无",
+  "@filterPresetNoneLabel": {
+    "description": "Filter-preset dropdown entry representing 'no preset active' (i.e. filters are whatever the user has manually applied)."
+  },
+  "filterPresetSaveDialogTitle": "保存筛选预设",
+  "@filterPresetSaveDialogTitle": {
+    "description": "Title of the dialog that prompts for a preset name when saving current filters as a new preset."
+  },
+  "filterPresetNameLabel": "预设名称",
+  "@filterPresetNameLabel": {
+    "description": "Input field label in the save-filter-preset dialog."
+  },
+  "filterPresetManageDialogTitle": "管理筛选预设",
+  "@filterPresetManageDialogTitle": {
+    "description": "Title of the dialog that lists existing filter presets with delete affordances."
+  },
+  "filterPresetEmptyState": "尚无已保存的预设。配置筛选后选择“将当前筛选保存为预设…”即可添加。",
+  "@filterPresetEmptyState": {
+    "description": "Empty-state body text in the manage-filter-presets dialog when the user has not yet saved any presets."
+  },
+  "filterPresetDeleteTooltip": "删除预设",
+  "@filterPresetDeleteTooltip": {
+    "description": "Tooltip on the trash icon next to each preset in the manage-filter-presets dialog."
+  },
+  "filterPresetSaveButton": "保存",
+  "@filterPresetSaveButton": {
+    "description": "Confirm button label in the save-filter-preset dialog."
+  },
+  "filterPresetCancelButton": "取消",
+  "@filterPresetCancelButton": {
+    "description": "Cancel button label in the save-filter-preset / manage-presets dialogs."
+  },
+  "filterPresetDoneButton": "完成",
+  "@filterPresetDoneButton": {
+    "description": "Close button label in the manage-filter-presets dialog."
+  },
+  "actionSaveSession": "保存会话…",
+  "@actionSaveSession": {
+    "description": "Menu / command palette label for the action that saves a .lintcrux-session file."
+  },
+  "actionOpenSession": "打开会话…",
+  "@actionOpenSession": {
+    "description": "Menu / command palette label for the action that opens a .lintcrux-session file."
+  },
+  "actionImportSarif": "导入 SARIF 报告…",
+  "@actionImportSarif": {
+    "description": "Menu / command palette / toolbar / welcome label for the desktop action that imports a CI-generated SARIF report into a read-only viewer without re-running engines."
+  },
+  "actionExportSarif": "将违规导出为 SARIF…",
+  "@actionExportSarif": {
+    "description": "Menu / command palette label for the action that exports the current violation set as SARIF 2.1.0."
+  },
+  "actionExportJson": "将违规导出为 JSON…",
+  "@actionExportJson": {
+    "description": "Menu / command palette label for the action that exports the current violation set as JSON."
+  },
+  "actionExportCsv": "将违规导出为 CSV…",
+  "@actionExportCsv": {
+    "description": "Menu / command palette label for the action that exports the current violation set as CSV (RFC 4180 quoting)."
+  },
+  "actionExportHtml": "将违规导出为 HTML…",
+  "@actionExportHtml": {
+    "description": "Menu / command palette label for the action that exports the current violation set as a single-page HTML dashboard."
+  },
+  "actionOpenTabDiagnostics": "标签页诊断…",
+  "@actionOpenTabDiagnostics": {
+    "description": "Menu / command palette label for the action that opens the per-tab diagnostics drawer."
+  },
+  "actionOpenAppDiagnostics": "应用诊断…",
+  "@actionOpenAppDiagnostics": {
+    "description": "Menu / command palette label for the action that opens the process-wide diagnostics dialog."
+  },
+  "actionSaveFilterPreset": "保存筛选预设…",
+  "@actionSaveFilterPreset": {
+    "description": "Menu / command palette label for the action that opens the save-filter-preset dialog."
+  },
+  "actionManageFilterPresets": "管理筛选预设…",
+  "@actionManageFilterPresets": {
+    "description": "Menu / command palette label for the action that opens the manage-filter-presets dialog."
+  },
+  "actionImportVivadoFilelist": "导入 Vivado 文件列表…",
+  "@actionImportVivadoFilelist": {
+    "description": "Menu / command palette label for the action that imports a Vivado-style `.f` filelist into a new .lintcrux project."
+  },
+  "actionImportEdam": "导入 FuseSoC EDAM…",
+  "@actionImportEdam": {
+    "description": "Menu / command palette label for the action that imports a FuseSoC/Edalize EDAM (.eda.yml) file into a new .lintcrux project."
+  },
+  "filelistImportError": "无法导入文件列表：{message}",
+  "@filelistImportError": {
+    "description": "Snackbar shown after a failed filelist import. Includes the underlying FilelistImportException message.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "edamImportError": "无法导入 EDAM 文件：{message}",
+  "@edamImportError": {
+    "description": "Snackbar shown after a failed EDAM import. Includes the underlying EdamImportException message.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigBinaryOverridesHeader": "引擎可执行文件路径",
+  "@engineConfigBinaryOverridesHeader": {
+    "description": "Section header for the per-engine binary-path override list in Settings → Engines."
+  },
+  "engineConfigBinaryOverridesHelp": "选择每个引擎可执行文件的来源。自动检测会搜索 PATH。内置预留给随 LintCrux 分发的各平台可执行文件——目前尚未随附任何引擎，因此除非 LINTCRUX_BUNDLED_BIN_DIR 指向可执行文件目录，否则内置同样回退到 PATH。自定义则使用显式的绝对路径。",
+  "@engineConfigBinaryOverridesHelp": {
+    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the three modes, including that Bundled resolves nothing today because no engine binaries ship with the app."
+  },
+  "engineConfigBinarySourceAuto": "自动检测",
+  "@engineConfigBinarySourceAuto": {
+    "description": "Label for the auto-detect segment of the binary-source SegmentedButton (Settings → Engines)."
+  },
+  "engineConfigBinarySourceBundled": "内置",
+  "@engineConfigBinarySourceBundled": {
+    "description": "Label for the bundled-binary segment of the binary-source SegmentedButton."
+  },
+  "engineConfigBinarySourceCustom": "自定义",
+  "@engineConfigBinarySourceCustom": {
+    "description": "Label for the custom-path segment of the binary-source SegmentedButton."
+  },
+  "engineConfigBinaryPathLabel": "可执行文件路径",
+  "@engineConfigBinaryPathLabel": {
+    "description": "Label for the custom binary-path text field shown when 'Custom' is selected."
+  },
+  "engineConfigBinaryProbeButton": "探测",
+  "@engineConfigBinaryProbeButton": {
+    "description": "Label for the button that runs `<binary> --version` against the entered custom path and surfaces the detected version."
+  },
+  "engineConfigBinaryProbing": "探测中…",
+  "@engineConfigBinaryProbing": {
+    "description": "Status text shown while the version probe is in flight."
+  },
+  "engineConfigBinaryProbeSuccess": "已检测到：{version}",
+  "@engineConfigBinaryProbeSuccess": {
+    "description": "Status text shown after a successful version probe. Includes the detected version string verbatim.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "engineConfigBinaryProbeFailure": "无法检测版本 — 可执行文件可能缺失或不兼容。",
+  "@engineConfigBinaryProbeFailure": {
+    "description": "Status text shown when the version probe returned null / exited non-zero."
+  },
+  "yosysDiagnosticsSectionTitle": "Yosys 诊断",
+  "@yosysDiagnosticsSectionTitle": {
+    "description": "Section header in the Tab Diagnostics drawer above the raw YosysDiagnostic list captured during the most recent run."
+  },
+  "yosysDiagnosticsEmpty": "最近一次运行没有 Yosys 诊断。",
+  "@yosysDiagnosticsEmpty": {
+    "description": "Placeholder text shown when the Yosys engine produced no diagnostics (or the engine was disabled / unavailable)."
+  },
+  "yosysDiagnosticsSeverityError": "错误",
+  "@yosysDiagnosticsSeverityError": {
+    "description": "Filter-chip label for the 'error' severity in the Yosys Diagnostics section. Plural label because the chip filters every row of that severity."
+  },
+  "yosysDiagnosticsSeverityWarning": "警告",
+  "@yosysDiagnosticsSeverityWarning": {
+    "description": "Filter-chip label for the 'warning' severity in the Yosys Diagnostics section."
+  },
+  "yosysDiagnosticsSeverityInfo": "信息",
+  "@yosysDiagnosticsSeverityInfo": {
+    "description": "Filter-chip label for the 'info' severity in the Yosys Diagnostics section."
+  },
+  "webModeAppBarTitle": "LintCrux 查看器",
+  "@webModeAppBarTitle": {
+    "description": "App bar title on the web read-only landing screen — communicates that this is the read-only browser viewer, not the full desktop LintCrux."
+  },
+  "webModeHeadline": "只读 SARIF 查看器",
+  "@webModeHeadline": {
+    "description": "Hero headline on the web read-only landing screen — sets the expectation that this is a viewer, not a runner."
+  },
+  "webModeBody": "上传 SARIF 报告或粘贴托管报告的 URL。浏览器查看器渲染违规表格、筛选标签、检查器和源代码预览，与桌面仪表板相同，但无法运行 Lint 引擎或修改项目设置。",
+  "@webModeBody": {
+    "description": "Body text on the web read-only landing screen explaining the two ingestion paths and the read-only limitation."
+  },
+  "webModeOpenFileButton": "打开 SARIF 文件…",
+  "@webModeOpenFileButton": {
+    "description": "Button label for the file-picker upload path on the web landing screen."
+  },
+  "webModeUrlPrompt": "或者通过 URL 打开托管的 SARIF 报告：",
+  "@webModeUrlPrompt": {
+    "description": "Label above the URL input field on the web landing screen."
+  },
+  "webModeUrlFieldLabel": "SARIF URL",
+  "@webModeUrlFieldLabel": {
+    "description": "Floating label of the URL input field on the web landing screen."
+  },
+  "webModeUrlOpenButton": "打开",
+  "@webModeUrlOpenButton": {
+    "description": "Button label next to the URL input field — fetches and opens the SARIF document at the given URL."
+  },
+  "webModeInvalidUrl": "请输入有效的 http 或 https URL。",
+  "@webModeInvalidUrl": {
+    "description": "Error message shown when the URL field contains a value that is not a parseable http/https URI."
+  },
+  "webModeFooterNote": "引擎编排、文件监视、项目设置和豁免是仅限桌面的功能。要在本地运行 Lint 引擎，请从 lintcrux.app/download 安装桌面应用。",
+  "@webModeFooterNote": {
+    "description": "Footer note on the web read-only landing screen — clarifies that the browser viewer is observation-only and points users to the desktop app for engine orchestration."
+  },
+  "webViewerAppBarTitle": "查看 SARIF",
+  "@webViewerAppBarTitle": {
+    "description": "App bar title on the web read-only viewer screen — descriptive prefix; the loaded source name renders to its right."
+  },
+  "webViewerNoSource": "(未加载源)",
+  "@webViewerNoSource": {
+    "description": "Placeholder rendered in the viewer subtitle when no SARIF source is loaded yet (the user navigated directly to /web/viewer without going through the landing screen)."
+  },
+  "webViewerOpenAnotherButton": "打开其他",
+  "@webViewerOpenAnotherButton": {
+    "description": "App bar action label on the web viewer screen — returns the user to the landing screen to upload a different SARIF report."
+  },
+  "importSarifFailed": "无法导入 SARIF 报告：{error}",
+  "@importSarifFailed": {
+    "description": "Snackbar shown on the desktop when importing a SARIF report fails (malformed / truncated / unreadable file). The previously-loaded report, if any, is left intact.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importSarifViewerTitle": "已导入的 SARIF 报告",
+  "@importSarifViewerTitle": {
+    "description": "App bar title on the desktop read-only imported-SARIF viewer screen — descriptive prefix; the imported file name renders to its right."
+  },
+  "importSarifViewerNoSource": "（未导入报告）",
+  "@importSarifViewerNoSource": {
+    "description": "Placeholder rendered in the imported-SARIF viewer subtitle when no report has been imported yet."
+  },
+  "importSarifViewerBackButton": "返回工作区",
+  "@importSarifViewerBackButton": {
+    "description": "App bar action on the desktop imported-SARIF viewer that returns the user to the project workspace."
+  },
+  "importSarifViewerImportAnotherButton": "导入其他报告…",
+  "@importSarifViewerImportAnotherButton": {
+    "description": "App bar action on the desktop imported-SARIF viewer that opens the file picker to import a different SARIF report."
+  },
+  "viewerTabBarCloseTabTooltip": "关闭标签页",
+  "@viewerTabBarCloseTabTooltip": {
+    "description": "Tooltip rendered over the per-chip close (×) button."
+  },
+  "tabChipCloseTooltip": "关闭 {name}",
+  "@tabChipCloseTooltip": {
+    "description": "See app_en.arb for description",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "viewerTabBarScrollTabsLeftTooltip": "向左滚动标签页",
+  "@viewerTabBarScrollTabsLeftTooltip": {
+    "description": "Tooltip on the chevron that scrolls the tab strip toward its start."
+  },
+  "viewerTabBarScrollTabsRightTooltip": "向右滚动标签页",
+  "@viewerTabBarScrollTabsRightTooltip": {
+    "description": "Tooltip on the chevron that scrolls the tab strip toward its end."
+  },
+  "diagnosticsCloseTooltip": "关闭",
+  "@diagnosticsCloseTooltip": {
+    "description": "Tooltip on the close (×) button in the App Diagnostics dialog."
+  },
+  "viewerTabBarNewTabTooltip": "新建标签页",
+  "@viewerTabBarNewTabTooltip": {
+    "description": "Tooltip rendered over the trailing \"+\" new-tab button."
+  },
+  "viewerTabBarNewTabDefaultDisplayName": "新建标签页",
+  "@viewerTabBarNewTabDefaultDisplayName": {
+    "description": "Default display name used when the user creates an empty new tab via the trailing \"+\" button."
+  },
+  "viewerTabBarUnnamedTabFallback": "(未命名标签页)",
+  "@viewerTabBarUnnamedTabFallback": {
+    "description": "Fallback rendered in place of a tab's display name when the host hands in a blank string."
+  },
+  "viewerTabBarCloseTabMenuItem": "关闭标签页",
+  "@viewerTabBarCloseTabMenuItem": {
+    "description": "Tab chip context-menu item that closes the tab."
+  },
+  "viewerTabBarCloseOtherTabsMenuItem": "关闭其他标签页",
+  "@viewerTabBarCloseOtherTabsMenuItem": {
+    "description": "Tab chip context-menu item that closes every tab except the right-clicked one."
+  },
+  "viewerTabBarCloseTabsToTheRightMenuItem": "关闭右侧标签页",
+  "@viewerTabBarCloseTabsToTheRightMenuItem": {
+    "description": "Tab chip context-menu item that closes every tab to the right of the right-clicked one."
+  },
+  "viewerTabBarMoveToNewWindowMenuItem": "移至新窗口",
+  "@viewerTabBarMoveToNewWindowMenuItem": {
+    "description": "Tab chip context-menu item that detaches the tab into its own window. Disabled until Flutter multi-window stabilizes."
+  },
+  "viewerTabBarMultiWindowUnavailableTooltip": "在 Flutter 多窗口功能稳定后可用",
+  "@viewerTabBarMultiWindowUnavailableTooltip": {
+    "description": "Tooltip shown next to the disabled \"Move to New Window\" menu item."
+  },
+  "viewerTabBarActivePaneAccessibilityLabel": "当前窗格",
+  "@viewerTabBarActivePaneAccessibilityLabel": {
+    "description": "Accessibility label rendered on the surrounding container of the active pane so screen readers announce focus changes."
+  },
+  "viewerTabBarDragToPaneAccessibilityHint": "拖放至此处可将标签页移入该窗格",
+  "@viewerTabBarDragToPaneAccessibilityHint": {
+    "description": "Accessibility hint announced while a tab is being dragged toward another pane's tab bar."
+  },
+  "viewerTabBarReorderHandleTooltip": "拖动以重新排序",
+  "@viewerTabBarReorderHandleTooltip": {
+    "description": "Tooltip describing the leading drag handle on each chip."
+  },
+  "emptyCanvasSubtitle": "打开项目开始静态检查、恢复已保存的会话或加载命名工作区。",
+  "@emptyCanvasSubtitle": {
+    "description": "One-line subtitle below the empty-canvas headline."
+  },
+  "emptyCanvasVersion": "版本 {version}",
+  "@emptyCanvasVersion": {
+    "description": "Muted version line under the empty-canvas (welcome) subtitle. The only always-visible version indicator on web, where there is no native menu bar to host an About entry point.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyCanvasSuiteFooter": "EDACrux 产品套件成员之一 — edacrux.app",
+  "@emptyCanvasSuiteFooter": {
+    "description": "Suite-membership line at the foot of the empty-canvas (welcome) screen. The whole line is a link to the EDACrux suite site. \"edacrux.app\" must appear verbatim — the widget splits the sentence around it to underline the domain — but a translation that drops it still renders and is still followable, just without an underlined segment. \"EDACrux\" is one word and is never translated."
+  },
+  "emptyCanvasPeersHeading": "EDACrux 的其他产品",
+  "@emptyCanvasPeersHeading": {
+    "description": "Section header above the three sibling-product rows at the foot of the empty-canvas (welcome) screen. Rendered upper-case in English as a small letter-spaced label, matching the \"RECENT FILES\" headers above it; a locale whose script has no case simply reads as a label. \"EDACrux\" is one word and is never translated."
+  },
+  "emptyCanvasPeerWaveCrux": "看到违规真正发生。打开触发该规则的那次运行的波形。",
+  "@emptyCanvasPeerWaveCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing WaveCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what WaveCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasPeerNetCrux": "查看问题所指向的逻辑。将违规交叉探查到原理图。",
+  "@emptyCanvasPeerNetCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing NetCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what NetCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasPeerSimCrux": "不只是读，还要跑。对刚刚 lint 过的源码启动回归。",
+  "@emptyCanvasPeerSimCrux": {
+    "description": "One line in the \"More from EDACrux\" section of the empty-canvas (welcome) screen, describing SimCrux to someone using LintCrux. Written from THIS product's point of view on purpose — what SimCrux does for a LintCrux user is not what it does for a user of another product — so do not reuse another repository's wording. Keep it to roughly one short sentence plus one more; the row wraps but is not a paragraph. Product names are never translated."
+  },
+  "emptyCanvasOpenProjectButton": "打开项目…",
+  "@emptyCanvasOpenProjectButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux` project file."
+  },
+  "emptyCanvasOpenSessionButton": "打开会话…",
+  "@emptyCanvasOpenSessionButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux-session` file."
+  },
+  "emptyCanvasOpenWorkspaceButton": "打开工作区…",
+  "@emptyCanvasOpenWorkspaceButton": {
+    "description": "Empty-canvas button that opens a `.lintcrux-workspace` file."
+  },
+  "emptyCanvasNewProjectButton": "新建项目…",
+  "@emptyCanvasNewProjectButton": {
+    "description": "Empty-canvas button that creates a new `.lintcrux` project."
+  },
+  "emptyCanvasRecentProjectsHeading": "最近的项目",
+  "@emptyCanvasRecentProjectsHeading": {
+    "description": "Section heading above the recent-projects list on the empty-canvas state."
+  },
+  "emptyCanvasRecentWorkspacesHeading": "最近的工作区",
+  "@emptyCanvasRecentWorkspacesHeading": {
+    "description": "Section heading above the recent-workspaces list on the empty-canvas state."
+  },
+  "emptyCanvasNoRecentProjects": "暂无最近的项目。",
+  "@emptyCanvasNoRecentProjects": {
+    "description": "Placeholder shown in the recent-projects section when the list is empty."
+  },
+  "emptyCanvasNoRecentWorkspaces": "暂无最近的工作区。",
+  "@emptyCanvasNoRecentWorkspaces": {
+    "description": "Placeholder shown in the recent-workspaces section when the list is empty."
+  },
+  "actionNewWorkspace": "新建工作区",
+  "@actionNewWorkspace": {
+    "description": "Menu / command palette label for the action that closes the current workspace and starts a fresh empty one."
+  },
+  "actionSaveWorkspaceAs": "工作区另存为…",
+  "@actionSaveWorkspaceAs": {
+    "description": "Menu / command palette label for the action that saves the current workspace under a user-chosen filename."
+  },
+  "actionOpenWorkspace": "打开工作区…",
+  "@actionOpenWorkspace": {
+    "description": "Menu / command palette label for the action that loads a `.lintcrux-workspace` file, replacing the current workspace."
+  },
+  "actionSplitPaneRight": "向右拆分窗格",
+  "@actionSplitPaneRight": {
+    "description": "Menu / command palette label for the action that splits the active pane horizontally."
+  },
+  "actionClosePane": "关闭窗格",
+  "@actionClosePane": {
+    "description": "Menu / command palette label for the action that closes the active pane, merging its tabs into the surviving pane."
+  },
+  "actionFocusOtherPane": "聚焦另一窗格",
+  "@actionFocusOtherPane": {
+    "description": "Menu / command palette label for the action that toggles focus to the non-active pane."
+  },
+  "actionMoveTabToOtherPane": "将标签页移至另一窗格",
+  "@actionMoveTabToOtherPane": {
+    "description": "Menu / command palette label for the action that moves the active tab to the other pane."
+  },
+  "actionNewTab": "新建标签页",
+  "@actionNewTab": {
+    "description": "Menu / command palette label for the action that creates a new empty tab in the active pane."
+  },
+  "actionCloseTab": "关闭标签页",
+  "@actionCloseTab": {
+    "description": "Menu / command palette label for the action that closes the active tab."
+  },
+  "actionNextTab": "下一个标签页",
+  "@actionNextTab": {
+    "description": "Menu / command palette label for the action that activates the next tab in the active pane."
+  },
+  "actionPreviousTab": "上一个标签页",
+  "@actionPreviousTab": {
+    "description": "Menu / command palette label for the action that activates the previous tab in the active pane."
+  },
+  "workspaceLoadFailed": "加载工作区失败：{message}",
+  "@workspaceLoadFailed": {
+    "description": "Snackbar message shown when loading a `.lintcrux-workspace` file fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "filePickerFailed": "无法打开文件选择器：{error}",
+  "@filePickerFailed": {
+    "description": "Snackbar shown when the file picker throws (e.g. macOS rejects an unknown extension, or the OS file-selector plugin returns an error). Surfaces the underlying error so file-open failures are not silent.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "openProjectLegacyManifestName": "此设计的清单仍使用旧文件名 .crux-project。请将其重命名为 {suggestedName}；后续版本将不再读取旧文件名。",
+  "@openProjectLegacyManifestName": {
+    "description": "Info snackbar shown once after opening a design manifest still named with the legacy bare .crux-project file name. suggestedName is the <design>.crux-project file name to rename it to. Keep .crux-project and the placeholder verbatim.",
+    "placeholders": {
+      "suggestedName": {
+        "type": "String"
+      }
+    }
+  },
+  "openProjectAmbiguousManifests": "无法打开设计：{directory} 中有多个设计清单（{names}）。一个设计文件夹只能有一个清单；请删除或合并多余的清单。",
+  "@openProjectAmbiguousManifests": {
+    "description": "Error snackbar shown when opening a design manifest whose folder holds more than one manifest, so nothing is opened. directory is the folder path; names lists the manifest file names, comma-separated. Keep the placeholders verbatim.",
+    "placeholders": {
+      "directory": {
+        "type": "String"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "filePickerOpenProjectButton": "打开项目",
+  "@filePickerOpenProjectButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux project file. On macOS this is `NSOpenPanel.prompt`; the rendered text appears on the picker's confirm button so the user can distinguish Open Project / Open Session / Open Workspace pickers from each other."
+  },
+  "filePickerImportSarifButton": "导入报告",
+  "@filePickerImportSarifButton": {
+    "description": "Action button label rendered by the OS file picker when importing a SARIF report via LintcruxAction.importSarif."
+  },
+  "filePickerOpenSessionButton": "打开会话",
+  "@filePickerOpenSessionButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux-session file."
+  },
+  "filePickerOpenWorkspaceButton": "打开工作区",
+  "@filePickerOpenWorkspaceButton": {
+    "description": "Action button label rendered by the OS file picker when opening a .lintcrux-workspace file."
+  },
+  "filePickerImportFilelistButton": "导入",
+  "@filePickerImportFilelistButton": {
+    "description": "Action button label rendered by the OS file picker when importing a .f Vivado-style filelist."
+  },
+  "filePickerImportEdamButton": "导入",
+  "@filePickerImportEdamButton": {
+    "description": "Action button label rendered by the OS file picker when importing a FuseSoC/Edalize EDAM (.eda.yml) file."
+  },
+  "filePickerCreateProjectButton": "创建项目",
+  "@filePickerCreateProjectButton": {
+    "description": "Action button label rendered by the OS save-file picker when creating a new .lintcrux project from the Welcome screen's New Project… button or the New Tab shortcut."
+  },
+  "filePickerSaveWorkspaceButton": "保存工作区",
+  "@filePickerSaveWorkspaceButton": {
+    "description": "Action button label rendered by the OS save-file picker when saving the active workspace as a new .lintcrux-workspace file via `LintcruxAction.saveWorkspaceAs`."
+  },
+  "filePickerExportSessionButton": "导出会话",
+  "@filePickerExportSessionButton": {
+    "description": "Action button label rendered by the OS save-file picker when exporting the active tab as a .lintcrux-session file via `LintcruxAction.exportTabAsSession` / `LintcruxAction.saveSession`."
+  },
+  "filePickerOpenSourcesButton": "添加到项目",
+  "@filePickerOpenSourcesButton": {
+    "description": "Action button label rendered by the OS file picker when picking HDL source files to add to the active project via `LintcruxAction.openSources`."
+  },
+  "openSourcesNoActiveProject": "请先打开或创建一个项目，然后再添加源文件。",
+  "@openSourcesNoActiveProject": {
+    "description": "Snackbar shown when the user invokes Open Sources (Cmd/Ctrl+Shift+O) without an active project tab. Hints that source files attach to a project."
+  },
+  "exportSessionNoActiveTab": "请先打开一个项目标签页，然后再导出会话。",
+  "@exportSessionNoActiveTab": {
+    "description": "Snackbar shown when the user invokes Export Tab as Session / Save Session without an active project tab."
+  },
+  "openSourcesAdded": "已将 {count} 个源文件添加到 {projectName}。",
+  "@openSourcesAdded": {
+    "description": "Snackbar shown after the user picks one or more HDL source files and they are appended to the active project's sourceFiles list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "projectName": {
+        "type": "String"
+      }
+    }
+  },
+  "saveWorkspaceFailed": "保存工作区失败：{message}",
+  "@saveWorkspaceFailed": {
+    "description": "Snackbar shown when saving the workspace via `LintcruxAction.saveWorkspaceAs` fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "saveSessionFailed": "导出会话失败：{message}",
+  "@saveSessionFailed": {
+    "description": "Snackbar shown when exporting the active tab as a .lintcrux-session via `LintcruxAction.exportTabAsSession` fails.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionSaved": "已将会话保存到 {path}。",
+  "@sessionSaved": {
+    "description": "Snackbar shown after a session is successfully exported.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceSaved": "已将工作区保存到 {path}。",
+  "@workspaceSaved": {
+    "description": "Snackbar shown after the workspace is successfully saved.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "workspaceResetConfirmTitle": "重置工作区？",
+  "@workspaceResetConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before `File → Reset Workspace` empties every open tab."
+  },
+  "workspaceResetConfirmBody": "所有已打开的标签页将被关闭。此操作无法撤销，但仅会替换自动保存的工作区文件——您的项目文件仍保留在磁盘上。",
+  "@workspaceResetConfirmBody": {
+    "description": "Body text of the confirmation dialog shown before `File → Reset Workspace`."
+  },
+  "workspaceResetConfirmAction": "重置",
+  "@workspaceResetConfirmAction": {
+    "description": "Confirmation button label on the reset-workspace dialog."
+  },
+  "dialogCancel": "取消",
+  "@dialogCancel": {
+    "description": "Generic cancel button label used by workspace confirmation dialogs and other modal dialogs."
+  },
+  "menuItemTierSuffix": " ({tier})",
+  "@menuItemTierSuffix": {
+    "description": "Suffix appended to a native menu-bar item's label to mark the license tier it requires; the placeholder is the short PRO/ENT badge text. The platform menu bar can only render a string label (no badge widget), so tier is shown as a parenthetical suffix there.",
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "tierBadgePro": "PRO",
+  "@tierBadgePro": {
+    "description": "Short visual label for the Pro-tier badge chip rendered next to Pro features in menus, palette entries, and panel headers."
+  },
+  "tierBadgeProSemantic": "Pro 等级功能",
+  "@tierBadgeProSemantic": {
+    "description": "Screen-reader phrase rendered on the Pro-tier badge chip."
+  },
+  "tierBadgeEnterprise": "ENT",
+  "@tierBadgeEnterprise": {
+    "description": "Short visual label for the Enterprise-tier badge chip rendered next to Enterprise features."
+  },
+  "tierBadgeEnterpriseSemantic": "Enterprise 等级功能",
+  "@tierBadgeEnterpriseSemantic": {
+    "description": "Screen-reader phrase rendered on the Enterprise-tier badge chip."
+  },
+  "editionMenuLine": "{edition} 版 — {identity}",
+  "editionMenuLineOrganization": "{edition} 版 — 由您的组织授权",
+  "editionNameEducational": "教育",
+  "editionNamePro": "Pro",
+  "editionNameEnterprise": "Enterprise",
+  "editionBadgeEduSemantic": "教育版",
+  "editionBadgeProSemantic": "专业版",
+  "editionBadgeEnterpriseSemantic": "企业版",
+  "tierBadgeEdu": "EDU",
+  "@tierBadgeEdu": {
+    "description": "Short visual label for the Educational license badge chip shown on user-status surfaces when the active license is EDU."
+  },
+  "tierBadgeEduSemantic": "教育版许可",
+  "@tierBadgeEduSemantic": {
+    "description": "Screen-reader phrase rendered on the Educational license badge chip."
+  },
+  "actionCloseActiveProject": "关闭当前项目",
+  "@actionCloseActiveProject": {
+    "description": "Menu / command palette label for the action that closes the currently-active project tab in the multi-project workspace."
+  },
+  "actionSwitchProject": "切换项目…",
+  "@actionSwitchProject": {
+    "description": "Menu / command palette label for the action that opens the project switcher dialog (Cmd/Ctrl+P). Lets the user pick from open and recently-closed projects."
+  },
+  "actionReopenRecentProject": "重新打开最近的项目",
+  "@actionReopenRecentProject": {
+    "description": "Menu / command palette label for the action that re-opens the most-recently-closed project from the recent-projects list."
+  },
+  "actionPinActiveProject": "固定项目标签",
+  "@actionPinActiveProject": {
+    "description": "Menu / command palette label for the Pro-tier action that pins (or unpins) the active project tab. Pinned tabs survive Close-All-Projects actions."
+  },
+  "actionCloseAllTabs": "关闭所有标签页",
+  "@actionCloseAllTabs": {
+    "description": "Menu / command palette label for the open-core action that closes every open workspace tab."
+  },
+  "closeAllTabsConfirmTitle": "关闭所有标签页？",
+  "@closeAllTabsConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before `File → Close All Tabs` closes every open tab."
+  },
+  "closeAllTabsConfirmBody": "所有打开的工作区标签页都将关闭。",
+  "@closeAllTabsConfirmBody": {
+    "description": "Body of the confirmation dialog shown before `File → Close All Tabs`."
+  },
+  "closeAllTabsConfirmConfirm": "全部关闭",
+  "@closeAllTabsConfirmConfirm": {
+    "description": "Confirmation button label on the close-all-tabs dialog."
+  },
+  "actionCloseAllProjects": "关闭所有项目",
+  "@actionCloseAllProjects": {
+    "description": "Menu / command palette label for the Pro-tier action that closes every open project except pinned ones."
+  },
+  "actionSearchAcrossProjects": "跨项目搜索…",
+  "@actionSearchAcrossProjects": {
+    "description": "Menu / command palette label for the Pro-tier action that opens the cross-project violation-search dialog (Cmd/Ctrl+Shift+F)."
+  },
+  "configLoadFailedTitle": "无法加载该项目",
+  "configLoadFailedPathLabel": "项目文件",
+  "configLoadFailedReasonLabel": "原因",
+  "configLoadFailedHint": "请使用 文件 > 打开项目… 选择其他 .lintcrux 文件，或修正上方路径后重新加载。",
+  "runEnginesNoActiveProject": "请先打开一个项目以运行 Lint 引擎。",
+  "@runEnginesNoActiveProject": {
+    "description": "Snackbar shown when the user invokes Run All Engines (F5) with no active project tab."
+  },
+  "runEnginesAlreadyRunning": "Lint 运行已在进行中。",
+  "@runEnginesAlreadyRunning": {
+    "description": "Snackbar shown when the user invokes Run All Engines (F5) while the current tab's runner is mid-run."
+  },
+  "cancelRunNoActiveRun": "没有正在进行的 Lint 运行。",
+  "@cancelRunNoActiveRun": {
+    "description": "Snackbar shown when the user invokes Cancel Run (Esc) with nothing in flight."
+  },
+  "aboutDialogTitle": "关于 LintCrux",
+  "@aboutDialogTitle": {
+    "description": "Title of the About dialog / screen."
+  },
+  "aboutTagline": "面向硬件工程师的现代 HDL 代码检查与风格查看器",
+  "@aboutTagline": {
+    "description": "One-line product tagline shown under the app name in the About header."
+  },
+  "aboutBetaChip": "公开测试版",
+  "@aboutBetaChip": {
+    "description": "Label on the public-beta chip in the About header."
+  },
+  "aboutEditionOpenCore": "开放核心版",
+  "@aboutEditionOpenCore": {
+    "description": "Edition label for the open-core build; hides the edition chip when matched."
+  },
+  "aboutSectionVersion": "版本",
+  "@aboutSectionVersion": {
+    "description": "Header / row label for the version sub-section in the About dialog."
+  },
+  "aboutBuildNumber": "构建号",
+  "@aboutBuildNumber": {
+    "description": "Row label for the platform build number in the About dialog."
+  },
+  "aboutGitSha": "提交",
+  "@aboutGitSha": {
+    "description": "Row label for the short git SHA in the About dialog."
+  },
+  "aboutSectionPlatform": "平台",
+  "@aboutSectionPlatform": {
+    "description": "Header for the platform sub-section in the About dialog."
+  },
+  "aboutOperatingSystem": "操作系统",
+  "@aboutOperatingSystem": {
+    "description": "Row label for the host operating system in the About dialog."
+  },
+  "aboutArchitecture": "架构",
+  "@aboutArchitecture": {
+    "description": "Row label for the CPU architecture in the About dialog."
+  },
+  "aboutFlutterVersion": "Flutter",
+  "@aboutFlutterVersion": {
+    "description": "Row label for the Flutter SDK version in the About dialog."
+  },
+  "aboutDartVersion": "Dart",
+  "@aboutDartVersion": {
+    "description": "Row label for the Dart SDK version in the About dialog."
+  },
+  "aboutButtonVisitWebsite": "访问网站",
+  "@aboutButtonVisitWebsite": {
+    "description": "About-dialog action button that opens the company website."
+  },
+  "aboutButtonDocs": "文档",
+  "@aboutButtonDocs": {
+    "description": "About-dialog action button that opens the LintCrux documentation site."
+  },
+  "aboutButtonPrivacy": "隐私政策",
+  "@aboutButtonPrivacy": {
+    "description": "About-dialog action button that opens the LintCrux privacy policy."
+  },
+  "aboutButtonTerms": "服务条款",
+  "@aboutButtonTerms": {
+    "description": "About-dialog action button that opens the LintCrux terms of service."
+  },
+  "aboutButtonCopyVersionInfo": "复制版本信息",
+  "@aboutButtonCopyVersionInfo": {
+    "description": "About-dialog action button that copies the structured version paragraph."
+  },
+  "aboutCopiedConfirmation": "版本信息已复制",
+  "@aboutCopiedConfirmation": {
+    "description": "Snackbar confirmation shown after Copy Version Info copies to the clipboard."
+  },
+  "aboutCompanyName": "Ferrite Engineering",
+  "@aboutCompanyName": {
+    "description": "Company tagline shown on the first line of the About branding banner."
+  },
+  "filePickerExportButton": "导出",
+  "exportFailed": "导出失败：{error}",
+  "snackFeatureRequiresPro": "{feature} 需要 LintCrux Pro。",
+  "snackFeatureNotAvailableYet": "{feature} 尚不可用。",
+  "engineConfigSeverityOff": "关闭",
+  "diagnosticsNoProjectLoaded": "未加载项目。",
+  "filePickerTypeProjectLabel": "LintCrux 项目",
+  "filePickerTypeSourcesLabel": "HDL 源文件",
+  "filePickerTypeFilelistLabel": "Vivado 文件列表",
+  "filePickerTypeEdamLabel": "FuseSoC EDAM",
+  "filePickerTypeSessionLabel": "LintCrux 会话",
+  "filePickerTypeWorkspaceLabel": "LintCrux 工作区",
+  "updateBannerMessage": "LintCrux {version} 现已发布。",
+  "updateViewChangesAction": "查看更新内容",
+  "updateNowAction": "立即更新",
+  "updateDismissLabel": "关闭",
+  "updateCheckInProgress": "正在检查更新…",
+  "updateCheckUpToDate": "您使用的已是最新版本（{version}）。",
+  "updateCheckFailed": "无法检查更新。",
+  "actionCheckForUpdates": "检查更新",
+  "settingsRestoreTabsOnLaunchLabel": "启动时恢复标签页",
+  "settingsRestoreTabsOnLaunchDescription": "重新打开 LintCrux 上次退出时处于打开状态的项目标签页。关闭后，LintCrux 将以空工作区启动；已保存的会话仍保留在磁盘上，因此重新开启此项即可恢复。",
+  "settingsAutoCheckUpdatesLabel": "自动检查更新",
+  "settingsAutoCheckUpdatesDescription": "在启动时以及每天检查一次新版本。仅发送您的应用版本和操作系统，绝不发送项目、源文件或违规数据。",
+  "aboutButtonCheckForUpdates": "检查更新",
+  "actionSubmitIssue": "提交问题…",
+  "aboutButtonSubmitIssue": "提交问题",
+  "issueReporterTitle": "提交问题",
+  "issueReporterTitleFieldLabel": "问题摘要",
+  "issueReporterTitleFieldHint": "简要描述出现的问题",
+  "issueReporterPrivacyNotice": "更多上下文有助于复现问题。请查看并关闭任何您不愿分享的内容。报告中绝不包含文件内容或文件路径。",
+  "issueReporterPreviewHeader": "预览问题正文",
+  "issueReporterCategoryAppEnv": "应用与环境",
+  "issueReporterCategoryAppEnvDescription": "版本、构建 SHA、平台、操作系统、屏幕 DPI、语言区域、SDK 版本。",
+  "issueReporterCategorySession": "会话状态",
+  "issueReporterCategorySessionDescription": "引擎名称与版本、违规与豁免数量 — 绝不包含文件路径或源代码内容。",
+  "issueReporterCategoryLog": "诊断信息",
+  "issueReporterCategoryLogDescription": "本次会话中捕获的最近警告和错误。",
+  "issueReporterCategoryScreenshot": "屏幕截图",
+  "issueReporterCategoryScreenshotDescription": "应用窗口的截图，已保存以便您附加。",
+  "issueReporterLockedCategorySemantics": "始终包含",
+  "issueReporterSubmitButton": "提交",
+  "issueReporterCancelButton": "取消",
+  "issueReporterOpenedToast": "已打开 GitHub 问题页 — 请从剪贴板粘贴到正文，然后拖入屏幕截图。",
+  "issueReporterOpenedToastPrefilled": "已打开 GitHub 问题页并预填报告内容 — 如已截图，请拖入屏幕截图。",
+  "issueReporterScreenshotSaved": "屏幕截图已保存到 {path}",
+  "issueReporterEmptyLogPlaceholder": "（未捕获日志条目）",
+  "issueReporterEmptySessionLogPlaceholder": "（本次会话未记录错误或警告）",
+  "betaExpiryBannerMessage": "{days, plural, =1{LintCrux Beta 版将在 1 天后过期。请下载最新版本。} other{LintCrux Beta 版将在 {days} 天后过期。请下载最新版本。}}",
+  "betaExpiryBannerAction": "下载",
+  "betaExpiryDismissLabel": "关闭",
+  "betaExpiryExpiredTitle": "Beta 版已过期",
+  "betaExpiryExpiredBody": "此 LintCrux Beta 版已到达过期日期。请下载最新版本以继续使用 LintCrux。",
+  "betaExpiryExpiredAction": "下载最新版本",
+  "betaExpiryExpiredQuit": "退出 LintCrux",
+  "crossProbeSendTooltip": "将所选发送到此对等端",
+  "crossProbeUnreachableTitle": "无法访问的对等端",
+  "crossProbeSendFailed": "发送到 {peer} 的交叉探测未能完成",
+  "crossProbeSendRefused": "发送到 {peer} 的交叉探测：{reason}",
+  "toolbarToggleCrossProbe": "交叉探测面板",
+  "settingsRequestAttentionOnCrossProbeLabel": "交叉探测时请求注意",
+  "settingsRequestAttentionOnCrossProbeDescription": "交叉探测到达时弹跳程序坞（或闪烁任务栏）。绝不抢占焦点。",
+  "settingsBroadcastSelectionOnCrossProbeLabel": "自动广播选择",
+  "settingsBroadcastSelectionOnCrossProbeDescription": "在您选择时，将选择内容通知已连接的对等端（实时交叉探测）。关闭时，仅共享显式发送的内容。",
+  "settingsCxpStatus": "CXP 状态",
+  "settingsCxpStatusRunning": "正在端口 {port} 上运行",
+  "settingsCxpStatusStopped": "已停止",
+  "settingsCxpPeersConnected": "{count, plural, =0{无已连接的对等端} =1{已连接 1 个对等端} other{已连接 {count} 个对等端}}",
+  "actionCategoryFileMnemonic": "文件(&F)",
+  "actionCategoryEditMnemonic": "编辑(&E)",
+  "actionCategoryViewMnemonic": "视图(&V)",
+  "actionCategoryNavigateMnemonic": "导航(&N)",
+  "actionCategorySearchMnemonic": "搜索(&S)",
+  "actionCategoryToolsMnemonic": "工具(&T)",
+  "actionCategoryHelpMnemonic": "帮助(&H)",
+  "actionCategoryEdit": "编辑",
+  "menuWindow": "窗口",
+  "actionExit": "退出",
+  "actionOpenDocumentation": "文档",
+  "accessibilityViolationRow": "{severity} 违规，规则 {rule}，文件 {file} 第 {line} 行：{message}",
+  "@accessibilityViolationRow": {
+    "description": "Screen-reader label for one violation table row.",
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "rule": {
+        "type": "String"
+      },
+      "file": {
+        "type": "String"
+      },
+      "line": {
+        "type": "int"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "accessibilityToolbarRegion": "工具栏",
+  "accessibilityStatusBarRegion": "状态栏",
+  "accessibilityViolationTableKeyboardHint": "使用上下方向键在违规之间移动。按 Enter 在编辑器中打开违规，按 Space 切换其复选框。",
+  "toolbarOverflowActions": "操作",
+  "toolbarExportCluster": "导出报告",
+  "statusBarBusyLintRun": "正在运行 Lint 引擎",
+  "statusBarNoProject": "未打开项目",
+  "dockTabDetails": "详情",
+  "dockTabRules": "规则",
+  "dockTabSource": "源码",
+  "dockTabCrossProbe": "交叉探测",
+  "dockCollapseTooltip": "隐藏面板",
+  "accessibilityRightDockRegion": "详情停靠区",
+  "accessibilityLeftDockRegion": "浏览器停靠区",
+  "accessibilityBottomDockRegion": "面板停靠区",
+  "settingsLanguageLabel": "语言",
+  "settingsLanguageDescription": "应用界面使用的语言",
+  "settingsCxpSectionTitle": "CXP 交叉探测",
+  "settingsAutoReloadDescription": "已加载项目在磁盘上更改时 LintCrux 的响应方式",
+  "settingsCxpPortError": "请输入 1 到 65535 之间的端口。",
+  "tabContextMenuRevealInFinder": "在 Finder 中显示",
+  "tabContextMenuRevealInExplorer": "在 Explorer 中显示",
+  "tabContextMenuRevealInFiles": "在文件管理器中显示",
+  "helpLinkLearnMore": "了解更多",
+  "telemetryConsentTitle": "帮助改进 LintCrux",
+  "telemetryConsentBody": "匿名使用次数与错误次数统计帮助我们决定下一步开发什么、修复什么。绝不收集你的文件、设计数据或任何能识别你身份的信息。",
+  "telemetryConsentLearnMore": "查看具体收集哪些内容",
+  "telemetryConsentToggleLabel": "发送匿名使用统计",
+  "telemetryConsentContinue": "继续",
+  "settingsPrivacySection": "隐私",
+  "settingsTelemetryLabel": "发送匿名使用统计",
+  "settingsTelemetryDescription": "功能、引擎与错误计数、应用与操作系统版本、外形规格、语言以及许可证等级。绝不包含文件名、规则标识符，也绝不包含任何 lint 消息或错误消息的文本。",
+  "settingsTelemetryDocsLabel": "遥测文档",
+  "settingsTelemetryDocsDescription": "字段的完整清单、绝不收集清单，以及发送这些数据的源码。",
+  "diagnosticsCloseDrawer": "关闭诊断",
+  "settingsDiagnosticsEnabledLabel": "启用诊断",
+  "settingsDiagnosticsEnabledDescription": "在“工具”菜单中启用“标签页诊断”和“应用诊断”。调试版本和性能分析版本中始终启用。",
+  "incomingFileNotSupported": "LintCrux 无法打开 {fileName}。",
+  "diagnosticsDisabledSnack": "诊断已关闭。可在设置 > {section}中启用。",
+  "inspectorClearSelection": "返回引擎状态",
+  "dockTabSources": "源文件",
+  "sourcesPanelEmpty": "此项目中没有源文件。",
+  "sourcesPanelNoProject": "打开一个项目以查看其源文件。",
+  "sourcesRemoveTooltip": "从项目中移除",
+  "sourcesRemoveConfirmTitle": "移除源文件？",
+  "sourcesRemoveConfirmBody": "{file} 将从此项目中移除。文件本身不会被删除。",
+  "sourcesRemoveConfirmAction": "移除",
+  "sourcesRemoved": "已从 {project} 移除 {file}。",
+  "sourcesCount": "{count, plural, =1{1 个源文件} other{{count} 个源文件}}",
+  "sourcesRemoveNotFound": "{file} 未列在此项目文件中——未做任何更改。",
+  "rulesPanelSearchHint": "搜索规则…",
+  "rulesPanelAllEngines": "所有引擎",
+  "rulesPanelEmpty": "没有匹配的规则。",
+  "rulesPanelCount": "{count, plural, =1{1 条规则} other{{count} 条规则}}",
+  "rulesPanelLearnMore": "文档",
+  "rulesPanelLoadFailed": "规则数据库不可用。",
+  "settingsTelemetryInstallationIdLabel": "安装 ID",
+  "settingsTelemetryInstallationIdDescription": "这是与所收集数据关联的唯一标识符。它是随机生成的，与您本人无关。如需删除本次安装的数据，请将其发送给支持人员。",
+  "settingsTelemetryInstallationIdCopy": "复制",
+  "settingsTelemetryInstallationIdCopied": "已复制安装 ID。"
+}

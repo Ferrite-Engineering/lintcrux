@@ -1,0 +1,1299 @@
+{
+  "engineId": "svlint",
+  "displayName": "Svlint",
+  "verifiedAgainstSvlintVersions": [
+    "0.9.5"
+  ],
+  "note": "Enumerated from `svlint --example` on the version above -- the binary's own rule manifest -- rather than transcribed. Severity is svlint's uniform 'warning'; it does not classify.",
+  "helpBaseUrl": "https://github.com/dalance/svlint/blob/master/MANUAL.md",
+  "rules": [
+    {
+      "id": "header_copyright",
+      "defaultSeverity": "warning",
+      "tags": [
+        "style",
+        "header"
+      ]
+    },
+    {
+      "id": "style_directives",
+      "defaultSeverity": "warning",
+      "tags": [
+        "style"
+      ]
+    },
+    {
+      "id": "style_semicolon",
+      "defaultSeverity": "warning",
+      "tags": [
+        "style"
+      ]
+    },
+    {
+      "id": "style_textwidth",
+      "defaultSeverity": "warning",
+      "tags": [
+        "style"
+      ]
+    },
+    {
+      "id": "action_block_with_side_effect",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "blocking_assignment_in_always_at_edge",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "blocking"
+      ]
+    },
+    {
+      "id": "blocking_assignment_in_always_ff",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "blocking"
+      ]
+    },
+    {
+      "id": "blocking_assignment_in_always_latch",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "blocking"
+      ]
+    },
+    {
+      "id": "case_default",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case"
+      ]
+    },
+    {
+      "id": "default_nettype_none",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "default_nettype_wire_at_end",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "enum_with_type",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "eventlist_comma_always_ff",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "eventlist_or",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "explicit_brackets_for_confusing_precedence",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "explicitness"
+      ]
+    },
+    {
+      "id": "explicit_case_default",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case",
+        "explicitness"
+      ]
+    },
+    {
+      "id": "explicit_if_else",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "explicitness"
+      ]
+    },
+    {
+      "id": "function_same_as_system_function",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "function"
+      ]
+    },
+    {
+      "id": "function_with_automatic",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "function"
+      ]
+    },
+    {
+      "id": "general_always_level_sensitive",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "general_always_no_edge",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "generate_case_with_label",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "generate",
+        "case"
+      ]
+    },
+    {
+      "id": "generate_for_with_label",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "generate"
+      ]
+    },
+    {
+      "id": "generate_if_with_label",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "generate"
+      ]
+    },
+    {
+      "id": "genvar_declaration_in_loop",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "genvar_declaration_out_loop",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "implicit_case_default",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case"
+      ]
+    },
+    {
+      "id": "inout_with_tri",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "input_with_var",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "interface_identifier_matches_filename",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "interface"
+      ]
+    },
+    {
+      "id": "interface_port_with_modport",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "interface"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_always",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_always_comb",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_always_ff",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_always_latch",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_generate",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "generate",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_logic",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_priority",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_unique",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_unique0",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_forbidden_wire_reg",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "keywords"
+      ]
+    },
+    {
+      "id": "keyword_required_generate",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "generate",
+        "keywords"
+      ]
+    },
+    {
+      "id": "localparam_explicit_type",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "explicitness"
+      ]
+    },
+    {
+      "id": "localparam_type_twostate",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "loop_statement_in_always_comb",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "loop_statement_in_always_ff",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "loop_statement_in_always_latch",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "loop_variable_declaration",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "lowercamelcase_interface",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case",
+        "interface"
+      ]
+    },
+    {
+      "id": "lowercamelcase_module",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case"
+      ]
+    },
+    {
+      "id": "lowercamelcase_package",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case"
+      ]
+    },
+    {
+      "id": "module_ansi_forbidden",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "module_identifier_matches_filename",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "module_nonansi_forbidden",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "multiline_for_begin",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "multiline_if_begin",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "non_blocking_assignment_in_always_comb",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "blocking"
+      ]
+    },
+    {
+      "id": "non_blocking_assignment_in_always_no_edge",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always",
+        "blocking"
+      ]
+    },
+    {
+      "id": "operator_case_equality",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case",
+        "operators"
+      ]
+    },
+    {
+      "id": "operator_incdec",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "operators"
+      ]
+    },
+    {
+      "id": "operator_self_assignment",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "operators"
+      ]
+    },
+    {
+      "id": "output_with_var",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "package_identifier_matches_filename",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "package_item_not_in_package",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "parameter_default_value",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "parameter_explicit_type",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "explicitness"
+      ]
+    },
+    {
+      "id": "parameter_in_generate",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "generate"
+      ]
+    },
+    {
+      "id": "parameter_in_package",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "parameter_type_twostate",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "prefix_inout",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "prefix_input",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "prefix_instance",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "prefix_interface",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "interface"
+      ]
+    },
+    {
+      "id": "prefix_module",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "prefix_output",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "prefix_package",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "procedural_continuous_assignment",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "program_identifier_matches_filename",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "re_forbidden_assert",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_assert_property",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_checker",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_class",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_function",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "function"
+      ]
+    },
+    {
+      "id": "re_forbidden_generateblock",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "generate"
+      ]
+    },
+    {
+      "id": "re_forbidden_genvar",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_instance",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_interface",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "interface"
+      ]
+    },
+    {
+      "id": "re_forbidden_localparam",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_modport",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_module_ansi",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_module_nonansi",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_package",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_parameter",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_port_inout",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_port_input",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_port_interface",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "interface"
+      ]
+    },
+    {
+      "id": "re_forbidden_port_output",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_port_ref",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_program",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_property",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_sequence",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_task",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_var_class",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_forbidden_var_classmethod",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_assert",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_assert_property",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_checker",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_class",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_function",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "function"
+      ]
+    },
+    {
+      "id": "re_required_generateblock",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "generate"
+      ]
+    },
+    {
+      "id": "re_required_genvar",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_instance",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_interface",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "interface"
+      ]
+    },
+    {
+      "id": "re_required_localparam",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_modport",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_module_ansi",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_module_nonansi",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_package",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_parameter",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_port_inout",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_port_input",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_port_interface",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming",
+        "interface"
+      ]
+    },
+    {
+      "id": "re_required_port_output",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_port_ref",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_program",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_property",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_sequence",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_task",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_var_class",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "re_required_var_classmethod",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "naming"
+      ]
+    },
+    {
+      "id": "sequential_block_in_always_comb",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "sequential_block_in_always_ff",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "sequential_block_in_always_latch",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "always"
+      ]
+    },
+    {
+      "id": "style_commaleading",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style"
+      ]
+    },
+    {
+      "id": "style_indent",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style"
+      ]
+    },
+    {
+      "id": "style_keyword_0or1space",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_0space",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_1or2space",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_1space",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_1spaceornewline",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_construct",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_datatype",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_end",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_maybelabel",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_new",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_keyword_newline",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "keywords"
+      ]
+    },
+    {
+      "id": "style_operator_arithmetic",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "operators"
+      ]
+    },
+    {
+      "id": "style_operator_arithmetic_leading_space",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "operators"
+      ]
+    },
+    {
+      "id": "style_operator_boolean",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "operators"
+      ]
+    },
+    {
+      "id": "style_operator_boolean_leading_space",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "operators"
+      ]
+    },
+    {
+      "id": "style_operator_integer",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "operators"
+      ]
+    },
+    {
+      "id": "style_operator_integer_leading_space",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "operators"
+      ]
+    },
+    {
+      "id": "style_operator_unary",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style",
+        "operators"
+      ]
+    },
+    {
+      "id": "style_trailingwhitespace",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "style"
+      ]
+    },
+    {
+      "id": "tab_character",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "unpacked_array",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax"
+      ]
+    },
+    {
+      "id": "uppercamelcase_interface",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case",
+        "interface"
+      ]
+    },
+    {
+      "id": "uppercamelcase_module",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case"
+      ]
+    },
+    {
+      "id": "uppercamelcase_package",
+      "defaultSeverity": "warning",
+      "tags": [
+        "syntax",
+        "case"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+verilator-5.x --lint-only cpu.sv

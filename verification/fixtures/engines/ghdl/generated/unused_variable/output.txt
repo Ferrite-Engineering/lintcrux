@@ -1,0 +1,1 @@
+design.vhd:42:13:warning: variable "x" is never referenced [-Wunused]

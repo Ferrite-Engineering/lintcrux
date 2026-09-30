@@ -1,0 +1,32 @@
+# Tab walk: 31 stops, cycles
+1. [Toolbar grouping] Import another… button
+2. Back to workspace button
+3. Search rules… edit
+4. All engines button selected
+5. verilator button
+6. verible button
+7. slang button
+8. yosys button
+9. ghdl button
+10. svlint button
+11. cdc button
+12. verilator/ALWCOMBORDER always-comb · ordering button
+13. [verilator/ALWCOMBORDER always-comb · ordering button] Documentation button
+14. Filter preset None button collapsed
+15. Fatal button
+16. Error button
+17. Warning button
+18. Note button
+19. Unclassified button
+20. verilator button
+21. Filter by rule or message… edit
+22. Filter by file glob (e.g. **/top.sv)… edit
+23. Severity button
+24. Engine button
+25. Rule button
+26. File button
+27. Line button
+28. Message button
+29. [Up and Down move between violations. Enter opens the violation in the editor, and Space toggles its check box. grouping] Fatal violation, rule verilator/SYNTAX, file src/broken.v line 12: Unexpected token 'endmodule', expected ';' check box not checked
+30. Back to engine status button
+31. [Location grouping] Open in editor button

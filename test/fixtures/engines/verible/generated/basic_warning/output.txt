@@ -1,0 +1,1 @@
+{"path":"top.sv","line":12,"column":3,"rule":"no-tabs","severity":"warning","message":"Use spaces, not tabs."}

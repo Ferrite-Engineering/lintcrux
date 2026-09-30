@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "name": "getting-started",
+  "rootPath": ".",
+  "language": "systemverilog",
+  "sourceFiles": ["alu.sv"],
+  "enabledEngineIds": ["verilator", "verible"]
+}

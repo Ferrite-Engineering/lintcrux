@@ -1,0 +1,13 @@
+demo.vhd:17:14:warning: declaration of "rst" hides port "rst" [-Whide]
+    variable rst : integer;
+             ^
+demo.vhd:24:11:error: no declaration for "bad_signal"
+  dout <= bad_signal;
+          ^
+demo.vhd:13:19:warning: variable "shared_count" is never referenced [-Wunused]
+  shared variable shared_count : integer := 0;
+                  ^
+demo.vhd:14:10:warning: signal "unused_sig" is never referenced [-Wunused]
+  signal unused_sig : std_logic;
+         ^
+ghdl:error: compilation error

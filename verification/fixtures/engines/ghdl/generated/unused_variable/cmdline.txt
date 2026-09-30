@@ -1,0 +1,1 @@
+ghdl -a --std=08 --warn-unused design.vhd

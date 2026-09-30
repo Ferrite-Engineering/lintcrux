@@ -1,0 +1,13 @@
+Top level design units:
+    top
+
+[
+  {
+    "severity": "warning",
+    "message": "unused variable 'spare'",
+    "optionName": "unused-variable",
+    "location": "top.sv:6:1",
+    "symbolPath": "top.spare"
+  }
+]
+Build succeeded: 0 errors, 1 warning

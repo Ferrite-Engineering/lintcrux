@@ -1,0 +1,1 @@
+{"path":"a dir/x.sv","line":3,"column":1,"rule":"tab_character","message":"tab found"}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "slang"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "1970-01-01T00:00:00.000Z",
+          "endTimeUtc": "1970-01-01T00:00:00.000Z"
+        }
+      ],
+      "automationDetails": {
+        "id": "gen/slang/path_with_spaces"
+      },
+      "results": [
+        {
+          "message": {
+            "text": "use of undeclared identifier 'foo'"
+          },
+          "ruleId": "UNCLASSIFIED",
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/work/a dir/m.sv"
+                },
+                "region": {
+                  "startLine": 4,
+                  "startColumn": 2
+                }
+              }
+            }
+          ],
+          "properties": {
+            "severity": "error",
+            "location": "a dir/m.sv:4:2",
+            "symbolPath": "m"
+          }
+        }
+      ]
+    }
+  ]
+}

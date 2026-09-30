@@ -1,0 +1,320 @@
+name: lintcrux
+description: "LintCrux: open-core EDA tool (Ferrite Engineering). See the WaveCrux reference implementation for the canonical open-core + Pro/Enterprise overlay pattern."
+publish_to: 'none'
+version: 1.0.0+10
+license: Apache-2.0
+
+environment:
+  sdk: ^3.12.0
+
+# The headless CI binary. Built with `dart build cli` (not
+# `dart compile exe` — a package in the resolution declares a build
+# hook, which `dart compile` refuses); see `tool/build_cli.sh`.
+executables:
+  lintcrux: lintcrux
+
+dependencies:
+  # Standard Dart CLI arg parser. It wires `lintcrux project.lintcrux`
+  # and `lintcrux foo.v ... --config x.yaml --sarif out.sarif --exit-code`
+  # through this; the parsed args are surfaced to the app via
+  # `CliArgsProvider`.
+  args: ^2.6.0
+  # Cross-suite About dialog / screen (CruxAboutDialog). One implementation
+  # rendered by every product in the suite; LintCrux supplies its branding,
+  # build metadata, edition label, localized chrome strings, an app icon, and
+  # the Visit Website / Copy Version Info action buttons. Tier + beta chips are
+  # read from `crux_license` internally. Consumed via the `crux-shared`
+  # submodule.
+  crux_about_dialog:
+    path: ./crux-shared/packages/crux_about_dialog
+  # Cross-suite About-box data shapes (ApplicationBranding / ApplicationBuildInfo
+  # / ApplicationEdition) consumed by the shared CruxAboutDialog. The Riverpod
+  # providers that return these live in `lib/core/app_info/about_providers.dart`.
+  crux_app_info:
+    path: ./crux-shared/packages/crux_app_info
+  # Cross-suite async/timing primitives: the one trailing-edge Debouncer the
+  # violation filter's rule and file fields coalesce keystrokes through.
+  # Consumed via the `crux-shared` submodule.
+  crux_async:
+    path: ./crux-shared/packages/crux_async
+  # Cross-suite command palette widget (CommandPalette<T extends CruxAction>).
+  # Consumed via the `crux-shared` submodule. The LintCrux command palette
+  # is a thin wrapper that delegates to this generic widget.
+  crux_command_palette:
+    path: ./crux-shared/packages/crux_command_palette
+  # Cross-suite Crux eXchange Protocol bindings (CXP v1.0). LintCrux
+  # consumes the LocalCxpServer + CxpDiscovery + ElementId/NameResolver
+  # surface as a receive-focused participant.
+  crux_cxp:
+    path: ./crux-shared/packages/crux_cxp
+  # Shared cross-probe UI: the one docked
+  # cross-probe side-panel + app-agnostic `CrossProbePanelController` contract
+  # all four products adopt. LintCrux hosts it via
+  # `LintCruxCrossProbePanelController` (features/remote/widgets).
+  crux_cxp_ui:
+    path: ./crux-shared/packages/crux_cxp_ui
+  # Cross-suite VSCode-style tabbed dock for CruxIdeLayout regions.
+  crux_dock:
+    path: ./crux-shared/packages/crux_dock
+  # Cross-suite first-launch EULA acceptance — the agreement text generated
+  # from the executed document, a store that records which VERSION was accepted
+  # (so a changed agreement re-prompts, per EULA 2.3), and the blocking gate.
+  # Mounted outside TelemetryConsentGate: the telemetry disclosure asks consent
+  # for a term the EULA defines, so it cannot come first. The agreement is not
+  # localized — it is executed in English.
+  crux_eula:
+    path: ./crux-shared/packages/crux_eula
+  # File-system watcher with debounced events. Consumed via the
+  # `crux-shared` submodule. Used by the lint-engine pipeline to re-run on
+  # source file changes.
+  crux_file_watcher:
+    path: ./crux-shared/packages/crux_file_watcher
+  # Cross-suite dockable IDE-layout shell (suite lift #1): the shared
+  # CruxIdeLayout that owns the panes IdeController + resizer theme +
+  # visibility/size sync each product previously copy-pasted. LintCrux
+  # supplies its own PanelLayoutState→IdePanelLayout(+Sink) adapter.
+  crux_ide_layout:
+    path: ./crux-shared/packages/crux_ide_layout
+  # Cross-suite filesystem-path identity (`canonicalizePath` /
+  # `canonicalPathKey` / `isSamePath`). The single answer to "do these two
+  # strings name the same project file?" — absolute, `..`-collapsed,
+  # trailing-separator-stripped, symlink-resolved, and case-folded where the
+  # filesystem ignores case. Consumed by `LintcruxWorkspaceCodec.identityOf`
+  # (workspace tab dedupe) and by `ProjectWorkspaceSync`'s tab↔registry keys.
+  crux_io:
+    path: ./crux-shared/packages/crux_io
+  # Cross-suite in-app beta issue reporter: diagnostic-log ring
+  # buffer, category collection, screenshot capture, markdown report builder,
+  # and the pre-filled GitHub new-issue dialog. LintCrux supplies its product
+  # config (repository slug), an ARB-backed strings adapter, and the
+  # privacy-scrubbed session-state contributor.
+  crux_issue_reporter:
+    path: ./crux-shared/packages/crux_issue_reporter
+  # Cross-suite customizable keyboard-binding infrastructure:
+  # platform-neutral KeyBinding/KeymapCodec/KeyBindingsStore, conflict
+  # detection, and the KeyBindingsEditor widget — all generic over CruxAction.
+  # LintCrux supplies its own LintcruxAction enum + defaultBindings + labels.
+  crux_keybindings:
+    path: ./crux-shared/packages/crux_keybindings
+  # Cross-suite licensing primitives (LicenseTier vocabulary, FeatureGate,
+  # kBetaPeriod / betaPeriodProvider, licenseTierProvider, TierBadge +
+  # EducationalBadge widgets, LicenseBadgeStrings adapter interface).
+  # Backs the Pro feature gating; mirrors WaveCrux's crux_license adoption.
+  crux_license:
+    path: ./crux-shared/packages/crux_license
+  # AppImage first-run desktop self-integration (Linux/Wayland): writes the
+  # host-side .desktop + hicolor icons so GNOME/Ubuntu matches the running
+  # window's app_id to its dock icon. maybeIntegrateDesktopEntry is called on
+  # the desktop bootstrap path (after the web early-return); inert off Linux
+  # and off AppImage.
+  crux_linux_integration:
+    path: ./crux-shared/packages/crux_linux_integration
+  # Cross-suite desktop menu bar: one declarative CruxMenuLayout rendered as
+  # the native macOS PlatformMenuBar or the in-window VS Code-style menu bar on
+  # Windows/Linux, with shared separator grouping, platform-idiomatic
+  # About/Settings/Quit placement, and the native key-equivalent guard.
+  crux_menu_bar:
+    path: ./crux-shared/packages/crux_menu_bar
+  # The shared elaborated-netlist model. The CDC engine is domain analysis
+  # over exactly the structure NetCrux's schematic is drawn from, so both
+  # products read one model rather than two that would drift.
+  crux_netlist:
+    path: ./crux-shared/packages/crux_netlist
+  crux_policy:
+    path: ./crux-shared/packages/crux_policy
+  # The `<design>.crux-project` suite design manifest — LintCrux reads the `lint`
+  # artifact, so one file opens the right project across all four products.
+  crux_project:
+    path: ./crux-shared/packages/crux_project
+  # Cross-suite multi-project workspace layer (ProjectDescriptor/Workspace,
+  # ProjectRegistry extension point, perProjectScope, JsonFileProjectRegistry)
+  # extracted from the near-verbatim LintCrux/SimCrux copies.
+  crux_projects:
+    path: ./crux-shared/packages/crux_projects
+  # Cross-suite settings infrastructure (CoreSettings + SettingsService<T>).
+  # LintCrux's AppSettings composes CoreSettings via has-a and adds
+  # lintcrux-specific fields (recent projects, default engine list, etc.).
+  # Mirrors the WaveCrux pattern.
+  crux_settings:
+    path: ./crux-shared/packages/crux_settings
+  # Cross-suite Settings panel shell — master-detail layout + grouped-row
+  # widgets. LintCrux supplies its own category list + dialog/route chrome.
+  crux_settings_ui:
+    path: ./crux-shared/packages/crux_settings_ui
+  # Cross-suite action infrastructure (ActionCategory enum + CruxAction
+  # abstract interface). LintCrux's `LintcruxAction` enum implements
+  # CruxAction so the command palette can route actions across the suite.
+  crux_shortcut_action:
+    path: ./crux-shared/packages/crux_shortcut_action
+  # Cross-suite bottom status bar. LintcruxStatusBar feeds the active
+  # tab's project name + live violation summary into the shared CruxStatusBar
+  # chrome so LintCrux gains a window-bottom bar matching WaveCrux.
+  crux_status_bar:
+    path: ./crux-shared/packages/crux_status_bar
+  # Cross-suite anonymous usage-statistics pipeline: the
+  # event model, the disk queue, the coalescing batcher, the never-throwing
+  # ingest client, the beta × dev × consent gate, and both consent surfaces.
+  # LintCrux supplies the product slug, the persistence adapter, the
+  # ARB-backed copy, the `form_factor` derivation, and — the part that is
+  # genuinely per-product — the event catalog under
+  # `lib/services/telemetry/`. Inert for the whole public beta.
+  crux_telemetry:
+    path: ./crux-shared/packages/crux_telemetry
+  # Cross-suite color-theme infrastructure (CruxColorTheme, built-in
+  # presets, chrome token catalog + `applyChromeTokens`, ThemePackBrowser
+  # widget, .crux-theme.json import/export). LintCrux's Settings →
+  # Appearance pane composes the shared `ThemeAppearanceSection` from
+  # this package; the bootstrap registers chrome tokens and bridges
+  # persistence into `cruxColorThemeProvider`. Mirrors the suite-wide
+  # adoption documented in
+  # `wavecrux/docs/ARCHITECTURE.md` §10 (Theming) and the WaveCrux /
+  # NetCrux reference implementations.
+  crux_theme:
+    path: ./crux-shared/packages/crux_theme
+  # Cross-suite application toolbar: one geometry token set, one button, one
+  # divider, one overflow strategy, plus the split-button, morphing run/stop,
+  # and badge affordances every product shares.
+  crux_toolbar:
+    path: ./crux-shared/packages/crux_toolbar
+  # Cross-suite update-check mechanism: version-manifest model,
+  # HTTP fetch service, the launch / periodic / manual status notifier, and
+  # the dismissible update banner. LintCrux supplies its manifest URL,
+  # download page, ARB-backed strings, the persisted "automatically check
+  # for updates" setting, and the observed-server-time sink that hardens
+  # `crux_license` beta expiry against a device-clock rollback.
+  crux_updates:
+    path: ./crux-shared/packages/crux_updates
+  # Cross-suite VS Code-style frameless window chrome (custom title bar,
+  # left-aligned mnemonic menu bar, caption buttons) over window_manager on
+  # Windows/Linux; macOS keeps its native menu. LintCrux supplies its own logo
+  # and its DesktopMenuBar feeds the shared MnemonicMenuBar.
+  crux_window_chrome:
+    path: ./crux-shared/packages/crux_window_chrome
+  # Cross-suite workspace + multi-tab + split-pane infrastructure
+  # (Workspace<P>, WorkspaceTab<P>, WorkspacePane, WorkspaceService<P>,
+  # WorkspaceNotifier<P>, PaneHost<P>, ViewerTabBar<P>, EmptyCanvasState,
+  # TabContainerManager, PaneContainerManager), extracted from WaveCrux.
+  crux_workspace:
+    path: ./crux-shared/packages/crux_workspace
+  # Cross-suite Yosys subprocess infrastructure (runner + availability
+  # service + stderr diagnostic parser). Consumed by
+  # YosysCheckEngine, the LintCrux lint adapter that maps Yosys
+  # `check -assert` warnings into LintCrux Violations.
+  crux_yosys:
+    path: ./crux-shared/packages/crux_yosys
+  # SHA-256 hashing for the lint-run cache fingerprint
+  # (file content + canonical engine config). Pure-Dart, ships in the
+  # Dart ecosystem alongside `convert`, no native code.
+  crypto: ^3.0.0
+  # Used **only** by the Settings → Appearance `ColorThemeSection` for
+  # the `.crux-theme.json` import/export flow inherited from the shared
+  # `ThemeAppearanceSection` widget. It returns a plain absolute path
+  # string, which the section wraps in `dart:io`'s `File` to hand to
+  # `ThemePackService`. Every other file-picking flow in LintCrux uses
+  # `file_selector` (see below) for its `confirmButtonText` and native
+  # macOS dialog-title support.
+  # PINNED, not caret-ranged, and **do not migrate to 12.0.0** — it is broken on
+  # macOS. 12.0.0's federated split lost the macOS Dart implementation:
+  # `file_picker_darwin` 1.0.0 has one Dart class serving two native handlers
+  # that speak different protocols. It sends the iOS method names (the *file
+  # type* — `custom`, `any`, `image`) while `MacOSFilePickerHandler.swift`
+  # switches on the *operation* (`pickFiles`, `saveFile`, `getDirectoryPath`),
+  # so every call raises MissingPluginException. LintCrux is the least exposed
+  # of the four — most flows use `file_selector` below — but the theme-pack
+  # import is a real macOS path and it broke like all the others.
+  #
+  # A caret on a prerelease admits the stable, which is how 12.0.0 arrived
+  # uninvited. 12.0.0-beta.7 is the last working version;
+  # `test/static/file_picker_pin_test.dart` holds the line.
+  file_picker: 12.0.0-beta.7
+  # Flutter team's desktop-friendly file picker. Used by the
+  # File → Open Project / New Project / Open Session / Open Workspace
+  # flows on the Welcome screen and the corresponding shortcut
+  # handlers, plus the web-mode SARIF viewer. Chosen over `file_picker`
+  # because on modern macOS its native plugin renders the dialog title
+  # text in the picker chrome (whereas `file_picker`'s macOS plugin
+  # drops `dialogTitle` for `pickFiles`) AND it exposes
+  # `confirmButtonText` so the action button label can distinguish the
+  # active flow ("Open Project" vs. "Open Session" vs. "Create Project")
+  # — the user-visible cosmetic fix for the previously identical
+  # pickers.
+  file_selector: ^1.0.0
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.3.2
+  go_router: ^17.3.0
+  # Web read-only mode — fetches a remote SARIF file from the
+  # `?sarif=<url>` query parameter. The same package powers any future
+  # remote-rule-database fetches; brought to a direct dep so the
+  # versioning surface is explicit.
+  http: ^1.5.0
+  # Brought in transitively by flutter_localizations; kept explicit so the
+  # file is `sort_pub_dependencies`-clean.
+  intl: any
+  # Log records: SEVERE and above are written to stderr alongside the issue
+  # reporter's in-memory buffer (lib/services/logging/).
+  logging: ^1.3.0
+  meta: ^1.18.0  # pinned to 1.18.0 by flutter_test
+  # Resolves runtime version / build number for the About box's
+  # `aboutBuildInfoProvider`. Pinned to 10.x here (not 9.x like NetCrux /
+  # SimCrux) because LintCrux is on file_picker ^12 (win32 ^6); pip 9.x needs
+  # win32 ^5 and would conflict. pip 10.x's win32 ^6 matches file_picker 12.
+  package_info_plus: ^10.1.0
+  # Dockable IDE-style panel layout. WaveCrux/NetCrux pin the same major
+  # version; mirror that choice so the IdeLayout integration matches
+  # the reference.
+  panes: ^1.3.0
+  path: ^1.9.0
+  path_provider: ^2.1.0
+  shared_preferences: ^2.2.0
+  # Opens the company website from the About box's "Visit Website" action.
+  url_launcher: ^6.3.0
+  # Frameless custom title bar on Windows/Linux (VS Code-style chrome via
+  # crux_window_chrome); TitleBarStyle.hidden removes the OS decorations.
+  window_manager: ^0.5.0
+  # Parses FuseSoC/Edalize EDAM (`.eda.yml`) files for the
+  # `--import-edam` / File → Import FuseSoC EDAM… flows (EdamReader).
+  yaml: ^3.1.3
+
+dev_dependencies:
+  # Resolved-AST source analysis for the static guards under `test/static/`
+  # (the per-tab provider scope-leak scanner and the lifecycle-Ref scanner).
+  # Pinned below 13.0.0: analyzer 13+ requires Dart 3.13 and this package
+  # targets the 3.12 SDK.
+  analyzer: '>=12.1.0 <13.0.0'
+  # The focus-walk harness (`crux_a11y_testing.dart`): what a screen reader
+  # hears as Tab moves through a surface, asserted by
+  # `test/accessibility/screen_reader_test.dart`. Test-only; no production
+  # code in LintCrux imports the package.
+  crux_a11y:
+    path: ./crux-shared/packages/crux_a11y
+  # The audit envelope, named directly by the emission tests' capturing sink.
+  # Test-only: production code reaches `AuditEvent` through crux_license's
+  # `CruxAuditRecorder`, so the runtime dependency stays where the binding is.
+  crux_audit:
+    path: ./crux-shared/packages/crux_audit
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+  # Direct dev deps so `test/support/fake_path_provider.dart` can implement a
+  # cross-platform PathProviderPlatform fake (both are already transitive
+  # deps of path_provider; declared here to satisfy
+  # depend_on_referenced_packages under `flutter analyze --fatal-infos`).
+  path_provider_platform_interface: ^2.1.0
+  plugin_platform_interface: ^2.1.0
+  very_good_analysis: ^10.2.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - lib/data/rules/
+    - lib/data/rule_aliases.json
+    # The LintCrux app icon (the VS Code-style title-bar logo via
+    # LintcruxIconImage). The master lives under macos/.../AppIcon; this is the
+    # Flutter-bundled copy.
+    - assets/images/

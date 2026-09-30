@@ -1,0 +1,2 @@
+~~~ stray line matching no diagnostic pattern ~~~
+%Warning-UNUSEDSIGNAL: top.sv:9:3: Signal is not used: 'spare'

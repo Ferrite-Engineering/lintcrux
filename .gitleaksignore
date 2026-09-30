@@ -1,0 +1,28 @@
+# gitleaks false positives, allowlisted by fingerprint.
+#
+# Format: <commit>:<file>:<rule>:<line>. A fingerprint pins one finding in one
+# historical commit, so allowlisting here cannot hide a NEW secret in the same
+# file — which is why this is the right mechanism rather than widening the rule
+# or adding a path exclusion.
+#
+# Every entry must record what the match actually was and why it is not a
+# secret. An unexplained fingerprint is indistinguishable from a suppressed
+# real leak.
+#
+# Do NOT quote a flagged string verbatim in this file. The history scan reads
+# every commit, so a quoted sample in an explanatory comment becomes a finding
+# of its own. This has already happened twice elsewhere in the estate.
+
+# The headless telemetry test seeds a store with an installation id so it can
+# assert what a run with consent already given transmits. The value was a
+# randomly generated v4 UUID, and `generic-api-key` decides on the entropy of
+# the value rather than on what the key means — so a random identifier reads
+# the same to it as a credential would. It is not one: installation ids are
+# minted on the device, never issued, and this one was typed into a test.
+#
+# The live fixtures now use a structurally obvious placeholder id, so the
+# working-tree scan needs no entry at all. Only history does, and only for the
+# commit that introduced the random one. That is the order to prefer wherever
+# it is available: remove what trips the rule, and allowlist only what history
+# has frozen.
+fde6bc428a3883fcf2107f15dd31792854ff3776:test/services/telemetry/headless_telemetry_test.dart:generic-api-key:139

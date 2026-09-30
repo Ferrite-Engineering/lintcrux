@@ -1,0 +1,2 @@
+{"path":"top.sv","line":8,"column":1,"rule":"no_generate_keyword","message":"avoid generate"}
+svlint 0.9 banner -- not a diagnostic

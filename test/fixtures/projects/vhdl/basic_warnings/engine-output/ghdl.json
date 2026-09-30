@@ -1,0 +1,28 @@
+{
+  "engineId": "ghdl",
+  "invocations": [
+    {
+      "executable": "ghdl",
+      "arguments": [
+        "-a",
+        "--warn-unused",
+        "--warn-hide",
+        "--warn-binding",
+        "design.vhd"
+      ],
+      "exitCode": 0,
+      "stdout": [],
+      "stderr": [
+        "design.vhd:34:14:warning: declaration of \"hidden_var\" hides signal \"hidden_var\" [-Whide]",
+        "    variable hidden_var : integer := 0;  -- shadows the outer signal",
+        "             ^",
+        "design.vhd:30:10:warning: signal \"hidden_var\" is never referenced [-Wunused]",
+        "  signal hidden_var : std_logic := '0';",
+        "         ^",
+        "design.vhd:31:10:warning: signal \"unused_sig\" is never referenced [-Wunused]",
+        "  signal unused_sig : std_logic := '0';",
+        "         ^"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+name: 🧪 Fixture submission
+description: Contribute an engine output or RTL source that LintCrux parses or reports incorrectly.
+title: "[Fixture]: "
+labels: ["fixture", "user-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        An engine message LintCrux gets wrong is the most valuable thing you can
+        give us — once it's in the suite, that behavior can never silently
+        regress. Best of all, a raw `output.txt` reproduces without any engine
+        installed, so it becomes a test in minutes.
+
+        **Licensing — read before you attach anything.** We can only accept
+        material you can share under MIT, BSD-2/3-Clause, Apache-2.0, ISC, CC0 or
+        public domain. Please do not attach proprietary, GPL or AGPL sources; a
+        hand-built minimal case that reproduces the same behaviour is always
+        welcome, and is often better.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What does it exercise?
+      options:
+        - Parsing — a violation is dropped, misplaced, or mis-attributed
+        - Severity — the violation is mapped to the wrong severity
+        - A rule that should have fired and didn't
+        - Engine invocation — the command line LintCrux builds is wrong
+        - Language routing (VHDL vs. SystemVerilog engines)
+        - Waiver matching
+        - Baseline / delta classification
+        - Export (SARIF / JSON / CSV / HTML)
+        - Something else
+    validations:
+      required: true
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Engine
+      options:
+        - Verilator
+        - Verible
+        - Slang
+        - Yosys checks
+        - GHDL
+        - Svlint
+        - Multiple / mixed
+    validations:
+      required: true
+  - type: input
+    id: engine-version
+    attributes:
+      label: Engine version + command line
+      description: The version string and the exact invocation you ran.
+      placeholder: "Verilator 5.026 — verilator --lint-only -Wall top.sv"
+    validations:
+      required: true
+  - type: input
+    id: rule
+    attributes:
+      label: Rule ID
+      description: The engine's own rule name, if the bug is about a specific one.
+      placeholder: "e.g. WIDTHTRUNC, no-trailing-spaces, ImplicitConvert"
+    validations:
+      required: false
+  - type: textarea
+    id: current-vs-expected
+    attributes:
+      label: What LintCrux does vs. what it should do
+      description: Be as precise as you can — ideally the exact file, line, column, rule, and severity that are wrong.
+      placeholder: |
+        Verilator printed:
+          %Warning-WIDTHTRUNC: alu.sv:88:14: Operator ASSIGNW expects 8 bits...
+        LintCrux shows this at alu.sv:87 with severity Info.
+        It should be alu.sv:88:14 with severity Warning.
+    validations:
+      required: true
+  - type: textarea
+    id: attach
+    attributes:
+      label: The fixture
+      description: |
+        **Paste or attach the raw engine output verbatim** — colour codes,
+        continuation lines and all; the escape sequences are frequently the bug.
+        If the rule *should* have fired but didn't, attach the RTL source and
+        your `project.lintcrux` too. Keep it to the fewest lines that still
+        reproduce it.
+      render: text
+    validations:
+      required: true
+  - type: dropdown
+    id: license
+    attributes:
+      label: License / origin
+      description: We can only publish permissively-licensed fixtures. See the guide for details.
+      options:
+        - My own hand-written source / output — I contribute it under CC0 / public domain
+        - Derived from an open-source project under MIT / BSD / Apache-2.0 / ISC / CC0 / public domain
+        - Other / not sure (we'll follow up — do not attach proprietary, GPL, or AGPL sources)
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source project + version (for derived captures)
+      description: Project name and commit/tag, and anything you changed to reproduce it standalone.
+    validations:
+      required: false

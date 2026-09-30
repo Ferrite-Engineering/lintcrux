@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "verilator"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "1970-01-01T00:00:00.000Z",
+          "endTimeUtc": "1970-01-01T00:00:00.000Z"
+        }
+      ],
+      "automationDetails": {
+        "id": "proj/multi_engine/verilator"
+      },
+      "results": [
+        {
+          "ruleId": "UNUSEDSIGNAL",
+          "level": "warning",
+          "message": {
+            "text": "Signal is not driven, nor used: 'tabbed'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "multi_engine.sv"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 8
+                }
+              }
+            }
+          ],
+          "properties": {
+            "verilator.continuation": [
+              "                                           : ... note: In instance 'multi_engine'",
+              "   21 |  logic tabbed;  ",
+              "      |        ^~~~~~",
+              "                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.050",
+              "                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message."
+            ]
+          }
+        },
+        {
+          "ruleId": "UNUSEDSIGNAL",
+          "level": "warning",
+          "message": {
+            "text": "Signal is not used: 'unread_sig'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "multi_engine.sv"
+                },
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "verilator.continuation": [
+              "                                           : ... note: In instance 'multi_engine'",
+              "   22 |   logic unread_sig;      ",
+              "      |         ^~~~~~~~~~"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "verible"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "1970-01-01T00:00:00.000Z",
+          "endTimeUtc": "1970-01-01T00:00:00.000Z"
+        }
+      ],
+      "automationDetails": {
+        "id": "proj/multi_engine/verible"
+      },
+      "results": [
+        {
+          "ruleId": "no-tabs",
+          "level": "warning",
+          "message": {
+            "text": "Use spaces, not tabs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "multi_engine.sv"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 1
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tool": {
+        "driver": {
+          "name": "slang"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "1970-01-01T00:00:00.000Z",
+          "endTimeUtc": "1970-01-01T00:00:00.000Z"
+        }
+      ],
+      "automationDetails": {
+        "id": "proj/multi_engine/slang"
+      },
+      "results": [
+        {
+          "message": {
+            "text": "if statement has empty body (put the semicolon on a separate line to silence this warning)"
+          },
+          "ruleId": "empty-body",
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "multi_engine.sv"
+                },
+                "region": {
+                  "startLine": 26,
+                  "startColumn": 14
+                }
+              }
+            }
+          ],
+          "properties": {
+            "severity": "warning",
+            "optionName": "empty-body",
+            "location": "multi_engine.sv:26:14"
+          }
+        }
+      ]
+    }
+  ]
+}

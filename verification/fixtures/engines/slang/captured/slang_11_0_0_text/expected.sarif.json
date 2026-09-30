@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "slang"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "startTimeUtc": "1970-01-01T00:00:00.000Z",
+          "endTimeUtc": "1970-01-01T00:00:00.000Z"
+        }
+      ],
+      "automationDetails": {
+        "id": "gen/slang/slang_11_0_0_text"
+      },
+      "results": [
+        {
+          "slang.context": [
+            "  assign narrow_out = undeclared_thing;",
+            "                      ^~~~~~~~~~~~~~~~"
+          ],
+          "ruleId": "UNCLASSIFIED",
+          "level": "error",
+          "message": {
+            "text": "use of undeclared identifier 'undeclared_thing'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/work/top.sv"
+                },
+                "region": {
+                  "startLine": 15,
+                  "startColumn": 23
+                }
+              }
+            }
+          ]
+        },
+        {
+          "slang.context": [
+            "  logic       never_used;",
+            "              ^"
+          ],
+          "ruleId": "unused-variable",
+          "level": "warning",
+          "message": {
+            "text": "unused variable 'never_used'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "/work/top.sv"
+                },
+                "region": {
+                  "startLine": 8,
+                  "startColumn": 15
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+{"path":"top.sv","line":7,"column":2,"rule":"no-tabs","severity":"warning","message":"tab found"}
+I am not JSON and not a text diagnostic either

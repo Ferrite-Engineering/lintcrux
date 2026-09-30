@@ -1,0 +1,1 @@
+{"path":"回路.sv","line":2,"column":1,"rule":"keyword_forbidden_wire_reg","message":"禁止"}

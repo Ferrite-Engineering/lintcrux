@@ -1,0 +1,85 @@
+{
+  "engineId": "yosys",
+  "displayName": "Yosys",
+  "note": "Yosys does not name its checks. These ids come from the pattern table in YosysCheckEngine, so the list is exhaustive for messages that table recognises; anything else falls back to a derived id and appears here as unknown.",
+  "rules": [
+    {
+      "id": "undriven-wire",
+      "defaultSeverity": "warning",
+      "tags": [
+        "synthesis",
+        "connectivity"
+      ]
+    },
+    {
+      "id": "multiple-drivers",
+      "defaultSeverity": "warning",
+      "tags": [
+        "synthesis",
+        "connectivity"
+      ]
+    },
+    {
+      "id": "logic-loop",
+      "defaultSeverity": "warning",
+      "tags": [
+        "synthesis",
+        "combinational-loop"
+      ]
+    },
+    {
+      "id": "latch-inferred",
+      "defaultSeverity": "warning",
+      "tags": [
+        "synthesis",
+        "latch"
+      ]
+    },
+    {
+      "id": "unknown-module",
+      "defaultSeverity": "error",
+      "tags": [
+        "elaboration",
+        "hierarchy"
+      ]
+    },
+    {
+      "id": "unknown-cell-type",
+      "defaultSeverity": "error",
+      "tags": [
+        "elaboration"
+      ]
+    },
+    {
+      "id": "implicit-declaration",
+      "defaultSeverity": "warning",
+      "tags": [
+        "elaboration",
+        "naming"
+      ]
+    },
+    {
+      "id": "memory-replaced",
+      "defaultSeverity": "note",
+      "tags": [
+        "synthesis",
+        "memory"
+      ]
+    },
+    {
+      "id": "check-summary",
+      "defaultSeverity": "note",
+      "tags": [
+        "info"
+      ]
+    },
+    {
+      "id": "run-summary",
+      "defaultSeverity": "note",
+      "tags": [
+        "info"
+      ]
+    }
+  ],
+  "helpBaseUrl": "https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/check.html"
+}

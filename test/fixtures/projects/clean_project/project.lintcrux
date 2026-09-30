@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "name": "clean_project",
+  "rootPath": "test/fixtures/projects/clean_project",
+  "language": "systemverilog",
+  "sourceFiles": ["clean.sv"],
+  "enabledEngineIds": ["verilator", "verible"]
+}
