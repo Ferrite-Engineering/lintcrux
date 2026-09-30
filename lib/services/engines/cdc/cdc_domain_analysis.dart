@@ -322,7 +322,6 @@ class CdcClassificationContext {
 // constraints and a handshake index as state and is selected at
 // registry-construction time; a bare function type could express neither, and
 // collapsing it would put the tier seam somewhere less obvious.
-// ignore: one_member_abstracts
 abstract class CdcSyncClassifier {
   /// Const constructor for subclasses.
   const CdcSyncClassifier();

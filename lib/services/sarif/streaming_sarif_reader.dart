@@ -666,10 +666,10 @@ class _SarifScanner {
     await _ensureCurrentChunk(iter);
     final first = _peekChar();
     if (first == '{' || first == '[') {
-      return _readBalanced(iter, first);
+      return await _readBalanced(iter, first);
     }
     if (first == '"') {
-      return _readStringRaw(iter);
+      return await _readStringRaw(iter);
     }
     // Number / true / false / null — read until a structural char.
     final out = StringBuffer();

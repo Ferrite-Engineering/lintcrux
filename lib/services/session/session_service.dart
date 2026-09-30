@@ -55,7 +55,6 @@ class SessionService {
 }
 
 /// Per-file string reader abstraction.
-// ignore: one_member_abstracts
 abstract class SessionFileReader {
   /// Reads the file at [path] and returns its contents, or `null` if
   /// the file doesn't exist.
@@ -63,7 +62,6 @@ abstract class SessionFileReader {
 }
 
 /// Per-file string writer abstraction.
-// ignore: one_member_abstracts
 abstract class SessionFileWriter {
   /// Writes [body] to [path], overwriting any existing file.
   Future<void> writeString(String path, String body);

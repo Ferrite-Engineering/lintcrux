@@ -125,7 +125,7 @@ Future<CruxIssueSessionContext> _snapshot(ProviderContainer container) async {
   // Warm the version probe exactly as `LintcruxIssueReporter.open` does, so
   // the snapshot under test is the one a real report carries.
   await container.read(engineVersionsProvider.future);
-  return container.read(cruxIssueSessionContextProvider);
+  return await container.read(cruxIssueSessionContextProvider);
 }
 
 void main() {

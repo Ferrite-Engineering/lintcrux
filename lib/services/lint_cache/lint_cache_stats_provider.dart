@@ -30,7 +30,7 @@ Future<LintCacheStats> buildLintCacheStats(Ref ref) async {
   final service = ref.watch(lintRunCacheServiceProvider);
   final sub = service.invalidations.listen((_) => ref.invalidateSelf());
   ref.onDispose(sub.cancel);
-  return service.stats();
+  return await service.stats();
 }
 
 /// Bare invalidation-event stream. Consumed by the invalidations

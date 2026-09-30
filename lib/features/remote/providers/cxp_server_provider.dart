@@ -92,7 +92,7 @@ final Provider<CxpServerConfig> cxpServerConfigProvider =
 /// Tests override this provider to point at a temp directory.
 final FutureProvider<String> cxpManifestDirectoryProvider =
     FutureProvider<String>((ref) async {
-      return const CxpPaths().manifestDirectory();
+      return await const CxpPaths().manifestDirectory();
     });
 
 /// Provider exposing the [LintCruxCxpRequestHandler] used by the
@@ -157,7 +157,7 @@ final Provider<LintCruxCxpRequestHandler> cxpRequestHandlerProvider =
               reason: 'No source artifact recorded for design "$designId".',
             );
           }
-          return openCxpProject(
+          return await openCxpProject(
             ref,
             path,
             refuse: kCxpOpenArtifactContainment.refuse,

@@ -142,7 +142,7 @@ class SarifFileLoader {
     required ViolationStore store,
     String source = '<string>',
   }) async {
-    return _ingest(
+    return await _ingest(
       Stream<List<int>>.value(utf8.encode(json)),
       store: store,
       source: source,

@@ -23,5 +23,5 @@ final FutureProvider<VeribleAvailability> veribleAvailabilityProvider =
 /// root-scope no-op service.
 Future<VeribleAvailability> buildVeribleAvailability(Ref ref) async {
   final service = ref.watch(veribleFixServiceProvider);
-  return service.checkAvailability();
+  return await service.checkAvailability();
 }

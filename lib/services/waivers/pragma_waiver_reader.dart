@@ -225,7 +225,6 @@ class PragmaWaiverReader {
 }
 
 /// File-content reader abstraction for testability.
-// ignore: one_member_abstracts
 abstract class LineReader {
   /// Reads [file]'s lines, or returns `null` when unreadable.
   Future<List<String>?> readLines(String file);

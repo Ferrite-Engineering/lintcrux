@@ -74,7 +74,6 @@ class CustomRuleEvaluationContext {
 /// custom-regex-rule *capability* is open-core (data model, parsing,
 /// provider seam) but the *evaluator implementation* is a Pro feature.
 // The Pro overlay subclasses this; the abstract class is the seam.
-// ignore: one_member_abstracts
 abstract class CustomRuleEvaluator {
   /// Evaluates [context]'s rules and returns the matched violations.
   ///

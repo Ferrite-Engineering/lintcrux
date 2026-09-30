@@ -121,7 +121,6 @@ class CrossProjectSearchProjectResult {
 // An interface, not a function typedef: the Pro implementation carries
 // per-project state (registry + store family reads) and the seam has to
 // be overridable as a unit.
-// ignore: one_member_abstracts
 abstract class CrossProjectSearchService {
   /// Runs [query] across the open projects.
   List<CrossProjectSearchProjectResult> search(CrossProjectSearchQuery query);

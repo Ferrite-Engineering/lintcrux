@@ -112,7 +112,6 @@ class SourcePreviewService {
 }
 
 /// Abstraction for reading a source file as a list of lines.
-// ignore: one_member_abstracts
 abstract class SourceReader {
   /// Reads [file] and returns its lines, or `null` if the file is
   /// missing / unreadable. Lines are returned without trailing

@@ -231,7 +231,7 @@ class LintcruxCli {
     // Reap any engine subprocess if the job is cancelled. The GUI does
     // the equivalent from `AppLifecycleState.detached`; a headless
     // process only ever learns it is going away from a signal.
-    return signalGuard.run(stderrSink: stderrSink, () async {
+    return await signalGuard.run(stderrSink: stderrSink, () async {
       // Resolved before the run so the counters have somewhere to go, and
       // resolved even when consent is `unset` — `HeadlessTelemetry` is the
       // thing that knows the answer is "record nothing", and a caller that

@@ -1374,7 +1374,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
     final l10n = L10N.of(ctx);
     // The suite-standard destructive confirm (error-colored, verb-labeled)
     // — this was previously a hand-rolled dialog with a plain FilledButton.
-    return confirmCruxDestructiveAction(
+    return await confirmCruxDestructiveAction(
       ctx,
       title: title(l10n),
       body: body(l10n),

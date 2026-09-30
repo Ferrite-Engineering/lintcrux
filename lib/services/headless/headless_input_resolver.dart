@@ -132,9 +132,9 @@ class HeadlessInputResolver {
     }
 
     if (projectPaths.length == 1) {
-      return _resolveProject(projectPaths.single, topModule: topModule);
+      return await _resolveProject(projectPaths.single, topModule: topModule);
     }
-    return _resolveAdHoc(sourcePaths, topModule: topModule);
+    return await _resolveAdHoc(sourcePaths, topModule: topModule);
   }
 
   Future<HeadlessInputResolution> _resolveProject(

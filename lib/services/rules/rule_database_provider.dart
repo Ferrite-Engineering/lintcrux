@@ -35,5 +35,5 @@ const List<String> kShippedRuleDatabaseEngineIds = <String>[
 /// app's lifetime.
 final FutureProvider<RuleDatabase> ruleDatabaseProvider =
     FutureProvider<RuleDatabase>((ref) async {
-      return RuleDatabase.load(engineIds: kShippedRuleDatabaseEngineIds);
+      return await RuleDatabase.load(engineIds: kShippedRuleDatabaseEngineIds);
     });

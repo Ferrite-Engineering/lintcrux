@@ -34,7 +34,7 @@ sourcePreviewWindowProvider = FutureProvider.family<SourceWindow?, Violation?>((
       related.add(loc.line);
     }
   }
-  return svc.windowAround(
+  return await svc.windowAround(
     file: violation.location.file,
     line: violation.location.line,
     relatedLineSet: related,

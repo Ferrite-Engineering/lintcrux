@@ -22,7 +22,7 @@ void main() {
 
   Future<SharedPreferences> freshPrefs() async {
     SharedPreferences.setMockInitialValues({});
-    return SharedPreferences.getInstance();
+    return await SharedPreferences.getInstance();
   }
 
   Widget wrap(SharedPreferences prefs, {Locale locale = const Locale('en')}) =>

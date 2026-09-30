@@ -107,7 +107,7 @@ abstract final class LintcruxIssueReporter {
       cruxAppScreenshotBoundaryKeyProvider,
     );
     final renderObject = boundaryKey.currentContext?.findRenderObject();
-    return service.captureScreenshot(
+    return await service.captureScreenshot(
       renderObject is RenderRepaintBoundary ? renderObject : null,
     );
   }

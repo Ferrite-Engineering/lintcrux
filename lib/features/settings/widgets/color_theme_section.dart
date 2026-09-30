@@ -170,13 +170,13 @@ class _ColorThemeSectionState extends ConsumerState<ColorThemeSection> {
     );
     final path = result?.files.single.path;
     if (path == null) return null;
-    return File(path).readAsString();
+    return await File(path).readAsString();
   }
 
   static Future<String?> _defaultSavePackDocument(String document) async {
     // file_picker 12 writes the bytes itself, so handing it the encoded
     // document does the whole export in one step — no follow-up write.
-    return FilePicker.saveFile(
+    return await FilePicker.saveFile(
       bytes: Uint8List.fromList(utf8.encode(document)),
       fileName: 'lintcrux-theme.crux-theme.json',
       allowedExtensions: ['json'],

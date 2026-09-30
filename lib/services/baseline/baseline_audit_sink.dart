@@ -71,7 +71,6 @@ class BaselineAuditEntry {
 /// The Enterprise tier swaps in a `crux_audit`-backed sink with
 /// the same interface — the [BaselineStore] implementation never
 /// knows which backend is active.
-// ignore: one_member_abstracts
 abstract class BaselineAuditSink {
   /// Records [entry]. Implementations are best-effort: a failure
   /// must never block the underlying mutation, because the persisted

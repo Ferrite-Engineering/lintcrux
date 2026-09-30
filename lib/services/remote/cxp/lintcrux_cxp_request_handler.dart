@@ -155,13 +155,13 @@ class LintCruxCxpRequestHandler {
     final envelope = inbound.envelope;
 
     if (message is RequestHighlight) {
-      return _dispatchRequestHighlight(message, envelope.messageId);
+      return await _dispatchRequestHighlight(message, envelope.messageId);
     }
     if (message is RequestOpenSource) {
-      return _dispatchRequestOpenSource(message, envelope.messageId);
+      return await _dispatchRequestOpenSource(message, envelope.messageId);
     }
     if (message is RequestOpenArtifact) {
-      return _dispatchRequestOpenArtifact(message, envelope.messageId);
+      return await _dispatchRequestOpenArtifact(message, envelope.messageId);
     }
     // Anything else (e.g. a NotifySelection a peer addressed directly
     // rather than broadcasting) is a kind LintCrux does not act on. Reply
@@ -187,13 +187,13 @@ class LintCruxCxpRequestHandler {
 
     switch (element.kind.known) {
       case KnownElementKind.rule:
-        return _withWorkspaceFallback(
+        return await _withWorkspaceFallback(
           req,
           requestId,
           _highlightRule(req, requestId, store, base),
         );
       case KnownElementKind.source:
-        return _withWorkspaceFallback(
+        return await _withWorkspaceFallback(
           req,
           requestId,
           _highlightSource(req, requestId, store, base),

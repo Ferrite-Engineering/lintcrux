@@ -185,7 +185,6 @@ class MacOsBundleEditorResolver {
 }
 
 /// Launcher abstraction so tests can substitute a fake.
-// ignore: one_member_abstracts
 abstract class EditorLauncher {
   /// Launches [executable] with [arguments] and returns the new
   /// process. Throws [ProcessException] when the binary cannot be

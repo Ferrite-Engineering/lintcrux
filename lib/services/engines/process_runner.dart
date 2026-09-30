@@ -26,7 +26,6 @@ import 'package:lintcrux/services/engines/clean_engine_environment.dart';
 /// - [start] throws [ProcessException] if the executable cannot be
 ///   launched (typically because it is not on `PATH`); engines
 ///   translate this to [EngineNotAvailableException].
-// ignore: one_member_abstracts
 abstract class ProcessRunner {
   /// Starts [executable] with [arguments] in [workingDirectory].
   Future<LintProcess> start(

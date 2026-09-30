@@ -172,7 +172,7 @@ Future<String?> _detectVersion(String engineId, String projectRoot) async {
     runner: const SystemProcessRunner(),
   );
   if (engine == null) return null;
-  return engine.detectVersion(const EngineBinaryConfig.system());
+  return await engine.detectVersion(const EngineBinaryConfig.system());
 }
 
 Future<void> main(List<String> args) async {

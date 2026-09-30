@@ -528,4 +528,4 @@ Set<String> goldenFindingKeys(String engineId, Map<String, dynamic> run) {
 Future<List<Violation>> collectViolations(
   LintEngine engine,
   LintRunRequest request,
-) async => engine.run(request).toList();
+) async => await engine.run(request).toList();

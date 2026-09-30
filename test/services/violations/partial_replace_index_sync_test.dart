@@ -45,7 +45,7 @@ void main() {
       ..replaceFromEngine('verible', verible);
   });
 
-  tearDown(() async => store.dispose());
+  tearDown(() async => await store.dispose());
 
   test('partial replace touches only the named engine bucket', () {
     final veribleBefore = List<Violation>.from(store.byEngine['verible']!);

@@ -19,7 +19,6 @@ import 'package:lintcrux/domain/models/violation.dart';
 /// [CompositeViolationTransformer]; the run orchestrator applies the
 /// composite at violation-emit time so the store only ever sees
 /// post-transform violations.
-// ignore: one_member_abstracts
 abstract class ViolationTransformer {
   /// Transform [v]. Returns the new violation (typically a
   /// [Violation.copyWith] with overridden fields). Returning the
