@@ -55,7 +55,7 @@ Open Settings with ++cmd+comma++ / ++ctrl+comma++. On desktop it opens as a dial
 |---|---|
 | General | **Auto-reload on source change** (Prompt me first / Re-run automatically / Do nothing — see [Auto-reload](projects-and-engines.md#auto-reload)), **Default sort column**, **Default filter set on launch**, **Restore tabs on launch**, **Automatically check for updates**, and in release builds **Enable diagnostics** (see [Diagnostics](#diagnostics)). |
 | Appearance | The **Language** picker (English, 中文, 日本語, 한국어), color theme presets, per-token color overrides (including the severity colors), and theme packs — see [Appearance & themes](appearance-and-themes.md). |
-| Privacy | The **Send anonymous usage statistics** toggle. Shown only on builds that can send statistics: the 0.8.x public-beta builds collect nothing, so the section is absent there; from 1.0 it is present — see [Usage statistics](getting-started.md#usage-statistics). |
+| Privacy | The **Send anonymous usage statistics** toggle. See [Usage statistics](getting-started.md#usage-statistics). |
 | Engines | **Engine binary paths** — Auto-detect / Bundled / Custom per engine, with a **Probe** button — and **Per-rule severity overrides**. |
 | Editors | The click-to-source editor — Visual Studio Code, Sublime Text, Vim / Neovim, Emacs, or a Custom executable and arguments template, with a live preview. |
 | CXP Cross-Probe | **Enable CXP server**, **CXP port**, **Request attention on cross-probe**, **Broadcast selection automatically**, and the live server status. |

@@ -18,8 +18,8 @@ LintCrux ships as a single application. The free **Open Core** dashboard is full
 - <span class="tier tier-enterprise">Enterprise</span> — the shared team trend database, the organization-wide waiver list, the multi-project rollup, the organization-wide CI gate threshold from a signed policy file, and the audit log.
 - <span class="tier tier-edu">EDU</span> — every Pro feature, free for verified students and non-commercial educational use. The Enterprise features are not part of EDU.
 
-!!! note "Beta builds, and what changes at 1.0"
-    Through the 0.8.x public beta every tier is unlocked for everyone: the badges are there so you can see which tier a feature belongs to, but nothing is gated in those builds. From 1.0 the badges are load-bearing — Open Core stays free, with no account, no license key and no time limit, while a feature carrying a <span class="tier tier-pro">Pro</span> or <span class="tier tier-enterprise">Enterprise</span> badge needs a license key, entered under `Settings → License`. See [Tiers & licensing](https://edacrux.app/licensing) for the full picture, including how the Education tier and license keys work.
+!!! note "What the badges mean"
+    Open Core is free, with no account, no license key and no time limit. A feature carrying a <span class="tier tier-pro">Pro</span> or <span class="tier tier-enterprise">Enterprise</span> badge needs a license key, entered under `Settings → License`. See [Tiers & licensing](https://edacrux.app/licensing) for the full picture, including how the Education tier and license keys work.
 
 ## How this guide is organized {#map}
 

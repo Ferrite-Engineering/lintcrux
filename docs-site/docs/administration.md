@@ -117,7 +117,7 @@ The suite's rule is that an audit payload carries no design source path — a pa
 
 ## Managed installs and updates {#packaging}
 
-**A managed install does not update itself.** An application installed by MSI, `.deb` or `.rpm` will not offer an in-app update and will not nag. That behaviour outranks every policy key, including `suite.updateChannel`, because it describes how the application was installed rather than what you configured. No LintCrux release has shipped those package formats yet — the [download page](https://lintcrux.app/download) lists what exists today.
+**A managed install does not update itself.** An application installed by MSI, `.deb` or `.rpm` will not offer an in-app update and will not nag. That behaviour outranks every policy key, including `suite.updateChannel`, because it describes how the application was installed rather than what you configured.
 
 !!! tip "See also"
     [Team trend database](team-database.md) for the connection, TLS and schema handshake · [Policy file reference](https://edacrux.app/policy-reference) · [Audit log](https://edacrux.app/audit-log) · [Deployment](https://edacrux.app/deployment) · [The end-to-end administrator workflow](https://edacrux.app/for/devops-engineers) · [Exports & CI](exports-and-ci.md) for the pipeline side

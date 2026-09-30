@@ -13,10 +13,10 @@ LintCrux is desktop-first. The same dashboard runs on Linux, macOS and Windows. 
 | Windows | 10 / 11, x86_64 | Installer or portable `.zip` from the [downloads page](https://lintcrux.app/download). |
 | Web | A current desktop browser | The read-only SARIF viewer at [app.lintcrux.app](https://app.lintcrux.app) — not the full dashboard. |
 
-The 0.8.x public-beta builds carry an expiry date, so a stale beta retires instead of drifting on indefinitely; 1.0 and later production builds do not expire. Either way the app tells you when a newer build is out (see [Staying up to date](#staying-up-to-date)).
+Release builds do not expire, and the app tells you when a newer build is out (see [Staying up to date](#staying-up-to-date)).
 
 !!! note "No activation step"
-    You do not need an account or a license key to begin: Open Core is free, with no sign-up and no time limit. Through the 0.8.x public beta the Pro and Enterprise features are unlocked as well, so nothing at all needs a key in those builds. From 1.0 those features need a license key, entered under `Settings → License`, and Open Core carries on unchanged. See [Tiers & licensing](https://edacrux.app/licensing).
+    You do not need an account or a license key to begin: Open Core is free, with no sign-up and no time limit. The Pro and Enterprise features need a license key, entered under `Settings → License`. See [Tiers & licensing](https://edacrux.app/licensing).
 
 ## The lint engines {#engines}
 
@@ -87,9 +87,7 @@ The rule is **counts, ids, versions and enum names — nothing else**. A report 
 
 ## Usage statistics {#usage-statistics}
 
-The 0.8.x public-beta builds collect no usage statistics: no disclosure appears and nothing is recorded.
-
-From 1.0, the first launch shows a one-time disclosure with a **Send anonymous usage statistics** toggle. It starts **on**, except on machines whose locale or time zone places them in the EEA, the United Kingdom, Switzerland or South Korea, where it starts **off**. Nothing is sent until the disclosure has been answered, and you can change the choice at any time under `Settings → Privacy`. On an Enterprise seat, an organization policy file can decide for the whole fleet instead, and no disclosure appears.
+The first launch shows a one-time disclosure with a **Send anonymous usage statistics** toggle. It starts **on**, except on machines whose locale or time zone places them in the EEA, the United Kingdom, Switzerland or South Korea, where it starts **off**. Nothing is sent until the disclosure has been answered, and you can change the choice at any time under `Settings → Privacy`. On an Enterprise seat, an organization policy file can decide for the whole fleet instead, and no disclosure appears.
 
 What is sent: feature, engine and error counters, app and OS version, form factor, language, and license tier — never file names, rule identifiers, or the text of any lint or error message. An error the desktop app did not handle is counted by its kind alone (for example, a state error in the widgets library), never with its message or stack trace. The headless `lintcrux` binary never asks; it sends only on a machine where the desktop app has stored an affirmative answer.
 

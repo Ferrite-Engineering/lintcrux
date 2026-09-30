@@ -100,7 +100,7 @@ jobs:
 
       - name: Install LintCrux
         env:
-          LINTCRUX_VERSION: '0.8.0'
+          LINTCRUX_VERSION: '1.0.0'
         run: |
           curl -fsSL -o lintcrux-cli.tar.gz \
             "https://updates.lintcrux.app/${LINTCRUX_VERSION}/lintcrux-cli-${LINTCRUX_VERSION}-linux-x64.tar.gz"
@@ -169,7 +169,7 @@ and catch-all arms. Everything else is identical.
 rtl-lint:
   image: ubuntu:latest
   variables:
-    LINTCRUX_VERSION: "0.8.0"
+    LINTCRUX_VERSION: "1.0.0"
   before_script:
     - apt-get update && apt-get install -y verilator curl
     - curl -fsSL -o lintcrux-cli.tar.gz

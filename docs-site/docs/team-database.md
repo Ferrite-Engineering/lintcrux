@@ -3,7 +3,7 @@
 A shared PostgreSQL trend history that *you* own, fed by the CI pipeline you already run. Reading it back in every engineer's desktop app is planned for 1.1. Nothing is hosted by us, no account or cloud service sits in the path, and lint data never leaves your network. This page is the database itself — connection, credentials, schema, and how CI pushes to it. The org-wide waiver list and the rollup that read the same database are on [Administration](administration.md).
 
 !!! note "What it takes to run one"
-    Through the 0.8.x public beta every tier is unlocked and no licences are issued, so you can stand one of these up without a key. From 1.0 the shared database is Enterprise: the desktop app reads its licence from `Settings → License`, and a headless run is told which licence it holds — see [the licence a CI agent runs as](#ci-license). Without one the push is refused and the run still passes. See [Tiers & licensing](https://edacrux.app/licensing).
+    The shared database is Enterprise: the desktop app reads its licence from `Settings → License`, and a headless run is told which licence it holds — see [the licence a CI agent runs as](#ci-license). Without one the push is refused and the run still passes. See [Tiers & licensing](https://edacrux.app/licensing).
 
 ## Why trends, and why shared {#why}
 
