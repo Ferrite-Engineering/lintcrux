@@ -66,8 +66,10 @@ void main() {
       () async {
         // The flip that activated telemetry is this constant, and nothing
         // else. With it off, an installation that has not answered the
-        // disclosure buffers until its stored answer is read back, and then
-        // sends nothing: `unset` is never consent.
+        // disclosure buffers until its stored answer is read back — and, once
+        // that answer turns out to be "not yet", keeps buffering while the
+        // disclosure asks. Nothing is sent either way: `unset` is never
+        // consent.
         expect(kBetaPeriod, isFalse);
         expect(kTelemetryDev, isFalse);
 
@@ -80,8 +82,9 @@ void main() {
         expect(container.read(telemetryEnabledProvider), isFalse);
         expect(
           container.read(telemetryServiceProvider),
-          isA<NoopTelemetryService>(),
+          isA<PendingTelemetryService>(),
         );
+        expect(container.read(telemetryGateProvider), TelemetryGate.closed);
       },
     );
 
@@ -248,9 +251,20 @@ void main() {
         ];
 
     for (final cell in cells) {
+      // Post-beta and unanswered is the disclosure on screen: the launch's
+      // events wait for its answer rather than being discarded, and still
+      // nothing transmits. Every other `on: false` cell is a real no.
+      final waits =
+          !cell.beta &&
+          !cell.dev &&
+          cell.consent == TelemetryConsentState.unset;
       test(
         'beta=${cell.beta} dev=${cell.dev} consent=${cell.consent.name} '
-        '→ ${cell.on ? "live" : "no-op"}',
+        '→ ${cell.on
+            ? "live"
+            : waits
+            ? "pending"
+            : "no-op"}',
         () async {
           final container = lintcruxContainer(
             extra: [
@@ -269,7 +283,11 @@ void main() {
           expect(container.read(telemetryEnabledProvider), cell.on);
           expect(
             container.read(telemetryServiceProvider),
-            cell.on ? isA<LiveTelemetryService>() : isA<NoopTelemetryService>(),
+            cell.on
+                ? isA<LiveTelemetryService>()
+                : waits
+                ? isA<PendingTelemetryService>()
+                : isA<NoopTelemetryService>(),
           );
         },
       );

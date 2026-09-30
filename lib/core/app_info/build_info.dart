@@ -38,7 +38,7 @@ abstract final class LintCruxBuildInfo {
   /// went up: a stale value no longer just misreports a version to a peer, it
   /// writes a false provenance record into a user's trend database on a row
   /// nothing will ever revisit.
-  static const String productVersion = '1.0.0';
+  static const String productVersion = '1.0.1';
 
   /// The line `--version` prints, from the desktop app and from the
   /// headless binary alike.
