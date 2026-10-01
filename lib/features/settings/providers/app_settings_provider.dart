@@ -111,6 +111,11 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
     state = state.copyWith(restoreTabsOnLaunch: stored);
   }
 
+  /// Set once the user changes the auto-check preference at run time — same
+  /// guard as [_restoreTabsTouched]: the asynchronous build-time restore
+  /// must not overwrite a toggle that landed before it resolved.
+  bool _autoCheckTouched = false;
+
   Future<void> _restoreAutoCheckForUpdates() async {
     final bool stored;
     try {
@@ -122,7 +127,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
       // cases, and a settings restore is never worth failing a launch over.
       return;
     }
-    if (!ref.mounted) return;
+    if (!ref.mounted || _autoCheckTouched) return;
     if (state.autoCheckForUpdates == stored) return;
     state = state.copyWith(autoCheckForUpdates: stored);
   }
@@ -343,6 +348,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
   /// unaffected. Read back by `crux_updates`' `autoUpdateCheckEnabledProvider`
   /// through the bootstrap override.
   void setAutoCheckForUpdates({required bool enabled}) {
+    _autoCheckTouched = true;
     if (state.autoCheckForUpdates == enabled) return;
     state = state.copyWith(autoCheckForUpdates: enabled);
     unawaited(_persistAutoCheckForUpdates(enabled: enabled));

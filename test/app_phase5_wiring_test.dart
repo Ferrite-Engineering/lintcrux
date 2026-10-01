@@ -20,6 +20,7 @@ import 'package:lintcrux/features/workspace/providers/tab_overrides_factory.dart
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/updates/observed_server_time_store.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'support/telemetry_test_store.dart';
 
 /// A licence tier a test can change mid-session, the way entering a key does.
@@ -41,6 +42,14 @@ final _mutableTierProvider = NotifierProvider<_MutableTier, LicenseTier>(
 /// `MaterialApp.builder`.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  // Every test here builds `appSettingsProvider`, whose restores call
+  // `SharedPreferences.getInstance()`. Unseeded, that static future fails
+  // with MissingPluginException AFTER a synchronous test has finished, and
+  // the next test's restores await the same pending future from another
+  // error zone, so the failure is reported against the earlier test (flaky,
+  // timing dependent). Seeding the in-memory store resolves it at once.
+  setUp(() => SharedPreferences.setMockInitialValues(<String, Object>{}));
 
   group('lintcruxPhase5Overrides', () {
     ProviderContainer wired() {

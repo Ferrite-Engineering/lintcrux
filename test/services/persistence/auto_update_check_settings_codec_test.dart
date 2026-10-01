@@ -106,6 +106,36 @@ void main() {
       expect(container.read(appSettingsProvider).autoCheckForUpdates, isFalse);
     });
 
+    test('a toggle made before the restore lands is not overwritten', () async {
+      // The build-time restore is asynchronous. Turning automatic checks off
+      // in the first frames must not be silently undone a moment later by
+      // the value that happened to be on disk at launch.
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        AutoUpdateCheckSettingsCodec.prefsKey: true,
+      });
+      final prefs = await SharedPreferences.getInstance();
+      final container = ProviderContainer(
+        overrides: [
+          autoUpdateCheckSettingsServiceProvider.overrideWithValue(
+            SettingsService<bool>(
+              const AutoUpdateCheckSettingsCodec(),
+              prefsOverride: prefs,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      container
+          .read(appSettingsProvider.notifier)
+          .setAutoCheckForUpdates(enabled: false);
+      await _settle();
+      await _settle();
+      await _settle();
+
+      expect(container.read(appSettingsProvider).autoCheckForUpdates, isFalse);
+    });
+
     test('a settings-store failure never breaks the toggle', () async {
       // No preferences backend: the model still changes, so the user's choice
       // holds for the session even though it will not survive a relaunch.
