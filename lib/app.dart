@@ -90,6 +90,7 @@ import 'package:lintcrux/services/import/edam_reader.dart';
 import 'package:lintcrux/services/import/filelist_import_service.dart';
 import 'package:lintcrux/services/import/filelist_reader.dart';
 import 'package:lintcrux/services/logging/severe_log_stderr_sink.dart';
+import 'package:lintcrux/services/persistence/cxp_settings_provider.dart';
 import 'package:lintcrux/services/persistence/engine_binary_overrides_settings_provider.dart';
 import 'package:lintcrux/services/persistence/restore_tabs_settings_provider.dart';
 import 'package:lintcrux/services/platform/incoming_file_source.dart';
@@ -478,6 +479,9 @@ Future<bool> bootstrap({
   // engines as it opens, and those runs must use the binaries the user chose
   // in Settings > Engines. See [launchEngineBinaryOverridesProvider].
   final engineBinaryOverrides = await loadEngineBinaryOverrides();
+  // And for the CXP server: a launch with CXP turned off must never start
+  // it, even briefly. See [launchCxpSettingsProvider].
+  final cxpSettings = await loadCxpSettings();
 
   // Windows/Linux only: switch the window to frameless (TitleBarStyle.hidden)
   // and show it once ready, so the in-window VS Code-style title bar drawn by
@@ -504,6 +508,7 @@ Future<bool> bootstrap({
         launchEngineBinaryOverridesProvider.overrideWithValue(
           engineBinaryOverrides,
         ),
+        launchCxpSettingsProvider.overrideWithValue(cxpSettings),
         ...lintcruxPhase5Overrides(),
         // Bind the EULA gate's persistence and quit path — see the web-mode
         // scope above.
