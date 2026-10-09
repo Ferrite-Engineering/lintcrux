@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/domain/models/violation_table_state.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
+import 'package:lintcrux/features/violations/providers/violation_column_layout_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/violations/widgets/severity_chip.dart';
 import 'package:lintcrux/features/violations/widgets/violation_row_focus.dart';
@@ -19,7 +20,9 @@ import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/violation_context_menu_provider.dart';
 import 'package:lintcrux/plugins/violation_row_leading_cells_provider.dart';
 import 'package:lintcrux/services/editor/editor_command_provider.dart';
+import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/shared/widgets/lintcrux_feature_tier_badge.dart';
+import 'package:path/path.dart' as p;
 
 /// Stable row height used by the virtualized list.
 const double kViolationRowHeight = 28;
@@ -162,6 +165,10 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
     final notifier = ref.read(violationTableStateProvider.notifier);
     final selectionNotifier = ref.read(selectedViolationProvider.notifier);
     final leadingCells = ref.watch(violationRowLeadingCellsProvider);
+    final layout = ref.watch(violationColumnLayoutProvider);
+    final projectRoot = ref.watch(
+      currentProjectProvider.select((p) => p?.rootPath),
+    );
     final scheme = Theme.of(context).colorScheme;
     final textStyle = Theme.of(context).textTheme.bodySmall;
     // ONE announcement per row, not five.
@@ -274,9 +281,13 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
                       },
                       // The visual cells stay exactly as they are: excluding
                       // them changes what is announced, not what is drawn.
+                      // Widths follow the header's, from the shared layout.
+                      // Every text cell carries its full value as a tooltip,
+                      // so a truncated rule ID or path is still readable.
                       child: Row(
                         children: [
                           Expanded(
+                            flex: layout.flexOf(ViolationTableColumn.severity),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -287,28 +298,31 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
                             ),
                           ),
                           Expanded(
+                            flex: layout.flexOf(ViolationTableColumn.engine),
                             child: _cell(violation.engineId, textStyle),
                           ),
                           Expanded(
-                            flex: 2,
+                            flex: layout.flexOf(ViolationTableColumn.rule),
                             child: _cell(violation.ruleId, textStyle),
                           ),
                           Expanded(
-                            flex: 3,
-                            child: _cell(violation.location.file, textStyle),
+                            flex: layout.flexOf(ViolationTableColumn.file),
+                            child: _cell(
+                              displayPath(violation.location.file, projectRoot),
+                              textStyle,
+                              tooltip: violation.location.file,
+                            ),
                           ),
                           Expanded(
+                            flex: layout.flexOf(ViolationTableColumn.line),
                             child: _cell(
                               '${violation.location.line}',
                               textStyle,
                             ),
                           ),
                           Expanded(
-                            flex: 5,
-                            child: Tooltip(
-                              message: violation.message,
-                              child: _cell(violation.message, textStyle),
-                            ),
+                            flex: layout.flexOf(ViolationTableColumn.message),
+                            child: _cell(violation.message, textStyle),
                           ),
                         ],
                       ),
@@ -379,13 +393,19 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
     await Future.sync(() => entry.onActivate(context, ref, violation));
   }
 
-  Widget _cell(String text, TextStyle? style) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Text(
-        text,
-        style: style,
-        overflow: TextOverflow.ellipsis,
+  Widget _cell(String text, TextStyle? style, {String? tooltip}) {
+    // Hover only: a tooltip's default long-press trigger would claim the
+    // long-press the row uses for its context menu on touch hosts.
+    return Tooltip(
+      message: tooltip ?? text,
+      triggerMode: TooltipTriggerMode.manual,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Text(
+          text,
+          style: style,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
   }
@@ -423,4 +443,14 @@ class _LeadingCells extends StatelessWidget {
       child: cells,
     );
   }
+}
+
+/// [file] relative to [projectRoot] when it lies inside it, else [file]
+/// unchanged. The File column shows this; its tooltip carries the full path.
+@visibleForTesting
+String displayPath(String file, String? projectRoot) {
+  if (projectRoot == null || projectRoot.isEmpty) return file;
+  return p.isWithin(projectRoot, file)
+      ? p.relative(file, from: projectRoot)
+      : file;
 }

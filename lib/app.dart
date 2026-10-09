@@ -66,6 +66,7 @@ import 'package:lintcrux/features/update/lintcrux_update_config.dart';
 import 'package:lintcrux/features/update/lintcrux_update_strings.dart';
 import 'package:lintcrux/features/viewer/providers/panel_layout_provider.dart';
 import 'package:lintcrux/features/viewer/providers/right_dock_provider.dart';
+import 'package:lintcrux/features/violations/providers/violation_column_layout_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/workspace/providers/project_workspace_sync.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
@@ -482,6 +483,9 @@ Future<bool> bootstrap({
   // And for the CXP server: a launch with CXP turned off must never start
   // it, even briefly. See [launchCxpSettingsProvider].
   final cxpSettings = await loadCxpSettings();
+  // The violation table's column widths, so a restored tab draws its first
+  // frame at the saved widths. See [launchViolationColumnLayoutProvider].
+  final violationColumnLayout = await loadViolationColumnLayout();
 
   // Windows/Linux only: switch the window to frameless (TitleBarStyle.hidden)
   // and show it once ready, so the in-window VS Code-style title bar drawn by
@@ -509,6 +513,9 @@ Future<bool> bootstrap({
           engineBinaryOverrides,
         ),
         launchCxpSettingsProvider.overrideWithValue(cxpSettings),
+        launchViolationColumnLayoutProvider.overrideWithValue(
+          violationColumnLayout,
+        ),
         ...lintcruxPhase5Overrides(),
         // Bind the EULA gate's persistence and quit path — see the web-mode
         // scope above.
