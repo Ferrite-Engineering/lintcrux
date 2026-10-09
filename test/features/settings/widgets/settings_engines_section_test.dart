@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
+import 'package:lintcrux/domain/models/engine_binary_override.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
@@ -70,7 +71,7 @@ void main() {
   group('SettingsEnginesSection', () {
     testWidgets(
       'renders the binary-overrides header and one row per registered '
-      'engine with the three source choices',
+      'engine with the two source choices',
       (tester) async {
         await tester.pumpWidget(wrap(const SettingsEnginesSection()));
         await tester.pump();
@@ -95,10 +96,17 @@ void main() {
           find.text(l10n.engineConfigBinarySourceAuto),
           findsNWidgets(6),
         );
-        expect(
-          find.text(l10n.engineConfigBinarySourceBundled),
-          findsNWidgets(6),
-        );
+        // No Bundled choice: no engine binaries ship, so it would resolve
+        // exactly as Auto-detect does.
+        for (final button
+            in tester.widgetList<SegmentedButton<EngineBinarySource>>(
+              find.byType(SegmentedButton<EngineBinarySource>),
+            )) {
+          expect(
+            button.segments.map((s) => s.value),
+            [EngineBinarySource.system, EngineBinarySource.custom],
+          );
+        }
         expect(
           find.text(l10n.engineConfigBinarySourceCustom),
           findsNWidgets(6),
@@ -111,6 +119,40 @@ void main() {
         expect(
           find.text(l10n.engineConfigSeverityOverridesHeader),
           findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'a setting saved as Bundled shows as Auto-detect and is kept',
+      (tester) async {
+        final engine = _FakeEngine();
+        await tester.pumpWidget(
+          wrap(
+            const SettingsEnginesSection(),
+            overrides: [registryWith(engine)],
+          ),
+        );
+        await tester.pump();
+        containerOf(tester)
+            .read(appSettingsProvider.notifier)
+            .setEngineBinaryOverride(
+              engine.id,
+              const EngineBinaryOverride(source: EngineBinarySource.bundled),
+            );
+        await tester.pump();
+
+        final button = tester.widget<SegmentedButton<EngineBinarySource>>(
+          find.byType(SegmentedButton<EngineBinarySource>),
+        );
+        expect(button.selected, {EngineBinarySource.system});
+        // Only the display maps it; the saved value is untouched.
+        expect(
+          containerOf(
+            tester,
+          ).read(appSettingsProvider).engineBinaryOverrideFor(engine.id).source,
+          EngineBinarySource.bundled,
         );
         expect(tester.takeException(), isNull);
       },
@@ -246,7 +288,6 @@ void main() {
           findsOneWidget,
         );
         expect(find.text(l10n.engineConfigBinarySourceAuto), findsOneWidget);
-        expect(find.text(l10n.engineConfigBinarySourceBundled), findsOneWidget);
         expect(find.text(l10n.engineConfigBinarySourceCustom), findsOneWidget);
 
         await switchToCustom(tester);

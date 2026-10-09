@@ -824,17 +824,13 @@
   "@engineConfigBinaryOverridesHeader": {
     "description": "Section header for the per-engine binary-path override list in Settings → Engines."
   },
-  "engineConfigBinaryOverridesHelp": "각 엔진 바이너리의 출처를 선택합니다. 자동 감지는 PATH를 검색합니다. 번들은 LintCrux와 함께 배포되는 플랫폼별 바이너리를 위한 항목이지만 현재 포함된 엔진은 없습니다. 따라서 LINTCRUX_BUNDLED_BIN_DIR이 바이너리 디렉터리를 가리키지 않는 한 번들도 PATH로 대체됩니다. 사용자 정의는 명시적 절대 경로를 받습니다.",
+  "engineConfigBinaryOverridesHelp": "각 엔진 바이너리의 출처를 선택합니다. 자동 감지는 PATH를 검색합니다. 사용자 정의는 명시적 절대 경로를 받습니다.",
   "@engineConfigBinaryOverridesHelp": {
-    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the three modes, including that Bundled resolves nothing today because no engine binaries ship with the app."
+    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the two binary sources, Auto-detect and Custom."
   },
   "engineConfigBinarySourceAuto": "자동 감지",
   "@engineConfigBinarySourceAuto": {
     "description": "Label for the auto-detect segment of the binary-source SegmentedButton (Settings → Engines)."
-  },
-  "engineConfigBinarySourceBundled": "번들",
-  "@engineConfigBinarySourceBundled": {
-    "description": "Label for the bundled-binary segment of the binary-source SegmentedButton."
   },
   "engineConfigBinarySourceCustom": "사용자 정의",
   "@engineConfigBinarySourceCustom": {

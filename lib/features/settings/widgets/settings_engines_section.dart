@@ -21,7 +21,10 @@ import 'package:lintcrux/services/engines/engine_registry_provider.dart';
 ///
 /// Renders, for every registered [LintEngine]:
 ///
-/// * A SegmentedButton choosing Auto-detect / Bundled / Custom.
+/// * A SegmentedButton choosing Auto-detect / Custom. There is no Bundled
+///   choice: no engine binaries ship with LintCrux, so it would resolve
+///   exactly as Auto-detect does. A setting saved as Bundled still resolves
+///   that way and shows as Auto-detect.
 /// * When **Custom** is active, an editable path field plus a
 ///   live-validation "Probe" button that runs `<binary> --version`
 ///   via the engine's own `detectVersion` and surfaces the detected
@@ -162,15 +165,16 @@ class _EngineRowState extends ConsumerState<_EngineRow> {
                 label: Text(l10n.engineConfigBinarySourceAuto),
               ),
               ButtonSegment(
-                value: EngineBinarySource.bundled,
-                label: Text(l10n.engineConfigBinarySourceBundled),
-              ),
-              ButtonSegment(
                 value: EngineBinarySource.custom,
                 label: Text(l10n.engineConfigBinarySourceCustom),
               ),
             ],
-            selected: {override.source},
+            selected: {
+              if (override.source == EngineBinarySource.bundled)
+                EngineBinarySource.system
+              else
+                override.source,
+            },
             onSelectionChanged: (next) {
               final source = next.first;
               notifier.setEngineBinaryOverride(

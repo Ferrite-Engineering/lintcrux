@@ -933,17 +933,13 @@
   "@engineConfigBinaryOverridesHeader": {
     "description": "Section header for the per-engine binary-path override list in Settings → Engines."
   },
-  "engineConfigBinaryOverridesHelp": "Choose where each engine binary comes from. Auto-detect searches PATH. Bundled is reserved for a per-platform binary shipped with LintCrux — none ship yet, so it also falls back to PATH unless LINTCRUX_BUNDLED_BIN_DIR points at a binary directory. Custom takes an explicit absolute path.",
+  "engineConfigBinaryOverridesHelp": "Choose where each engine binary comes from. Auto-detect searches PATH. Custom takes an explicit absolute path.",
   "@engineConfigBinaryOverridesHelp": {
-    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the three modes, including that Bundled resolves nothing today because no engine binaries ship with the app."
+    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the two binary sources, Auto-detect and Custom."
   },
   "engineConfigBinarySourceAuto": "Auto-detect",
   "@engineConfigBinarySourceAuto": {
     "description": "Label for the auto-detect segment of the binary-source SegmentedButton (Settings → Engines)."
-  },
-  "engineConfigBinarySourceBundled": "Bundled",
-  "@engineConfigBinarySourceBundled": {
-    "description": "Label for the bundled-binary segment of the binary-source SegmentedButton."
   },
   "engineConfigBinarySourceCustom": "Custom",
   "@engineConfigBinarySourceCustom": {

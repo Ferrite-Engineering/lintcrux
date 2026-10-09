@@ -824,17 +824,13 @@
   "@engineConfigBinaryOverridesHeader": {
     "description": "Section header for the per-engine binary-path override list in Settings → Engines."
   },
-  "engineConfigBinaryOverridesHelp": "各エンジンバイナリの取得元を選択します。自動検出は PATH を検索します。バンドルは LintCrux に同梱されるプラットフォーム別バイナリ用の予約項目ですが、現時点で同梱されているエンジンはありません。そのため LINTCRUX_BUNDLED_BIN_DIR がバイナリのディレクトリを指していない限り、バンドルも PATH にフォールバックします。カスタムは明示的な絶対パスを受け付けます。",
+  "engineConfigBinaryOverridesHelp": "各エンジンバイナリの取得元を選択します。自動検出は PATH を検索します。カスタムは明示的な絶対パスを受け付けます。",
   "@engineConfigBinaryOverridesHelp": {
-    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the three modes, including that Bundled resolves nothing today because no engine binaries ship with the app."
+    "description": "Help text shown beneath the Settings → Engines binary-override section header. Explains the two binary sources, Auto-detect and Custom."
   },
   "engineConfigBinarySourceAuto": "自動検出",
   "@engineConfigBinarySourceAuto": {
     "description": "Label for the auto-detect segment of the binary-source SegmentedButton (Settings → Engines)."
-  },
-  "engineConfigBinarySourceBundled": "バンドル",
-  "@engineConfigBinarySourceBundled": {
-    "description": "Label for the bundled-binary segment of the binary-source SegmentedButton."
   },
   "engineConfigBinarySourceCustom": "カスタム",
   "@engineConfigBinarySourceCustom": {
