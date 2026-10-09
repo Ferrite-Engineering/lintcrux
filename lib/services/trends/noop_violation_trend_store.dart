@@ -69,6 +69,7 @@ class NoopViolationTrendStore implements ViolationTrendStore {
     required ViolationTrendAggregateKey key,
     required Duration windowSize,
     DateTime? since,
+    String? projectPath,
   }) async {
     // The noop store does not bucket — it returns an empty list. The
     // Pro SqliteViolationTrendStore computes buckets via SQL.

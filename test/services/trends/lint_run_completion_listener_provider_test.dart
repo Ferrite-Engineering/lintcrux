@@ -52,6 +52,7 @@ class _RecordingStore implements ViolationTrendStore {
     required ViolationTrendAggregateKey key,
     required Duration windowSize,
     DateTime? since,
+    String? projectPath,
   }) async => const [];
 
   @override

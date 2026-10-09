@@ -72,11 +72,14 @@ abstract class ViolationTrendStore {
   ///
   /// [windowSize] controls the bucket width. [since] is optional —
   /// when null, the store returns aggregates over its entire
-  /// retained history.
+  /// retained history. [projectPath], when non-null, limits the
+  /// aggregates to that project's runs, as it does for
+  /// [queryDataPoints].
   Future<List<ViolationTrendAggregate>> queryAggregates({
     required ViolationTrendAggregateKey key,
     required Duration windowSize,
     DateTime? since,
+    String? projectPath,
   });
 
   /// Enforces [policy] on the underlying storage, deleting any data
