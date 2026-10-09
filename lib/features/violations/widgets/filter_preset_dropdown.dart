@@ -144,25 +144,32 @@ class FilterPresetDropdown extends ConsumerWidget {
     await reportPresetWriteFailure(context, notifier.persisted);
   }
 
-  Future<void> _showManageDialog(BuildContext context, WidgetRef ref) async {
-    // `wrapInActiveTabScope`, unlike the save dialog above: the manage
-    // dialog READS `savedFilterPresetsProvider` (and deletes through it)
-    // with its own `ref`, and a dialog route is a child of the Navigator,
-    // which sits ABOVE the per-tab `UncontrolledProviderScope`. Without the
-    // wrapper its reads resolve the ROOT container, whose presets list is
-    // always empty — the dialog rendered "No saved presets" over a dropdown
-    // that was visibly listing several, and Delete wrote to the root
-    // notifier so nothing disappeared. The save dialog needs no wrapper
-    // because it reads nothing: it returns a name by `pop` and the caller
-    // above (still inside the tab scope) does the per-tab write.
-    await showDialog<void>(
-      context: context,
-      builder: (_) => wrapInActiveTabScope(
-        context,
-        const _FilterPresetManageDialog(),
-      ),
-    );
-  }
+  Future<void> _showManageDialog(BuildContext context, WidgetRef ref) =>
+      showProjectFilterPresetManageDialog(context);
+}
+
+/// Opens the dialog that lists and deletes the project's saved filter
+/// presets (`savedFilterPresetsProvider`). Public so an overlay that
+/// replaces [FilterPresetDropdown] (see `filterPresetDropdownVisibleProvider`)
+/// can still offer it. [context] must be inside the tab's scope.
+Future<void> showProjectFilterPresetManageDialog(BuildContext context) async {
+  // `wrapInActiveTabScope`, unlike the dropdown's save dialog: the manage
+  // dialog READS `savedFilterPresetsProvider` (and deletes through it)
+  // with its own `ref`, and a dialog route is a child of the Navigator,
+  // which sits ABOVE the per-tab `UncontrolledProviderScope`. Without the
+  // wrapper its reads resolve the ROOT container, whose presets list is
+  // always empty — the dialog rendered "No saved presets" over a dropdown
+  // that was visibly listing several, and Delete wrote to the root
+  // notifier so nothing disappeared. The save dialog needs no wrapper
+  // because it reads nothing: it returns a name by `pop` and the caller
+  // above (still inside the tab scope) does the per-tab write.
+  await showDialog<void>(
+    context: context,
+    builder: (_) => wrapInActiveTabScope(
+      context,
+      const _FilterPresetManageDialog(),
+    ),
+  );
 }
 
 class _FilterPresetSaveDialog extends StatefulWidget {

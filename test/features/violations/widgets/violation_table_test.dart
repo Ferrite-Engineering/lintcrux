@@ -13,10 +13,12 @@ import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/domain/models/violation_table_state.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
+import 'package:lintcrux/features/violations/widgets/filter_preset_dropdown.dart';
 import 'package:lintcrux/features/violations/widgets/violation_table.dart';
 import 'package:lintcrux/features/violations/widgets/violation_table_header.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/dashboard_banners_provider.dart';
+import 'package:lintcrux/plugins/filter_preset_dropdown_visible_provider.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
@@ -66,6 +68,7 @@ Widget _harness({
   EngineRegistry? registry,
   Locale locale = const Locale('en'),
   List<DashboardBannerBuilder>? banners,
+  bool? presetDropdownVisible,
 }) {
   return ProviderScope(
     overrides: [
@@ -75,6 +78,10 @@ Widget _harness({
         registry ?? EngineRegistry([_FakeEngine('verilator')]),
       ),
       if (banners != null) dashboardBannersProvider.overrideWithValue(banners),
+      if (presetDropdownVisible != null)
+        filterPresetDropdownVisibleProvider.overrideWithValue(
+          presetDropdownVisible,
+        ),
     ],
     child: MaterialApp(
       locale: locale,
@@ -100,6 +107,21 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('No violations.'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('shows the Filter preset dropdown by default', (tester) async {
+      await tester.pumpWidget(_harness(store: InMemoryViolationStore()));
+      await tester.pumpAndSettle();
+      expect(find.byType(FilterPresetDropdown), findsOneWidget);
+    });
+
+    testWidgets('hides the Filter preset dropdown when an overlay replaces '
+        'it', (tester) async {
+      await tester.pumpWidget(
+        _harness(store: InMemoryViolationStore(), presetDropdownVisible: false),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(FilterPresetDropdown), findsNothing);
     });
 
     testWidgets('renders one row per violation', (tester) async {

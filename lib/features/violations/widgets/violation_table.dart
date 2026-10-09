@@ -12,6 +12,7 @@ import 'package:lintcrux/features/violations/widgets/violation_table_header.dart
 import 'package:lintcrux/features/violations/widgets/violation_table_row.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/dashboard_banners_provider.dart';
+import 'package:lintcrux/plugins/filter_preset_dropdown_visible_provider.dart';
 import 'package:lintcrux/plugins/violation_table_top_actions_provider.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
 
@@ -84,7 +85,8 @@ class _ViolationTableState extends ConsumerState<ViolationTable> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const FilterPresetDropdown(),
+        if (ref.watch(filterPresetDropdownVisibleProvider))
+          const FilterPresetDropdown(),
         if (topActions.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
