@@ -433,6 +433,10 @@ class CxpServerLifecycle extends AsyncNotifier<CxpServerLifecycleState> {
     // the cross-probe panel. Re-populated below once the connector runs.
     final dialFailuresNotifier = ref.read(cxpDialFailuresProvider.notifier)
       ..replace(const <CxpDialFailure>[]);
+    // The same for the peer list: discovery stopped in [_teardown], so the
+    // last snapshot is stale. Left alone, a disabled server keeps showing
+    // the peers it saw while running (the toolbar badge among them).
+    ref.read(cxpPeersProvider.notifier).replace(const <CxpPeerManifest>[]);
 
     if (!config.enabled) {
       return const CxpServerLifecycleState(running: false, boundPort: null);

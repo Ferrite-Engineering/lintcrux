@@ -25,6 +25,7 @@ import 'package:lintcrux/services/remote/cxp/cxp_workspace_link.dart';
 import 'package:lintcrux/services/remote/cxp/lintcrux_name_resolver.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../support/host_absolute_path.dart';
 import '../../support/host_independent_editor_resolver.dart';
 import '../../support/noop_process.dart';
@@ -481,6 +482,51 @@ void main() {
             .read(cxpPeersProvider)
             .every((p) => p.identity.peerId != fakePeerId),
         timeout: const Duration(seconds: 4),
+      );
+    });
+
+    test('turning the server off empties the peer list', () async {
+      // The setter persists; give it an in-memory preferences store.
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      container = buildContainer(
+        manifestDir: tempDir.path,
+        store: store,
+        launcher: launcher,
+      );
+      await container!.read(cxpServerLifecycleProvider.future);
+
+      // A live pid, for the reason the discovery test above gives.
+      final fakePeerId = 'vscode-$pid-7';
+      File('${tempDir.path}/$fakePeerId.json').writeAsStringSync(
+        _jsonEncode(<String, Object?>{
+          'identity': <String, Object?>{
+            'peer_id': fakePeerId,
+            'product_name': 'vscode',
+            'product_version': '1.0.0',
+            'capabilities': <String>[],
+          },
+          'host': '127.0.0.1',
+          'port': 54329,
+          'started_at': DateTime.now().toUtc().millisecondsSinceEpoch,
+        }),
+      );
+      await _pumpUntil(
+        () => container!.read(cxpPeersProvider).isNotEmpty,
+        timeout: const Duration(seconds: 4),
+      );
+
+      // The peer's manifest stays on disk: only the server is turned off.
+      container!
+          .read(appSettingsProvider.notifier)
+          .setCxpServerEnabled(enabled: false);
+      final state = await container!.read(cxpServerLifecycleProvider.future);
+      expect(state.running, isFalse);
+      expect(
+        container!.read(cxpPeersProvider),
+        isEmpty,
+        reason:
+            'a stopped server must not keep reporting peers (the '
+            'toolbar badge counts this list)',
       );
     });
 
