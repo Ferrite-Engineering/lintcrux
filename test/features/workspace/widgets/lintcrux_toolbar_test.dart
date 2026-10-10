@@ -90,6 +90,17 @@ Set<LintcruxAction> _rendered(WidgetTester tester) => tester
 
 void main() {
   group('LintcruxToolbar', () {
+    testWidgets('the export button names the group and its default format', (
+      tester,
+    ) async {
+      await _pump(tester);
+      expect(
+        find.byTooltip('Export Violations… (SARIF is default)'),
+        findsOneWidget,
+      );
+      expect(find.byTooltip('Export Violations as SARIF…'), findsNothing);
+    });
+
     testWidgets('renders through the shared CruxToolbar', (tester) async {
       await _pump(tester);
       expect(tester.takeException(), isNull);

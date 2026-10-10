@@ -1456,7 +1456,7 @@
   "@aboutCompanyName": {
     "description": "Company tagline shown on the first line of the About branding banner."
   },
-  "filePickerExportButton": "내보내기",
+  "filePickerExportFormatButton": "{format} 내보내기",
   "exportFailed": "내보내기에 실패했습니다: {error}",
   "snackFeatureRequiresPro": "{feature}에는 LintCrux Pro가 필요합니다.",
   "snackFeatureNotAvailableYet": "{feature}은(는) 아직 사용할 수 없습니다.",
@@ -1560,7 +1560,8 @@
   "accessibilityStatusBarRegion": "상태 표시줄",
   "accessibilityViolationTableKeyboardHint": "위아래 화살표 키로 위반 사이를 이동합니다. Enter는 위반을 에디터에서 열고, Space는 체크박스를 전환합니다.",
   "toolbarOverflowActions": "동작",
-  "toolbarExportCluster": "보고서 내보내기",
+  "toolbarExportCluster": "위반 내보내기…",
+  "toolbarExportClusterTooltip": "위반 내보내기… (기본값: {format})",
   "statusBarBusyLintRun": "Lint 엔진 실행 중",
   "statusBarNoProject": "열린 프로젝트 없음",
   "dockTabDetails": "세부 정보",

@@ -1456,7 +1456,7 @@
   "@aboutCompanyName": {
     "description": "Company tagline shown on the first line of the About branding banner."
   },
-  "filePickerExportButton": "エクスポート",
+  "filePickerExportFormatButton": "{format} をエクスポート",
   "exportFailed": "エクスポートに失敗しました: {error}",
   "snackFeatureRequiresPro": "{feature} には LintCrux Pro が必要です。",
   "snackFeatureNotAvailableYet": "{feature} はまだ利用できません。",
@@ -1560,7 +1560,8 @@
   "accessibilityStatusBarRegion": "ステータスバー",
   "accessibilityViolationTableKeyboardHint": "上下キーで違反間を移動します。Enter で違反をエディターで開き、Space でチェックボックスを切り替えます。",
   "toolbarOverflowActions": "アクション",
-  "toolbarExportCluster": "レポートをエクスポート",
+  "toolbarExportCluster": "違反をエクスポート…",
+  "toolbarExportClusterTooltip": "違反をエクスポート…(既定: {format})",
   "statusBarBusyLintRun": "Lint エンジンを実行中",
   "statusBarNoProject": "プロジェクトが開かれていません",
   "dockTabDetails": "詳細",

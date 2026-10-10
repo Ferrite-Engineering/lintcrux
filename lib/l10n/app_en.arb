@@ -1621,9 +1621,14 @@
   "@aboutCompanyName": {
     "description": "Company tagline shown on the first line of the About branding banner."
   },
-  "filePickerExportButton": "Export",
-  "@filePickerExportButton": {
-    "description": "Action button label rendered by the OS save-file picker when exporting the violation set (SARIF / JSON / CSV / HTML)."
+  "filePickerExportFormatButton": "Export {format}",
+  "@filePickerExportFormatButton": {
+    "description": "Confirm-button label of the save dialog for a violations export, naming the format being exported, since the native macOS save panel has no title. {format} = SARIF, JSON, CSV or HTML, not translated.",
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
   },
   "exportFailed": "Export failed: {error}",
   "@exportFailed": {
@@ -1957,9 +1962,18 @@
   "@toolbarOverflowActions": {
     "description": "Tooltip on the toolbar's trailing overflow button, which opens the full action list"
   },
-  "toolbarExportCluster": "Export Report",
+  "toolbarExportCluster": "Export Violations…",
   "@toolbarExportCluster": {
-    "description": "Tooltip on the toolbar grouped export button, whose siblings are the SARIF / JSON / CSV / HTML export actions"
+    "description": "Label of the toolbar grouped export button as a whole (its corner triangle's accessible name), whose siblings are the SARIF / JSON / CSV / HTML export actions. The hover tooltip is toolbarExportClusterTooltip."
+  },
+  "toolbarExportClusterTooltip": "Export Violations… ({format} is default)",
+  "@toolbarExportClusterTooltip": {
+    "description": "Hover tooltip of the toolbar's grouped export button. A plain click exports in the format currently on the button's face, which changes when another format is picked from its menu. {format} = that format's short name (SARIF, JSON, CSV or HTML), not translated.",
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
   },
   "statusBarBusyLintRun": "Running lint engines",
   "@statusBarBusyLintRun": {

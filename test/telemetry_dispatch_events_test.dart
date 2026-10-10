@@ -262,6 +262,13 @@ void main() {
             .toList(),
         <String>['sarif', 'json', 'csv', 'html'],
       );
+      // The macOS save panel has no title, so the button names the format.
+      expect(picker.exportButtons, <String>[
+        'Export SARIF',
+        'Export JSON',
+        'Export CSV',
+        'Export HTML',
+      ]);
     });
 
     testWidgets('a cancelled picker records nothing', (tester) async {
@@ -450,6 +457,9 @@ class _StubPicker extends ProjectPicker {
   /// Which pickers have been asked, in order.
   final List<String> calls = <String>[];
 
+  /// The confirm-button label of each export dialog, in order.
+  final List<String> exportButtons = <String>[];
+
   @override
   Future<String?> pickProjectFile({
     required String confirmButtonText,
@@ -467,6 +477,7 @@ class _StubPicker extends ProjectPicker {
     String? defaultFileName,
   }) {
     calls.add('export');
+    exportButtons.add(confirmButtonText);
     return exportAnswer?.future ?? Future<String?>.value(exportPath);
   }
 

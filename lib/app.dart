@@ -1279,7 +1279,9 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
     String? path;
     try {
       path = await picker.pickSaveExportFile(
-        confirmButtonText: L10N.of(ctx).filePickerExportButton,
+        // The native macOS save panel has no title, so the button names the
+        // format: once the toolbar menu closes, it is the only reminder.
+        confirmButtonText: L10N.of(ctx).filePickerExportFormatButton(label),
         extension: ext,
         label: label,
       );

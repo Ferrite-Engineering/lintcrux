@@ -1456,7 +1456,7 @@
   "@aboutCompanyName": {
     "description": "Company tagline shown on the first line of the About branding banner."
   },
-  "filePickerExportButton": "导出",
+  "filePickerExportFormatButton": "导出 {format}",
   "exportFailed": "导出失败：{error}",
   "snackFeatureRequiresPro": "{feature} 需要 LintCrux Pro。",
   "snackFeatureNotAvailableYet": "{feature} 尚不可用。",
@@ -1560,7 +1560,8 @@
   "accessibilityStatusBarRegion": "状态栏",
   "accessibilityViolationTableKeyboardHint": "使用上下方向键在违规之间移动。按 Enter 在编辑器中打开违规，按 Space 切换其复选框。",
   "toolbarOverflowActions": "操作",
-  "toolbarExportCluster": "导出报告",
+  "toolbarExportCluster": "导出违规…",
+  "toolbarExportClusterTooltip": "导出违规…(默认 {format})",
   "statusBarBusyLintRun": "正在运行 Lint 引擎",
   "statusBarNoProject": "未打开项目",
   "dockTabDetails": "详情",

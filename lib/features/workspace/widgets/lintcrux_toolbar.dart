@@ -135,6 +135,16 @@ class LintcruxToolbar extends ConsumerWidget {
         CruxToolbarSplitItem(
           id: 'export',
           tooltip: l10n.toolbarExportCluster,
+          // Names the cluster and what a plain click exports, which follows
+          // the format last picked from the menu.
+          faceTooltip: (action) => l10n.toolbarExportClusterTooltip(
+            switch (action) {
+              LintcruxAction.exportJson => 'JSON',
+              LintcruxAction.exportCsv => 'CSV',
+              LintcruxAction.exportHtml => 'HTML',
+              _ => 'SARIF',
+            },
+          ),
           variants: [
             CruxToolbarButtonItem(
               action: LintcruxAction.exportSarif,
