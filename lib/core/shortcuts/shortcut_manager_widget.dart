@@ -24,7 +24,33 @@ class _TextAwareShortcutManager extends ShortcutManager {
     if (_isTextInputFocused() && _isBareLetter()) {
       return KeyEventResult.ignored;
     }
+    if (_isBareEscape(event) && _isPopupFocused()) {
+      return KeyEventResult.ignored;
+    }
     return super.handleKeypress(context, event);
+  }
+
+  /// Escape with no modifier at all.
+  static bool _isBareEscape(KeyEvent event) =>
+      event.logicalKey == LogicalKeyboardKey.escape &&
+      !HardwareKeyboard.instance.isControlPressed &&
+      !HardwareKeyboard.instance.isMetaPressed &&
+      !HardwareKeyboard.instance.isAltPressed &&
+      !HardwareKeyboard.instance.isShiftPressed;
+
+  /// True when focus is inside a popup route: a context menu, a dropdown, a
+  /// dialog.
+  ///
+  /// This manager sits above the app's Navigator, so a key reaches it before
+  /// the framework's own Escape-dismisses-the-popup handling, which lives in
+  /// `WidgetsApp`'s default shortcuts further up. Binding a bare Escape here
+  /// (cancel run) therefore used to swallow it: Escape on an open row menu
+  /// cancelled nothing, said so in a snackbar, and left the menu open.
+  /// Inside a popup, Escape belongs to the popup.
+  static bool _isPopupFocused() {
+    final focusContext = FocusManager.instance.primaryFocus?.context;
+    if (focusContext == null || !focusContext.mounted) return false;
+    return ModalRoute.of(focusContext) is PopupRoute;
   }
 
   /// True when the current key event has no primary modifier keys
@@ -63,6 +89,9 @@ class _TextAwareShortcutManager extends ShortcutManager {
 ///
 /// Pass [handlers] for globally-scoped actions (theme toggle, opening
 /// the command palette, etc. — wired at the app root in [LintcruxApp]).
+/// [isEnabled], when given, is asked before a matched binding fires: a
+/// disabled action leaves the key unhandled, so it reaches whatever else
+/// wants it (Escape with no run in progress no longer cancels nothing).
 /// Context-sensitive areas (the violation table, the rule-id search
 /// field) can register their own `Actions` widget lower in the tree —
 /// unhandled intents propagate up to this top-level handler.
@@ -74,6 +103,7 @@ class ShortcutManagerWidget extends ConsumerWidget {
   const ShortcutManagerWidget({
     required this.child,
     this.handlers = const {},
+    this.isEnabled,
     super.key,
   });
 
@@ -82,6 +112,10 @@ class ShortcutManagerWidget extends ConsumerWidget {
 
   /// Callbacks invoked when a matched shortcut fires.
   final Map<LintcruxAction, VoidCallback> handlers;
+
+  /// Whether an action may fire from the keyboard right now. Null means
+  /// always. The menu bar greys out the same disabled actions.
+  final bool Function(LintcruxAction action)? isEnabled;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -101,15 +135,33 @@ class ShortcutManagerWidget extends ConsumerWidget {
       ),
       child: Actions(
         actions: <Type, Action<Intent>>{
-          ShortcutActionIntent: CallbackAction<ShortcutActionIntent>(
-            onInvoke: (intent) {
-              handlers[intent.action]?.call();
-              return null;
-            },
+          ShortcutActionIntent: _ShortcutAction(
+            handlers: handlers,
+            enabled: isEnabled,
           ),
         },
         child: child,
       ),
     );
+  }
+}
+
+/// Fires the handler for a matched binding, unless [enabled] says the
+/// action is disabled; a disabled action reports so, which makes
+/// [ShortcutManager] leave the key event unhandled.
+class _ShortcutAction extends Action<ShortcutActionIntent> {
+  _ShortcutAction({required this.handlers, required this.enabled});
+
+  final Map<LintcruxAction, VoidCallback> handlers;
+  final bool Function(LintcruxAction action)? enabled;
+
+  @override
+  bool isEnabled(ShortcutActionIntent intent) =>
+      enabled?.call(intent.action) ?? true;
+
+  @override
+  Object? invoke(ShortcutActionIntent intent) {
+    handlers[intent.action]?.call();
+    return null;
   }
 }

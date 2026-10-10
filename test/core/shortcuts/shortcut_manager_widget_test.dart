@@ -139,4 +139,82 @@ void main() {
       },
     );
   });
+
+  group('ShortcutManagerWidget — Escape and popups', () {
+    // As the app mounts it: above the Navigator, so popup routes sit below
+    // the manager and a key reaches the manager before the framework's own
+    // Escape-dismisses-the-popup handling.
+    Widget appHarness({
+      required Map<LintcruxAction, VoidCallback> handlers,
+      bool Function(LintcruxAction)? isEnabled,
+    }) => ProviderScope(
+      child: MaterialApp(
+        builder: (context, child) => ShortcutManagerWidget(
+          handlers: handlers,
+          isEnabled: isEnabled,
+          child: child!,
+        ),
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Focus(
+              autofocus: true,
+              child: TextButton(
+                onPressed: () => showMenu<void>(
+                  context: context,
+                  position: const RelativeRect.fromLTRB(10, 10, 10, 10),
+                  items: const [
+                    PopupMenuItem<void>(child: Text('Waive…')),
+                  ],
+                ),
+                child: const Text('open menu'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    testWidgets('Escape on an open menu closes the menu and does not fire '
+        'the bare-Escape action', (tester) async {
+      var cancelled = 0;
+      await tester.pumpWidget(
+        appHarness(handlers: {LintcruxAction.cancelRun: () => cancelled++}),
+      );
+      await tester.tap(find.text('open menu'));
+      await tester.pumpAndSettle();
+      expect(find.text('Waive…'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Waive…'), findsNothing);
+      expect(cancelled, 0);
+    });
+
+    testWidgets('Escape with no popup open still fires the action', (
+      tester,
+    ) async {
+      var cancelled = 0;
+      await tester.pumpWidget(
+        appHarness(handlers: {LintcruxAction.cancelRun: () => cancelled++}),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+      expect(cancelled, 1);
+    });
+
+    testWidgets('a disabled action does not fire from its key', (tester) async {
+      var cancelled = 0;
+      await tester.pumpWidget(
+        appHarness(
+          handlers: {LintcruxAction.cancelRun: () => cancelled++},
+          isEnabled: (action) => action != LintcruxAction.cancelRun,
+        ),
+      );
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump();
+      expect(cancelled, 0);
+    });
+  });
 }

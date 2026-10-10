@@ -32,6 +32,7 @@ import 'package:lintcrux/core/policy/lintcrux_policy_keys.dart';
 import 'package:lintcrux/core/router/app_router.dart';
 import 'package:lintcrux/core/shortcuts/action_label.dart';
 import 'package:lintcrux/core/shortcuts/lintcrux_action.dart';
+import 'package:lintcrux/core/shortcuts/lintcrux_action_descriptors.dart';
 import 'package:lintcrux/core/shortcuts/shortcut_manager_widget.dart';
 import 'package:lintcrux/core/telemetry/lintcrux_telemetry_storage.dart';
 import 'package:lintcrux/core/theme/lintcrux_color_theme_bootstrap.dart';
@@ -68,6 +69,7 @@ import 'package:lintcrux/features/viewer/providers/panel_layout_provider.dart';
 import 'package:lintcrux/features/viewer/providers/right_dock_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_column_layout_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
+import 'package:lintcrux/features/workspace/providers/lintcrux_action_context_provider.dart';
 import 'package:lintcrux/features/workspace/providers/project_workspace_sync.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/crux_project_resolution.dart';
@@ -878,6 +880,13 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
             for (final action in LintcruxAction.values)
               action: () => _dispatchPaletteAction(action),
           },
+          // The same rule the menu bar greys items by. A disabled action
+          // leaves its key alone: Escape with no run in progress used to
+          // cancel nothing and say so in a snackbar.
+          isEnabled: (action) => isActionEnabled(
+            action,
+            ref.read(lintcruxActionContextProvider),
+          ),
           child: _EagerStartupGate(
             child: child ?? const SizedBox.shrink(),
           ),
