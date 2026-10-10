@@ -64,9 +64,12 @@ class AutoReloadController extends Notifier<void> {
 
   void _spawnWatchers(LintProject project, AutoReloadMode mode) {
     final watchFactory = ref.read(autoReloadWatchFactoryProvider);
+    final pollInterval = ref.read(autoReloadPollIntervalProvider);
     for (final src in project.sourceFiles) {
-      final watcher = FileWatcherService(watchFactory: watchFactory)
-        ..startWatching(src);
+      final watcher = FileWatcherService(
+        watchFactory: watchFactory,
+        pollInterval: pollInterval,
+      )..startWatching(src);
       _subs.add(watcher.events.listen(_onChanged(project, mode, src)));
       _watchers.add(watcher);
     }
@@ -113,6 +116,25 @@ class AutoReloadController extends Notifier<void> {
 /// touching the real filesystem.
 final Provider<WatchFactory?> autoReloadWatchFactoryProvider =
     Provider<WatchFactory?>((ref) => null);
+
+/// How often each watched source file's size and modification time are
+/// also checked, as a backstop to the platform watch.
+///
+/// On macOS the directory watch behind [FileWatcherService] can stop
+/// delivering events for the rest of the process, with no error, and a new
+/// watch hears nothing either (crux-shared#25). Watching alone, the
+/// "Source files changed" prompt appeared once and never again, even after
+/// closing and reopening the project. A stat of each source file a second is
+/// cheap next to that. NetCrux uses the same interval.
+const Duration kAutoReloadPollInterval = Duration(seconds: 1);
+
+/// The polling backstop's interval, [kAutoReloadPollInterval]. Tests that
+/// drive a fake [WatchFactory] override it with null so only their scripted
+/// events arrive.
+final Provider<Duration?> autoReloadPollIntervalProvider = Provider<Duration?>(
+  (ref) => kAutoReloadPollInterval,
+  name: 'autoReloadPollIntervalProvider',
+);
 
 /// Provider that drives the "source files changed — re-run?" prompt.
 /// `true` when at least one source file has changed since the last

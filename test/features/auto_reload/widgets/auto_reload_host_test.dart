@@ -58,6 +58,8 @@ void main() {
         ...telemetryDeclinedOverrides(),
         engineRegistryProvider.overrideWithValue(EngineRegistry(const [])),
         autoReloadWatchFactoryProvider.overrideWithValue(watch.call),
+        // Only the scripted events: no polling backstop.
+        autoReloadPollIntervalProvider.overrideWithValue(null),
       ],
     );
     addTearDown(container.dispose);

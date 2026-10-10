@@ -69,6 +69,8 @@ void main() {
           () => _SeedProjectNotifier(project),
         ),
         autoReloadWatchFactoryProvider.overrideWithValue(fakeWatch.call),
+        // Only the scripted events: no polling backstop.
+        autoReloadPollIntervalProvider.overrideWithValue(null),
       ],
     );
     addTearDown(container.dispose);
@@ -240,6 +242,64 @@ void main() {
           (error, _) => asyncError = error,
         );
         expect(asyncError, isNull);
+      },
+    );
+  });
+
+  // The macOS failure: the directory watch goes deaf for the rest of the
+  // process (crux-shared#25), so the prompt appeared once and never again.
+  group('polling backstop', () {
+    test(
+      'a change the platform watch never reports still raises the prompt',
+      () async {
+        final dir = Directory.systemTemp.createTempSync('autoreload_poll');
+        addTearDown(() => dir.deleteSync(recursive: true));
+        final src = File('${dir.path}/alu.sv')..writeAsStringSync('a\n');
+        final deaf = ProviderContainer(
+          overrides: [
+            engineRegistryProvider.overrideWithValue(EngineRegistry(const [])),
+            currentProjectProvider.overrideWith(
+              () => _SeedProjectNotifier(
+                LintProject(
+                  name: 'deaf',
+                  rootPath: dir.path,
+                  sourceFiles: [src.path],
+                ),
+              ),
+            ),
+            // A watch that never delivers an event, as macOS's does once it
+            // has gone deaf.
+            autoReloadWatchFactoryProvider.overrideWithValue(
+              (_) => StreamController<FileSystemEvent>.broadcast().stream,
+            ),
+            autoReloadPollIntervalProvider.overrideWithValue(
+              const Duration(milliseconds: 50),
+            ),
+          ],
+        );
+        addTearDown(deaf.dispose);
+        deaf
+            .read(appSettingsProvider.notifier)
+            .setAutoReloadMode(AutoReloadMode.prompt);
+        deaf.listen(
+          autoReloadControllerProvider,
+          (_, _) {},
+          fireImmediately: true,
+        );
+
+        // Twice, as in a rehearsal followed by the take: the second change
+        // must be heard too.
+        for (var i = 1; i <= 2; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 120));
+          src.setLastModifiedSync(DateTime.now().add(Duration(seconds: i)));
+          await _pollUntil(() => deaf.read(pendingReloadProvider));
+          expect(
+            deaf.read(pendingReloadProvider),
+            isTrue,
+            reason: 'change $i must raise the prompt',
+          );
+          deaf.read(pendingReloadProvider.notifier).markPending(pending: false);
+        }
       },
     );
   });
