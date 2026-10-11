@@ -14,7 +14,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
-import 'package:lintcrux/features/remote/providers/cross_probe_originate_gate_provider.dart';
 import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
 import 'package:lintcrux/features/remote/widgets/cross_probe_panel.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
@@ -217,8 +216,6 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           overrides: [
-            // Sending is Pro since the beta ended; these are about the send itself.
-            licenseTierProvider.overrideWithValue(LicenseTier.pro),
             cxpServerLifecycleProvider.overrideWith(() => lifecycle),
             cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
             selectedViolationProvider.overrideWith(
@@ -252,8 +249,6 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           overrides: [
-            // Sending is Pro since the beta ended; these are about the send itself.
-            licenseTierProvider.overrideWithValue(LicenseTier.pro),
             cxpServerLifecycleProvider.overrideWith(() => lifecycle),
             cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
             selectedViolationProvider.overrideWith(
@@ -292,8 +287,6 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           overrides: [
-            // Sending is Pro since the beta ended; these are about the send itself.
-            licenseTierProvider.overrideWithValue(LicenseTier.pro),
             cxpServerLifecycleProvider.overrideWith(() => lifecycle),
             cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
             selectedViolationProvider.overrideWith(
@@ -340,8 +333,6 @@ void main() {
         _wrap(
           overrides: [
             telemetryServiceProvider.overrideWithValue(telemetry),
-            // Sending is Pro since the beta ended; these are about the send itself.
-            licenseTierProvider.overrideWithValue(LicenseTier.pro),
             cxpServerLifecycleProvider.overrideWith(() => lifecycle),
             cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
             selectedViolationProvider.overrideWith(
@@ -540,18 +531,15 @@ void main() {
     }
   });
 
-  group('the per-peer send button is a route to a Pro capability', () {
-    // Origination is sold as Pro. The Pro overlay gates its own route (the
-    // violation row's context-menu entry); this panel ships in open core and
-    // its send button reaches the same capability, so it has to gate too.
-    // Every test here pins the selection so that, absent a gate, the send
-    // WOULD go through — which is what made the button a bypass.
-    List<Override> gated({
-      required bool beta,
+  group('sending is free in every tier', () {
+    // Cross-probing is free in both directions: an unlicensed seat after the
+    // beta sends exactly as a Pro seat does. Every test pins the selection,
+    // so a send that does not go through can only be a gate.
+    List<Override> seat({
       required LicenseTier tier,
       required _FakeLifecycle lifecycle,
     }) => [
-      betaPeriodProvider.overrideWithValue(beta),
+      betaPeriodProvider.overrideWithValue(false),
       licenseTierProvider.overrideWithValue(tier),
       cxpServerLifecycleProvider.overrideWith(() => lifecycle),
       cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
@@ -560,121 +548,27 @@ void main() {
       ),
     ];
 
-    testWidgets('post-beta at Open Core: nothing is sent, and the user is '
-        'told why', (tester) async {
-      final lifecycle = _FakeLifecycle(_running());
-      await tester.pumpWidget(
-        _wrap(
-          overrides: gated(
-            beta: false,
-            tier: LicenseTier.openCore,
-            lifecycle: lifecycle,
+    for (final tier in LicenseTier.values) {
+      testWidgets('post-beta at ${tier.name}: the send goes through with no '
+          'upgrade prompt', (tester) async {
+        final lifecycle = _FakeLifecycle(_running());
+        await tester.pumpWidget(
+          _wrap(
+            overrides: seat(tier: tier, lifecycle: lifecycle),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
+        await tester.pumpAndSettle();
 
-      expect(
-        lifecycle.sent,
-        isEmpty,
-        reason:
-            'the panel is open core and the send button reaches a Pro '
-            'capability; without a gate here the overlay menu gate is a '
-            'paywall with a second door',
-      );
-      expect(
-        find.textContaining('requires LintCrux Pro'),
-        findsOneWidget,
-        reason: 'a denied press is never silent',
-      );
-    });
-
-    testWidgets('post-beta at Pro: the send goes through', (tester) async {
-      final lifecycle = _FakeLifecycle(_running());
-      await tester.pumpWidget(
-        _wrap(
-          overrides: gated(
-            beta: false,
-            tier: LicenseTier.pro,
-            lifecycle: lifecycle,
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-      await tester.pumpAndSettle();
-
-      expect(lifecycle.sent, hasLength(1));
-      expect(find.textContaining('requires LintCrux Pro'), findsNothing);
-    });
-
-    testWidgets('EDU is feature-equivalent to Pro', (tester) async {
-      final lifecycle = _FakeLifecycle(_running());
-      await tester.pumpWidget(
-        _wrap(
-          overrides: gated(
-            beta: false,
-            tier: LicenseTier.edu,
-            lifecycle: lifecycle,
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-      await tester.pumpAndSettle();
-      expect(lifecycle.sent, hasLength(1));
-    });
-
-    testWidgets('during the beta every tier sends', (tester) async {
-      final lifecycle = _FakeLifecycle(_running());
-      await tester.pumpWidget(
-        _wrap(
-          overrides: gated(
-            beta: true,
-            tier: LicenseTier.openCore,
-            lifecycle: lifecycle,
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-      await tester.pumpAndSettle();
-      expect(lifecycle.sent, hasLength(1));
-      expect(find.textContaining('requires LintCrux Pro'), findsNothing);
-    });
-
-    testWidgets('the panel asks the gate seam, so the Pro overlay can bind '
-        'its own dialog', (tester) async {
-      // The overlay overrides `crossProbeOriginateGateProvider` with its
-      // activation choke point. That only guards anything if the panel
-      // consults the seam rather than the tier directly.
-      final lifecycle = _FakeLifecycle(_running());
-      var asked = 0;
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            // A tier the default gate would ADMIT, so a send that still gets
-            // through can only mean the seam was bypassed.
-            ...gated(beta: true, tier: LicenseTier.pro, lifecycle: lifecycle),
-            crossProbeOriginateGateProvider.overrideWith(
-              (ref) => (_) {
-                asked++;
-                return false;
-              },
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-      await tester.pumpAndSettle();
-      expect(asked, 1);
-      expect(lifecycle.sent, isEmpty);
-    });
+        expect(lifecycle.sent, hasLength(1));
+        expect(lifecycle.sent.single.$1, 'wavecrux-1');
+        expect(find.textContaining('requires LintCrux Pro'), findsNothing);
+        expect(find.byType(SnackBar), findsNothing);
+        expect(find.byType(AlertDialog), findsNothing);
+      });
+    }
   });
 
   group('the send-failure toast is in the user language', () {
@@ -689,8 +583,6 @@ void main() {
         _wrap(
           locale: locale,
           overrides: [
-            // Sending is Pro since the beta ended; these are about the send itself.
-            licenseTierProvider.overrideWithValue(LicenseTier.pro),
             cxpServerLifecycleProvider.overrideWith(() => lifecycle),
             cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
             selectedViolationProvider.overrideWith(
@@ -743,39 +635,6 @@ void main() {
           findsOneWidget,
           reason: 'the frame is translated; the reason is the peer words',
         );
-      });
-    }
-  });
-
-  group('LintCruxCrossProbePanel (locales)', () {
-    for (final locale in const [
-      Locale('en'),
-      Locale('zh', 'CN'),
-      Locale('zh'),
-      Locale('ja'),
-      Locale('ko'),
-    ]) {
-      testWidgets('denial snack renders without exception in $locale', (
-        tester,
-      ) async {
-        await tester.pumpWidget(
-          _wrap(
-            overrides: [
-              betaPeriodProvider.overrideWithValue(false),
-              licenseTierProvider.overrideWithValue(LicenseTier.openCore),
-              cxpServerLifecycleProvider.overrideWith(
-                () => _FakeLifecycle(_running()),
-              ),
-              cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
-            ],
-            locale: locale,
-          ),
-        );
-        await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-        await tester.pumpAndSettle();
-        expect(find.byType(SnackBar), findsOneWidget);
-        expect(tester.takeException(), isNull);
       });
     }
   });

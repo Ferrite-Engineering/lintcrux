@@ -79,7 +79,7 @@ Every line in both reports is measured: a value LintCrux did not measure, such a
 
 ## Cross-Probe panel {#crossprobe}
 
-The Cross-Probe panel (++cmd+shift+x++ / ++ctrl+shift+x++, `View → Cross-probe Peers`) lists connected peers (WaveCrux, NetCrux, SimCrux), shows the cross-probe event log, and reports the CXP server status. Receiving cross-probes is Open Core; originating them is <span class="tier tier-pro">Pro</span>. See [Cross-probe & the suite](integrations.md).
+The Cross-Probe panel (++cmd+shift+x++ / ++ctrl+shift+x++, `View → Cross-probe Peers`) lists connected peers (WaveCrux, NetCrux, SimCrux), shows the cross-probe event log, and reports the CXP server status. Each peer row has a send button that sends the selected violation to that peer. Sending and receiving cross-probes are both free in every tier from 1.1. See [Cross-probe & the suite](integrations.md).
 
 ## About box {#about}
 

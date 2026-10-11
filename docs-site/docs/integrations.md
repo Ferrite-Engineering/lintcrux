@@ -10,10 +10,10 @@ Cross-probe (CXP) is the suite's lightweight protocol for "show me this location
 - **Request attention on cross-probe** bounces the dock icon (or flashes the taskbar) when a peer sends a cross-probe. It never steals focus.
 - **Broadcast selection automatically** (on by default) announces every violation you select to connected peers, so a waveform or schematic viewer can follow along. Turn it off to keep selections to yourself; explicit sends still work.
 
-Two directions exist:
+Two directions exist, and from 1.1 both are free in every tier, with no license key:
 
 - **Receive** — a connected peer can ask LintCrux to highlight a rule or a source location, which filters the table and selects the matching violation; to open a source location in your editor; or to open a design's LintCrux project that the suite's shared workspace knows about. Every request is acknowledged, including the ones LintCrux cannot act on, so the sending tool can tell you why.
-- **Originate** <span class="tier tier-pro">Pro</span> — right-click a violation and choose **Cross-probe to peer…**, pick a connected peer, and LintCrux sends it the violation's location. The send is acknowledged: LintCrux tells you whether the peer acted on it (*Sent to …*), declined it with the peer's reason, or did not respond.
+- **Send** — press a peer's send button in the [Cross-Probe panel](#panel), or right-click a violation and choose **Cross-probe to peer…** and pick a connected peer, and LintCrux sends it the selected violation's location. The send is acknowledged: LintCrux tells you whether the peer acted on it (*Sent to …*), declined it with the peer's reason, or did not respond.
 
 ![Two EDACrux apps running side by side with their Cross-Probe panels open: NetCrux showing the VexRiscv schematic with its peer list (simcrux, wavecrux, lintcrux), and WaveCrux showing waveform lanes with the same connected peers plus a live 'Selection received' cross-probe event from LintCrux.](img/CrossProbe.png)
 

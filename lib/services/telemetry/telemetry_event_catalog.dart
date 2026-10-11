@@ -525,12 +525,6 @@ enum LintcruxGatedFeature {
   /// Multi-project workspace bookkeeping: pin, close all
   /// (`_pinActiveProject`, `_closeAllProjects`).
   projectRegistry,
-
-  /// Originating a cross-probe to a peer, by either route: the violation
-  /// row's "Cross-probe to peer…" entry (`buildCrossProbeMenuEntry`) and the
-  /// cross-probe panel's per-peer send button
-  /// (`crossProbeOriginateGateProvider`).
-  crossProbe,
 }
 
 /// The closed `feature` vocabulary of `tier.gate_hit`, spelled out because
@@ -554,7 +548,6 @@ const List<String> kLintcruxGatedFeatureTokens = <String>[
   'project_switcher',
   'cross_project_search',
   'project_registry',
-  'cross_probe',
 ];
 
 /// How wide a managed waiver was scoped when it was created.

@@ -79,7 +79,7 @@ The violations table is the gesture surface in LintCrux. These are the gestures 
 
 Every row gesture has a keyboard equivalent once a row has focus — ++arrow-up++ / ++arrow-down++ select, ++enter++ opens in the editor, ++space++ ticks the checkbox, ++shift+f10++ opens the context menu; see [the violations table's keyboard section](violations.md#keyboard).
 
-Right-clicking selects the row first, so the context menu always acts on the row under the pointer. The menu's entries come from the Pro features — **Waive…**, **Cross-probe to peer…** and **Suggest fix with Verible**, each badged <span class="tier tier-pro">Pro</span> — so an Open Core build has no row context menu.
+Right-clicking selects the row first, so the context menu always acts on the row under the pointer. The menu's entries come from the Pro overlay: **Waive…** and **Suggest fix with Verible**, each badged <span class="tier tier-pro">Pro</span>, and **Cross-probe to peer…**, which is free in every tier from 1.1. An Open Core build has no row context menu.
 
 !!! note "No other pointer gestures"
     LintCrux binds no scroll-wheel, middle-click or drag gestures on the table. Editor integration is configured under `Settings → Editors`; see [Cross-probe & the suite](integrations.md#editors).

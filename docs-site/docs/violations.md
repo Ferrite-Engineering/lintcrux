@@ -35,10 +35,10 @@ With Pro, **Search Across Projects…** (++cmd+shift+f++ / ++ctrl+shift+f++) sea
 
 Click a row to select it: the **Details** pane shows the violation and the **Source** pane previews its code. Double-click a row to open its location in your editor. Tick the leading checkbox to add rows to a multi-row selection.
 
-Right-click a row for its context menu. The entries are Pro features, so an Open Core build shows no menu:
+Right-click a row for its context menu. The entries come from the Pro overlay, so an Open Core build shows no menu:
 
 - **Waive…** <span class="tier tier-pro">Pro</span> — open the [Waive dialog](waivers.md#waive-dialog) for that violation.
-- **Cross-probe to peer…** <span class="tier tier-pro">Pro</span> — pick a connected suite peer and send it the violation's location — see [Cross-probe](integrations.md#cxp).
+- **Cross-probe to peer…** — free in every tier from 1.1. Pick a connected suite peer and send it the violation's location — see [Cross-probe](integrations.md#cxp).
 - **Suggest fix with Verible** <span class="tier tier-pro">Pro</span> — run a Verible dry-run scoped to the violation's file and rule and review the proposed fix — see [Verible auto-fix](exports-and-ci.md#autofix).
 
 ## Inspector & Source Preview {#inspector}

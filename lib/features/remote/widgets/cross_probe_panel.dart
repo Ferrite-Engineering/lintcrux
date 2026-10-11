@@ -9,7 +9,6 @@ import 'package:crux_telemetry/crux_telemetry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lintcrux/features/remote/providers/cross_probe_originate_gate_provider.dart';
 import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
 import 'package:lintcrux/features/viewer/providers/panel_layout_provider.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
@@ -178,13 +177,9 @@ class LintCruxCrossProbePanelController
   /// no-op). The Pro selection emitter still broadcasts fire-and-forget
   /// `notify_selection`.
   ///
-  /// Origination is a Pro capability, and this button is a route to it that
-  /// ships in open core — so the tier is checked HERE, first, before the
-  /// selection is even resolved. A denied press has already been explained by
-  /// the gate; an unselected row after an admitted press is the existing
-  /// quiet no-op, which is a different situation from a refusal.
+  /// Sending is free in every tier, like receiving: there is no licence
+  /// check on this path. A press with no selected violation is a quiet no-op.
   Future<void> _sendTo(PeerIdentity peer) async {
-    if (!_ref.read(crossProbeOriginateGateProvider)(_ref.context)) return;
     // The selection + project are per-tab; resolve the ACTIVE tab's container
     // (the panel is app-level, so its own `ref` is root). Fall back to root
     // when no tab is active (an unlikely case that simply has no selection).
