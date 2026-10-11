@@ -883,10 +883,17 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
           // The same rule the menu bar greys items by. A disabled action
           // leaves its key alone: Escape with no run in progress used to
           // cancel nothing and say so in a snackbar.
-          isEnabled: (action) => isActionEnabled(
-            action,
-            ref.read(lintcruxActionContextProvider),
-          ),
+          //
+          // Not on the web: the context describes the desktop workspace,
+          // and the browser viewer has none, so every tab-gated action
+          // (Find in Violations among them) would read as disabled. The
+          // web dispatch below decides what a key does there.
+          isEnabled: isWebMode
+              ? null
+              : (action) => isActionEnabled(
+                  action,
+                  ref.read(lintcruxActionContextProvider),
+                ),
           child: _EagerStartupGate(
             child: child ?? const SizedBox.shrink(),
           ),

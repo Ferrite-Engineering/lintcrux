@@ -20,11 +20,16 @@ import 'package:lintcrux/services/persistence/violation_column_layout_codec.dart
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../support/telemetry_test_store.dart';
 
 const _file = '/work/soc/rtl/alu.sv';
+
+/// What the File column shows for [_file]: the host's separator, as a user
+/// on that host would see it.
+final String _relative = p.join('rtl', 'alu.sv');
 
 Violation _v(String rule) => Violation(
   engineId: 'verilator',
@@ -90,13 +95,13 @@ void main() {
     tester
         .getTopLeft(find.byKey(const ValueKey('violationTableHeader-file')))
         .dx,
-    tester.getTopLeft(find.text('rtl/alu.sv')).dx,
+    tester.getTopLeft(find.text(_relative)).dx,
   );
 
   testWidgets('the File column shows the path inside the project, the '
       'tooltip the full path', (tester) async {
     await pumpTable(tester);
-    expect(find.text('rtl/alu.sv'), findsOneWidget);
+    expect(find.text(_relative), findsOneWidget);
     expect(find.text(_file), findsNothing);
     expect(find.byTooltip(_file), findsOneWidget);
   });
@@ -170,7 +175,7 @@ void main() {
         find.byKey(const ValueKey('violationTableResize-rule')),
         findsOneWidget,
       );
-      expect(find.text('rtl/alu.sv'), findsOneWidget);
+      expect(find.text(_relative), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }
