@@ -12,6 +12,8 @@ Rule ids are namespaced by engine (`verilator/UNUSEDSIGNAL`, `verible/no-tabs`),
 
 Click any column header to sort by it; click again to reverse. The column a tab starts sorted by is set with `Settings → General → Default sort column` (Severity, Engine, Rule or File).
 
+From 1.1, drag the divider at the right edge of a column header to widen that column at the expense of the next; double-click a divider to restore the default widths. The widths are remembered across tabs and launches. Hover a cell to see its full text when the column is too narrow to show it; the File column shows the path relative to the project, with the full path on hover.
+
 ## Filtering {#filter}
 
 The strip above the table combines several independent filters:

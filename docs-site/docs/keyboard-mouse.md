@@ -76,6 +76,7 @@ The violations table is the gesture surface in LintCrux. These are the gestures 
 | Right-click | Open the violation context menu at the pointer. |
 | Click the row's leading checkbox | Add the row to, or remove it from, the multi-row selection. |
 | Click a column header | Sort by that column; click again to reverse. |
+| Drag a column header's right-edge divider | Resize that column against the next (from 1.1). Double-click the divider to restore the default widths. |
 
 Every row gesture has a keyboard equivalent once a row has focus — ++arrow-up++ / ++arrow-down++ select, ++enter++ opens in the editor, ++space++ ticks the checkbox, ++shift+f10++ opens the context menu; see [the violations table's keyboard section](violations.md#keyboard).
 
