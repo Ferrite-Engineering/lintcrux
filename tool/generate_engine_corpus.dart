@@ -354,43 +354,90 @@ const List<_Case> _cases = <_Case>[
     ],
   ),
 
-  // ── Svlint (JSON) ────────────────────────────────────────────────────
+  // ── Svlint (default rustc-style block report) ────────────────────────
+  //
+  // Svlint has no JSON mode. These cases used to assert a
+  // `--output-format=json` one-object-per-line shape that no svlint release
+  // emits (the flag makes svlint exit 2 without linting), so the engine
+  // reported every run clean. The block below is what `svlint` prints by
+  // default and is the only output that carries the rule name;
+  // `captured/svlint_0_9_5_default/` holds the unedited real transcript.
   _Case(
     engineId: 'svlint',
     name: 'basic',
-    cmdline: 'svlint --output-format=json top.sv',
+    cmdline: 'svlint top.sv',
     output: <String>[
-      '{"path":"top.sv","line":15,"column":5,'
-          '"rule":"non_blocking_assignment_in_always_comb",'
-          '"message":"non-blocking in always_comb"}',
+      'Fail: non_blocking_assignment_in_always_comb',
+      '   --> top.sv:15:5',
+      '   |',
+      '15 |     d <= ~q;',
+      '   |     ^^^^^^^ hint  : Remove non-blocking assignment in '
+          '`always_comb`.',
+      '   |             reason: Scheduling between blocking and non-blocking '
+          'assignments is non-deterministic.',
+      '',
     ],
   ),
   _Case(
     engineId: 'svlint',
     name: 'path_with_spaces',
-    cmdline: 'svlint --output-format=json "a dir/x.sv"',
+    cmdline: 'svlint "a dir/x.sv"',
     output: <String>[
-      '{"path":"a dir/x.sv","line":3,"column":1,'
-          '"rule":"tab_character","message":"tab found"}',
+      'Fail: tab_character',
+      '   --> a dir/x.sv:3:1',
+      '  |',
+      '3 | \tlogic q;',
+      '  | ^ hint  : Replace tab with spaces.',
+      '  |   reason: Tabs may cause misalignment.',
+      '',
     ],
   ),
   _Case(
     engineId: 'svlint',
     name: 'unicode_filename',
-    cmdline: 'svlint --output-format=json 回路.sv',
+    cmdline: 'svlint 回路.sv',
     output: <String>[
-      '{"path":"回路.sv","line":2,"column":1,'
-          '"rule":"keyword_forbidden_wire_reg","message":"禁止"}',
+      'Fail: keyword_forbidden_wire_reg',
+      '   --> 回路.sv:2:1',
+      '  |',
+      '2 | wire クロック;',
+      '  | ^^^^ hint  : 禁止',
+      '  |      reason: Only SystemVerilog, not Verilog, has `logic`.',
+      '',
     ],
   ),
   _Case(
     engineId: 'svlint',
     name: 'unrecognized_line',
-    cmdline: 'svlint --output-format=json top.sv',
+    cmdline: 'svlint top.sv',
     output: <String>[
-      '{"path":"top.sv","line":8,"column":1,'
-          '"rule":"no_generate_keyword","message":"avoid generate"}',
-      'svlint 0.9 banner -- not a diagnostic',
+      // No `.svlint.toml` in reach: svlint says so once, then lints with
+      // every rule on. The notice carries no finding and must surface as a
+      // notification rather than be dropped.
+      "Warning: Config file '.svlint.toml' is not found. Enable all rules",
+      'Fail: keyword_forbidden_generate',
+      '   --> top.sv:8:1',
+      '  |',
+      '8 | generate',
+      '  | ^^^^^^^^ hint  : Remove `generate`/`endgenerate` keywords.',
+      '  |          reason: Keywords `generate`/`endgenerate` do not change '
+          'semantics of generate blocks.',
+      '',
+    ],
+  ),
+  _Case(
+    engineId: 'svlint',
+    name: 'parse_error',
+    cmdline: 'svlint broken.sv',
+    output: <String>[
+      // A file svlint cannot parse was not linted. The error points at a
+      // position, so it is an error-level finding on that file rather than
+      // a silent clean result.
+      'Error: parse error',
+      '   --> broken.sv:5:10',
+      '  |',
+      '5 |     q <= ;',
+      '  |          ^',
     ],
   ),
 

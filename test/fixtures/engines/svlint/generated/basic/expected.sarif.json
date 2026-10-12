@@ -20,12 +20,11 @@
       },
       "results": [
         {
-          "rule": "non_blocking_assignment_in_always_comb",
-          "message": {
-            "text": "non-blocking in always_comb"
-          },
           "ruleId": "non_blocking_assignment_in_always_comb",
           "level": "warning",
+          "message": {
+            "text": "Remove non-blocking assignment in `always_comb`."
+          },
           "locations": [
             {
               "physicalLocation": {
@@ -40,9 +39,10 @@
             }
           ],
           "properties": {
-            "path": "top.sv",
-            "line": 15,
-            "column": 5
+            "svlint.reason": "Scheduling between blocking and non-blocking assignments is non-deterministic.",
+            "svlint.context": [
+              "     d <= ~q;"
+            ]
           }
         }
       ]

@@ -16,15 +16,23 @@ import 'package:lintcrux/services/engines/svlint/svlint_parser.dart';
 ///
 /// Svlint is the lightweight SystemVerilog linter from the dalance/svlint
 /// project — focused on the synthesizable subset, configured via a
-/// project-root `.svlint.toml` file. The engine prefers
-/// `--output-format=json`; older builds without JSON support fall back
-/// to the text parser via the `textModeFallback` option.
+/// project-root `.svlint.toml` file. It has no structured output mode, so
+/// the engine runs it with its default report and parses the rustc-style
+/// block svlint prints per finding (see [SvlintParser]). No output flag is
+/// passed: `--oneline` and `--github-actions` both drop the rule name, and
+/// an option svlint does not know makes it exit 2 without linting anything.
 ///
 /// `.svlint.toml` detection: when the project root
 /// ([LintRunRequest.projectRoot]) contains a `.svlint.toml`, the engine
 /// adds `--config <path>` so svlint applies the project's rule selection
 /// even to sources that live outside the root. Overridden when the caller
 /// sets `configPath` in [LintRunRequest.options].
+///
+/// Svlint exits 0 on a clean run, 1 when a rule failed, and 2 when the
+/// invocation itself failed (an unknown option, a source it could not
+/// open). A non-zero exit that produced no parsed finding is therefore a
+/// run that linted nothing, and the engine reports it as an
+/// [EngineRunFailedException] rather than as a clean result.
 ///
 /// Binary resolution follows the standard
 /// custom → bundled → PATH chain. Missing-binary cases surface as
@@ -50,6 +58,9 @@ class SvlintEngine implements LintEngine {
   /// is [EngineBinarySource.bundled].
   final BundledBinaryResolver bundledBinaryResolver;
 
+  /// How many non-blank output lines an [EngineRunFailedException] quotes.
+  static const int _kOutputExcerptLines = 10;
+
   LintProcess? _process;
 
   @override
@@ -64,7 +75,6 @@ class SvlintEngine implements LintEngine {
       HdlLanguage.systemVerilog,
       HdlLanguage.verilog,
     },
-    emitsStructuredOutput: true,
     supportsConfigFile: true,
     // Svlint is per-file and could in principle support
     // incremental re-runs (it has no project-wide analysis), but
@@ -108,8 +118,7 @@ class SvlintEngine implements LintEngine {
   @override
   Stream<Violation> run(LintRunRequest request) async* {
     final exe = _resolveExecutable(request.binary);
-    final textMode = request.options['textModeFallback'] == true;
-    final args = _buildArgs(request, textMode: textMode);
+    final args = _buildArgs(request);
     final root = projectRoot.isNotEmpty
         ? projectRoot
         : (request.sourceFiles.isNotEmpty
@@ -130,11 +139,10 @@ class SvlintEngine implements LintEngine {
     }
     _process = proc;
 
-    // Svlint emits violations on stdout; errors and diagnostics go to
-    // stderr. Drain both so the pipe doesn't stall, and read both to
-    // end-of-file, not to the exit: this engine does not consult the exit
-    // code, so findings that land after it would otherwise parse as a
-    // clean run.
+    // Svlint prints its report on stdout and its own errors on stderr.
+    // Drain both so the pipe doesn't stall, and read both to end-of-file,
+    // not to the exit: findings that land after it would otherwise parse as
+    // a clean run.
     final CapturedProcessOutput output;
     try {
       output = await collectProcessOutput(
@@ -146,9 +154,36 @@ class SvlintEngine implements LintEngine {
       _process = null;
     }
     final lines = <String>[...output.stdout, ...output.stderr];
-    final violations = textMode
-        ? parser.parseText(lines)
-        : parser.parseJsonLines(lines);
+    final violations = parser.parse(lines);
+
+    // False-clean guard, the same contract as the Verilator and Verible
+    // engines. Exit 1 always comes with at least one `Fail:` block, so a
+    // non-zero exit with nothing parsed means svlint rejected the
+    // invocation or a source file and linted nothing. Reporting that as
+    // "Completed, 0 violations" is the defect this guard exists to stop.
+    if (output.exitCode != 0 && violations.isEmpty) {
+      final nonBlank = lines
+          .where((l) => l.trim().isNotEmpty)
+          .toList(growable: false);
+      // svlint's own errors start `Error:`; its argument parser's start
+      // `error:`.
+      final error = nonBlank.firstWhere(
+        (l) => l.trimLeft().toLowerCase().startsWith('error'),
+        orElse: () => '',
+      );
+      throw EngineRunFailedException(
+        engineId: id,
+        exitCode: output.exitCode,
+        reason: error.isNotEmpty
+            ? error.trim()
+            : nonBlank.isEmpty
+            ? 'exited ${output.exitCode} with no output'
+            : 'exited ${output.exitCode} without reporting a finding',
+        outputExcerpt: nonBlank.take(_kOutputExcerptLines).toList(),
+        resolvedPath: exe,
+      );
+    }
+
     for (final v in violations) {
       yield v;
     }
@@ -189,17 +224,8 @@ class SvlintEngine implements LintEngine {
     }
   }
 
-  List<String> _buildArgs(
-    LintRunRequest request, {
-    required bool textMode,
-  }) {
+  List<String> _buildArgs(LintRunRequest request) {
     final args = <String>[];
-    if (!textMode) {
-      // Svlint emits one JSON object per finding in JSON mode.
-      args
-        ..add('--output-format')
-        ..add('json');
-    }
     final explicitConfig = request.options['configPath'];
     final configPath = explicitConfig is String && explicitConfig.isNotEmpty
         ? explicitConfig

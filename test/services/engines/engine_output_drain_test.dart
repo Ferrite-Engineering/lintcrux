@@ -140,7 +140,7 @@ void main() {
       final violations = await _run(
         SvlintEngine(
           runner: _LateOutputRunner([
-            const _Script(stdoutAfterExit: [_svlintJson], exitCode: 1),
+            const _Script(stdoutAfterExit: _svlintBlock, exitCode: 1),
           ]),
           projectRoot: '/work',
         ),
@@ -237,9 +237,14 @@ const _slangJson =
     '"message":"Implicit conversion", '
     '"location":{"file":"top.sv","line":42,"column":13}}';
 
-const _svlintJson =
-    '{"path":"top.sv","line":4,"column":2, '
-    '"rule":"non_blocking_assignment_in_always_comb","message":"m"}';
+// svlint's default report: one block per finding, the rule on the header.
+const List<String> _svlintBlock = <String>[
+  'Fail: non_blocking_assignment_in_always_comb',
+  '   --> top.sv:4:2',
+  '  |',
+  '4 |  d <= ~q;',
+  '  |  ^^^^^^^ hint  : Remove non-blocking assignment in `always_comb`.',
+];
 
 Future<List<Violation>> _run(
   LintEngine engine,

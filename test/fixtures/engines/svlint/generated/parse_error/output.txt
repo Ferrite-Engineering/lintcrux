@@ -1,0 +1,5 @@
+Error: parse error
+   --> broken.sv:5:10
+  |
+5 |     q <= ;
+  |          ^

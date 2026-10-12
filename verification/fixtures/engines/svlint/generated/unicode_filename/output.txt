@@ -1,1 +1,7 @@
-{"path":"回路.sv","line":2,"column":1,"rule":"keyword_forbidden_wire_reg","message":"禁止"}
+Fail: keyword_forbidden_wire_reg
+   --> 回路.sv:2:1
+  |
+2 | wire クロック;
+  | ^^^^ hint  : 禁止
+  |      reason: Only SystemVerilog, not Verilog, has `logic`.
+

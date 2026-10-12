@@ -1,1 +1,1 @@
-svlint --output-format=json top.sv
+svlint top.sv

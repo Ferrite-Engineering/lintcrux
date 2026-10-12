@@ -17,7 +17,7 @@
             {
               "level": "note",
               "message": {
-                "text": "svlint 0.9 banner -- not a diagnostic"
+                "text": "Warning: Config file '.svlint.toml' is not found. Enable all rules"
               }
             }
           ]
@@ -28,12 +28,11 @@
       },
       "results": [
         {
-          "rule": "no_generate_keyword",
-          "message": {
-            "text": "avoid generate"
-          },
-          "ruleId": "no_generate_keyword",
+          "ruleId": "keyword_forbidden_generate",
           "level": "warning",
+          "message": {
+            "text": "Remove `generate`/`endgenerate` keywords."
+          },
           "locations": [
             {
               "physicalLocation": {
@@ -48,9 +47,10 @@
             }
           ],
           "properties": {
-            "path": "top.sv",
-            "line": 8,
-            "column": 1
+            "svlint.reason": "Keywords `generate`/`endgenerate` do not change semantics of generate blocks.",
+            "svlint.context": [
+              " generate"
+            ]
           }
         }
       ]

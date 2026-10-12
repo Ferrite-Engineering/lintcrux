@@ -20,12 +20,11 @@
       },
       "results": [
         {
-          "rule": "keyword_forbidden_wire_reg",
+          "ruleId": "keyword_forbidden_wire_reg",
+          "level": "warning",
           "message": {
             "text": "禁止"
           },
-          "ruleId": "keyword_forbidden_wire_reg",
-          "level": "warning",
           "locations": [
             {
               "physicalLocation": {
@@ -40,9 +39,10 @@
             }
           ],
           "properties": {
-            "path": "回路.sv",
-            "line": 2,
-            "column": 1
+            "svlint.reason": "Only SystemVerilog, not Verilog, has `logic`.",
+            "svlint.context": [
+              " wire クロック;"
+            ]
           }
         }
       ]

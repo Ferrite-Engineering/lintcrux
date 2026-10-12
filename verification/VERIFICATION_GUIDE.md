@@ -218,7 +218,7 @@ Completes the engine roster (GHDL + Svlint), mixed-language routing, `.f` fileli
 
 ### 6.1 What it does (plain language)
 
-`GhdlEngine` (`ghdl -a` + `--warn-*`) and `SvlintEngine` (`.svlint.toml` + JSON) join the registry (default-disabled). `EngineLanguageRouter` routes each engine only at the source files whose language it accepts (Verilator never sees `.vhd`; GHDL never sees `.sv`) and surfaces the routing outcome in the run-status panel. `FilelistReader` imports Vivado-style `.f` filelists (`+incdir+`, `+define+`, recursive `-f`, env-var expansion). Custom per-engine binary paths persist in Settings + accept CLI overrides. `runIncremental` re-lints only changed files for engines that support it (Verilator/Slang/Verible), patching the store via `replacePartialFromEngine`. `StreamingSarifReader` ingests very large SARIF documents in bounded memory. The Flutter Web build serves a read-only SARIF viewer (`?sarif=<url>` or file upload) that reuses the desktop dashboard layout — no engine subprocesses, no disk persistence.
+`GhdlEngine` (`ghdl -a` + `--warn-*`) and `SvlintEngine` (`.svlint.toml` + the default block report, svlint's only output that names the rule) join the registry (default-disabled). `EngineLanguageRouter` routes each engine only at the source files whose language it accepts (Verilator never sees `.vhd`; GHDL never sees `.sv`) and surfaces the routing outcome in the run-status panel. `FilelistReader` imports Vivado-style `.f` filelists (`+incdir+`, `+define+`, recursive `-f`, env-var expansion). Custom per-engine binary paths persist in Settings + accept CLI overrides. `runIncremental` re-lints only changed files for engines that support it (Verilator/Slang/Verible), patching the store via `replacePartialFromEngine`. `StreamingSarifReader` ingests very large SARIF documents in bounded memory. The Flutter Web build serves a read-only SARIF viewer (`?sarif=<url>` or file upload) that reuses the desktop dashboard layout — no engine subprocesses, no disk persistence.
 
 ### 6.2 Setup
 
@@ -246,7 +246,7 @@ Open Core — no gating. The web viewer is the free viewing surface; it has no P
 | Test | Coverage | File |
 |---|---|---|
 | GHDL engine + parser (`--warn-*`, caret continuation, `-W` rule-id strip) | `[Coverage: UNIT/GOLDEN]` | `test/services/engines/ghdl/**` + `engines/ghdl/generated/**` |
-| Svlint engine + `.svlint.toml` discovery (project root, from the run request) + JSON/text parse | `[Coverage: UNIT/GOLDEN]` | `test/services/engines/svlint/**` + `engines/svlint/generated/**` |
+| Svlint engine + `.svlint.toml` discovery (project root, from the run request) + block-report parse + non-zero exit with no finding reported as an engine failure | `[Coverage: UNIT/GOLDEN/REAL-BINARY]` | `test/services/engines/svlint/**` + `engines/svlint/generated/**` + `engines/svlint/captured/**` |
 | Verible `.rules.verible_lint` in the project root enables `--rules_config_search`; both config files are in the lint-cache key | `[Coverage: UNIT]` | `test/services/engines/verible/verible_engine_test.dart`, `test/services/lint_cache/cache_fingerprint_test.dart` |
 | Language routing (per-engine source selection, subset status) | `[Coverage: UNIT]` | `test/services/engines/engine_language_router_test.dart` |
 | `.f` filelist reader (incdir/define/recursive/env/comments/cycle) | `[Coverage: UNIT]` | `test/services/import/filelist_reader_test.dart` |

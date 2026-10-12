@@ -1,1 +1,1 @@
-svlint --output-format=json "a dir/x.sv"
+svlint "a dir/x.sv"

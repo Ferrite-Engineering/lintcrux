@@ -90,7 +90,7 @@ LintCrux registers seven engines. Six run a real tool as a subprocess and normal
 | `slang` | Slang | Verilog, SystemVerilog | `textModeFallback` |
 | `yosys` | Yosys `hierarchy -check` + `check -assert` | Verilog, SystemVerilog | — |
 | `ghdl` | GHDL `-a` | VHDL | `warnFlags` (the `--warn-*` classes) |
-| `svlint` | Svlint | Verilog, SystemVerilog | `configPath`, `textModeFallback` |
+| `svlint` | Svlint | Verilog, SystemVerilog | `configPath` |
 | `cdc` | Structural clock-domain-crossing lint | Verilog, SystemVerilog | — (no binary of its own; it drives Yosys — see [Clock-domain crossings](cdc.md)) |
 
 Defines, include paths and the top module are project-level, so every engine that understands them receives them. The option keys and their defaults are in the [project file reference](reference/project-file.md). Engine options are edited in the `.lintcrux` file; `Settings → Engines` configures binaries and severity overrides, not engine flags.

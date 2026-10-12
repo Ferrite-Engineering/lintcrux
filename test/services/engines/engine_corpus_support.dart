@@ -41,9 +41,10 @@ const List<String> kCorpusEngineIds = <String>[
 /// contract surfaced.
 ///
 /// The entry point per engine matches production: Verilator/GHDL parse a
-/// text stderr transcript; Verible/Slang/Svlint parse their JSON-line
-/// output (with the built-in text fallback). Throws [ArgumentError] for an
-/// unknown engine so a typo in the case table fails loudly.
+/// text stderr transcript; Verible/Slang parse their JSON-line output (with
+/// the built-in text fallback); Svlint parses its default block report.
+/// Throws [ArgumentError] for an unknown engine so a typo in the case table
+/// fails loudly.
 ({List<Violation> violations, List<String> notifications}) runEngineParser(
   String engineId,
   List<String> lines, {
@@ -73,7 +74,7 @@ const List<String> kCorpusEngineIds = <String>[
     case 'svlint':
       violations = SvlintParser(
         rootPath: rootPath,
-      ).parseJsonLines(lines, onUnrecognized: onUnrecognized);
+      ).parse(lines, onUnrecognized: onUnrecognized);
     case 'yosys':
       // Yosys parses a whole stderr transcript (not line-by-line) via the
       // crux_yosys parser; it surfaces no log-and-continue notifications.

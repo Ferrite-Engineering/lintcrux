@@ -1,0 +1,19 @@
+Error: parse error
+   --> broken.sv:5:10
+  |
+5 |     q <= ;
+  |          ^
+Fail: non_blocking_assignment_in_always_comb
+   --> top.sv:7:3
+  |
+7 |   always_comb begin
+  |   ^^^^^^^^^^^ hint  : Remove non-blocking assignment in `always_comb`.
+  |               reason: Scheduling between blocking and non-blocking assignments is non-deterministic.
+
+Fail: blocking_assignment_in_always_ff
+   --> top.sv:10:3
+   |
+10 |   always_ff @(posedge clk) begin
+   |   ^^^^^^^^^ hint  : Do not use blocking assignments within `always_ff`.
+   |             reason: Blocking assignment in `always_ff` may cause undefined event ordering.
+

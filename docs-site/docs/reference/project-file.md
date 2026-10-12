@@ -75,7 +75,8 @@ project".
 | Key | Type | Meaning |
 |---|---|---|
 | `configPath` | string | Passed as `--config <path>`. Relative paths resolve against the directory of the first source file, which svlint runs from. |
-| `textModeFallback` | bool | Skip `--output-format json` and parse text directly. |
+
+Svlint has no structured output mode; LintCrux parses its default report, which is the only svlint output that names the rule. A non-zero exit that reports no finding (an option svlint does not know, a source it cannot open) is an engine failure, not a clean run.
 
 ## `perEngineOptions.ghdl`
 

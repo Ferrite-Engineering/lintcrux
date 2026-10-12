@@ -23,8 +23,8 @@ class _FuzzTarget {
   const _FuzzTarget({
     required this.id,
     required this.parse,
-    required this.validLine,
-    required this.ansiValidLine,
+    required this.validLines,
+    required this.ansiValidLines,
     this.isJson = false,
   });
 
@@ -38,12 +38,14 @@ class _FuzzTarget {
   })
   parse;
 
-  /// A line the parser is known to recognize as exactly one violation.
-  final String validLine;
+  /// Output the parser is known to recognize as exactly one violation. One
+  /// line for the engines that report a finding per line; the whole block
+  /// for svlint, whose report spreads one finding over several lines.
+  final List<String> validLines;
 
   /// A valid diagnostic whose *message* carries residual ANSI escapes —
   /// the parser must still parse it (NO_COLOR defense in depth).
-  final String ansiValidLine;
+  final List<String> ansiValidLines;
 
   /// Whether this engine consumes JSON-line output (enables the
   /// truncated-JSON case).
@@ -64,20 +66,24 @@ List<_FuzzTarget> _targets() {
       parse: (lines, {onUnrecognized}) => VerilatorParser(
         rootPath: root,
       ).parse(lines, onUnrecognized: onUnrecognized),
-      validLine: "%Warning-UNUSEDSIGNAL: top.sv:42:13: Signal is not used: 'x'",
-      ansiValidLine:
-          '%Warning-UNUSEDSIGNAL: top.sv:42:13: '
-          "$_esc[31mSignal is not used$_esc[0m: 'x'",
+      validLines: const <String>[
+        "%Warning-UNUSEDSIGNAL: top.sv:42:13: Signal is not used: 'x'",
+      ],
+      ansiValidLines: <String>[
+        "%Warning-UNUSEDSIGNAL: top.sv:42:13: $_esc[31mSignal is not used$_esc[0m: 'x'",
+      ],
     ),
     _FuzzTarget(
       id: 'ghdl',
       parse: (lines, {onUnrecognized}) => GhdlParser(
         rootPath: root,
       ).parse(lines, onUnrecognized: onUnrecognized),
-      validLine: 'design.vhd:42:13: warning: unused variable "x" [-Wunused]',
-      ansiValidLine:
-          'design.vhd:42:13: warning: '
-          '$_esc[31munused variable$_esc[0m "x" [-Wunused]',
+      validLines: const <String>[
+        'design.vhd:42:13: warning: unused variable "x" [-Wunused]',
+      ],
+      ansiValidLines: <String>[
+        'design.vhd:42:13: warning: $_esc[31munused variable$_esc[0m "x" [-Wunused]',
+      ],
     ),
     _FuzzTarget(
       id: 'verible',
@@ -85,15 +91,15 @@ List<_FuzzTarget> _targets() {
       parse: (lines, {onUnrecognized}) => VeribleParser(
         rootPath: root,
       ).parseJsonLines(lines, onUnrecognized: onUnrecognized),
-      validLine:
-          '{"path":"a.sv","line":3,"column":5,"rule":"no-tabs",'
-          '"severity":"warning","message":"Use spaces"}',
+      validLines: const <String>[
+        '{"path":"a.sv","line":3,"column":5,"rule":"no-tabs","severity":"warning","message":"Use spaces"}',
+      ],
       // JSON engines never emit raw control bytes — residual ANSI arrives
       // as a JSON unicode escape that decodes to an ESC inside the message.
       // message. The parser must still produce the violation.
-      ansiValidLine:
-          '{"path":"a.sv","line":3,"column":5,"rule":"no-tabs",'
-          '"severity":"warning","message":"$jsonEsc[31mUse spaces$jsonEsc[0m"}',
+      ansiValidLines: <String>[
+        '{"path":"a.sv","line":3,"column":5,"rule":"no-tabs","severity":"warning","message":"$jsonEsc[31mUse spaces$jsonEsc[0m"}',
+      ],
     ),
     _FuzzTarget(
       id: 'slang',
@@ -101,26 +107,33 @@ List<_FuzzTarget> _targets() {
       parse: (lines, {onUnrecognized}) => SlangParser(
         rootPath: root,
       ).parseJsonLines(lines, onUnrecognized: onUnrecognized),
-      validLine:
-          '{"severity":"warning","code":"slang::diag::ImplicitConvert",'
-          '"message":"conv","location":{"file":"a.sv","line":3,"column":5}}',
-      ansiValidLine:
-          '{"severity":"warning","code":"slang::diag::ImplicitConvert",'
-          '"message":"$jsonEsc[31mconv$jsonEsc[0m",'
-          '"location":{"file":"a.sv","line":3,"column":5}}',
+      validLines: const <String>[
+        '{"severity":"warning","code":"slang::diag::ImplicitConvert","message":"conv","location":{"file":"a.sv","line":3,"column":5}}',
+      ],
+      ansiValidLines: <String>[
+        '{"severity":"warning","code":"slang::diag::ImplicitConvert","message":"$jsonEsc[31mconv$jsonEsc[0m","location":{"file":"a.sv","line":3,"column":5}}',
+      ],
     ),
     _FuzzTarget(
       id: 'svlint',
-      isJson: true,
       parse: (lines, {onUnrecognized}) => SvlintParser(
         rootPath: root,
-      ).parseJsonLines(lines, onUnrecognized: onUnrecognized),
-      validLine:
-          '{"path":"a.sv","line":3,"column":5,"rule":"no_tab",'
-          '"message":"no tabs"}',
-      ansiValidLine:
-          '{"path":"a.sv","line":3,"column":5,"rule":"no_tab",'
-          '"message":"$jsonEsc[31mno tabs$jsonEsc[0m"}',
+      ).parse(lines, onUnrecognized: onUnrecognized),
+      // Svlint's default report: one block per finding, rule on the header.
+      validLines: const <String>[
+        'Fail: tab_character',
+        '   --> a.sv:3:5',
+        '  |',
+        '3 |     \tlogic q;',
+        '  |     ^ hint  : Replace tab with spaces.',
+      ],
+      ansiValidLines: <String>[
+        'Fail: tab_character',
+        '   --> a.sv:3:5',
+        '  |',
+        '3 |     \tlogic q;',
+        '  |     ^ hint  : $_esc[31mReplace tab with spaces.$_esc[0m',
+      ],
     ),
   ];
 }
@@ -140,8 +153,8 @@ void main() {
     group('parser fuzz: ${t.id}', () {
       // Baseline: the "valid" line really is recognized, so the
       // interleaving / preservation assertions below are meaningful.
-      test('valid line parses to exactly one violation', () {
-        expect(t.parse(<String>[t.validLine]), hasLength(1));
+      test('valid output parses to exactly one violation', () {
+        expect(t.parse(t.validLines), hasLength(1));
       });
 
       test('empty input → empty list, no throw', () {
@@ -165,7 +178,7 @@ void main() {
       test('valid + garbage interleaved → valid kept, garbage surfaced', () {
         final notes = <String>[];
         final out = t.parse(
-          <String>[_garbage, t.validLine],
+          <String>[_garbage, ...t.validLines],
           onUnrecognized: notes.add,
         );
         expect(
@@ -177,7 +190,7 @@ void main() {
       });
 
       test('ANSI-wrapped message still parses (NO_COLOR defense in depth)', () {
-        expect(t.parse(<String>[t.ansiValidLine]), isNotEmpty);
+        expect(t.parse(t.ansiValidLines), isNotEmpty);
       });
 
       test('lines with embedded CR / CRLF / lone LF → no throw', () {
@@ -185,7 +198,7 @@ void main() {
           'a\rb',
           'c\r\nd',
           'e\nf',
-          t.validLine,
+          ...t.validLines,
         ];
         expect(() => t.parse(input), returnsNormally);
       });
@@ -194,7 +207,7 @@ void main() {
         final input = <String>[
           'valid\x00line',
           '\x00\x00\x00',
-          t.validLine,
+          ...t.validLines,
         ];
         expect(t.parse(input), isA<List<Violation>>());
       });
@@ -203,7 +216,7 @@ void main() {
         final input = <String>[
           // Lone surrogate (invalid on its own) + CJK multibyte.
           'path_${String.fromCharCode(0xD800)}日本語.sv:1:1: garbage',
-          t.validLine,
+          ...t.validLines,
         ];
         expect(() => t.parse(input), returnsNormally);
       });
@@ -221,7 +234,10 @@ void main() {
         'pathologically long line (>1 MB) → bounded, no quadratic blowup',
         () {
           final huge = 'x' * (1024 * 1024 + 7);
-          expect(() => t.parse(<String>[huge, t.validLine]), returnsNormally);
+          expect(
+            () => t.parse(<String>[huge, ...t.validLines]),
+            returnsNormally,
+          );
         },
         timeout: const Timeout(Duration(seconds: 5)),
       );
@@ -231,7 +247,7 @@ void main() {
           final input = <String>[
             '{"path":"a.sv","line":3,"column":',
             '{"severity":"warning","code":',
-            t.validLine,
+            ...t.validLines,
           ];
           expect(() => t.parse(input), returnsNormally);
         });

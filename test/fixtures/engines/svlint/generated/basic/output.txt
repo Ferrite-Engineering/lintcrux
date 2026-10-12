@@ -1,1 +1,7 @@
-{"path":"top.sv","line":15,"column":5,"rule":"non_blocking_assignment_in_always_comb","message":"non-blocking in always_comb"}
+Fail: non_blocking_assignment_in_always_comb
+   --> top.sv:15:5
+   |
+15 |     d <= ~q;
+   |     ^^^^^^^ hint  : Remove non-blocking assignment in `always_comb`.
+   |             reason: Scheduling between blocking and non-blocking assignments is non-deterministic.
+
