@@ -250,6 +250,50 @@ void main() {
     });
   });
 
+  group('--engine-timeout', () {
+    String waitingProject() {
+      File(
+        p.join(tmp.path, 'top.sv'),
+      ).writeAsStringSync('module top;endmodule');
+      final project = File(p.join(tmp.path, 'p.lintcrux'))
+        ..writeAsStringSync('''
+{"version":1,"name":"p","rootPath":".","sourceFiles":["top.sv"],
+ "language":"systemverilog","enabledEngineIds":["waiting"]}
+''');
+      return project.path;
+    }
+
+    test(
+      'an engine still running when the budget ends fails the run with 3',
+      () async {
+        // The engine would wait ten seconds; a one-second budget must end the
+        // run first, as a run failure rather than a clean result.
+        final release = Completer<void>();
+        final code =
+            await LintcruxCli(
+              registry: EngineRegistry(<LintEngine>[_WaitingEngine(release)]),
+              installSignalReaper: false,
+            ).run(
+              <String>[waitingProject(), '--engine-timeout', '1'],
+              stdoutSink: out.add,
+              stderrSink: err.add,
+            );
+        expect(code, CliExitCode.runFailed);
+        expect(err.join('\n'), contains('waiting'));
+        if (!release.isCompleted) release.complete();
+      },
+    );
+
+    test(
+      'a budget that is not a positive number of seconds exits 64',
+      () async {
+        final code = await run(<String>['a.sv', '--engine-timeout', '0']);
+        expect(code, CliExitCode.usage);
+        expect(err.join('\n'), contains('--engine-timeout'));
+      },
+    );
+  });
+
   group('argument errors', () {
     test('an unknown flag exits 64 and prints usage to stderr', () async {
       expect(await run(<String>['--nope']), CliExitCode.usage);

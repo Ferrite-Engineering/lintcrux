@@ -50,6 +50,18 @@ void main() {
       expect(a, isNot(c));
     });
 
+    test('engineTimeout is stored, copied, compared and printed', () {
+      const a = CliArgs(engineTimeout: Duration(seconds: 900));
+      expect(a.engineTimeout, const Duration(seconds: 900));
+      expect(CliArgs.empty.engineTimeout, isNull);
+      expect(
+        CliArgs.empty.copyWith(engineTimeout: const Duration(seconds: 900)),
+        a,
+      );
+      expect(a, isNot(CliArgs.empty));
+      expect(a.toString(), contains('engineTimeout: 0:15:00.000000'));
+    });
+
     test('toString includes every field', () {
       const a = CliArgs(
         paths: ['x'],

@@ -69,10 +69,16 @@ class HeadlessRunner {
     this.exportWriter = const HeadlessExportWriter(),
     this.pragmaReader = const PragmaWaiverReader(),
     this.extraTransformers = const <ViolationTransformer>[],
-    this.engineTimeout = const Duration(seconds: 300),
+    this.engineTimeout = defaultEngineTimeout,
     this.telemetry,
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now;
+
+  /// The per-engine budget when the command line names none; the value
+  /// `--engine-timeout` documents.
+  static const Duration defaultEngineTimeout = Duration(
+    seconds: CliArgsParser.kDefaultEngineTimeoutSeconds,
+  );
 
   /// Engines available to this invocation.
   final EngineRegistry registry;
@@ -109,7 +115,8 @@ class HeadlessRunner {
 
   /// Per-engine wall-clock budget. Larger than the GUI default (120 s)
   /// because a CI runner is slower than a workstation and a watchdog
-  /// kill reports as a run failure, which fails the build.
+  /// kill reports as a run failure, which fails the build. The CLI passes
+  /// `--engine-timeout` here; see [CliArgs.engineTimeout].
   final Duration engineTimeout;
 
   final DateTime Function() _now;

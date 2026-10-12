@@ -109,8 +109,36 @@ void main() {
       expect(u, contains('--version'));
       expect(u, contains('--import-filelist'));
       expect(u, contains('--import-edam'));
+      expect(u, contains('--engine-timeout'));
+      expect(u, contains('Default 300'));
       // Examples block helps first-time users.
       expect(u, contains('lintcrux project.lintcrux'));
+    });
+
+    group('--engine-timeout', () {
+      test('is absent by default, leaving the runner its own budget', () {
+        expect(parser.parse(const []).args!.engineTimeout, isNull);
+      });
+
+      test('reads a whole number of seconds', () {
+        final r = parser.parse(const ['--engine-timeout', '1800', 'a.sv']);
+        expect(r.isSuccess, isTrue, reason: r.error);
+        expect(r.args!.engineTimeout, const Duration(seconds: 1800));
+        expect(r.args!.paths, ['a.sv']);
+      });
+
+      for (final bad in const <String>['0', '-5', '2.5', '5m', 'soon']) {
+        test('"$bad" is a usage error, not a silent default', () {
+          final r = parser.parse(['--engine-timeout', bad, 'a.sv']);
+          expect(r.isSuccess, isFalse);
+          expect(r.error, contains('--engine-timeout'));
+          expect(r.error, contains('"$bad"'));
+        });
+      }
+
+      test('a missing value is a usage error', () {
+        expect(parser.parse(const ['--engine-timeout']).isSuccess, isFalse);
+      });
     });
 
     test('--import-filelist accepts a path', () {

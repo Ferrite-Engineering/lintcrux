@@ -76,6 +76,24 @@ class CliArgsParser {
       );
     }
 
+    // A budget that is not a positive whole number of seconds is a usage
+    // error: `--engine-timeout 0` would kill every engine on the spot, and
+    // a fractional or negative value says the caller meant something else.
+    Duration? engineTimeout;
+    final timeoutRaw = results[kEngineTimeoutOption] as String?;
+    if (timeoutRaw != null) {
+      final seconds = int.tryParse(timeoutRaw.trim());
+      if (seconds == null || seconds <= 0) {
+        return CliArgsParseResult(
+          error:
+              'Option "--$kEngineTimeoutOption" expects a positive whole '
+              'number of seconds, got "$timeoutRaw".',
+          usage: usage,
+        );
+      }
+      engineTimeout = Duration(seconds: seconds);
+    }
+
     final parsed = CliArgs(
       paths: List<String>.unmodifiable(results.rest),
       configPath: results['config'] as String?,
@@ -98,12 +116,21 @@ class CliArgsParser {
         (results['engine'] as List<String>?) ?? const <String>[],
       ),
       quiet: results['quiet'] as bool? ?? false,
+      engineTimeout: engineTimeout,
     );
     return CliArgsParseResult(args: parsed, usage: usage);
   }
 
   /// The `--export` value that selects SARIF 2.1.0 output.
   static const String kSarifExportFormat = 'sarif';
+
+  /// The option that sets the per-engine wall-clock budget, in seconds.
+  static const String kEngineTimeoutOption = 'engine-timeout';
+
+  /// The budget the headless runner applies when [kEngineTimeoutOption] is
+  /// absent. One definition, quoted in the usage text and used as the
+  /// runner's default.
+  static const int kDefaultEngineTimeoutSeconds = 300;
 
   /// Every value `--export <format>` accepts. Matches the four formats
   /// `ViolationExporters` can emit; keep the two in sync.
@@ -292,6 +319,15 @@ Examples:
         help:
             'Suppress the per-violation listing; print only the summary '
             'line and any diagnostics. Exit codes are unaffected.',
+      )
+      ..addOption(
+        kEngineTimeoutOption,
+        valueHelp: 'seconds',
+        help:
+            'Wall-clock budget per engine, after which the engine is killed '
+            'and the run fails (exit 3). Default '
+            '$kDefaultEngineTimeoutSeconds. Raise it for a Yosys-based '
+            'engine (yosys, cdc) flattening a full SoC.',
       )
       ..addOption(
         'import-filelist',

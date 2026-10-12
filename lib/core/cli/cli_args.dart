@@ -57,6 +57,7 @@ class CliArgs {
     this.allowMissingEngines = false,
     this.engineIds = const <String>[],
     this.quiet = false,
+    this.engineTimeout,
   });
 
   /// Empty/default args — equivalent to `lintcrux` with no flags.
@@ -206,6 +207,15 @@ class CliArgs {
   /// the per-violation listing. Exit codes are unaffected.
   final bool quiet;
 
+  /// Per-engine wall-clock budget supplied via `--engine-timeout <seconds>`,
+  /// or `null` for the headless runner's default (300 s).
+  ///
+  /// Yosys-based engines flatten the whole design, and on a full SoC that
+  /// can take longer than five minutes; without this a headless run could
+  /// not be made to wait. The desktop app has its own setting and ignores
+  /// this field.
+  final Duration? engineTimeout;
+
   /// Returns a copy with overridden fields.
   CliArgs copyWith({
     List<String>? paths,
@@ -228,6 +238,7 @@ class CliArgs {
     bool? allowMissingEngines,
     List<String>? engineIds,
     bool? quiet,
+    Duration? engineTimeout,
   }) {
     return CliArgs(
       paths: paths ?? this.paths,
@@ -250,6 +261,7 @@ class CliArgs {
       allowMissingEngines: allowMissingEngines ?? this.allowMissingEngines,
       engineIds: engineIds ?? this.engineIds,
       quiet: quiet ?? this.quiet,
+      engineTimeout: engineTimeout ?? this.engineTimeout,
     );
   }
 
@@ -283,6 +295,7 @@ class CliArgs {
     if (other.failOnNewViolations != failOnNewViolations) return false;
     if (other.allowMissingEngines != allowMissingEngines) return false;
     if (other.quiet != quiet) return false;
+    if (other.engineTimeout != engineTimeout) return false;
     if (other.engineIds.length != engineIds.length) return false;
     for (var i = 0; i < engineIds.length; i++) {
       if (other.engineIds[i] != engineIds[i]) return false;
@@ -315,6 +328,7 @@ class CliArgs {
       failOnNewViolations,
       allowMissingEngines,
       quiet,
+      engineTimeout,
       Object.hashAll(engineIds),
     );
   }
@@ -330,5 +344,5 @@ class CliArgs {
       'export: $exportFormat, out: $exportOutputPath, '
       'baseline: $baselinePath, failOnNew: $failOnNewViolations, '
       'allowMissingEngines: $allowMissingEngines, engines: $engineIds, '
-      'quiet: $quiet)';
+      'quiet: $quiet, engineTimeout: $engineTimeout)';
 }

@@ -266,6 +266,7 @@ class LintcruxCli {
       registry: registry,
       extraTransformers: extraTransformers,
       telemetry: telemetry,
+      engineTimeout: args.engineTimeout ?? HeadlessRunner.defaultEngineTimeout,
     );
     return runner.run(args);
   }
