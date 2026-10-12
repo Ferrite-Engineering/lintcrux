@@ -49,7 +49,7 @@ jobs:
     # Cost guardrail: no job may run unbounded (max observed suite-wide is 29 min).
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # crux-shared is a git submodule consumed via `path:` deps in
           # pubspec.yaml; without recursive checkout, `flutter pub get`
@@ -89,7 +89,7 @@ jobs:
           cache: true
 
       - name: Cache pub dependencies
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ${{ steps.flutter.outputs.pub-cache-path }}
@@ -163,7 +163,7 @@ jobs:
         # branches are non-empty arrays, so the `&&` result is never falsy.
         os: ${{ github.event_name == 'push' && fromJSON('["ubuntu-latest"]') || fromJSON('["ubuntu-latest","macos-latest","windows-latest"]') }}
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
           # A read-only PAT (Contents) for the crux-shared submodule when the
@@ -180,7 +180,7 @@ jobs:
           cache: true
 
       - name: Cache pub dependencies
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ${{ steps.flutter.outputs.pub-cache-path }}
@@ -361,7 +361,7 @@ jobs:
         # thing this workflow could do. Linux still proves the build compiles.
         include: ${{ github.event_name == 'push' && fromJSON('[{"os":"ubuntu-latest","target":"linux"}]') || fromJSON('[{"os":"ubuntu-latest","target":"linux"},{"os":"macos-latest","target":"macos"},{"os":"windows-latest","target":"windows"}]') }}
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
           # A read-only PAT (Contents) for the crux-shared submodule when the
@@ -384,7 +384,7 @@ jobs:
           cache: true
 
       - name: Cache pub dependencies
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ${{ steps.flutter.outputs.pub-cache-path }}
@@ -419,7 +419,7 @@ jobs:
     # Cost guardrail: no job may run unbounded (max observed suite-wide is 29 min).
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
           # A read-only PAT (Contents) for the crux-shared submodule when the
@@ -436,7 +436,7 @@ jobs:
           cache: true
 
       - name: Cache pub dependencies
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ${{ steps.flutter.outputs.pub-cache-path }}
@@ -489,7 +489,7 @@ jobs:
     # Cost guardrail: no job may run unbounded.
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           submodules: recursive
           token: ${{ secrets.SUBMODULE_PAT || github.token }}
