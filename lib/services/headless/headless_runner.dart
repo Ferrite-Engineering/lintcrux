@@ -276,6 +276,17 @@ class HeadlessRunner {
       }
     }
 
+    // An engine that ran but could not analyse the design reports that as
+    // a violation, so the desktop shows why there are no findings. A CI
+    // run must not read it as a completed analysis: the design was never
+    // checked, and a gate that passes on "nothing analysed" gates nothing.
+    for (final v in violations) {
+      if (!v.isAnalysisFailure) continue;
+      problems.add(
+        'engine "${v.engineId}" could not analyse the design: ${v.message}',
+      );
+    }
+
     // ── 7. Baseline classification ─────────────────────────────────
     final reportable = <Violation>[
       for (final v in violations)

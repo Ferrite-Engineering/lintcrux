@@ -184,6 +184,40 @@ void main() {
       expect(r.exitCode, CliExitCode.violations);
     });
 
+    test(
+      'an engine that could not analyse the design → runFailed (3), '
+      'with no gate requested',
+      () async {
+        // CDC reports an elaboration failure as a finding so the desktop can
+        // show it. Without a gate flag that used to exit 0: a CI job read a
+        // design Yosys never elaborated as clean.
+        final r = await runnerWith([
+          _FakeEngine(
+            'cdc',
+            violations: [
+              Violation(
+                engineId: 'cdc',
+                ruleId: 'cdc/elaboration-failed',
+                severity: Severity.error,
+                message:
+                    'CDC analysis could not elaborate the design: ERROR: Can '
+                    r"not open file 'zephyr_hello.hex' for $readmemh",
+                location: SourceLocation(file: sourcePath, line: 1, column: 1),
+                raw: const <String, dynamic>{
+                  Violation.analysisFailedKey: true,
+                },
+              ),
+            ],
+          ),
+        ]).run(args());
+        expect(r.exitCode, CliExitCode.runFailed);
+        expect(r.problems.single, contains('could not analyse the design'));
+        expect(r.problems.single, contains('zephyr_hello.hex'));
+        // The finding itself is still reported, so the export carries it.
+        expect(r.violations, hasLength(1));
+      },
+    );
+
     test('an engine that fails → runFailed (3)', () async {
       final r = await runnerWith([
         _FakeEngine(

@@ -34,6 +34,12 @@ void main() {
       expect(sel.sourcesDropped, ['b.vhd']);
       expect(sel.sourcesTotal, 3);
       expect(sel.requestLanguage, HdlLanguage.systemVerilog);
+      // Each surviving file keeps its own language, so an engine that reads
+      // more than one dialect in a run can pick the right reader per file.
+      expect(sel.sourceLanguages, {
+        'a.sv': HdlLanguage.systemVerilog,
+        'c.v': HdlLanguage.verilog,
+      });
     });
 
     test('ghdl gets only .vhd sources', () {
@@ -84,6 +90,7 @@ void main() {
       // strict Verilog which Slang doesn't accept here.
       expect(sel.sourcesUsed, ['a.v']);
       expect(sel.sourcesDropped, ['b.v']);
+      expect(sel.sourceLanguages, {'a.v': HdlLanguage.systemVerilog});
     });
 
     test('returns empty selection when no source files match', () {

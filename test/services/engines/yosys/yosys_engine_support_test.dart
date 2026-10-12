@@ -1,12 +1,38 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'dart:io';
+
+import 'package:crux_io/crux_io.dart';
 import 'package:crux_yosys/crux_yosys.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_engine_support.dart';
+
+/// Records what it was asked to spawn and answers with a clean exit.
+class _RecordingProcessRunner implements ProcessRunner {
+  String? workingDirectory;
+  Map<String, String>? environment;
+
+  @override
+  Future<ProcessRunResult> run(
+    String executable,
+    List<String> arguments, {
+    String? workingDirectory,
+    Map<String, String>? environment,
+    Duration? timeout,
+    Future<void>? cancelSignal,
+    String? stdoutFilePath,
+    void Function(String line)? onStderrLine,
+  }) async {
+    this.workingDirectory = workingDirectory;
+    this.environment = environment;
+    return const ProcessRunResult(exitCode: 0, stdout: '', stderr: '');
+  }
+}
 
 void main() {
   group('yosysExecutableFor', () {
@@ -187,6 +213,162 @@ void main() {
           ['a', 'b'],
         ),
       );
+    });
+  });
+
+  group('yosysSourcesFor', () {
+    test('reads each file under the language the project resolved', () {
+      const request = LintRunRequest(
+        sourceFiles: ['/p/top.sv', '/p/old.v', '/p/ent.vhd'],
+        binary: EngineBinaryConfig.system(),
+        language: HdlLanguage.mixed,
+        sourceLanguages: {
+          '/p/top.sv': HdlLanguage.systemVerilog,
+          '/p/old.v': HdlLanguage.verilog,
+          '/p/ent.vhd': HdlLanguage.vhdl,
+        },
+      );
+      expect(yosysSourcesFor(request), const <YosysSourceFile>[
+        YosysSourceFile.systemVerilog('/p/top.sv'),
+        YosysSourceFile('/p/old.v'),
+        YosysSourceFile.vhdl('/p/ent.vhd'),
+      ]);
+    });
+
+    test('a request with no per-file languages uses the request one', () {
+      const request = LintRunRequest(
+        sourceFiles: ['/p/a.v', '/p/b.v'],
+        binary: EngineBinaryConfig.system(),
+        language: HdlLanguage.systemVerilog,
+      );
+      expect(
+        yosysSourcesFor(request).map((s) => s.language),
+        everyElement(YosysSourceLanguage.systemVerilog),
+      );
+    });
+
+    test('a mixed request with no per-file languages falls back to the '
+        'extension', () {
+      const request = LintRunRequest(
+        sourceFiles: ['/p/a.SV', '/p/b.svh', '/p/c.v', '/p/d.vhdl'],
+        binary: EngineBinaryConfig.system(),
+        language: HdlLanguage.mixed,
+      );
+      expect(yosysSourcesFor(request).map((s) => s.language), const [
+        YosysSourceLanguage.systemVerilog,
+        YosysSourceLanguage.systemVerilog,
+        YosysSourceLanguage.verilog,
+        YosysSourceLanguage.vhdl,
+      ]);
+    });
+  });
+
+  group('yosysDefinesFor', () {
+    test('renders NAME and NAME=VALUE', () {
+      const request = LintRunRequest(
+        sourceFiles: ['/p/a.v'],
+        binary: EngineBinaryConfig.system(),
+        language: HdlLanguage.verilog,
+        defines: {'SIM': '', 'WIDTH': '8'},
+      );
+      expect(yosysDefinesFor(request), ['SIM', 'WIDTH=8']);
+    });
+  });
+
+  group('yosysWorkingDirectoryFor', () {
+    LintRunRequest request({
+      String root = '',
+      List<String> sources = const ['/p/rtl/a.v'],
+      Map<String, Object?> options = const {},
+    }) => LintRunRequest(
+      sourceFiles: sources,
+      binary: const EngineBinaryConfig.system(),
+      language: HdlLanguage.verilog,
+      projectRoot: root,
+      options: options,
+    );
+
+    test('the project root by default', () {
+      expect(yosysWorkingDirectoryFor(request(root: '/p')), '/p');
+    });
+
+    test('the first source directory when there is no project root', () {
+      expect(yosysWorkingDirectoryFor(request()), '/p/rtl');
+    });
+
+    test('null when there is nothing to anchor on', () {
+      expect(yosysWorkingDirectoryFor(request(sources: const [])), isNull);
+    });
+
+    test('the workingDirectory option, relative to the root', () {
+      expect(
+        yosysWorkingDirectoryFor(
+          request(root: '/p', options: const {'workingDirectory': 'sw'}),
+        ),
+        '/p/sw',
+      );
+    });
+
+    test('an absolute workingDirectory option stands alone', () {
+      expect(
+        yosysWorkingDirectoryFor(
+          request(
+            root: '/p',
+            options: const {'workingDirectory': '/images/'},
+          ),
+        ),
+        '/images',
+      );
+    });
+
+    test('an empty option is ignored', () {
+      expect(
+        yosysWorkingDirectoryFor(
+          request(root: '/p', options: const {'workingDirectory': ''}),
+        ),
+        '/p',
+      );
+    });
+  });
+
+  group('EngineYosysProcessRunner', () {
+    test(
+      'spawns through the engine environment, from the run directory',
+      () async {
+        final inner = _RecordingProcessRunner();
+        // The PATH launchd hands a GUI app: none of the package-manager
+        // directories a terminal session would have.
+        const launchdPath = '/usr/bin:/bin:/usr/sbin:/sbin';
+        await EngineYosysProcessRunner(inner, workingDirectory: '/p').run(
+          'yosys',
+          const ['-V'],
+          environment: const {'FOO': 'bar', 'PATH': launchdPath},
+        );
+
+        expect(inner.workingDirectory, '/p');
+        final env = inner.environment!;
+        expect(env['FOO'], 'bar');
+        expect(env['NO_COLOR'], '1');
+        expect(env['TERM'], 'dumb');
+        final dirs = engineSearchDirs();
+        if (dirs.isEmpty) {
+          // Linux: nothing to append, the PATH is passed through.
+          expect(env['PATH'], launchdPath);
+        } else {
+          final path = env['PATH']!.split(Platform.isWindows ? ';' : ':');
+          expect(path, containsAll(dirs));
+          expect(path.first, '/usr/bin', reason: 'appended, never prepended');
+        }
+      },
+    );
+
+    test('a caller-named working directory wins', () async {
+      final inner = _RecordingProcessRunner();
+      await EngineYosysProcessRunner(
+        inner,
+        workingDirectory: '/p',
+      ).run('yosys', const [], workingDirectory: '/elsewhere');
+      expect(inner.workingDirectory, '/elsewhere');
     });
   });
 

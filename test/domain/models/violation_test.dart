@@ -20,6 +20,38 @@ void main() {
   );
 
   group('Violation', () {
+    test('isAnalysisFailure reads the engine marker in raw', () {
+      const location = SourceLocation(file: '/p/top.sv', line: 1, column: 1);
+      const finding = Violation(
+        engineId: 'cdc',
+        ruleId: 'cdc/unsync-single-bit',
+        severity: Severity.warning,
+        message: 'a crossing',
+        location: location,
+      );
+      const failure = Violation(
+        engineId: 'cdc',
+        ruleId: 'cdc/elaboration-failed',
+        severity: Severity.error,
+        message: 'could not elaborate',
+        location: location,
+        raw: <String, dynamic>{Violation.analysisFailedKey: true},
+      );
+      expect(finding.isAnalysisFailure, isFalse);
+      expect(failure.isAnalysisFailure, isTrue);
+      // Only the boolean `true` counts: a stray string is not a marker.
+      expect(
+        failure
+            .copyWith(
+              raw: const <String, dynamic>{
+                Violation.analysisFailedKey: 'true',
+              },
+            )
+            .isAnalysisFailure,
+        isFalse,
+      );
+    });
+
     test('isSuppressed reflects suppression presence', () {
       expect(make().isSuppressed, isFalse);
       final waiver = Waiver(

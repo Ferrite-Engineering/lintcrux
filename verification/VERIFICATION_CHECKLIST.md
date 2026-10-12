@@ -69,6 +69,8 @@ See `VERIFICATION_GUIDE.md` §5.
 
 - [ ] Yosys adapter maps diagnostics → violations (module fallback when file:line absent) — `[Coverage: UNIT]` (`test/services/engines/yosys/**`)
 - [ ] A missing or bad Yosys binary makes `yosys` and `cdc` unavailable (exit 3 headless, hint names `--yosys-path`); a Custom Yosys path and `--yosys-path` reach both, and **Probe** reports that binary — `[Coverage: UNIT]` (`test/services/engines/cdc/cdc_engine_unavailable_test.dart`, `test/services/headless/headless_runner_test.dart`)
+- [ ] `yosys` and `cdc` read each source under its resolved language (`read_verilog -sv` for SystemVerilog), pass the project's include paths and defines, run Yosys from the project root (or `perEngineOptions.<engine>.workingDirectory`) so `$readmemh` resolves the same from a shell and from the Dock, and spawn Yosys through the engine environment (Homebrew `PATH` appended); `cdc/elaboration-failed` and `cdc/unsupported-sources` exit 3 headless — `[Coverage: UNIT]` (`test/services/engines/cdc/cdc_engine_yosys_request_test.dart`, `test/services/engines/yosys/yosys_engine_support_test.dart`, `test/services/headless/headless_runner_test.dart`)
+- [ ] From Finder or the Dock on macOS with a Homebrew Yosys and no Custom path, **Probe** on the Yosys row reports the version and a `cdc` run elaborates — `[Coverage: MANUAL]`
 - [ ] Yosys canned output → golden SARIF — `[Coverage: GOLDEN]` (`engines/yosys/generated/**`)
 - [ ] `yosys` engine is default-disabled (opt-in via `enabledEngineIds`) — `[Coverage: UNIT]`
 - [ ] GHDL availability probe resolves bundled → PATH → null — `[Coverage: UNIT]` (`ghdl_availability_service_test.dart`)

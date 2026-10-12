@@ -83,6 +83,9 @@ void main() {
       expect(v.message, contains('2 source file'));
       expect(v.message, contains('pkg.vhd'));
       expect(v.location.file, 'pkg.vhd');
+      // Nothing was analysed, and a headless run must say so with its exit
+      // code rather than count one error.
+      expect(v.isAnalysisFailure, isTrue);
     });
 
     test('names at most three files, then counts the rest', () async {

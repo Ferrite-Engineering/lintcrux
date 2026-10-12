@@ -124,7 +124,7 @@ class CdcEngine implements LintEngine {
   @override
   Future<String?> detectVersion(EngineBinaryConfig config) async {
     final probe = await YosysAvailabilityService(
-      runner: processRunner,
+      runner: EngineYosysProcessRunner(processRunner),
       executableNameOverride: yosysExecutableFor(
         config,
         resolver: bundledBinaryResolver,
@@ -165,6 +165,7 @@ class CdcEngine implements LintEngine {
             'from the remaining files would miss any crossing that involves '
             'the excluded ones.',
         location: SourceLocation(file: dropped.first, line: 1, column: 1),
+        raw: const <String, dynamic>{Violation.analysisFailedKey: true},
       );
       return;
     }
@@ -174,15 +175,21 @@ class CdcEngine implements LintEngine {
       resolver: bundledBinaryResolver,
     );
     final runner = YosysRunner(
-      processRunner: processRunner,
+      processRunner: EngineYosysProcessRunner(
+        processRunner,
+        workingDirectory: yosysWorkingDirectoryFor(request),
+      ),
       executable: executable,
       tempDirectory: tempDirectory,
     );
     final result = await runner.run(
       YosysRunRequest(
-        sources: <YosysSourceFile>[
-          for (final f in request.sourceFiles) YosysSourceFile(f),
-        ],
+        // Each file under its own language, with the project's include paths
+        // and defines: what the Yosys check engine passes, so a design that
+        // elaborates there elaborates here.
+        sources: yosysSourcesFor(request),
+        defines: yosysDefinesFor(request),
+        includePaths: request.includePaths,
         topModule: request.topModule,
         // `flatten` is required rather than cosmetic: without it every module
         // is its own scope and a crossing *between* two instances is invisible,
@@ -219,6 +226,9 @@ class CdcEngine implements LintEngine {
             line: 1,
             column: 1,
           ),
+          // A finding about the run, not the design: the headless binary
+          // fails the run on it rather than counting it as one error.
+          raw: const <String, dynamic>{Violation.analysisFailedKey: true},
         );
         return;
       case YosysRunFailure() || YosysRunTimeout() || YosysRunCancelled():
@@ -243,6 +253,7 @@ class CdcEngine implements LintEngine {
           line: 1,
           column: 1,
         ),
+        raw: const <String, dynamic>{Violation.analysisFailedKey: true},
       );
       return;
     }

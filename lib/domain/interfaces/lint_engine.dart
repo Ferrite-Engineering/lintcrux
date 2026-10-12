@@ -80,6 +80,7 @@ class LintRunRequest {
     required this.binary,
     required this.language,
     this.droppedSources = const <String>[],
+    this.sourceLanguages = const <String, HdlLanguage>{},
     this.includePaths = const <String>[],
     this.defines = const <String, String>{},
     this.topModule,
@@ -89,6 +90,18 @@ class LintRunRequest {
 
   /// Source files passed to the engine.
   final List<String> sourceFiles;
+
+  /// The language the project resolved for each file in [sourceFiles],
+  /// keyed by path: the file's declared language, else the one its
+  /// extension implies.
+  ///
+  /// [language] is the request-level answer and is what a per-file linter
+  /// needs. An engine that reads files under more than one dialect in one
+  /// run (Yosys needs `read_verilog -sv` for a SystemVerilog file and not
+  /// for a Verilog one) asks [languageOf] instead. Empty when the caller
+  /// built the request by hand, in which case [languageOf] answers
+  /// [language] for every file.
+  final Map<String, HdlLanguage> sourceLanguages;
 
   /// Source files the language router excluded for THIS engine, because
   /// the engine does not support their language.
@@ -129,12 +142,17 @@ class LintRunRequest {
   /// `.svlint.toml`) look for it here.
   final String projectRoot;
 
+  /// The language to read [path] under: its entry in [sourceLanguages],
+  /// else [language].
+  HdlLanguage languageOf(String path) => sourceLanguages[path] ?? language;
+
   /// Returns a copy with overridden fields. Used by the incremental
   /// re-run path to swap [sourceFiles] for the changed subset without
   /// rebuilding the request from scratch.
   LintRunRequest copyWith({
     List<String>? sourceFiles,
     List<String>? droppedSources,
+    Map<String, HdlLanguage>? sourceLanguages,
     List<String>? includePaths,
     Map<String, String>? defines,
     String? topModule,
@@ -150,6 +168,9 @@ class LintRunRequest {
       // would let a whole-design engine analyse a partial design on every
       // re-run while the first run correctly refused.
       droppedSources: droppedSources ?? this.droppedSources,
+      // Carried for the same reason: a re-run over the changed subset must
+      // still read each file under its own language.
+      sourceLanguages: sourceLanguages ?? this.sourceLanguages,
       includePaths: includePaths ?? this.includePaths,
       defines: defines ?? this.defines,
       topModule: topModule ?? this.topModule,

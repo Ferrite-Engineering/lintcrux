@@ -73,6 +73,21 @@ class Violation {
   /// Whether this violation is currently suppressed by [suppression].
   bool get isSuppressed => suppression != null;
 
+  /// Key in [raw] an engine sets to `true` on a violation that reports the
+  /// engine could not analyse the design (an elaboration failure, sources
+  /// it had to refuse) rather than a property of the design.
+  ///
+  /// Such a violation is shown like any other, so the user sees why there
+  /// are no findings. A headless run must not count it as a completed
+  /// analysis: `HeadlessRunner` reports it as a run failure, because a CI
+  /// job that read the run as clean would be gating on a design nothing
+  /// checked.
+  static const String analysisFailedKey = 'lintcrux.analysis_failed';
+
+  /// Whether this violation reports that the engine could not analyse the
+  /// design. See [analysisFailedKey].
+  bool get isAnalysisFailure => raw[analysisFailedKey] == true;
+
   /// The underlying SARIF `result` object preserved verbatim for
   /// round-tripping. Untyped by design — SARIF's full shape is too wide
   /// for a typed mirror.

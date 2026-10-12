@@ -47,11 +47,13 @@ class EngineLanguageRouter {
       final caps = engine.capabilities;
       final supported = caps.supportedLanguages;
       final used = <String>[];
+      final languages = <String, HdlLanguage>{};
       final dropped = <String>[];
       for (final file in typed) {
         final fileLang = file.resolveLanguage();
         if (_engineAcceptsLanguage(supported, fileLang)) {
           used.add(file.path);
+          languages[file.path] = fileLang;
         } else {
           dropped.add(file.path);
         }
@@ -59,6 +61,7 @@ class EngineLanguageRouter {
       perEngine[engine.id] = EngineSourceSelection(
         engineId: engine.id,
         sourcesUsed: List<String>.unmodifiable(used),
+        sourceLanguages: Map<String, HdlLanguage>.unmodifiable(languages),
         sourcesDropped: List<String>.unmodifiable(dropped),
         sourcesTotal: typed.length,
         // Engine-level request language: pick the single supported
@@ -125,6 +128,7 @@ class EngineSourceSelection {
     required this.sourcesDropped,
     required this.sourcesTotal,
     required this.requestLanguage,
+    this.sourceLanguages = const <String, HdlLanguage>{},
   });
 
   /// Engine this selection applies to.
@@ -132,6 +136,11 @@ class EngineSourceSelection {
 
   /// Source files this engine should receive.
   final List<String> sourcesUsed;
+
+  /// The resolved language of each file in [sourcesUsed], keyed by path.
+  /// Becomes the request's `sourceLanguages`, so an engine that reads more
+  /// than one dialect in a run can pick the right reader per file.
+  final Map<String, HdlLanguage> sourceLanguages;
 
   /// Source files dropped because the engine doesn't accept their
   /// language. Kept for diagnostics — the run status panel does not

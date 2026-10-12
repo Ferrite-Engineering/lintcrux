@@ -71,6 +71,35 @@ void main() {
   });
 
   group('LintRunRequest', () {
+    test('languageOf answers the per-file language, else the request one', () {
+      const request = LintRunRequest(
+        sourceFiles: ['/p/top.sv', '/p/old.v'],
+        binary: EngineBinaryConfig.system(),
+        language: HdlLanguage.mixed,
+        sourceLanguages: {'/p/top.sv': HdlLanguage.systemVerilog},
+      );
+      expect(request.languageOf('/p/top.sv'), HdlLanguage.systemVerilog);
+      expect(request.languageOf('/p/old.v'), HdlLanguage.mixed);
+    });
+
+    test('copyWith carries sourceLanguages through a re-run', () {
+      const original = LintRunRequest(
+        sourceFiles: ['/p/top.sv', '/p/old.v'],
+        binary: EngineBinaryConfig.system(),
+        language: HdlLanguage.systemVerilog,
+        sourceLanguages: {
+          '/p/top.sv': HdlLanguage.systemVerilog,
+          '/p/old.v': HdlLanguage.verilog,
+        },
+      );
+      final rerun = original.copyWith(sourceFiles: ['/p/old.v']);
+      expect(rerun.languageOf('/p/old.v'), HdlLanguage.verilog);
+      expect(
+        original.copyWith(sourceLanguages: const {}).languageOf('/p/old.v'),
+        HdlLanguage.systemVerilog,
+      );
+    });
+
     test('defaults are conservative empty collections', () {
       const req = LintRunRequest(
         sourceFiles: ['/x.v'],

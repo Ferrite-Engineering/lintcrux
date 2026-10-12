@@ -78,6 +78,20 @@ project".
 
 Svlint has no structured output mode; LintCrux parses its default report, which is the only svlint output that names the rule. A non-zero exit that reports no finding (an option svlint does not know, a source it cannot open) is an engine failure, not a clean run.
 
+## `perEngineOptions.yosys`
+
+| Key | Type | Meaning |
+|---|---|---|
+| `workingDirectory` | string | The directory Yosys runs from, relative to the project root or absolute. Defaults to the project root. A relative path in `$readmemh` or `$readmemb` resolves against it, so a design that loads a memory image gives the same answer wherever LintCrux was started from. |
+
+## `perEngineOptions.cdc`
+
+| Key | Type | Meaning |
+|---|---|---|
+| `workingDirectory` | string | As for `yosys`: CDC drives Yosys and resolves memory images the same way. |
+
+Both Yosys-backed engines read each source under the language the project resolved for it (a declared language, else the extension), and pass the project's `includePaths` and `defines`.
+
 ## `perEngineOptions.ghdl`
 
 | Key | Type | Meaning |

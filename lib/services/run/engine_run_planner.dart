@@ -108,6 +108,7 @@ class EngineRunPlanner {
           engine: engine,
           request: LintRunRequest(
             sourceFiles: selection.sourcesUsed,
+            sourceLanguages: selection.sourceLanguages,
             droppedSources: selection.sourcesDropped,
             includePaths: project.includePaths,
             defines: project.defines,

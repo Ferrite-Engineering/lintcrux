@@ -111,7 +111,7 @@ class YosysCheckEngine implements LintEngine {
   @override
   Future<String?> detectVersion(EngineBinaryConfig config) async {
     final service = YosysAvailabilityService(
-      runner: processRunner,
+      runner: EngineYosysProcessRunner(processRunner),
       executableNameOverride: yosysExecutableFor(
         config,
         resolver: bundledBinaryResolver,
@@ -139,21 +139,18 @@ class YosysCheckEngine implements LintEngine {
         resolver: bundledBinaryResolver,
       );
       final runner = YosysRunner(
-        processRunner: processRunner,
+        processRunner: EngineYosysProcessRunner(
+          processRunner,
+          workingDirectory: yosysWorkingDirectoryFor(request),
+        ),
         executable: executable,
         tempDirectory: tempDirectory,
       );
       final result = await runner.run(
-        YosysRunRequest.fromPaths(
-          sourceFiles: request.sourceFiles,
+        YosysRunRequest(
+          sources: yosysSourcesFor(request),
           topModule: request.topModule,
-          defines: [
-            for (final entry in request.defines.entries)
-              if (entry.value.isEmpty)
-                entry.key
-              else
-                '${entry.key}=${entry.value}',
-          ],
+          defines: yosysDefinesFor(request),
           includePaths: request.includePaths,
           extraCommands: const ['check -assert'],
         ),
