@@ -252,6 +252,25 @@ void main() {
     handle.dispose();
   });
 
+  testWidgets('a clicked row takes focus, so the arrow keys work at once', (
+    tester,
+  ) async {
+    // The click selected the row and moved the Tab stop but left focus where
+    // it was, so Down did nothing until the user had tabbed into the list.
+    final container = await _pump(tester);
+
+    await tester.tap(find.text('m5'));
+    await tester.pumpAndSettle();
+    expect(container.read(selectedViolationProvider), _v(5));
+
+    await _press(tester, LogicalKeyboardKey.arrowDown);
+    expect(container.read(selectedViolationProvider), _v(6));
+    await _press(tester, LogicalKeyboardKey.arrowUp);
+    await _press(tester, LogicalKeyboardKey.arrowUp);
+    expect(container.read(selectedViolationProvider), _v(4));
+    expect(tester.takeException(), isNull);
+  });
+
   // The row sentence and the list's keyboard hint are localized; the keys and
   // the selection that follows them are not locale-dependent, and must not
   // break in a CJK rendering.

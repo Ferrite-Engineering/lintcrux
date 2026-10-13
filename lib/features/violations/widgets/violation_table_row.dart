@@ -268,6 +268,11 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
                         // A later Tab into the list returns to the row the
                         // user clicked.
                         widget.focus?.moveTabStopTo(violation);
+                        // And the arrow keys work at once, as in VS Code or
+                        // Finder: a click that selected a row but left focus
+                        // where it was made Down do nothing until the user
+                        // had tabbed into the list.
+                        _node.requestFocus();
                       }
                     },
                     // Inner detector must NOT be opaque: opaque hit-testing
@@ -446,8 +451,8 @@ class _LeadingCells extends StatelessWidget {
 }
 
 /// [file] relative to [projectRoot] when it lies inside it, else [file]
-/// unchanged. The File column shows this; its tooltip carries the full path.
-@visibleForTesting
+/// unchanged. The File column shows this, and so does the inspector's
+/// Related locations list; the tooltip carries the full path in both.
 String displayPath(String file, String? projectRoot) {
   if (projectRoot == null || projectRoot.isEmpty) return file;
   return p.isWithin(projectRoot, file)
