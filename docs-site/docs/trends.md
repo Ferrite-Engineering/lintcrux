@@ -22,7 +22,7 @@ Three charts are available from the `Tools` menu and the command palette:
 
 2. **Read the movement.**
 
-    A rising line is accumulating debt; a falling line is a cleanup landing. Hover a point to see the exact count for that run.
+    A rising line is accumulating debt; a falling line is a cleanup landing. The horizontal axis is labelled with run dates in your language's short date format, and the vertical axis with whole violation counts. Hover a point (or a bar, on Severity Drift) to see that run's date and exact count. A screen reader reads each chart as one item naming both axes and their ranges.
 
 ## The calendar heatmap {#heatmap}
 

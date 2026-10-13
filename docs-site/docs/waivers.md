@@ -31,7 +31,7 @@ The Pro command line applies the same committed `.lintcrux-waivers.json` in your
 
 A waiver matches a violation when all of these hold:
 
-- **Rule** — the waiver's rule id equals the violation's. Engine rule renames are tolerated through the rule-alias table, so a waiver written against a retired id (for example `verilator/UNUSED`) still matches the renamed rule.
+- **Rule** — the waiver's rule id equals the violation's. Engine rule renames are tolerated through the rule-alias table, so a waiver written against a retired id (for example `verilator/UNUSED`) still matches the renamed rule. Waiver Review shows a notice on that waiver's row naming the new id, and a command-line run prints a warning line on stderr for it, so you can update the waiver to the current id.
 - **File** — the waiver's file path equals the violation's file path exactly. There is no glob or directory matching.
 - **Lines** — if the waiver has a line range, the violation's line falls inside it; a waiver without one covers the whole file.
 - **Not expired** — the waiver has no expiry date, or it has not passed.
