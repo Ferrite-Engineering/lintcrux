@@ -12,8 +12,11 @@ import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/features/violations/widgets/severity_chip.dart';
+import 'package:lintcrux/features/violations/widgets/violation_table_row.dart'
+    show displayPath;
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/services/editor/editor_command_provider.dart';
+import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/rules/rule_database_provider.dart';
 
 /// Right-pane inspector that surfaces details for the currently
@@ -394,22 +397,32 @@ class _RelatedLocationsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10N.of(context);
+    // The same rule as the table's File column: project-relative on screen,
+    // so a screenshot does not carry the user's home directory, with the
+    // full path in the tooltip.
+    final projectRoot = ref.watch(
+      currentProjectProvider.select((p) => p?.rootPath),
+    );
     return _Section(
       title: l10n.inspectorRelatedLocationsHeader,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final loc in violation.relatedLocations)
-            InkWell(
-              onTap: () async {
-                final svc = ref.read(clickToSourceServiceProvider);
-                await svc.openInEditor(loc);
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Text(
-                  '${loc.file}:${loc.line}:${loc.column}',
-                  style: Theme.of(context).textTheme.bodySmall,
+            Tooltip(
+              message: '${loc.file}:${loc.line}:${loc.column}',
+              child: InkWell(
+                onTap: () async {
+                  final svc = ref.read(clickToSourceServiceProvider);
+                  await svc.openInEditor(loc);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    '${displayPath(loc.file, projectRoot)}'
+                    ':${loc.line}:${loc.column}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ),
               ),
             ),

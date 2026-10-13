@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/models/editor/editor_command.dart';
 import 'package:lintcrux/domain/models/engine_run_status.dart';
+import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
@@ -20,6 +21,7 @@ import 'package:lintcrux/features/violations/providers/selected_violation_provid
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/services/editor/click_to_source_service.dart';
 import 'package:lintcrux/services/editor/editor_command_provider.dart';
+import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/rules/rule_database.dart';
 import 'package:lintcrux/services/rules/rule_database_provider.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
@@ -271,6 +273,55 @@ void main() {
         contains('/p/top.sv'),
       );
     });
+
+    testWidgets(
+      'related locations inside the project show project-relative, with the '
+      'full path as the tooltip',
+      (tester) async {
+        // The table's File column is project-relative; the inspector printed
+        // the absolute path, which put the user's home directory in every
+        // screenshot and read differently from the row above it.
+        final launcher = _RecordingLauncher();
+        final withRelated = violation.copyWith(
+          relatedLocations: const [
+            relatedA,
+            SourceLocation(file: '/elsewhere/lib.sv', line: 2, column: 5),
+          ],
+        );
+        await tester.pumpWidget(
+          wrap(
+            const InspectorPane(),
+            overrides: [_clickToSourceOverride(launcher)],
+            storeViolations: [withRelated],
+          ),
+        );
+        await tester.pump();
+        containerOf(tester)
+            .read(currentProjectProvider.notifier)
+            .load(
+              const LintProject(
+                name: 'p',
+                rootPath: '/p',
+                sourceFiles: ['a.sv', 'pkg.sv'],
+              ),
+            );
+        await selectViolation(tester, withRelated);
+
+        expect(find.text('pkg.sv:4:1'), findsOneWidget);
+        expect(find.text('/p/pkg.sv:4:1'), findsNothing);
+        expect(find.byTooltip('/p/pkg.sv:4:1'), findsOneWidget);
+        // A location outside the project keeps its full path on screen.
+        expect(find.text('/elsewhere/lib.sv:2:5'), findsOneWidget);
+
+        // Click-to-open still receives the real location.
+        await tester.tap(find.text('pkg.sv:4:1'));
+        await tester.pump();
+        expect(
+          launcher.launched.single.arguments.join(' '),
+          contains('/p/pkg.sv'),
+        );
+      },
+    );
   });
 
   group('InspectorPane locale sweep', () {
