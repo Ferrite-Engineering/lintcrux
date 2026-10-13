@@ -117,6 +117,10 @@ class CliArgsParser {
       ),
       quiet: results['quiet'] as bool? ?? false,
       engineTimeout: engineTimeout,
+      sarifRoot: switch (results[kSarifRootOption] as String?) {
+        final String s when s.isNotEmpty => s,
+        _ => null,
+      },
     );
     return CliArgsParseResult(args: parsed, usage: usage);
   }
@@ -126,6 +130,9 @@ class CliArgsParser {
 
   /// The option that sets the per-engine wall-clock budget, in seconds.
   static const String kEngineTimeoutOption = 'engine-timeout';
+
+  /// The option naming the directory SARIF paths are written relative to.
+  static const String kSarifRootOption = 'sarif-root';
 
   /// The budget the headless runner applies when [kEngineTimeoutOption] is
   /// absent. One definition, quoted in the usage text and used as the
@@ -263,6 +270,16 @@ Examples:
             'Shorthand for "--export sarif --out <path>". Writes the '
             'aggregated violation set as SARIF 2.1.0, suitable for '
             'upload to GitHub Code Scanning or GitLab SAST.',
+      )
+      ..addOption(
+        kSarifRootOption,
+        valueHelp: 'dir',
+        help:
+            'Directory SARIF paths are written relative to and declared as '
+            '%SRCROOT%. Default: the nearest enclosing git repository root '
+            'of the project, else the project root. GitHub code scanning '
+            'resolves paths against the repository root, so set this when '
+            'the checkout root is not the git root.',
       )
       ..addOption(
         'baseline',

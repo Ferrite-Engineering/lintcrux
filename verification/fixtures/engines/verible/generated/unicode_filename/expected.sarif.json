@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "verible"
+          "name": "verible",
+          "rules": [
+            {
+              "id": "explicit-parameter-storage-type",
+              "name": "explicit-parameter-storage-type",
+              "shortDescription": {
+                "text": "explicit-parameter-storage-type"
+              },
+              "helpUri": "https://chipsalliance.github.io/verible/lint.html#explicit-parameter-storage-type",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -20,11 +33,11 @@
       },
       "results": [
         {
-          "rule": "explicit-parameter-storage-type",
           "message": {
             "text": "パラメータ"
           },
           "ruleId": "explicit-parameter-storage-type",
+          "ruleIndex": 0,
           "level": "warning",
           "locations": [
             {

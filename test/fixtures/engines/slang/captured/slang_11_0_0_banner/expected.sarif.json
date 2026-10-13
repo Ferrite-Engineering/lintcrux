@@ -5,7 +5,31 @@
     {
       "tool": {
         "driver": {
-          "name": "slang"
+          "name": "slang",
+          "rules": [
+            {
+              "id": "UNCLASSIFIED",
+              "name": "UNCLASSIFIED",
+              "shortDescription": {
+                "text": "UNCLASSIFIED"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#UNCLASSIFIED",
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "unused-variable",
+              "name": "unused-variable",
+              "shortDescription": {
+                "text": "unused-variable"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#unused-variable",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -44,6 +68,7 @@
             "text": "use of undeclared identifier 'undeclared_thing'"
           },
           "ruleId": "UNCLASSIFIED",
+          "ruleIndex": 0,
           "level": "error",
           "locations": [
             {
@@ -69,6 +94,7 @@
             "text": "unused variable 'never_used'"
           },
           "ruleId": "unused-variable",
+          "ruleIndex": 1,
           "level": "warning",
           "locations": [
             {

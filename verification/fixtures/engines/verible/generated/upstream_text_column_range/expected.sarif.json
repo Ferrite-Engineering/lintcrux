@@ -5,7 +5,42 @@
     {
       "tool": {
         "driver": {
-          "name": "verible"
+          "name": "verible",
+          "rules": [
+            {
+              "id": "line-length",
+              "name": "line-length",
+              "shortDescription": {
+                "text": "line-length"
+              },
+              "helpUri": "https://chipsalliance.github.io/verible/lint.html#line-length",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "no-tabs",
+              "name": "no-tabs",
+              "shortDescription": {
+                "text": "no-tabs"
+              },
+              "helpUri": "https://chipsalliance.github.io/verible/lint.html#no-tabs",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "explicit-parameter-storage-type",
+              "name": "explicit-parameter-storage-type",
+              "shortDescription": {
+                "text": "explicit-parameter-storage-type"
+              },
+              "helpUri": "https://chipsalliance.github.io/verible/lint.html#explicit-parameter-storage-type",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +56,7 @@
       "results": [
         {
           "ruleId": "line-length",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Line length exceeds max: 100; is: 118"
@@ -41,6 +77,7 @@
         },
         {
           "ruleId": "no-tabs",
+          "ruleIndex": 1,
           "level": "warning",
           "message": {
             "text": "Use spaces, not tabs."
@@ -61,6 +98,7 @@
         },
         {
           "ruleId": "explicit-parameter-storage-type",
+          "ruleIndex": 2,
           "level": "warning",
           "message": {
             "text": "Explicit parameter storage type recommended"

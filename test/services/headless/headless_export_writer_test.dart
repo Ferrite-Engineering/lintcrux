@@ -41,17 +41,181 @@ void main() {
     );
   }
 
+  // The fake root sits inside this repository, so it is named outright:
+  // otherwise the writer would find the checkout's own `.git` above it and
+  // relativize against that.
   Map<String, dynamic> render(List<Violation> violations) {
     final json = writer.renderSarif(
       violations: violations,
       projectRoot: root,
+      sarifRoot: root,
       runId: 'my-project',
       exportTime: DateTime.utc(2026, 7, 21, 12),
     );
     return jsonDecode(json) as Map<String, dynamic>;
   }
 
+  Map<String, dynamic> firstResult(Map<String, dynamic> doc) =>
+      (((doc['runs'] as List).first as Map)['results'] as List).first
+          as Map<String, dynamic>;
+
+  String uriOf(Map<String, dynamic> result) =>
+      ((((result['locations'] as List).first as Map)['physicalLocation']
+                  as Map)['artifactLocation']
+              as Map)['uri']
+          as String;
+
+  group('the SARIF root', () {
+    late Directory tmp;
+
+    setUp(() => tmp = Directory.systemTemp.createTempSync('lintcrux_sarif_'));
+    tearDown(() => tmp.deleteSync(recursive: true));
+
+    Map<String, dynamic> renderIn({
+      required String projectRoot,
+      required String file,
+      String? sarifRoot,
+    }) {
+      final json = writer.renderSarif(
+        violations: <Violation>[
+          Violation(
+            engineId: 'verilator',
+            ruleId: 'verilator/UNUSEDSIGNAL',
+            severity: Severity.warning,
+            message: 'a finding',
+            location: SourceLocation(file: file, line: 1, column: 1),
+          ),
+        ],
+        projectRoot: projectRoot,
+        sarifRoot: sarifRoot,
+        runId: 'demo',
+      );
+      return jsonDecode(json) as Map<String, dynamic>;
+    }
+
+    String srcRoot(Map<String, dynamic> doc) =>
+        ((((doc['runs'] as List).first as Map)['originalUriBaseIds']
+                    as Map)[HeadlessExportWriter.srcRootBaseId]
+                as Map)['uri']
+            as String;
+
+    test('is the enclosing git repository, not the project folder', () {
+      // GitHub resolves a relative URI against the repository root and
+      // ignores originalUriBaseIds. A project kept in `rtl/` recorded every
+      // alert at `alu.sv` instead of `rtl/alu.sv`, so the PR check found
+      // no alerts in the changed lines.
+      final repo = Directory(p.join(tmp.path, 'repo'))..createSync();
+      Directory(p.join(repo.path, '.git')).createSync();
+      final rtl = Directory(p.join(repo.path, 'rtl'))..createSync();
+      final doc = renderIn(
+        projectRoot: rtl.path,
+        file: p.join(rtl.path, 'alu.sv'),
+      );
+      expect(uriOf(firstResult(doc)), 'rtl/alu.sv');
+      expect(srcRoot(doc), Uri.directory(repo.path).toString());
+    });
+
+    test('a .git file (submodule, linked work tree) marks the root too', () {
+      final repo = Directory(p.join(tmp.path, 'repo'))..createSync();
+      File(p.join(repo.path, '.git')).writeAsStringSync('gitdir: ../x\n');
+      final rtl = Directory(p.join(repo.path, 'rtl'))..createSync();
+      final doc = renderIn(
+        projectRoot: rtl.path,
+        file: p.join(rtl.path, 'alu.sv'),
+      );
+      expect(uriOf(firstResult(doc)), 'rtl/alu.sv');
+    });
+
+    test('--sarif-root names it outright', () {
+      final repo = Directory(p.join(tmp.path, 'repo'))..createSync();
+      Directory(p.join(repo.path, '.git')).createSync();
+      final rtl = Directory(p.join(repo.path, 'rtl'))..createSync();
+      final doc = renderIn(
+        projectRoot: rtl.path,
+        file: p.join(rtl.path, 'alu.sv'),
+        sarifRoot: rtl.path,
+      );
+      expect(uriOf(firstResult(doc)), 'alu.sv');
+      expect(srcRoot(doc), Uri.directory(rtl.path).toString());
+    });
+
+    test('with no repository anywhere above, the project root stands', () {
+      final rtl = Directory(p.join(tmp.path, 'rtl'))..createSync();
+      final doc = renderIn(
+        projectRoot: rtl.path,
+        file: p.join(rtl.path, 'alu.sv'),
+      );
+      expect(uriOf(firstResult(doc)), 'alu.sv');
+      expect(srcRoot(doc), Uri.directory(rtl.path).toString());
+    });
+
+    test('findRepositoryRoot answers null off any repository', () {
+      expect(HeadlessExportWriter.findRepositoryRoot(tmp.path), isNull);
+    });
+  });
+
   group('SARIF shaped for GitHub code scanning', () {
+    test('every rule has a descriptor and each result points at it', () {
+      final doc = render(<Violation>[
+        violation(),
+        violation(rule: 'verilator/UNUSEDSIGNAL'),
+      ]);
+      final run = (doc['runs'] as List).first as Map<String, dynamic>;
+      final rules =
+          ((run['tool'] as Map)['driver'] as Map)['rules'] as List<dynamic>;
+      expect(rules.map((r) => (r as Map)['id']), [
+        'WIDTHTRUNC',
+        'UNUSEDSIGNAL',
+      ]);
+      final results = run['results'] as List;
+      expect(results.map((r) => (r as Map)['ruleIndex']), [0, 1]);
+      final first = rules.first as Map<String, dynamic>;
+      expect(first['name'], 'WIDTHTRUNC');
+      expect((first['shortDescription'] as Map)['text'], 'WIDTHTRUNC');
+      expect(first['helpUri'], 'https://verilator.org/warn/WIDTHTRUNC');
+      expect((first['defaultConfiguration'] as Map)['level'], 'warning');
+    });
+
+    test("an engine's structured data survives in properties", () {
+      // A CDC finding carries the registers, domains, width and synchronizer
+      // kind the crossing connects; dropping the whole bag left a consumer
+      // able to see that a crossing was reported and nothing else.
+      final doc = render(<Violation>[
+        violation(
+          raw: <String, dynamic>{
+            'src_domain': 'clk_a',
+            'dst_domain': 'clk_b',
+            'width': 8,
+            'sync_kind': 'none',
+            'src_register': 'top.u_a.q',
+          },
+        ),
+      ]);
+      final props = firstResult(doc)['properties'] as Map<String, dynamic>;
+      expect(props['src_domain'], 'clk_a');
+      expect(props['width'], 8);
+      expect(props['src_register'], 'top.u_a.q');
+    });
+
+    test('a path inside the structured data is made relative too', () {
+      final doc = render(<Violation>[
+        violation(
+          raw: <String, dynamic>{
+            'lintcrux.pragmaWaiverSourceFile': p.join(root, 'rtl', 'top.sv'),
+            'nested': <String, dynamic>{
+              'files': <String>[p.join(root, 'rtl', 'a.sv')],
+            },
+          },
+        ),
+      ]);
+      final props = firstResult(doc)['properties'] as Map<String, dynamic>;
+      expect(props['lintcrux.pragmaWaiverSourceFile'], 'rtl/top.sv');
+      expect(((props['nested'] as Map)['files'] as List).single, 'rtl/a.sv');
+      // The root appears once, as the declared %SRCROOT% base; no result
+      // carries it.
+      expect(jsonEncode(firstResult(doc)), isNot(contains(root)));
+    });
+
     test('declares the 2.1.0 version and schema', () {
       final doc = render(<Violation>[violation()]);
       expect(doc['version'], '2.1.0');
@@ -193,11 +357,8 @@ void main() {
       final runs = doc['runs'] as List;
       expect(runs, hasLength(2));
       expect(
-        runs.map((r) => ((r as Map)['tool'] as Map)['driver']),
-        containsAll(<Object>[
-          <String, dynamic>{'name': 'verilator'},
-          <String, dynamic>{'name': 'verible'},
-        ]),
+        runs.map((r) => (((r as Map)['tool'] as Map)['driver'] as Map)['name']),
+        containsAll(<Object>['verilator', 'verible']),
       );
     });
 

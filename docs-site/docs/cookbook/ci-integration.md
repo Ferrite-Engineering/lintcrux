@@ -316,11 +316,23 @@ a gap.
 `--export sarif --out lint.sarif` produces SARIF 2.1.0 already shaped
 for the upload:
 
-- paths are **relative to the project root** with a declared
-  `%SRCROOT%` base, so alerts annotate the PR diff. (Absolute paths are
+- paths are **relative to the repository root** (the nearest enclosing
+  `.git`, else the project root; `--sarif-root <dir>` overrides it) with a
+  declared `%SRCROOT%` base, so alerts annotate the PR diff even when the
+  project file sits in a subfolder such as `rtl/`. (Absolute paths are
   the classic failure here: GitHub accepts the file and then annotates
   nothing, because no path in the checkout matches
-  `/home/runner/work/repo/repo/rtl/top.sv`.)
+  `/home/runner/work/repo/repo/rtl/top.sv`. Paths relative to a subfolder
+  fail more quietly: the alerts are recorded against the wrong file, so the
+  PR check reports no new alerts.)
+- every rule that appears in the run has a `tool.driver.rules[]`
+  descriptor (id, name, default level, a help link where the engine
+  documents its rules), and each result carries `ruleIndex`, so an alert
+  is titled `verilator / UNUSEDSIGNAL` rather than `verilator /`.
+- an engine's structured data (a CDC finding's source and destination
+  registers, both clock domains, the bus width and the synchronizer kind)
+  rides in each result's `properties`, with any path inside it made
+  relative like the locations.
 - `automationDetails.id` is stable across runs, so a re-upload
   supersedes the previous one instead of creating a duplicate category.
 - one SARIF run per engine, so a finding's provenance survives.

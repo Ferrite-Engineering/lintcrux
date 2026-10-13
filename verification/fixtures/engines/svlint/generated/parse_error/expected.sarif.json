@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "svlint"
+          "name": "svlint",
+          "rules": [
+            {
+              "id": "parse_error",
+              "name": "parse_error",
+              "shortDescription": {
+                "text": "parse_error"
+              },
+              "helpUri": "https://github.com/dalance/svlint/blob/master/MANUAL.md#parse_error",
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "parse_error",
+          "ruleIndex": 0,
           "level": "error",
           "message": {
             "text": "parse error"

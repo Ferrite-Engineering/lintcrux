@@ -5,7 +5,42 @@
     {
       "tool": {
         "driver": {
-          "name": "ghdl"
+          "name": "ghdl",
+          "rules": [
+            {
+              "id": "hide",
+              "name": "hide",
+              "shortDescription": {
+                "text": "hide"
+              },
+              "helpUri": "https://ghdl.github.io/ghdl/using/InvokingGHDL.html#cmdoption-ghdl-warn-hide",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "UNCLASSIFIED",
+              "name": "UNCLASSIFIED",
+              "shortDescription": {
+                "text": "UNCLASSIFIED"
+              },
+              "helpUri": "https://ghdl.github.io/ghdl/using/InvokingGHDL.html#cmdoption-ghdl-warn-UNCLASSIFIED",
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "unused",
+              "name": "unused",
+              "shortDescription": {
+                "text": "unused"
+              },
+              "helpUri": "https://ghdl.github.io/ghdl/using/InvokingGHDL.html#cmdoption-ghdl-warn-unused",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -29,6 +64,7 @@
       "results": [
         {
           "ruleId": "hide",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "declaration of \"rst\" hides port \"rst\""
@@ -56,6 +92,7 @@
         },
         {
           "ruleId": "UNCLASSIFIED",
+          "ruleIndex": 1,
           "level": "error",
           "message": {
             "text": "no declaration for \"bad_signal\""
@@ -82,6 +119,7 @@
         },
         {
           "ruleId": "unused",
+          "ruleIndex": 2,
           "level": "warning",
           "message": {
             "text": "variable \"shared_count\" is never referenced"
@@ -109,6 +147,7 @@
         },
         {
           "ruleId": "unused",
+          "ruleIndex": 2,
           "level": "warning",
           "message": {
             "text": "signal \"unused_sig\" is never referenced"

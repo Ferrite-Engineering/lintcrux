@@ -58,6 +58,7 @@ class CliArgs {
     this.engineIds = const <String>[],
     this.quiet = false,
     this.engineTimeout,
+    this.sarifRoot,
   });
 
   /// Empty/default args — equivalent to `lintcrux` with no flags.
@@ -216,6 +217,17 @@ class CliArgs {
   /// this field.
   final Duration? engineTimeout;
 
+  /// The directory SARIF paths are written relative to and declared as
+  /// `%SRCROOT%`, supplied via `--sarif-root <dir>`; `null` means the
+  /// nearest enclosing git repository root of the project, else the project
+  /// root.
+  ///
+  /// GitHub code scanning resolves a relative URI against the repository
+  /// root and ignores `originalUriBaseIds`, so a project kept in a
+  /// subfolder had every alert recorded at the wrong path. The flag covers
+  /// a CI layout whose checkout root is not the git root.
+  final String? sarifRoot;
+
   /// Returns a copy with overridden fields.
   CliArgs copyWith({
     List<String>? paths,
@@ -239,6 +251,7 @@ class CliArgs {
     List<String>? engineIds,
     bool? quiet,
     Duration? engineTimeout,
+    String? sarifRoot,
   }) {
     return CliArgs(
       paths: paths ?? this.paths,
@@ -262,6 +275,7 @@ class CliArgs {
       engineIds: engineIds ?? this.engineIds,
       quiet: quiet ?? this.quiet,
       engineTimeout: engineTimeout ?? this.engineTimeout,
+      sarifRoot: sarifRoot ?? this.sarifRoot,
     );
   }
 
@@ -296,6 +310,7 @@ class CliArgs {
     if (other.allowMissingEngines != allowMissingEngines) return false;
     if (other.quiet != quiet) return false;
     if (other.engineTimeout != engineTimeout) return false;
+    if (other.sarifRoot != sarifRoot) return false;
     if (other.engineIds.length != engineIds.length) return false;
     for (var i = 0; i < engineIds.length; i++) {
       if (other.engineIds[i] != engineIds[i]) return false;
@@ -328,7 +343,8 @@ class CliArgs {
       failOnNewViolations,
       allowMissingEngines,
       quiet,
-      engineTimeout,
+      // Object.hash takes at most twenty arguments.
+      Object.hash(engineTimeout, sarifRoot),
       Object.hashAll(engineIds),
     );
   }
@@ -344,5 +360,5 @@ class CliArgs {
       'export: $exportFormat, out: $exportOutputPath, '
       'baseline: $baselinePath, failOnNew: $failOnNewViolations, '
       'allowMissingEngines: $allowMissingEngines, engines: $engineIds, '
-      'quiet: $quiet, engineTimeout: $engineTimeout)';
+      'quiet: $quiet, engineTimeout: $engineTimeout, sarifRoot: $sarifRoot)';
 }

@@ -4,11 +4,19 @@
 import 'dart:convert';
 
 import 'package:lintcrux/domain/enums/severity.dart';
+import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/domain/models/run.dart';
 import 'package:lintcrux/domain/models/sarif_report.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/domain/models/waiver.dart';
+import 'package:lintcrux/services/rules/bundled_rule_help.dart';
+
+/// Answers the rule database's entry for `<engineId>/<localRuleId>`, or
+/// `null` when it has none. The desktop export binds the loaded
+/// `RuleDatabase`; the headless binary, which has no asset bundle, passes
+/// nothing and the writer falls back to what it can derive.
+typedef RuleDescriber = Rule? Function(String engineId, String localRuleId);
 
 /// Serializes a [SarifReport] to a SARIF 2.1.0 JSON document.
 ///
@@ -34,6 +42,12 @@ import 'package:lintcrux/domain/models/waiver.dart';
 /// dates and line range ride in `properties.lintcrux` so [SarifReader]
 /// can restore it. The waiver id is not a GUID, so it never goes in
 /// `guid`.
+///
+/// Every rule that appears in a run gets a `tool.driver.rules[]`
+/// descriptor (SARIF §3.49) and each result carries its `ruleIndex`.
+/// GitHub code scanning titles an alert `<tool> / <rule name>` from the
+/// descriptor; without one the header read `verilator /` and the alert
+/// page had no rule description or help link.
 class SarifWriter {
   /// Creates a writer. The writer is stateless; the same instance can
   /// be reused across files.
@@ -41,11 +55,19 @@ class SarifWriter {
     this.pretty = true,
     this.uriBaseId,
     this.originalUriBaseIds = const <String, String>{},
+    this.describeRule,
   });
 
   /// When `true` (default), the produced JSON is pretty-printed with
   /// two-space indentation. Disable for compact CI / piping output.
   final bool pretty;
+
+  /// Where a rule descriptor's description, help link, tags and default
+  /// level come from when the rule database has an entry. `null`, or an
+  /// entry-less rule, falls back to the rule id as the description, the
+  /// bundled help-URL convention ([bundledRuleHelpUri]) and the level of
+  /// the first result reported under the rule.
+  final RuleDescriber? describeRule;
 
   /// Symbolic base emitted as `artifactLocation.uriBaseId` on every
   /// location, or `null` (the default) to omit it.
@@ -90,11 +112,22 @@ class SarifWriter {
   }
 
   Map<String, dynamic> _runToMap(Run run) {
+    // One descriptor per distinct rule, in order of first appearance, and
+    // the index each result points at.
+    final ruleIndex = <String, int>{};
+    final rules = <Map<String, dynamic>>[];
+    for (final v in run.violations) {
+      final local = _localRuleId(run.engineId, v.ruleId);
+      if (ruleIndex.containsKey(local)) continue;
+      ruleIndex[local] = rules.length;
+      rules.add(_ruleDescriptor(run.engineId, local, v));
+    }
     return <String, dynamic>{
       'tool': <String, dynamic>{
         'driver': <String, dynamic>{
           'name': run.engineId,
           if (run.engineVersion.isNotEmpty) 'version': run.engineVersion,
+          if (rules.isNotEmpty) 'rules': rules,
         },
       },
       'invocations': <Map<String, dynamic>>[
@@ -123,7 +156,43 @@ class SarifWriter {
           for (final entry in originalUriBaseIds.entries)
             entry.key: <String, dynamic>{'uri': entry.value},
         },
-      'results': run.violations.map(_violationToMap).toList(),
+      'results': <Map<String, dynamic>>[
+        for (final v in run.violations)
+          _violationToMap(
+            v,
+            ruleIndex: ruleIndex[_localRuleId(run.engineId, v.ruleId)]!,
+          ),
+      ],
+    };
+  }
+
+  /// The `reportingDescriptor` (SARIF §3.49) for [localRuleId], described
+  /// from the rule database when [describeRule] has an entry and from
+  /// [first], the first result reported under the rule, otherwise.
+  Map<String, dynamic> _ruleDescriptor(
+    String engineId,
+    String localRuleId,
+    Violation first,
+  ) {
+    final rule = describeRule?.call(engineId, localRuleId);
+    final help = rule?.helpUri ?? bundledRuleHelpUri(engineId, localRuleId);
+    final short = rule?.shortDescription ?? '';
+    final full = rule?.fullDescription ?? '';
+    final tags = rule?.tags ?? const <String>[];
+    return <String, dynamic>{
+      'id': localRuleId,
+      'name': localRuleId,
+      // GitHub shows this as the alert title; the rule id is the best
+      // fallback, and far better than the empty title no descriptor gave.
+      'shortDescription': <String, dynamic>{
+        'text': short.isNotEmpty ? short : localRuleId,
+      },
+      if (full.isNotEmpty) 'fullDescription': <String, dynamic>{'text': full},
+      if (help != null) 'helpUri': help.toString(),
+      'defaultConfiguration': <String, dynamic>{
+        'level': _severityToLevel(rule?.defaultSeverity ?? first.severity),
+      },
+      if (tags.isNotEmpty) 'properties': <String, dynamic>{'tags': tags},
     };
   }
 
@@ -161,7 +230,7 @@ class SarifWriter {
     'properties',
   };
 
-  Map<String, dynamic> _violationToMap(Violation v) {
+  Map<String, dynamic> _violationToMap(Violation v, {required int ruleIndex}) {
     // Start from the preserved raw bag so vendor extensions survive the
     // round-trip; overwrite the structured fields with the current values
     // so user mutations on the typed wrapper win over the cached raw.
@@ -173,10 +242,13 @@ class SarifWriter {
       for (final entry in v.raw.entries)
         if (sarifResultKeys.contains(entry.key)) entry.key: entry.value,
       'ruleId': _localRuleId(v.engineId, v.ruleId),
+      // Points at this run's descriptor; a `rule` reference read with the
+      // raw bag would carry another document's index, so it is dropped.
+      'ruleIndex': ruleIndex,
       'level': _severityToLevel(v.severity),
       'message': <String, dynamic>{'text': v.message},
       'locations': <Map<String, dynamic>>[_locationToMap(v.location)],
-    };
+    }..remove('rule');
     if (extensions.isNotEmpty) {
       out['properties'] = <String, dynamic>{
         ...extensions,

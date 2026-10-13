@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "svlint"
+          "name": "svlint",
+          "rules": [
+            {
+              "id": "tab_character",
+              "name": "tab_character",
+              "shortDescription": {
+                "text": "tab_character"
+              },
+              "helpUri": "https://github.com/dalance/svlint/blob/master/MANUAL.md#tab_character",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "tab_character",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Replace tab with spaces."

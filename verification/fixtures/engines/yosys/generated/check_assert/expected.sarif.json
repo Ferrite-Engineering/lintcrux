@@ -5,7 +5,31 @@
     {
       "tool": {
         "driver": {
-          "name": "yosys"
+          "name": "yosys",
+          "rules": [
+            {
+              "id": "synthesis-unused-signal-foo",
+              "name": "synthesis-unused-signal-foo",
+              "shortDescription": {
+                "text": "synthesis-unused-signal-foo"
+              },
+              "helpUri": "https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/check.html#synthesis-unused-signal-foo",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "multiply-driven-net-conflict",
+              "name": "multiply-driven-net-conflict",
+              "shortDescription": {
+                "text": "multiply-driven-net-conflict"
+              },
+              "helpUri": "https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/check.html#multiply-driven-net-conflict",
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +45,7 @@
       "results": [
         {
           "ruleId": "synthesis-unused-signal-foo",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "synthesis: unused signal foo"
@@ -45,6 +70,7 @@
         },
         {
           "ruleId": "multiply-driven-net-conflict",
+          "ruleIndex": 1,
           "level": "error",
           "message": {
             "text": "multiply driven net conflict"

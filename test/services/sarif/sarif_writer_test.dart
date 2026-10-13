@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
+import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/domain/models/run.dart';
 import 'package:lintcrux/domain/models/sarif_report.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
@@ -184,6 +185,150 @@ void main() {
         ),
       );
       expect(body.contains('\n'), isFalse);
+    });
+  });
+
+  group('rule descriptors', () {
+    Run run(List<Violation> vs, {String engineId = 'verilator'}) => Run(
+      id: 'r',
+      engineId: engineId,
+      engineVersion: '',
+      startedAt: DateTime.utc(2026),
+      finishedAt: DateTime.utc(2026),
+      violations: vs,
+    );
+    Violation v(
+      String rule, {
+      Severity severity = Severity.warning,
+      String engineId = 'verilator',
+    }) => Violation(
+      engineId: engineId,
+      ruleId: '$engineId/$rule',
+      severity: severity,
+      message: 'm',
+      location: const SourceLocation(file: '/p/a.sv', line: 1, column: 1),
+    );
+    List<dynamic> rulesOf(Map<String, dynamic> m) {
+      final runMap = (m['runs'] as List).single as Map<String, dynamic>;
+      return ((runMap['tool'] as Map)['driver'] as Map)['rules'] as List;
+    }
+
+    test('every ruleId in a run has one, and results point at it', () {
+      final m = const SarifWriter().toMap(
+        SarifReport(
+          runs: [
+            run([
+              v('WIDTH'),
+              v('UNUSEDSIGNAL', severity: Severity.error),
+              v('WIDTH'),
+            ]),
+          ],
+        ),
+      );
+      final rules = rulesOf(m);
+      expect(rules.map((r) => (r as Map)['id']), ['WIDTH', 'UNUSEDSIGNAL']);
+      final results =
+          ((m['runs'] as List).single as Map<String, dynamic>)['results']
+              as List;
+      expect(results.map((r) => (r as Map)['ruleIndex']), [0, 1, 0]);
+      for (final r in results) {
+        final result = r as Map<String, dynamic>;
+        final descriptor = rules[result['ruleIndex'] as int] as Map;
+        expect(descriptor['id'], result['ruleId']);
+      }
+      final width = rules.first as Map<String, dynamic>;
+      expect(width['name'], 'WIDTH');
+      // No database entry: the id is the title, the compiled-in convention
+      // the help link, and the first finding's level the default.
+      expect((width['shortDescription'] as Map)['text'], 'WIDTH');
+      expect(width.containsKey('fullDescription'), isFalse);
+      expect(width['helpUri'], 'https://verilator.org/warn/WIDTH');
+      expect((width['defaultConfiguration'] as Map)['level'], 'warning');
+      expect(
+        ((rules[1] as Map)['defaultConfiguration'] as Map)['level'],
+        'error',
+      );
+    });
+
+    test('describeRule supplies the database entry when there is one', () {
+      final writer = SarifWriter(
+        describeRule: (engineId, local) => local == 'WIDTH'
+            ? Rule(
+                id: '$engineId/WIDTH',
+                defaultSeverity: Severity.error,
+                shortDescription: 'Width mismatch',
+                fullDescription: 'The operands differ in width.',
+                helpUri: Uri.parse('https://example.test/width'),
+                tags: const ['width', 'lint'],
+              )
+            : null,
+      );
+      final rules = rulesOf(
+        writer.toMap(
+          SarifReport(
+            runs: [
+              run([v('WIDTH'), v('OTHER')]),
+            ],
+          ),
+        ),
+      );
+      final width = rules[0] as Map<String, dynamic>;
+      expect((width['shortDescription'] as Map)['text'], 'Width mismatch');
+      expect(
+        (width['fullDescription'] as Map)['text'],
+        'The operands differ in width.',
+      );
+      expect(width['helpUri'], 'https://example.test/width');
+      // The database's default outranks the finding's severity.
+      expect((width['defaultConfiguration'] as Map)['level'], 'error');
+      expect((width['properties'] as Map)['tags'], ['width', 'lint']);
+      final other = rules[1] as Map<String, dynamic>;
+      expect((other['shortDescription'] as Map)['text'], 'OTHER');
+      expect(other.containsKey('properties'), isFalse);
+    });
+
+    test('an engine with no help convention gets no helpUri', () {
+      final rules = rulesOf(
+        const SarifWriter().toMap(
+          SarifReport(
+            runs: [
+              run([v('rule-1', engineId: 'custom')], engineId: 'custom'),
+            ],
+          ),
+        ),
+      );
+      expect((rules.single as Map).containsKey('helpUri'), isFalse);
+    });
+
+    test('a run with no results declares no rules', () {
+      final m = const SarifWriter().toMap(SarifReport(runs: [run(const [])]));
+      final runMap = (m['runs'] as List).single as Map<String, dynamic>;
+      final driver = (runMap['tool'] as Map)['driver'] as Map;
+      expect(driver.containsKey('rules'), isFalse);
+    });
+
+    test('a stale rule reference read with the raw bag is dropped', () {
+      final m = const SarifWriter().toMap(
+        SarifReport(
+          runs: [
+            run([
+              v('WIDTH').copyWith(
+                raw: const <String, dynamic>{
+                  'rule': <String, dynamic>{'index': 7},
+                  'ruleIndex': 7,
+                },
+              ),
+            ]),
+          ],
+        ),
+      );
+      final result =
+          (((m['runs'] as List).single as Map<String, dynamic>)['results']
+                      as List)
+                  .single
+              as Map<String, dynamic>;
+      expect(result['ruleIndex'], 0);
+      expect(result.containsKey('rule'), isFalse);
     });
   });
 

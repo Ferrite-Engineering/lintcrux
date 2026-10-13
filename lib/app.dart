@@ -41,6 +41,7 @@ import 'package:lintcrux/core/theme/lintcrux_theme.dart';
 import 'package:lintcrux/core/theme/lintcrux_theme_tokens.dart';
 import 'package:lintcrux/core/theme/theme_brightness_toggle.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
+import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/domain/models/session/lintcrux_session.dart';
 import 'package:lintcrux/features/about/lintcrux_about_dialog.dart';
 import 'package:lintcrux/features/beta_expiry/beta_expiry_metrics.dart';
@@ -89,6 +90,7 @@ import 'package:lintcrux/plugins/save_filter_preset_opener_provider.dart';
 import 'package:lintcrux/plugins/waiver_review_opener_provider.dart';
 import 'package:lintcrux/services/cli/cli_args.dart' as launch_cli;
 import 'package:lintcrux/services/export/violation_exporters.dart';
+import 'package:lintcrux/services/headless/headless_export_writer.dart';
 import 'package:lintcrux/services/import/edam_import_service.dart';
 import 'package:lintcrux/services/import/edam_reader.dart';
 import 'package:lintcrux/services/import/filelist_import_service.dart';
@@ -102,6 +104,7 @@ import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/project/project_file_codec.dart';
 import 'package:lintcrux/services/project/project_file_service.dart';
 import 'package:lintcrux/services/project/project_path_resolver.dart';
+import 'package:lintcrux/services/rules/rule_database_provider.dart';
 import 'package:lintcrux/services/session/session_service.dart';
 import 'package:lintcrux/services/telemetry/telemetry_event_catalog.dart';
 import 'package:lintcrux/services/updates/observed_server_time_store.dart';
@@ -1283,9 +1286,29 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       return;
     }
     final violations = active.container.read(visibleViolationsProvider);
+    final project = active.container.read(currentProjectProvider);
+    final rules = ref.read(ruleDatabaseProvider).value;
+    Rule? describeRule(String engineId, String localRuleId) =>
+        rules?.lookupBy(engineId: engineId, localRuleId: localRuleId);
     const exporter = ViolationExporters();
     final (String content, String ext, String label) = switch (format) {
-      ExportFormat.sarif => (exporter.toSarif(violations), 'sarif', 'SARIF'),
+      // The desktop SARIF export is the CI export: the same repository-
+      // relative paths under `%SRCROOT%`, rule descriptors and stable
+      // automation id, so a file saved here uploads to code scanning like
+      // one the command line wrote. Only a tab with no project falls back
+      // to the plain writer.
+      ExportFormat.sarif => (
+        project == null
+            ? exporter.toSarif(violations, describeRule: describeRule)
+            : const HeadlessExportWriter().renderSarif(
+                violations: violations.toList(growable: false),
+                projectRoot: project.rootPath,
+                runId: project.name,
+                describeRule: describeRule,
+              ),
+        'sarif',
+        'SARIF',
+      ),
       ExportFormat.json => (exporter.toJson(violations), 'json', 'JSON'),
       ExportFormat.csv => (exporter.toCsv(violations), 'csv', 'CSV'),
       ExportFormat.html => (exporter.toHtml(violations), 'html', 'HTML'),

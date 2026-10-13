@@ -349,6 +349,7 @@ class HeadlessRunner {
           format: format,
           outputPath: outPath,
           projectRoot: project.rootPath,
+          sarifRoot: args.sarifRoot,
           runId: project.name,
           exportTime: _now(),
         );

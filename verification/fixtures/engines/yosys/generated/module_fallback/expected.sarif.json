@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "yosys"
+          "name": "yosys",
+          "rules": [
+            {
+              "id": "found-multiply-driven-net",
+              "name": "found-multiply-driven-net",
+              "shortDescription": {
+                "text": "found-multiply-driven-net"
+              },
+              "helpUri": "https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/check.html#found-multiply-driven-net",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "found-multiply-driven-net",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Found multiply driven net \\q in module \\regfile"

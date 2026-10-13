@@ -5,7 +5,42 @@
     {
       "tool": {
         "driver": {
-          "name": "svlint"
+          "name": "svlint",
+          "rules": [
+            {
+              "id": "parse_error",
+              "name": "parse_error",
+              "shortDescription": {
+                "text": "parse_error"
+              },
+              "helpUri": "https://github.com/dalance/svlint/blob/master/MANUAL.md#parse_error",
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "non_blocking_assignment_in_always_comb",
+              "name": "non_blocking_assignment_in_always_comb",
+              "shortDescription": {
+                "text": "non_blocking_assignment_in_always_comb"
+              },
+              "helpUri": "https://github.com/dalance/svlint/blob/master/MANUAL.md#non_blocking_assignment_in_always_comb",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "blocking_assignment_in_always_ff",
+              "name": "blocking_assignment_in_always_ff",
+              "shortDescription": {
+                "text": "blocking_assignment_in_always_ff"
+              },
+              "helpUri": "https://github.com/dalance/svlint/blob/master/MANUAL.md#blocking_assignment_in_always_ff",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +56,7 @@
       "results": [
         {
           "ruleId": "parse_error",
+          "ruleIndex": 0,
           "level": "error",
           "message": {
             "text": "parse error"
@@ -47,6 +83,7 @@
         },
         {
           "ruleId": "non_blocking_assignment_in_always_comb",
+          "ruleIndex": 1,
           "level": "warning",
           "message": {
             "text": "Remove non-blocking assignment in `always_comb`."
@@ -73,6 +110,7 @@
         },
         {
           "ruleId": "blocking_assignment_in_always_ff",
+          "ruleIndex": 2,
           "level": "warning",
           "message": {
             "text": "Do not use blocking assignments within `always_ff`."

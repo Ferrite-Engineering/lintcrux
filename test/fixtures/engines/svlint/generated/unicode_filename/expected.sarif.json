@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "svlint"
+          "name": "svlint",
+          "rules": [
+            {
+              "id": "keyword_forbidden_wire_reg",
+              "name": "keyword_forbidden_wire_reg",
+              "shortDescription": {
+                "text": "keyword_forbidden_wire_reg"
+              },
+              "helpUri": "https://github.com/dalance/svlint/blob/master/MANUAL.md#keyword_forbidden_wire_reg",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "keyword_forbidden_wire_reg",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "禁止"

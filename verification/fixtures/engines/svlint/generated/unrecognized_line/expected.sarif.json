@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "svlint"
+          "name": "svlint",
+          "rules": [
+            {
+              "id": "keyword_forbidden_generate",
+              "name": "keyword_forbidden_generate",
+              "shortDescription": {
+                "text": "keyword_forbidden_generate"
+              },
+              "helpUri": "https://github.com/dalance/svlint/blob/master/MANUAL.md#keyword_forbidden_generate",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -29,6 +42,7 @@
       "results": [
         {
           "ruleId": "keyword_forbidden_generate",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Remove `generate`/`endgenerate` keywords."

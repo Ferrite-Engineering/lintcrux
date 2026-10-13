@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "ghdl"
+          "name": "ghdl",
+          "rules": [
+            {
+              "id": "UNCLASSIFIED",
+              "name": "UNCLASSIFIED",
+              "shortDescription": {
+                "text": "UNCLASSIFIED"
+              },
+              "helpUri": "https://ghdl.github.io/ghdl/using/InvokingGHDL.html#cmdoption-ghdl-warn-UNCLASSIFIED",
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "UNCLASSIFIED",
+          "ruleIndex": 0,
           "level": "error",
           "message": {
             "text": "entity \"foo\" not found"

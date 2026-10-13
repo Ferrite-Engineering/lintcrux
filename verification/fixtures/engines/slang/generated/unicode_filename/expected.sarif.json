@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "slang"
+          "name": "slang",
+          "rules": [
+            {
+              "id": "width-trunc",
+              "name": "width-trunc",
+              "shortDescription": {
+                "text": "width-trunc"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#width-trunc",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -24,6 +37,7 @@
             "text": "幅切り捨て"
           },
           "ruleId": "width-trunc",
+          "ruleIndex": 0,
           "level": "warning",
           "locations": [
             {

@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "slang"
+          "name": "slang",
+          "rules": [
+            {
+              "id": "implicit-conv",
+              "name": "implicit-conv",
+              "shortDescription": {
+                "text": "implicit-conv"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#implicit-conv",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -24,6 +37,7 @@
             "text": "implicit conversion from 'logic[7:0]' to 'logic[3:0]' changes value"
           },
           "ruleId": "implicit-conv",
+          "ruleIndex": 0,
           "level": "warning",
           "locations": [
             {

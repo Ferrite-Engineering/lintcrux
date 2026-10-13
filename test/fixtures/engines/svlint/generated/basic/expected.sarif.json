@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "svlint"
+          "name": "svlint",
+          "rules": [
+            {
+              "id": "non_blocking_assignment_in_always_comb",
+              "name": "non_blocking_assignment_in_always_comb",
+              "shortDescription": {
+                "text": "non_blocking_assignment_in_always_comb"
+              },
+              "helpUri": "https://github.com/dalance/svlint/blob/master/MANUAL.md#non_blocking_assignment_in_always_comb",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "non_blocking_assignment_in_always_comb",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Remove non-blocking assignment in `always_comb`."

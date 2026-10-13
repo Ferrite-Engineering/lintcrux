@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "slang"
+          "name": "slang",
+          "rules": [
+            {
+              "id": "unused-variable",
+              "name": "unused-variable",
+              "shortDescription": {
+                "text": "unused-variable"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#unused-variable",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -44,6 +57,7 @@
             "text": "unused variable 'spare'"
           },
           "ruleId": "unused-variable",
+          "ruleIndex": 0,
           "level": "warning",
           "locations": [
             {

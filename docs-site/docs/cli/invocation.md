@@ -82,6 +82,7 @@ clean run over zero files.
 | `--export <format>` | Write the violations in this format to `--out`. One of `sarif`, `json`, `csv`, `html`. Requires `--out`. |
 | `--out <path>`, `-o` | Destination for `--export`. Parent directories are created. |
 | `--sarif <out.sarif>` | Shorthand for `--export sarif --out <path>`. |
+| `--sarif-root <dir>` | The directory SARIF paths are written relative to and declared as `%SRCROOT%`. Defaults to the nearest enclosing git repository root of the project, else the project root. GitHub code scanning resolves paths against the repository root, so set this only when the checkout root is not the git root. |
 | `--baseline <path>` | Baseline file for `--fail-on-new-violations`. Defaults to `.lintcrux-baseline.json` in the project root. |
 | `--exit-code` | Exit `1` when any non-suppressed violation remains. |
 | `--fail-on-new-violations` | Exit `2` when a violation is absent from the baseline. Pre-existing findings do not fail the build. Composes with `--exit-code`. |

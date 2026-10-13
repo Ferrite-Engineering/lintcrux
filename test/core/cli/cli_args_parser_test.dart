@@ -115,6 +115,29 @@ void main() {
       expect(u, contains('lintcrux project.lintcrux'));
     });
 
+    group('--sarif-root', () {
+      test('is absent by default, leaving the writer its own detection', () {
+        expect(parser.parse(const []).args!.sarifRoot, isNull);
+      });
+
+      test('captures the directory', () {
+        final r = parser.parse(const ['--sarif-root', '/ci/checkout', 'a.sv']);
+        expect(r.isSuccess, isTrue, reason: r.error);
+        expect(r.args!.sarifRoot, '/ci/checkout');
+      });
+
+      test('an empty value reads as absent', () {
+        expect(
+          parser.parse(const ['--sarif-root', '', 'a.sv']).args!.sarifRoot,
+          isNull,
+        );
+      });
+
+      test('is documented', () {
+        expect(parser.usage, contains('--sarif-root'));
+      });
+    });
+
     group('--engine-timeout', () {
       test('is absent by default, leaving the runner its own budget', () {
         expect(parser.parse(const []).args!.engineTimeout, isNull);

@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "slang"
+          "name": "slang",
+          "rules": [
+            {
+              "id": "UNCLASSIFIED",
+              "name": "UNCLASSIFIED",
+              "shortDescription": {
+                "text": "UNCLASSIFIED"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#UNCLASSIFIED",
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -24,6 +37,7 @@
             "text": "use of undeclared identifier 'foo'"
           },
           "ruleId": "UNCLASSIFIED",
+          "ruleIndex": 0,
           "level": "error",
           "locations": [
             {

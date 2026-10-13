@@ -36,6 +36,7 @@ class ViolationExporters {
   String toSarif(
     Iterable<Violation> violations, {
     DateTime? exportTime,
+    RuleDescriber? describeRule,
   }) {
     final now = exportTime ?? DateTime.now();
     final byEngine = <String, List<Violation>>{};
@@ -54,7 +55,7 @@ class ViolationExporters {
         ),
     ];
     final report = SarifReport(runs: runs);
-    return const SarifWriter().write(report);
+    return SarifWriter(describeRule: describeRule).write(report);
   }
 
   /// Encodes [violations] as a JSON array. The shape is a stable

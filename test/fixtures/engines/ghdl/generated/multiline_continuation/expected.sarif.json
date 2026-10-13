@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "ghdl"
+          "name": "ghdl",
+          "rules": [
+            {
+              "id": "hide",
+              "name": "hide",
+              "shortDescription": {
+                "text": "hide"
+              },
+              "helpUri": "https://ghdl.github.io/ghdl/using/InvokingGHDL.html#cmdoption-ghdl-warn-hide",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "hide",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "declaration of \"carry\" hides signal \"carry\""

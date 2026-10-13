@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "verilator"
+          "name": "verilator",
+          "rules": [
+            {
+              "id": "UNUSEDSIGNAL",
+              "name": "UNUSEDSIGNAL",
+              "shortDescription": {
+                "text": "UNUSEDSIGNAL"
+              },
+              "helpUri": "https://verilator.org/warn/UNUSEDSIGNAL",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "UNUSEDSIGNAL",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Signal is not used: 'unused_sig'"

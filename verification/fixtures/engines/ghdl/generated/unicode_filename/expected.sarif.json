@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "ghdl"
+          "name": "ghdl",
+          "rules": [
+            {
+              "id": "unused",
+              "name": "unused",
+              "shortDescription": {
+                "text": "unused"
+              },
+              "helpUri": "https://ghdl.github.io/ghdl/using/InvokingGHDL.html#cmdoption-ghdl-warn-unused",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "unused",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "signal \"señal\" is never referenced"

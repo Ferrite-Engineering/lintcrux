@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "verilator"
+          "name": "verilator",
+          "rules": [
+            {
+              "id": "WIDTH",
+              "name": "WIDTH",
+              "shortDescription": {
+                "text": "WIDTH"
+              },
+              "helpUri": "https://verilator.org/warn/WIDTH",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "WIDTH",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Operator ASSIGNW expects 32 bits but got 16"

@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "verilator"
+          "name": "verilator",
+          "rules": [
+            {
+              "id": "UNUSED",
+              "name": "UNUSED",
+              "shortDescription": {
+                "text": "UNUSED"
+              },
+              "helpUri": "https://verilator.org/warn/UNUSED",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "UNUSED",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Bits of signal are not used: 'q'[7:4]"

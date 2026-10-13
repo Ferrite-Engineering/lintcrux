@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "verible"
+          "name": "verible",
+          "rules": [
+            {
+              "id": "line-length",
+              "name": "line-length",
+              "shortDescription": {
+                "text": "line-length"
+              },
+              "helpUri": "https://chipsalliance.github.io/verible/lint.html#line-length",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -20,11 +33,11 @@
       },
       "results": [
         {
-          "rule": "line-length",
           "message": {
             "text": "Line too long"
           },
           "ruleId": "line-length",
+          "ruleIndex": 0,
           "level": "warning",
           "locations": [
             {

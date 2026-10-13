@@ -5,7 +5,31 @@
     {
       "tool": {
         "driver": {
-          "name": "slang"
+          "name": "slang",
+          "rules": [
+            {
+              "id": "UNCLASSIFIED",
+              "name": "UNCLASSIFIED",
+              "shortDescription": {
+                "text": "UNCLASSIFIED"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#UNCLASSIFIED",
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "unused-variable",
+              "name": "unused-variable",
+              "shortDescription": {
+                "text": "unused-variable"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#unused-variable",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -20,13 +44,11 @@
       },
       "results": [
         {
-          "severity": "error",
           "message": {
             "text": "use of undeclared identifier 'undeclared_thing'"
           },
-          "location": "top.sv:15:23",
-          "symbolPath": "top",
           "ruleId": "UNCLASSIFIED",
+          "ruleIndex": 0,
           "level": "error",
           "locations": [
             {
@@ -40,17 +62,19 @@
                 }
               }
             }
-          ]
+          ],
+          "properties": {
+            "severity": "error",
+            "location": "top.sv:15:23",
+            "symbolPath": "top"
+          }
         },
         {
-          "severity": "warning",
           "message": {
             "text": "unused variable 'never_used'"
           },
-          "optionName": "unused-variable",
-          "location": "top.sv:8:15",
-          "symbolPath": "top.never_used",
           "ruleId": "unused-variable",
+          "ruleIndex": 1,
           "level": "warning",
           "locations": [
             {
@@ -64,7 +88,13 @@
                 }
               }
             }
-          ]
+          ],
+          "properties": {
+            "severity": "warning",
+            "optionName": "unused-variable",
+            "location": "top.sv:8:15",
+            "symbolPath": "top.never_used"
+          }
         }
       ]
     }

@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "verible"
+          "name": "verible",
+          "rules": [
+            {
+              "id": "no-tabs",
+              "name": "no-tabs",
+              "shortDescription": {
+                "text": "no-tabs"
+              },
+              "helpUri": "https://chipsalliance.github.io/verible/lint.html#no-tabs",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -28,11 +41,11 @@
       },
       "results": [
         {
-          "rule": "no-tabs",
           "message": {
             "text": "tab found"
           },
           "ruleId": "no-tabs",
+          "ruleIndex": 0,
           "level": "warning",
           "locations": [
             {
