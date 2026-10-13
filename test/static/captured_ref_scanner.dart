@@ -17,10 +17,12 @@
 // is not invoked in place: it is passed as an argument, stored, or returned.
 // The provider is then classified by whether it can be disposed while the
 // closure is live: a body that watches or listens can rebuild, and a
-// scoped / family / autoDispose / override-bound provider can be disposed.
-// Those are violations. A `ref.read`-only body on a root provider is allowed,
-// and the allowance names the invariant it rests on, so that adding one
-// `ref.watch` to such a body is caught by the next run of the guard.
+// family / autoDispose provider can be disposed. Those are violations. A
+// `ref.read`-only body on anything else is allowed, and the allowance names
+// the invariant it rests on, so that adding one `ref.watch` to such a body
+// is caught by the next run of the guard. An `overrideWith` binding is
+// judged by its body alone: the source of a binding does not say whether it
+// is installed at the root or in a scope that can be torn down.
 //
 // WHAT IS DELIBERATELY NOT FLAGGED:
 // - a closure handed to a Riverpod lifecycle hook (`ref.onDispose(…)`): the
@@ -87,9 +89,11 @@ final RegExp _refUseRe = RegExp(r'(?<![\w$.])(ref|_ref)\s*\.');
 final RegExp _refRebuildRe = RegExp(
   r'(?<![\w$.])(ref|_ref)\s*\.\s*(watch|listen)\s*\(',
 );
-final RegExp _disposableRe = RegExp(
-  r'autoDispose|\.family\b|\.overrideWith\s*\(',
-);
+// An `overrideWith` binding is not disposable in itself: whether it can go
+// away with a scope is decided by where it is registered, which the source
+// of the binding does not say. Its body watching or listening is what makes
+// it a violation.
+final RegExp _disposableRe = RegExp(r'autoDispose|\.family\b');
 final RegExp _providerNameRe = RegExp(r'(\w+)\s*=\s*[^=;]*$');
 final RegExp _overrideTargetRe = RegExp(r'(\w+)\s*\.\s*overrideWith\s*\(\s*$');
 
@@ -197,8 +201,7 @@ List<CapturedRefClosure> scanCapturedSource(String src, String path) {
       final why = rebuilds
           ? 'the body watches or listens, so the provider can rebuild'
           : disposable
-          ? 'the provider is scoped, a family, autoDispose or an override '
-                'binding, so it can be disposed'
+          ? 'the provider is a family or autoDispose, so it can be disposed'
           : 'allowed: the body only reads and the provider is a root '
                 'provider, so its Ref lives as long as the container; adding '
                 'a single ref.watch to the body turns this into the bug';

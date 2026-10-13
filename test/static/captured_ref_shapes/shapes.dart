@@ -48,9 +48,10 @@ final Provider<int Function()> returnedProvider =
       return () => ref.read(otherProvider);
     });
 
-// --- Shape 4: an override binding builder, which is installed in a scope
-// and disposed with it.
+// --- Shape 4: an override binding builder whose body watches, so the
+// binding rebuilds wherever it is installed.
 final Override overrideShape = otherProvider.overrideWith((ref) {
+  ref.watch(tabProvider);
   return Holder(supplier: () => ref.read(tabProvider)).supplier!();
 });
 
