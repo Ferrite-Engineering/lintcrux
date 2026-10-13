@@ -98,7 +98,7 @@ void main() {
         );
 
         expect(result.ack, isA<RequestHighlightAck>());
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isTrue);
         expect(ack.inReplyTo, 'msg-1');
         expect(result.selection, v);
@@ -123,7 +123,7 @@ void main() {
           ),
         );
         expect(result.selection, isNull);
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isFalse);
         expect(ack.reason, contains('Malformed'));
       },
@@ -146,7 +146,7 @@ void main() {
             ),
           ),
         );
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isFalse);
         expect(ack.reason, contains('No matching violation'));
         expect(result.selection, isNull);
@@ -177,7 +177,7 @@ void main() {
           ),
         );
 
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isTrue);
         expect(result.selection, near);
         expect(result.tableState!.fileGlob, '/proj/rtl/cpu.sv');
@@ -198,7 +198,7 @@ void main() {
             ),
           ),
         );
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isTrue);
         expect(ack.reason, contains('No violations in file'));
         expect(result.tableState!.fileGlob, '/other/file.sv');
@@ -218,7 +218,7 @@ void main() {
           ),
         ),
       );
-      final ack = result.ack as RequestHighlightAck;
+      final ack = result.ack! as RequestHighlightAck;
       expect(ack.honored, isFalse);
     });
   });
@@ -246,7 +246,7 @@ void main() {
         // ruleSubstring matches against ruleId+message; "top.cpu.cpu_clk"
         // won't match anything literal, so the table narrows to zero.
         // The handler still acks honored=true with a reason.
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isTrue);
         expect(result.tableState!.ruleSubstring, 'top.cpu.cpu_clk');
         expect(result.selection, isNull);
@@ -266,7 +266,7 @@ void main() {
           ),
         ),
       );
-      final ack = result.ack as RequestHighlightAck;
+      final ack = result.ack! as RequestHighlightAck;
       expect(ack.honored, isTrue);
       expect(result.tableState!.ruleSubstring, 'top.cpu');
     });
@@ -290,7 +290,7 @@ void main() {
             ),
           ),
         );
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isFalse, reason: 'kind: $kind');
         expect(ack.reason, contains(kind.name), reason: 'kind: $kind');
         expect(result.tableState, isNull, reason: 'kind: $kind');
@@ -322,7 +322,7 @@ void main() {
           ),
         );
 
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isFalse);
         // The unrecognised wire string is echoed back verbatim so the
         // originator can tell which of its requests went unserved.
@@ -350,7 +350,7 @@ void main() {
       expect(editorInvocations.single.file, file);
       expect(editorInvocations.single.line, 42);
       expect(editorInvocations.single.column, 7);
-      final ack = result.ack as RequestOpenSourceAck;
+      final ack = result.ack! as RequestOpenSourceAck;
       expect(ack.honored, isTrue);
       expect(ack.inReplyTo, 'msg-1');
     });
@@ -383,7 +383,7 @@ void main() {
           ),
         ),
       );
-      final ack = result.ack as RequestOpenSourceAck;
+      final ack = result.ack! as RequestOpenSourceAck;
       expect(ack.honored, isFalse);
       expect(ack.reason, 'No such file');
     });
@@ -399,7 +399,7 @@ void main() {
         ),
       );
       expect(editorInvocations, isEmpty);
-      final ack = result.ack as RequestOpenSourceAck;
+      final ack = result.ack! as RequestOpenSourceAck;
       expect(ack.honored, isFalse);
       expect(ack.reason, contains('Invalid line'));
     });
@@ -422,7 +422,7 @@ void main() {
         inbound(RequestOpenSource(filePath: outside, line: 1)),
       );
       expect(editorInvocations, isEmpty);
-      final ack = result.ack as RequestOpenSourceAck;
+      final ack = result.ack! as RequestOpenSourceAck;
       expect(ack.honored, isFalse);
       expect(ack.reason, contains('outside the directories'));
       expect(ack.reason, isNot(contains(outside)));
@@ -436,25 +436,57 @@ void main() {
           inbound(const RequestOpenSource(filePath: '--help', line: 1)),
         );
         expect(editorInvocations, isEmpty);
-        final ack = result.ack as RequestOpenSourceAck;
+        final ack = result.ack! as RequestOpenSourceAck;
         expect(ack.honored, isFalse);
         expect(ack.reason, contains('absolute path'));
       },
     );
   });
 
-  group('Unknown message kinds', () {
+  group('Messages that are not requests draw no reply (CXP §6.1, §9)', () {
+    // A selection notification is informational; an ack and an error
+    // response are themselves replies. Answering any of them with
+    // `unsupported` was protocol noise, and §9.8 forbids replying to an
+    // error response outright: two peers answering each other's errors
+    // would never stop.
+    final silent = <String, CxpMessage>{
+      'a directly-addressed NotifySelection': const NotifySelection(
+        elements: <ElementId>[],
+      ),
+      'an inbound RequestHighlightAck': const RequestHighlightAck(
+        inReplyTo: 'msg-0',
+        honored: true,
+      ),
+      'an inbound RequestOpenSourceAck': const RequestOpenSourceAck(
+        inReplyTo: 'msg-0',
+        honored: false,
+        reason: 'no',
+      ),
+      'an inbound ErrorResponse': const ErrorResponse(
+        code: CxpErrorCode.unsupported,
+        message: 'the peer did not handle our request',
+        inReplyTo: 'msg-0',
+      ),
+    };
+    for (final entry in silent.entries) {
+      test('${entry.key} gets no ack and changes nothing', () async {
+        final handler = buildHandler();
+        final result = await handler.dispatch(inbound(entry.value));
+        expect(result.ack, isNull);
+        expect(result.tableState, isNull);
+        expect(result.selection, isNull);
+      });
+    }
+
     test(
-      'NotifySelection (broadcast LintCrux did not subscribe to) returns'
-      ' an unsupported ErrorResponse, not a fabricated highlight ack',
+      'a request kind LintCrux does not recognise still gets an unsupported '
+      'ErrorResponse, not a fabricated highlight ack',
       () async {
         final handler = buildHandler();
-        final result = await handler.dispatch(
-          inbound(const NotifySelection(elements: <ElementId>[])),
-        );
+        final result = await handler.dispatch(inbound(const _UnknownRequest()));
         expect(result.ack, isA<ErrorResponse>());
         expect(result.ack, isNot(isA<RequestHighlightAck>()));
-        final ack = result.ack as ErrorResponse;
+        final ack = result.ack! as ErrorResponse;
         expect(ack.code, CxpErrorCode.unsupported);
         expect(ack.message, contains('does not handle'));
         expect(ack.inReplyTo, isNotEmpty);
@@ -509,7 +541,7 @@ void main() {
         );
         expect(asked, <(String, String?)>[('design-7', null)]);
         expect(result.ack, isA<RequestOpenArtifactAck>());
-        final ack = result.ack as RequestOpenArtifactAck;
+        final ack = result.ack! as RequestOpenArtifactAck;
         expect(ack.honored, isTrue);
         expect(ack.reason, isNull);
       },
@@ -559,7 +591,7 @@ void main() {
           ),
         );
         expect(called, isFalse);
-        final ack = result.ack as RequestOpenArtifactAck;
+        final ack = result.ack! as RequestOpenArtifactAck;
         expect(ack.honored, isFalse);
         expect(ack.reason, contains('waveform'));
       },
@@ -578,7 +610,7 @@ void main() {
           ),
         ),
       );
-      final ack = result.ack as RequestOpenArtifactAck;
+      final ack = result.ack! as RequestOpenArtifactAck;
       expect(ack.honored, isFalse);
       expect(ack.reason, 'file_path must be an absolute path');
     });
@@ -593,7 +625,7 @@ void main() {
           ),
         ),
       );
-      expect((result.ack as RequestOpenArtifactAck).honored, isFalse);
+      expect((result.ack! as RequestOpenArtifactAck).honored, isFalse);
     });
 
     // MUTATION: calling `resolveAndOpenArtifact` from
@@ -617,7 +649,7 @@ void main() {
           ),
         );
         expect(fallback, isEmpty);
-        expect((result.ack as RequestOpenArtifactAck).honored, isFalse);
+        expect((result.ack! as RequestOpenArtifactAck).honored, isFalse);
       },
     );
 
@@ -654,7 +686,7 @@ void main() {
           isFalse,
           reason: 'the fallback keeps the roots; it is not the floor route',
         );
-        final ack = result.ack as RequestHighlightAck;
+        final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isTrue);
       },
     );
@@ -674,8 +706,20 @@ void main() {
             ),
           ),
         );
-        expect((result.ack as RequestHighlightAck).honored, isFalse);
+        expect((result.ack! as RequestHighlightAck).honored, isFalse);
       },
     );
   });
+}
+
+/// A request kind from a protocol revision this build does not model: the
+/// one shape that must still be answered, with `unsupported`.
+class _UnknownRequest extends CxpMessage {
+  const _UnknownRequest();
+
+  @override
+  String get kind => 'request_frobnicate';
+
+  @override
+  Map<String, Object?> toJson() => const <String, Object?>{};
 }

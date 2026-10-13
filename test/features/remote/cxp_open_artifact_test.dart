@@ -135,7 +135,7 @@ void main() {
             ),
           ),
         );
-    return result.ack as RequestOpenArtifactAck;
+    return result.ack! as RequestOpenArtifactAck;
   }
 
   group('request_open_artifact', () {
@@ -456,7 +456,7 @@ void main() {
               ),
             ),
           );
-      return result.ack as RequestHighlightAck;
+      return result.ack! as RequestHighlightAck;
     }
 
     test('opens a project inside the opened projects', () async {

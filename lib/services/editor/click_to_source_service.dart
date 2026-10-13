@@ -282,6 +282,14 @@ class ClickToSourceService {
   /// "Could not launch editor" unless the app was started from a
   /// terminal. If the editor genuinely is not installed / on `PATH`,
   /// the launch still throws and surfaces the clear failure snackbar.
+  /// The reason given when a location is refused for not carrying an
+  /// absolute path. A fixed sentence: it is shown in the snackbar and
+  /// travels back to a CXP peer as a `request_open_source` reason, and a
+  /// refusal must not repeat the string it refused (CXP §11.3).
+  static const String refusedNonAbsolutePathMessage =
+      'Refusing to open the location: click-to-source only opens absolute '
+      'file paths, and this location did not carry one.';
+
   Future<ClickToSourceResult> openInEditor(SourceLocation location) async {
     final command = commandFor();
     // The last gate before a string the app did not author becomes argv.
@@ -309,13 +317,13 @@ class ClickToSourceService {
         ),
       );
       _report(command.preset, ok: false);
+      // A fixed sentence that never repeats the refused path (CXP §11.3):
+      // a `request_open_source` reason travels back to the peer, and the
+      // path is the one string here the peer chose.
       return ClickToSourceResult(
         success: false,
         command: refused,
-        errorMessage:
-            'Refusing to open "${location.file}": click-to-source only '
-            'opens absolute file paths, and this location did not carry '
-            'one.',
+        errorMessage: refusedNonAbsolutePathMessage,
       );
     }
     final environment = (environmentBuilder ?? cleanEngineEnvironment)();

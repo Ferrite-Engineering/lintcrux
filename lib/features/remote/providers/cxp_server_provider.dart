@@ -498,7 +498,12 @@ class CxpServerLifecycle extends AsyncNotifier<CxpServerLifecycleState> {
         // Gated by the user setting via the swappable `windowAttentionRequester`
         // seam (see `cxpAttentionGateProvider`), so this is a no-op when the
         // preference is off, and a safe no-op under tests.
-        final honored = _ackHonored(result.ack);
+        // A message that is not a request (an ack, a selection
+        // notification, an error response) draws no reply and is not a
+        // probe: nothing to send, nothing to count.
+        final ack = result.ack;
+        if (ack == null) return;
+        final honored = _ackHonored(ack);
         // `cxp.crossprobe` — the suite network-effect funnel. Recorded
         // once per inbound request with the ack's own honored bit, so a probe
         // LintCrux could not act on (unknown rule, no matching project) is
@@ -519,12 +524,12 @@ class CxpServerLifecycle extends AsyncNotifier<CxpServerLifecycleState> {
             );
         if (honored) unawaited(requestUserAttention());
         // Send the ack back to the originator.
-        _server?.sendTo(inbound.from.peerId, result.ack);
+        _server?.sendTo(inbound.from.peerId, ack);
         eventLog.append(
           CxpEventEntry(
             timestamp: DateTime.now(),
             kind: CxpEventKind.outboundAck,
-            summary: '${result.ack.kind} → ${inbound.from.peerId}',
+            summary: '${ack.kind} → ${inbound.from.peerId}',
             peerId: inbound.from.peerId,
           ),
         );

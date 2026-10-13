@@ -359,9 +359,12 @@ void main() {
       expect(result.success, isFalse);
       expect(launcher.calls, isEmpty, reason: 'nothing may be spawned');
       expect(result.errorMessage, contains('absolute file paths'));
+      // The reason travels back to a CXP peer and is shown in a snackbar; a
+      // refusal never repeats the string it refused (CXP §11.3).
+      expect(result.errorMessage, isNot(contains('curl')));
     });
 
-    test('refuses a relative path', () async {
+    test('refuses a relative path with a fixed reason', () async {
       final launcher = _FakeLauncher();
       final svc = ClickToSourceService(
         commandFor: () => EditorCommand.vsCode,
@@ -373,6 +376,11 @@ void main() {
       );
       expect(result.success, isFalse);
       expect(launcher.calls, isEmpty);
+      expect(
+        result.errorMessage,
+        ClickToSourceService.refusedNonAbsolutePathMessage,
+      );
+      expect(result.errorMessage, isNot(contains('rtl/top.sv')));
     });
 
     test('still opens a Windows-absolute path', () async {

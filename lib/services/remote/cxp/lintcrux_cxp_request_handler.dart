@@ -28,10 +28,15 @@ class CxpDispatchResult {
     this.openSourceResult,
   });
 
-  /// The CxpMessage to send back to the originator. Always non-null —
-  /// every inbound request gets an ack of some kind so the requester
-  /// does not time out.
-  final CxpMessage ack;
+  /// The CxpMessage to send back to the originator, or `null` when the
+  /// inbound message draws no reply.
+  ///
+  /// Every inbound *request* gets an ack of some kind so the requester does
+  /// not time out. An ack, a `notify_selection` and an `error_response` are
+  /// not requests: CXP §9's table lists them as not acknowledged, and §9.8
+  /// forbids answering an error response at all, since two peers each
+  /// answering the other's error would never stop.
+  final CxpMessage? ack;
 
   /// Post-dispatch [ViolationTableState] (if the handler updated it).
   final ViolationTableState? tableState;
@@ -140,16 +145,22 @@ class LintCruxCxpRequestHandler {
   /// Dispatches a single inbound message and returns the ack + any
   /// state mutations the receive-side handler decided to apply.
   ///
-  /// Every inbound request the handler sees (after the server's
+  /// Every inbound *request* the handler sees (after the server's
   /// internal Hello / Subscribe filter) needs a reply, even when
   /// LintCrux cannot honour it, because the originator times out
   /// otherwise. Kinds LintCrux implements get their *matching* ack type
-  /// ([RequestHighlightAck] / [RequestOpenSourceAck]); kinds it does not
-  /// implement get an [ErrorResponse] with
-  /// [CxpErrorCode.unsupported]. Replying to an arbitrary kind with a
-  /// `RequestHighlightAck` would be a wire-contract violation — the
+  /// ([RequestHighlightAck] / [RequestOpenSourceAck]); request kinds it
+  /// does not recognise get an [ErrorResponse] with
+  /// [CxpErrorCode.unsupported] (CXP §6.1). Replying to an arbitrary kind
+  /// with a `RequestHighlightAck` would be a wire-contract violation — the
   /// originator correlates on [CxpEnvelope.messageId] but still decodes
   /// by kind, and would see an ack for a request it never sent.
+  ///
+  /// A message that is not a request draws no reply at all: an ack, a
+  /// `notify_selection` a peer addressed directly, or an `error_response`
+  /// (CXP §9; §9.8 forbids answering an error response). Answering those
+  /// with `unsupported` was protocol noise at best, and a reply to a
+  /// peer's error at worst.
   Future<CxpDispatchResult> dispatch(InboundCxpMessage inbound) async {
     final message = inbound.message;
     final envelope = inbound.envelope;
@@ -163,11 +174,12 @@ class LintCruxCxpRequestHandler {
     if (message is RequestOpenArtifact) {
       return await _dispatchRequestOpenArtifact(message, envelope.messageId);
     }
-    // Anything else (e.g. a NotifySelection a peer addressed directly
-    // rather than broadcasting) is a kind LintCrux does not act on. Reply
-    // with an ErrorResponse rather than a fabricated RequestHighlightAck
-    // so the originator can decode the reply against the request it
-    // actually sent.
+    if (_drawsNoReply(message)) {
+      return const CxpDispatchResult(ack: null);
+    }
+    // Any other kind is a request LintCrux does not act on. Reply with an
+    // ErrorResponse rather than a fabricated RequestHighlightAck so the
+    // originator can decode the reply against the request it actually sent.
     return CxpDispatchResult(
       ack: ErrorResponse(
         code: CxpErrorCode.unsupported,
@@ -176,6 +188,17 @@ class LintCruxCxpRequestHandler {
       ),
     );
   }
+
+  /// Whether [message] is one of the kinds CXP §9 lists as never
+  /// acknowledged: the acks themselves, a selection notification, and an
+  /// error response.
+  static bool _drawsNoReply(CxpMessage message) =>
+      message is RequestHighlightAck ||
+      message is RequestOpenSourceAck ||
+      message is RequestOpenArtifactAck ||
+      message is HelloAck ||
+      message is NotifySelection ||
+      message is ErrorResponse;
 
   Future<CxpDispatchResult> _dispatchRequestHighlight(
     RequestHighlight req,
