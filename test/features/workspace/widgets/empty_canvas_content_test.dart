@@ -7,9 +7,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/core/app_info/about_providers.dart';
+import 'package:lintcrux/features/workspace/providers/recent_project_exists_provider.dart';
 import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
 import 'package:lintcrux/features/workspace/widgets/empty_canvas_content.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Fixed build metadata for the version-line test, so the assertion does not
 /// track the real `pubspec.yaml` version.
@@ -23,7 +25,11 @@ const _testBuildInfo = ApplicationBuildInfo(
   dartSdkVersion: '3.12.2',
 );
 
+bool _allExist(String _) => true;
+
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues(<String, Object>{}));
+
   Future<void> pumpContent(
     WidgetTester tester, {
     required Locale locale,
@@ -31,12 +37,16 @@ void main() {
     List<String> recentProjects = const <String>[],
     void Function(String path)? onOpenRecent,
     ApplicationBuildInfo? buildInfo,
+    RecentProjectExists exists = _allExist,
+    bool liveRecentList = false,
   }) async {
     final [openProject, openSession, openWorkspace, newProject] = callbacks;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          recentProjectsProvider.overrideWithValue(recentProjects),
+          if (!liveRecentList)
+            recentProjectsProvider.overrideWithValue(recentProjects),
+          recentProjectExistsProvider.overrideWithValue(exists),
           if (buildInfo != null)
             aboutBuildInfoProvider.overrideWith((ref) async => buildInfo),
         ],
@@ -127,6 +137,7 @@ void main() {
         ProviderScope(
           overrides: [
             recentProjectsProvider.overrideWithValue(const <String>[]),
+            recentProjectExistsProvider.overrideWithValue(_allExist),
           ],
           child: MaterialApp(
             locale: const Locale('en'),
@@ -201,6 +212,62 @@ void main() {
     await tester.tap(find.text('/p/a.lintcrux'));
     await tester.pump();
     expect(tapped, '/p/a.lintcrux');
+  });
+
+  testWidgets("a row's remove button drops that entry and only that one", (
+    tester,
+  ) async {
+    await pumpContent(
+      tester,
+      locale: const Locale('en'),
+      callbacks: [() {}, () {}, () {}, () {}],
+      liveRecentList: true,
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(EmptyCanvasContent)),
+    );
+    container.read(recentProjectsListProvider.notifier)
+      ..markOpened('/p/b.lintcrux')
+      ..markOpened('/p/a.lintcrux');
+    await tester.pump();
+    expect(find.text('/p/a.lintcrux'), findsOneWidget);
+
+    final removeA = find.descendant(
+      of: find.widgetWithText(ListTile, '/p/a.lintcrux'),
+      matching: find.byTooltip('Remove from Recent Projects'),
+    );
+    await tester.ensureVisible(removeA);
+    await tester.tap(removeA);
+    await tester.pump();
+    expect(find.text('/p/a.lintcrux'), findsNothing);
+    expect(find.text('/p/b.lintcrux'), findsOneWidget);
+    expect(container.read(recentProjectsProvider), ['/p/b.lintcrux']);
+  });
+
+  testWidgets('a row whose project file is gone is greyed, says so, and can '
+      'still be removed or opened', (tester) async {
+    var tapped = '';
+    await pumpContent(
+      tester,
+      locale: const Locale('en'),
+      callbacks: [() {}, () {}, () {}, () {}],
+      recentProjects: const ['/p/here.lintcrux', '/p/gone.lintcrux'],
+      exists: (path) => path != '/p/gone.lintcrux',
+      onOpenRecent: (path) => tapped = path,
+    );
+    expect(find.text('Project file not found'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.widgetWithText(ListTile, '/p/gone.lintcrux'),
+        matching: find.text('Project file not found'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.folder_off_outlined), findsOneWidget);
+    expect(find.byTooltip('Remove from Recent Projects'), findsNWidgets(2));
+    await tester.tap(find.text('/p/gone.lintcrux'));
+    await tester.pump();
+    expect(tapped, '/p/gone.lintcrux');
   });
 
   testWidgets('locale sweep: renders the localized chrome for every supported '

@@ -215,6 +215,9 @@ void main() {
       LintcruxAction.reopenRecentProject,
       LintcruxAction.pinActiveProject,
       LintcruxAction.closeAllProjects,
+      // Clearing the welcome screen's Recent projects list is a rare,
+      // deliberate command; a chord would only invite an accidental wipe.
+      LintcruxAction.clearRecentProjects,
       // Update mechanism + beta issue reporter. Help-menu /
       // palette / About-box only; neither is frequent enough to earn a
       // chord.

@@ -88,6 +88,7 @@ extension LintcruxActionLabel on LintcruxAction {
     LintcruxAction.closeActiveProject => l10n.actionCloseActiveProject,
     LintcruxAction.switchProject => l10n.actionSwitchProject,
     LintcruxAction.reopenRecentProject => l10n.actionReopenRecentProject,
+    LintcruxAction.clearRecentProjects => l10n.actionClearRecentProjects,
     LintcruxAction.pinActiveProject => l10n.actionPinActiveProject,
     LintcruxAction.closeAllProjects => l10n.actionCloseAllProjects,
     LintcruxAction.closeAllTabs => l10n.actionCloseAllTabs,

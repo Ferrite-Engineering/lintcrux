@@ -1185,6 +1185,14 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
+  "emptyCanvasRecentProjectMissing": "Project file not found",
+  "@emptyCanvasRecentProjectMissing": {
+    "description": "Second line of a welcome-screen Recent projects row whose project file no longer exists (moved or deleted); the row is greyed."
+  },
+  "emptyCanvasRemoveRecentProject": "Remove from Recent Projects",
+  "@emptyCanvasRemoveRecentProject": {
+    "description": "Tooltip and accessible name of the button on a welcome-screen Recent projects row that removes that one entry from the list."
+  },
   "emptyCanvasRecentProjectsHeading": "Recent projects",
   "@emptyCanvasRecentProjectsHeading": {
     "description": "Section heading above the recent-projects list on the empty-canvas state."
@@ -1484,6 +1492,14 @@
   "actionSwitchProject": "Switch Project…",
   "@actionSwitchProject": {
     "description": "Menu / command palette label for the action that opens the project switcher dialog (Cmd/Ctrl+P). Lets the user pick from open and recently-closed projects."
+  },
+  "actionClearRecentProjects": "Clear Recent Projects",
+  "@actionClearRecentProjects": {
+    "description": "Command palette and File menu label: empties the welcome screen Recent projects list."
+  },
+  "recentProjectsClearedSnack": "Recent projects cleared.",
+  "@recentProjectsClearedSnack": {
+    "description": "Confirmation shown (and announced to screen readers) after Clear Recent Projects empties the list."
   },
   "actionReopenRecentProject": "Reopen Recent Project",
   "@actionReopenRecentProject": {

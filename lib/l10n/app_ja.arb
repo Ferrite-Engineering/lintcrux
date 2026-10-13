@@ -1072,6 +1072,14 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
+  "emptyCanvasRecentProjectMissing": "プロジェクトファイルが見つかりません",
+  "@emptyCanvasRecentProjectMissing": {
+    "description": "Second line of a welcome-screen Recent projects row whose project file no longer exists (moved or deleted); the row is greyed."
+  },
+  "emptyCanvasRemoveRecentProject": "最近のプロジェクトから削除",
+  "@emptyCanvasRemoveRecentProject": {
+    "description": "Tooltip and accessible name of the button on a welcome-screen Recent projects row that removes that one entry from the list."
+  },
   "emptyCanvasRecentProjectsHeading": "最近のプロジェクト",
   "@emptyCanvasRecentProjectsHeading": {
     "description": "Section heading above the recent-projects list on the empty-canvas state."
@@ -1331,6 +1339,14 @@
   "actionSwitchProject": "プロジェクトを切り替え…",
   "@actionSwitchProject": {
     "description": "Menu / command palette label for the action that opens the project switcher dialog (Cmd/Ctrl+P). Lets the user pick from open and recently-closed projects."
+  },
+  "actionClearRecentProjects": "最近のプロジェクトを消去",
+  "@actionClearRecentProjects": {
+    "description": "Command palette and File menu label: empties the welcome screen Recent projects list."
+  },
+  "recentProjectsClearedSnack": "最近のプロジェクトを消去しました。",
+  "@recentProjectsClearedSnack": {
+    "description": "Confirmation shown (and announced to screen readers) after Clear Recent Projects empties the list."
   },
   "actionReopenRecentProject": "最近のプロジェクトを再度開く",
   "@actionReopenRecentProject": {

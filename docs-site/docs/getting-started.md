@@ -39,7 +39,7 @@ An engine whose binary is not installed is reported as **Binary not available** 
 
 ## First launch {#first-launch}
 
-With nothing open, LintCrux shows a welcome screen with **Open Project…**, **Open Workspace…**, **Open Session…**, **New Project…** and **Import SARIF report…** buttons, and a **Recent projects** list of the projects you opened most recently — click one to reopen it. You do not need a project loaded to explore: the toolbar, status bar, menu bar, command palette and Settings are all reachable from the welcome screen. LintCrux is localized in English, Simplified Chinese, Japanese and Korean — the **Language** picker lives in `Settings → Appearance`.
+With nothing open, LintCrux shows a welcome screen with **Open Project…**, **Open Workspace…**, **Open Session…**, **New Project…** and **Import SARIF report…** buttons, and a **Recent projects** list of the projects you opened most recently. Click one to reopen it, or click the X at the end of its row to remove it from the list. A project whose file has been moved or deleted is shown greyed as "Project file not found". `File → Clear Recent Projects` (also in the command palette) empties the list. You do not need a project loaded to explore: the toolbar, status bar, menu bar, command palette and Settings are all reachable from the welcome screen. LintCrux is localized in English, Simplified Chinese, Japanese and Korean — the **Language** picker lives in `Settings → Appearance`.
 
 ## Run your first lint {#run-first-lint}
 

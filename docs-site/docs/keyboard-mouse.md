@@ -41,7 +41,7 @@ Twenty-one actions ship with a default binding. Everything else is reachable fro
 
 These actions ship deliberately unbound. They are fully available from the command palette (++cmd+shift+p++ / ++ctrl+shift+p++) and the menu bar, and you can assign your own shortcut to any of them.
 
-- **File:** New Workspace, Open Workspace…, Open Session…, Import Vivado Filelist…, Import FuseSoC EDAM…, Import SARIF report…, Save Session…, Save Workspace As…, the four **Export Violations as …** actions, Close All Tabs, Close Active Project, and the Pro project actions Reopen Recent Project, Pin Project Tab and Close All Projects.
+- **File:** New Workspace, Open Workspace…, Open Session…, Import Vivado Filelist…, Import FuseSoC EDAM…, Import SARIF report…, Save Session…, Save Workspace As…, the four **Export Violations as …** actions, Close All Tabs, Close Active Project, Clear Recent Projects, and the Pro project actions Reopen Recent Project, Pin Project Tab and Close All Projects.
 - **View:** Save Filter Preset…, Manage Filter Presets…, Close Pane, Focus Other Pane, Move Tab to Other Pane.
 - **Tools:** Run Lint (Bypass Cache) and every Pro waiver, baseline, trend, bookmark, Verible and lint-cache action.
 - **Help:** Documentation, Submit Issue…, Check for Updates.

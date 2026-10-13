@@ -79,6 +79,12 @@ class RecentProjectsNotifier extends Notifier<List<String>> {
       );
       return;
     }
+    if (_clearedBeforeRestore) {
+      // A clear is a decision about the stored history too: persist what
+      // was opened since, and nothing older.
+      _set(state);
+      return;
+    }
     // Opens and removals that landed first go in front of the stored
     // history, not instead of it.
     _set(
@@ -103,7 +109,8 @@ class RecentProjectsNotifier extends Notifier<List<String>> {
     _set(next);
   }
 
-  /// Removes [path], for an entry whose file no longer opens.
+  /// Removes [path]: the row's remove button on the welcome screen, or an
+  /// entry whose file no longer opens.
   void remove(String path) {
     if (!state.contains(path) && _restored) return;
     _touched = true;
@@ -113,6 +120,19 @@ class RecentProjectsNotifier extends Notifier<List<String>> {
         if (existing != path) existing,
     ]);
   }
+
+  /// Empties the list and persists the empty list (File > Clear Recent
+  /// Projects). Projects opened afterwards are recorded as usual.
+  void clear() {
+    _touched = true;
+    if (!_restored) _clearedBeforeRestore = true;
+    _removed.addAll(state);
+    _set(const <String>[]);
+  }
+
+  /// Set when [clear] ran before the stored list arrived, so the restore
+  /// discards the stored history instead of merging it back in.
+  bool _clearedBeforeRestore = false;
 
   void _set(List<String> next) {
     state = List<String>.unmodifiable(next);

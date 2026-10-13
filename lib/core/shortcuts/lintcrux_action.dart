@@ -362,6 +362,11 @@ enum LintcruxAction implements CruxAction {
   /// per-project state.
   reopenRecentProject,
 
+  /// Empty the welcome screen's Recent projects list. Open-core: the list
+  /// is open-core's own (`recentProjectsListProvider`), not the Pro
+  /// registry's recents. File menu and palette; no shortcut.
+  clearRecentProjects,
+
   /// Pro-tier action that pins (or unpins) the
   /// active project tab. Pinned tabs survive [closeAllProjects].
   /// Open-core no-op (single-project mode); the command-palette /
@@ -496,6 +501,7 @@ enum LintcruxAction implements CruxAction {
     LintcruxAction.closeActiveProject => ActionCategory.file,
     LintcruxAction.switchProject => ActionCategory.file,
     LintcruxAction.reopenRecentProject => ActionCategory.file,
+    LintcruxAction.clearRecentProjects => ActionCategory.file,
     LintcruxAction.pinActiveProject => ActionCategory.file,
     LintcruxAction.closeAllProjects => ActionCategory.file,
     LintcruxAction.closeAllTabs => ActionCategory.file,
@@ -571,6 +577,7 @@ extension LintcruxActionRequiredTier on LintcruxAction {
         // `closeActiveProject` stay open-core — they work standalone.
         return LicenseTier.pro;
       case LintcruxAction.openProject:
+      case LintcruxAction.clearRecentProjects:
       case LintcruxAction.openSources:
       case LintcruxAction.importVivadoFilelist:
       case LintcruxAction.importEdam:

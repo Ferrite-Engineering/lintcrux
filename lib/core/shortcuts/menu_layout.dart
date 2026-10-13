@@ -58,6 +58,7 @@ const CruxMenuLayout<LintcruxAction> kMenuLayout = {
     [
       LintcruxAction.switchProject,
       LintcruxAction.reopenRecentProject,
+      LintcruxAction.clearRecentProjects,
       LintcruxAction.pinActiveProject,
     ],
     [

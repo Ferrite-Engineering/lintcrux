@@ -75,6 +75,7 @@ import 'package:lintcrux/features/violations/providers/violation_column_layout_p
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/workspace/providers/lintcrux_action_context_provider.dart';
 import 'package:lintcrux/features/workspace/providers/project_workspace_sync.dart';
+import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/crux_project_resolution.dart';
 import 'package:lintcrux/features/workspace/services/incoming_file_kind.dart';
@@ -1196,7 +1197,20 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
         unawaited(_handleOpener(action, closeAllProjectsOpenerProvider));
       case LintcruxAction.closeAllTabs:
         unawaited(_handleCloseAllTabs());
+      case LintcruxAction.clearRecentProjects:
+        _handleClearRecentProjects();
     }
+  }
+
+  /// Empties the welcome screen's Recent projects list and says so. No
+  /// confirmation: the list is a convenience, every entry is one Open
+  /// Project away, and other editors clear theirs the same way.
+  void _handleClearRecentProjects() {
+    ref.read(recentProjectsListProvider.notifier).clear();
+    final router = ref.read(appRouterProvider);
+    final ctx = router.routerDelegate.navigatorKey.currentState?.context;
+    if (ctx == null || !ctx.mounted) return;
+    showCruxInfoSnack(ctx, L10N.of(ctx).recentProjectsClearedSnack);
   }
 
   /// Records one telemetry counter from the event catalog.

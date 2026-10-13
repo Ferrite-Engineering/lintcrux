@@ -20,6 +20,7 @@ import 'package:lintcrux/features/project/providers/project_picker_provider.dart
 import 'package:lintcrux/features/project/services/project_picker.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
 import 'package:lintcrux/features/viewer/providers/panel_layout_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/baseline_comparison_opener_provider.dart';
@@ -238,6 +239,17 @@ void main() {
         expect(
           find.byKey(const Key('closeAllTabsConfirmDialog')),
           findsNothing,
+        );
+      },
+    ),
+    // Empties the welcome screen's list and says so; no confirmation.
+    LintcruxAction.clearRecentProjects: _DispatchCase(
+      'empties Recent projects and confirms with a snackbar',
+      (tester) async {
+        expect(rootContainer(tester).read(recentProjectsProvider), isEmpty);
+        expect(
+          find.text(l10nOf(tester).recentProjectsClearedSnack),
+          findsOneWidget,
         );
       },
     ),

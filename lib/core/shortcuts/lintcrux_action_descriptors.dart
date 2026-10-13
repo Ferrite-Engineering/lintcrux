@@ -126,6 +126,11 @@ LintcruxActionDescriptor descriptorFor(LintcruxAction action) =>
       LintcruxAction.reopenRecentProject => const LintcruxActionDescriptor(
         surfaces: _menuPalette,
       ),
+      // Clearing the welcome screen's list needs nothing open; on an empty
+      // list it is a harmless no-op, so it is not greyed.
+      LintcruxAction.clearRecentProjects => const LintcruxActionDescriptor(
+        surfaces: _menuPalette,
+      ),
       LintcruxAction.switchProject ||
       LintcruxAction.searchAcrossProjects => const LintcruxActionDescriptor(
         surfaces: _menuPalette,

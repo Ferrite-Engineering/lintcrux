@@ -133,5 +133,57 @@ void main() {
         ..remove('/gone.lintcrux');
       expect(container.read(recentProjectsProvider), isEmpty);
     });
+
+    test('clear empties the list and saves the empty list', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        RecentProjectsSettingsCodec.prefsKey: <String>['/a.lintcrux'],
+      });
+      final prefs = await SharedPreferences.getInstance();
+      final container = containerOver(prefs);
+      await _settle();
+      await _settle();
+      container.read(recentProjectsListProvider.notifier)
+        ..markOpened('/b.lintcrux')
+        ..clear();
+      expect(container.read(recentProjectsProvider), isEmpty);
+      await _settle();
+      expect(
+        prefs.getStringList(RecentProjectsSettingsCodec.prefsKey),
+        isEmpty,
+      );
+    });
+
+    test('a clear before the stored list is read discards the stored '
+        'history, keeping what was opened after it', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        RecentProjectsSettingsCodec.prefsKey: <String>[
+          '/a.lintcrux',
+          '/b.lintcrux',
+        ],
+      });
+      final prefs = await SharedPreferences.getInstance();
+      final container = containerOver(prefs);
+      container.read(recentProjectsListProvider.notifier)
+        ..clear()
+        ..markOpened('/new.lintcrux');
+      await _settle();
+      await _settle();
+      expect(container.read(recentProjectsProvider), ['/new.lintcrux']);
+      expect(
+        prefs.getStringList(RecentProjectsSettingsCodec.prefsKey),
+        ['/new.lintcrux'],
+      );
+    });
+
+    test('a project opened after a clear is recorded again', () async {
+      final prefs = await SharedPreferences.getInstance();
+      final container = containerOver(prefs);
+      await _settle();
+      container.read(recentProjectsListProvider.notifier)
+        ..markOpened('/p.lintcrux')
+        ..clear()
+        ..markOpened('/p.lintcrux');
+      expect(container.read(recentProjectsProvider), ['/p.lintcrux']);
+    });
   });
 }

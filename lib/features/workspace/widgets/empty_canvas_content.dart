@@ -9,7 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/core/app_info/about_providers.dart';
 import 'package:lintcrux/core/help_urls.dart';
 import 'package:lintcrux/core/lintcrux_url_launcher.dart';
+import 'package:lintcrux/features/workspace/providers/recent_project_exists_provider.dart';
 import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/widgets/recent_project_tile.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/shared/widgets/glowing_app_icon.dart';
 
@@ -66,6 +68,7 @@ class EmptyCanvasContent extends ConsumerWidget {
     final l10n = L10N.of(context);
     final theme = Theme.of(context);
     final recentProjects = ref.watch(recentProjectsProvider);
+    final exists = ref.watch(recentProjectExistsProvider);
     // The running version, shown as a muted line under the subtitle. On web
     // there is no native menu bar, so this is the only always-visible place a
     // user can read the version without knowing the palette / overflow About
@@ -81,16 +84,25 @@ class EmptyCanvasContent extends ConsumerWidget {
         heading: l10n.emptyCanvasRecentProjectsHeading,
         emptyPlaceholder: l10n.emptyCanvasNoRecentProjects,
         items: recentProjects,
-        iconBuilder: (_) => const Icon(Icons.folder_outlined),
-        onTap: onOpenRecentProject,
+        rowBuilder: (path) => RecentProjectTile(
+          path: path,
+          exists: exists(path),
+          onOpen: () => onOpenRecentProject(path),
+          onRemove: () =>
+              ref.read(recentProjectsListProvider.notifier).remove(path),
+        ),
         theme: theme,
       ),
       recentWorkspacesSection: _RecentSection(
         heading: l10n.emptyCanvasRecentWorkspacesHeading,
         emptyPlaceholder: l10n.emptyCanvasNoRecentWorkspaces,
         items: const <String>[],
-        iconBuilder: (_) => const Icon(Icons.workspaces_outlined),
-        onTap: (_) {},
+        rowBuilder: (item) => ListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.workspaces_outlined),
+          title: Text(item, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
         theme: theme,
       ),
       primaryActions: [
@@ -161,22 +173,20 @@ class EmptyCanvasContent extends ConsumerWidget {
 }
 
 /// Internal helper rendering one labeled "Recent X" section with a
-/// list of tappable rows or an empty-state placeholder.
+/// list of rows built by its owner, or an empty-state placeholder.
 class _RecentSection extends StatelessWidget {
   const _RecentSection({
     required this.heading,
     required this.emptyPlaceholder,
     required this.items,
-    required this.iconBuilder,
-    required this.onTap,
+    required this.rowBuilder,
     required this.theme,
   });
 
   final String heading;
   final String emptyPlaceholder;
   final List<String> items;
-  final Widget Function(String item) iconBuilder;
-  final void Function(String item) onTap;
+  final Widget Function(String item) rowBuilder;
   final ThemeData theme;
 
   @override
@@ -200,14 +210,7 @@ class _RecentSection extends StatelessWidget {
             ),
           )
         else
-          for (final item in items)
-            ListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              leading: iconBuilder(item),
-              title: Text(item, maxLines: 1, overflow: TextOverflow.ellipsis),
-              onTap: () => onTap(item),
-            ),
+          for (final item in items) rowBuilder(item),
       ],
     );
   }
