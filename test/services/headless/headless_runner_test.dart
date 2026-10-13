@@ -146,6 +146,7 @@ void main() {
     String? exportFormat,
     String? out,
     List<String> engines = const <String>[],
+    List<String> mandatory = const <String>[],
   }) {
     return CliArgs(
       paths: <String>[projectPath],
@@ -158,6 +159,7 @@ void main() {
       exportFormat: exportFormat,
       exportOutputPath: out,
       engineIds: engines,
+      mandatoryEngineIds: mandatory,
     );
   }
 
@@ -287,6 +289,108 @@ void main() {
       expect(r.exitCode, CliExitCode.clean);
       expect(r.problems, isEmpty);
       expect(r.diagnostics.single, contains('skipped'));
+    });
+
+    group('mandated engines', () {
+      // `CliArgs.mandatoryEngineIds` is populated only by the Pro CLI, from
+      // the organization's signed policy. What open core owns is the
+      // mechanism: the engine is added to the run, and its absence is a run
+      // failure the pipeline cannot talk its way out of.
+      final unavailable = _FakeEngine(
+        'fake',
+        error: const EngineNotAvailableException(
+          engineId: 'fake',
+          reason: 'not on PATH',
+        ),
+      );
+
+      test('a missing mandated engine fails the run (3)', () async {
+        final r = await runnerWith([unavailable]).run(
+          args(mandatory: <String>['fake']),
+        );
+        expect(r.exitCode, CliExitCode.runFailed);
+        expect(
+          r.problems.single,
+          startsWith('mandated engine "fake" is not available'),
+        );
+        expect(r.problems.single, contains('not on PATH'));
+        expect(
+          r.problems.single,
+          isNot(contains('drop it with --engine')),
+          reason: 'dropping a mandated engine is not an option to offer',
+        );
+      });
+
+      test('--allow-missing-engines cannot override a mandate', () async {
+        final r = await runnerWith([unavailable]).run(
+          args(mandatory: <String>['fake'], allowMissing: true),
+        );
+        expect(r.exitCode, CliExitCode.runFailed);
+        expect(
+          r.problems.single,
+          contains('--allow-missing-engines does not apply'),
+        );
+        expect(r.diagnostics.where((d) => d.contains('skipped')), isEmpty);
+      });
+
+      test(
+        'a mandated engine the command line left out runs, and the run says '
+        'why it ran',
+        () async {
+          final r = await runnerWith([
+            _FakeEngine('good'),
+            _FakeEngine('fake', violations: [violation()]),
+          ]).run(args(engines: <String>['good'], mandatory: <String>['fake']));
+          expect(r.exitCode, CliExitCode.clean);
+          expect(r.statuses.keys, containsAll(<String>['good', 'fake']));
+          expect(r.reportableViolations, hasLength(1));
+          expect(
+            r.diagnostics.single,
+            contains(
+              'engine "fake" was added to this run by the organization '
+              'policy (mandatoryEngines)',
+            ),
+          );
+        },
+      );
+
+      test(
+        'a mandated id nothing registers fails the run (3), not 64',
+        () async {
+          final r = await runnerWith([_FakeEngine('good')]).run(
+            args(mandatory: <String>['verlator']),
+          );
+          expect(r.exitCode, CliExitCode.runFailed);
+          expect(
+            r.problems.single,
+            startsWith('mandated engine "verlator" is not available'),
+          );
+          expect(r.problems.single, contains('Registered engines: good'));
+        },
+      );
+
+      test(
+        'a mistyped --engine beside a mandate is still a usage error',
+        () async {
+          final r = await runnerWith([_FakeEngine('good')]).run(
+            args(engines: <String>['verlator'], mandatory: <String>['good']),
+          );
+          expect(r.exitCode, CliExitCode.usage);
+          expect(r.problems.single, contains('Unknown engine id(s): verlator'));
+        },
+      );
+
+      test(
+        'a non-mandated missing engine is still tolerated by the flag',
+        () async {
+          final r = await runnerWith([
+            _FakeEngine('good'),
+            unavailable,
+          ]).run(args(mandatory: <String>['good'], allowMissing: true));
+          expect(r.exitCode, CliExitCode.clean);
+          expect(r.diagnostics.single, contains('skipped'));
+        },
+      );
     });
 
     group('the Yosys-backed engines on a machine without yosys', () {

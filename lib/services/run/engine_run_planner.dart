@@ -32,7 +32,8 @@ import 'package:meta/meta.dart';
 ///
 /// Routing rules (unchanged from the pre-extraction behavior):
 ///   - Candidate engines are [engineIdsOverride] when non-empty, else
-///     the project's `enabledEngineIds`, else every registered engine.
+///     the project's `enabledEngineIds`, else every registered engine,
+///     plus every id in [mandatoryEngineIds] that selection left out.
 ///   - Each engine receives only the project source files whose
 ///     effective language is in its
 ///     [EngineCapabilities.supportedLanguages].
@@ -58,21 +59,37 @@ class EngineRunPlanner {
   /// non-empty, replaces the project's `topModule` for this run
   /// (the `--top` flag).
   ///
+  /// [mandatoryEngineIds] are the engines the organization's policy
+  /// requires on every run. They are **added** to whatever the selection
+  /// above produced, never substituted for it: a mandate is a restriction
+  /// on the run, and a project or a `--engine` flag that could leave a
+  /// mandated engine out would make it a default. The ids the mandate
+  /// added, beyond what was already selected, are reported on the plan as
+  /// [EngineRunPlan.addedByMandate] so a caller can say why an engine the
+  /// project did not ask for ran.
+  ///
   /// [unknownEngineIds] on the result reports any id in
-  /// [engineIdsOverride] that the registry does not know, so a caller
-  /// can fail loudly on `--engine verlator` instead of running nothing.
+  /// [engineIdsOverride], the project's selection or [mandatoryEngineIds]
+  /// that the registry does not know, so a caller can fail loudly on
+  /// `--engine verlator` instead of running nothing.
   EngineRunPlan plan({
     required LintProject project,
     required EngineRegistry registry,
     required EngineBinaryConfig Function(String engineId) binaryConfigFor,
     List<String> engineIdsOverride = const <String>[],
+    List<String> mandatoryEngineIds = const <String>[],
     String? topModuleOverride,
   }) {
-    final requested = engineIdsOverride.isNotEmpty
+    final selected = engineIdsOverride.isNotEmpty
         ? engineIdsOverride
         : (project.enabledEngineIds.isEmpty
               ? registry.engineIds
               : project.enabledEngineIds);
+    final addedByMandate = <String>[
+      for (final id in mandatoryEngineIds)
+        if (!selected.contains(id)) id,
+    ];
+    final requested = <String>[...selected, ...addedByMandate];
 
     final unknown = <String>[];
     final candidates = <LintEngine>[];
@@ -131,6 +148,7 @@ class EngineRunPlanner {
       pairs: List<EngineRunPair>.unmodifiable(pairs),
       routing: routing,
       unknownEngineIds: List<String>.unmodifiable(unknown),
+      addedByMandate: List<String>.unmodifiable(addedByMandate),
     );
   }
 }
@@ -143,6 +161,7 @@ class EngineRunPlan {
     required this.pairs,
     required this.routing,
     required this.unknownEngineIds,
+    this.addedByMandate = const <String>[],
   });
 
   /// Engines that have at least one compatible source file, paired with
@@ -159,6 +178,12 @@ class EngineRunPlan {
   /// means the caller should fail rather than run a narrower set than
   /// the user asked for.
   final List<String> unknownEngineIds;
+
+  /// Mandated engine ids the project's own selection (or the `--engine`
+  /// override) had left out, in mandate order. Empty when no mandate
+  /// applied or every mandated engine was already selected. Lets a caller
+  /// tell the user why an engine they did not ask for ran.
+  final List<String> addedByMandate;
 
   /// Ids of engines that were candidates but received zero compatible
   /// source files — e.g. GHDL in a SystemVerilog-only project.

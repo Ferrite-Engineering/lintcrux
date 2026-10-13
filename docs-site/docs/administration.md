@@ -13,15 +13,12 @@ All under `products.lintcrux`.
 |---|---|---|
 | `ciGateThreshold` | The organization-wide ceiling on surviving violations. [Below.](#ci-gate) | In force |
 | `teamDatabaseSubmitter` | Who pooled runs are attributed to in the [shared trend database](team-database.md#submitter). | In force |
-| `ruleSeverityOverrides` | Org-wide rule-severity defaults: a map of engine-namespaced rule id to `fatal`, `error`, `warning`, `note` or `none`. Applies only to rules the project file's own `severityOverrides` leaves unset; the project's entry always wins. Enterprise, like the threshold; the desktop app and `lintcrux-pro` apply it alike. [Below.](#severity-defaults) | In force (the `crux-policy lint` tool and the startup notice still list it as reserved until their registry is updated) |
-| `mandatoryEngines` | Intended to require particular engines in every run. | **Reserved** — nothing reads it |
+| `ruleSeverityOverrides` | Org-wide rule-severity defaults: a map of engine-namespaced rule id to `fatal`, `error`, `warning`, `note` or `none`. Applies only to rules the project file's own `severityOverrides` leaves unset; the project's entry always wins. Enterprise, like the threshold; the desktop app and `lintcrux-pro` apply it alike. [Below.](#severity-defaults) | In force |
+| `mandatoryEngines` | Engines every run must include: a list of engine ids added to every run whatever the project's `enabledEngineIds` or `--engine` say. A mandated engine that is not available fails a `lintcrux-pro` run with exit `3`, and `--allow-missing-engines` cannot override that; the desktop app shows it as unavailable and runs the rest. Enterprise. [Below.](#mandatory-engines) | In force (the `crux-policy lint` tool and the startup notice still list it as reserved until their registry is updated) |
 
 **Four keys, and that is the whole list.** `customRuleMetadata` was listed here until 2026-09-19 and was **removed from the schema**, because no release ever registered it: it was a key this page invented and nothing has ever parsed. `crux-policy lint` now reports it as unknown — *"unknown to this version of the CLI… check the spelling"* — so a file carrying it fails your own linter. Delete it from any policy file that has it.
 
-!!! note "What Reserved means, precisely"
-    The schema knows the key and LintCrux parses it without complaint. **Nothing consumes it, so writing it changes no behaviour.** A reserved key and a working key look identical in a file that validates and deploys without error, which is exactly why they are called out — silence here would send you to file a bug against a product doing exactly what it is built to do.
-
-    **Severity policy is per project first**, in the `.lintcrux` file committed with the RTL — see [Severity & pragmas](severity-and-pragmas.md). `ruleSeverityOverrides` adds the fleet-wide defaults underneath it.
+**Severity policy is per project first**, in the `.lintcrux` file committed with the RTL — see [Severity & pragmas](severity-and-pragmas.md). `ruleSeverityOverrides` adds the fleet-wide defaults underneath it.
 
 ## Organization-wide severity defaults {#severity-defaults}
 
@@ -43,6 +40,24 @@ The map goes inside the key's `value` member: a map-valued key is always written
 The project file wins. A rule the project's `severityOverrides` names keeps the project's severity; every other rule in the map takes the organization's. That is the defaults reading on purpose: an organization setting a default should not overrule a project that deliberately stated its own, and a project that needs to opt out of a default states its own value. A value that is not a map, a rule id without its engine prefix (`verilator/WIDTH`, never `WIDTH`), or a severity that is not one of the five names refuses the whole key with a diagnostic rather than applying half of it.
 
 The desktop app applies the defaults to every run of every tab, and `lintcrux-pro` to every headless run, so a CI gate and a developer's table agree. On a licence below Enterprise the key is read and reported (`lintcrux-pro` says so on stderr every run) and not applied.
+
+## Mandatory engines {#mandatory-engines}
+
+```json
+"products": {
+  "lintcrux": {
+    "mandatoryEngines": { "value": ["verilator", "cdc"], "locked": true }
+  }
+}
+```
+
+A list of engine ids (`verilator`, `verible`, `slang`, `yosys`, `ghdl`, `svlint`, `cdc`), bare or inside `value`. A value that is not a list of engine ids refuses the whole key with a diagnostic rather than mandating half of it.
+
+**This is a restriction, not a default.** The mandated engines are added to every run, whatever the project file's `enabledEngineIds` or a `--engine` flag selected; a project cannot opt out of a mandate by listing other engines, and a pipeline cannot by naming one. The run says which engines it added on stderr (`engine "cdc" was added to this run by the organization policy (mandatoryEngines)`), so a developer reading a CI log is told why an engine the project did not ask for ran. A mandated engine with no compatible source file in the project (GHDL mandated on a design with no VHDL) is skipped with the usual note: the mandate is about which engines run, not about which languages a project is written in.
+
+**A mandated engine that is not available fails the run.** `lintcrux-pro` exits `3` with `mandated engine "cdc" is not available: …`, and `--allow-missing-engines` does not reach it: a mandate is the administrator's statement and the flag is the pipeline's, and a run that silently omitted a mandated engine is the failure the mandate exists to prevent. An id nothing registers (a typo in the policy) fails the same way. The desktop app answers differently on purpose: the engine shows as **Binary not available** in the run status and the other engines run, because blocking every run on a developer's machine would stop work rather than enforce policy.
+
+On a licence below Enterprise the key is read and reported (`lintcrux-pro` says so on stderr every run) and not applied; the project's own engine selection stands.
 
 ## CI gating: what is free and what is Enterprise {#ci-gate}
 
@@ -70,7 +85,7 @@ The value is a whole count of surviving (non-suppressed) violations; `0` means n
 | `0` | clean | Nothing to fail on — or findings present with no gate requested. A bare `lintcrux project.lintcrux` is a reporting command, not a gate. | free |
 | `1` | violations | `--exit-code` was passed and at least one non-suppressed violation survived. | free |
 | `2` | new-violations | `--fail-on-new-violations` was passed and at least one violation is absent from the baseline. Outranks `1`, so a job can branch on regression versus pre-existing debt. | free |
-| `3` | run-failed | An engine failed, timed out or was unavailable; no engine had a compatible source; the `--config` overlay was malformed; the baseline was corrupt; or the export could not be written. **The violation count printed alongside this is not trustworthy.** Outranks every other code. | free |
+| `3` | run-failed | An engine failed, timed out or was unavailable (a [mandated engine](#mandatory-engines), whatever `--allow-missing-engines` says); no engine had a compatible source; the `--config` overlay was malformed; the baseline was corrupt; or the export could not be written. **The violation count printed alongside this is not trustworthy.** Outranks every other code. | free |
 | `4` | over-threshold | The organization's `ciGateThreshold` is configured and the surviving count exceeds it. **Outranks 1 and 2.** | Enterprise |
 | `64` | usage-error | Bad command line — unknown flag, missing value, a positional that is neither a project nor a lintable source file — or a project file that could not be loaded. | free |
 | `65` | data-error | `--import-filelist` or `--import-edam` could not convert its input. | free |

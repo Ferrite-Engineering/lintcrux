@@ -62,6 +62,23 @@ void main() {
       expect(a.toString(), contains('engineTimeout: 0:15:00.000000'));
     });
 
+    test('mandatoryEngineIds is stored, copied, compared and printed', () {
+      const a = CliArgs(mandatoryEngineIds: ['verilator', 'cdc']);
+      expect(a.mandatoryEngineIds, ['verilator', 'cdc']);
+      expect(CliArgs.empty.mandatoryEngineIds, isEmpty);
+      expect(
+        CliArgs.empty.copyWith(mandatoryEngineIds: ['verilator', 'cdc']),
+        a,
+      );
+      expect(a, isNot(CliArgs.empty));
+      expect(
+        a,
+        isNot(const CliArgs(mandatoryEngineIds: ['cdc', 'verilator'])),
+        reason: 'mandate order is part of the value',
+      );
+      expect(a.toString(), contains('mandatoryEngines: [verilator, cdc]'));
+    });
+
     test('toString includes every field', () {
       const a = CliArgs(
         paths: ['x'],

@@ -56,6 +56,7 @@ class CliArgs {
     this.ciGateThreshold,
     this.allowMissingEngines = false,
     this.engineIds = const <String>[],
+    this.mandatoryEngineIds = const <String>[],
     this.quiet = false,
     this.engineTimeout,
     this.sarifRoot,
@@ -203,6 +204,23 @@ class CliArgs {
   /// installed.
   final List<String> engineIds;
 
+  /// Engine ids the organization requires on every run, or empty when none
+  /// are mandated.
+  ///
+  /// A restriction, not a default: the planner adds these to the run
+  /// whatever [engineIds] or the project's `enabledEngineIds` say, and the
+  /// headless runner refuses the run (exit 3) when one of them is
+  /// unavailable, whatever [allowMissingEngines] says. A mandate a pipeline
+  /// could opt out of would not be one.
+  ///
+  /// **Nothing in open core ever populates this**, for the same reason as
+  /// [ciGateThreshold]: it is read from the organization's signed
+  /// `.crux-policy.json` by the Pro CLI, which checks the tier before it
+  /// hands a value down, and it is deliberately not a command-line flag.
+  /// Open core supplies the mechanism that honours a mandate; only a
+  /// licensed build knows what is mandated.
+  final List<String> mandatoryEngineIds;
+
   /// When `true` (the `--quiet` flag), the headless runner prints only
   /// the machine-readable summary line and any diagnostics, suppressing
   /// the per-violation listing. Exit codes are unaffected.
@@ -249,6 +267,7 @@ class CliArgs {
     int? ciGateThreshold,
     bool? allowMissingEngines,
     List<String>? engineIds,
+    List<String>? mandatoryEngineIds,
     bool? quiet,
     Duration? engineTimeout,
     String? sarifRoot,
@@ -273,6 +292,7 @@ class CliArgs {
       ciGateThreshold: ciGateThreshold ?? this.ciGateThreshold,
       allowMissingEngines: allowMissingEngines ?? this.allowMissingEngines,
       engineIds: engineIds ?? this.engineIds,
+      mandatoryEngineIds: mandatoryEngineIds ?? this.mandatoryEngineIds,
       quiet: quiet ?? this.quiet,
       engineTimeout: engineTimeout ?? this.engineTimeout,
       sarifRoot: sarifRoot ?? this.sarifRoot,
@@ -315,6 +335,12 @@ class CliArgs {
     for (var i = 0; i < engineIds.length; i++) {
       if (other.engineIds[i] != engineIds[i]) return false;
     }
+    if (other.mandatoryEngineIds.length != mandatoryEngineIds.length) {
+      return false;
+    }
+    for (var i = 0; i < mandatoryEngineIds.length; i++) {
+      if (other.mandatoryEngineIds[i] != mandatoryEngineIds[i]) return false;
+    }
     return true;
   }
 
@@ -344,7 +370,7 @@ class CliArgs {
       allowMissingEngines,
       quiet,
       // Object.hash takes at most twenty arguments.
-      Object.hash(engineTimeout, sarifRoot),
+      Object.hash(engineTimeout, sarifRoot, Object.hashAll(mandatoryEngineIds)),
       Object.hashAll(engineIds),
     );
   }
@@ -360,5 +386,6 @@ class CliArgs {
       'export: $exportFormat, out: $exportOutputPath, '
       'baseline: $baselinePath, failOnNew: $failOnNewViolations, '
       'allowMissingEngines: $allowMissingEngines, engines: $engineIds, '
+      'mandatoryEngines: $mandatoryEngineIds, '
       'quiet: $quiet, engineTimeout: $engineTimeout, sarifRoot: $sarifRoot)';
 }

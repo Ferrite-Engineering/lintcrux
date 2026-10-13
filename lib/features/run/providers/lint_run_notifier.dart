@@ -17,6 +17,7 @@ import 'package:lintcrux/domain/models/engine_run_status.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
 import 'package:lintcrux/plugins/extra_violation_transformers_provider.dart';
+import 'package:lintcrux/plugins/mandatory_engine_ids_provider.dart';
 import 'package:lintcrux/services/engines/engine_language_router.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
@@ -511,7 +512,8 @@ class LintRunNotifier extends Notifier<LintRunState> {
     final registry = ref.read(engineRegistryProvider);
     final settings = ref.read(appSettingsProvider);
     final cliArgs = ref.read(cliArgsProvider);
-    return _pairsForProject(project, registry, settings, cliArgs);
+    final mandated = ref.read(mandatoryEngineIdsProvider);
+    return _pairsForProject(project, registry, settings, cliArgs, mandated);
   }
 
   /// Cancel the in-flight run. No-op when nothing is running.
@@ -537,7 +539,11 @@ class LintRunNotifier extends Notifier<LintRunState> {
   ///
   /// Routing rules:
   ///   - Engines listed in `enabledEngineIds` (or every registered
-  ///     engine when that list is empty) are candidates.
+  ///     engine when that list is empty) are candidates, plus every id
+  ///     in [mandatoryEngineIds] (the organization's policy, through
+  ///     `mandatoryEngineIdsProvider`) that list left out. A mandated
+  ///     engine that is not installed shows as unavailable in the run
+  ///     status like any other; the run itself goes ahead.
   ///   - Each engine receives only the project source files whose
   ///     effective language ([ProjectSourceFile.resolveLanguage]) is
   ///     in its [EngineCapabilities.supportedLanguages].
@@ -554,6 +560,7 @@ class LintRunNotifier extends Notifier<LintRunState> {
     EngineRegistry registry,
     AppSettings settings,
     CliArgs cliArgs,
+    List<String> mandatoryEngineIds,
   ) {
     // The planning itself lives in the Flutter-free
     // `EngineRunPlanner` so the headless CI binary
@@ -569,6 +576,7 @@ class LintRunNotifier extends Notifier<LintRunState> {
     final plan = planner.plan(
       project: project,
       registry: registry,
+      mandatoryEngineIds: mandatoryEngineIds,
       topModuleOverride: cliArgs.topModule,
       binaryConfigFor: (engineId) {
         final cliPath = cliArgs.engineBinaryPaths[engineId];

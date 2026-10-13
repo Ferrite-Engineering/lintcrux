@@ -165,6 +165,78 @@ void main() {
     expect(plan.pairs.map((p) => p.engine.id), <String>['verilator']);
   });
 
+  group('mandatory engines', () {
+    const narrowed = LintProject(
+      name: 'design',
+      rootPath: '/repo',
+      sourceFiles: <String>['/repo/top.sv'],
+      enabledEngineIds: <String>['verilator'],
+    );
+
+    test('are added to the project selection, and reported as added', () {
+      final plan = planner.plan(
+        project: narrowed,
+        registry: registry,
+        binaryConfigFor: binaryFor,
+        mandatoryEngineIds: <String>['slang'],
+      );
+      expect(
+        plan.pairs.map((p) => p.engine.id),
+        <String>['verilator', 'slang'],
+      );
+      expect(plan.addedByMandate, <String>['slang']);
+    });
+
+    test('are added over an --engine override too', () {
+      // A restriction, not a default: the one way to leave a mandated engine
+      // out would be the command line, and that is the way that must not work.
+      final plan = planner.plan(
+        project: narrowed,
+        registry: registry,
+        binaryConfigFor: binaryFor,
+        engineIdsOverride: <String>['slang'],
+        mandatoryEngineIds: <String>['verilator'],
+      );
+      expect(
+        plan.pairs.map((p) => p.engine.id),
+        <String>['slang', 'verilator'],
+      );
+      expect(plan.addedByMandate, <String>['verilator']);
+    });
+
+    test('an already-selected mandated engine is not added twice', () {
+      final plan = planner.plan(
+        project: narrowed,
+        registry: registry,
+        binaryConfigFor: binaryFor,
+        mandatoryEngineIds: <String>['verilator'],
+      );
+      expect(plan.pairs.map((p) => p.engine.id), <String>['verilator']);
+      expect(plan.addedByMandate, isEmpty);
+    });
+
+    test('an unknown mandated id is reported as unknown', () {
+      final plan = planner.plan(
+        project: narrowed,
+        registry: registry,
+        binaryConfigFor: binaryFor,
+        mandatoryEngineIds: <String>['verlator'],
+      );
+      expect(plan.unknownEngineIds, <String>['verlator']);
+      expect(plan.addedByMandate, <String>['verlator']);
+      expect(plan.pairs.map((p) => p.engine.id), <String>['verilator']);
+    });
+
+    test('no mandate adds nothing', () {
+      final plan = planner.plan(
+        project: narrowed,
+        registry: registry,
+        binaryConfigFor: binaryFor,
+      );
+      expect(plan.addedByMandate, isEmpty);
+    });
+  });
+
   test('topModuleOverride wins over the project topModule', () {
     const withTop = LintProject(
       name: 'design',

@@ -16,6 +16,7 @@ import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
+import 'package:lintcrux/plugins/mandatory_engine_ids_provider.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
 import 'package:lintcrux/services/run/lint_run_lifecycle.dart';
@@ -68,6 +69,34 @@ class _VhdlOnlyEngine implements LintEngine {
   Future<String?> detectVersion(EngineBinaryConfig config) async => '4.0.0';
   @override
   Stream<Violation> run(LintRunRequest request) async* {}
+  @override
+  Stream<Violation> runIncremental(
+    LintRunRequest request,
+    Set<String> changedFiles,
+  ) => run(request);
+  @override
+  void cancel() {}
+}
+
+/// An engine whose binary is not installed: every run throws the exception
+/// the runner maps to `EngineRunPhase.unavailable`.
+class _UnavailableEngine implements LintEngine {
+  _UnavailableEngine(this.id);
+  @override
+  final String id;
+  @override
+  String get displayName => 'Missing $id';
+  @override
+  EngineCapabilities get capabilities => const EngineCapabilities(
+    supportedLanguages: {HdlLanguage.systemVerilog},
+  );
+  @override
+  Future<String?> detectVersion(EngineBinaryConfig config) async => null;
+  @override
+  Stream<Violation> run(LintRunRequest request) async* {
+    throw EngineNotAvailableException(engineId: id, reason: 'not on PATH');
+  }
+
   @override
   Stream<Violation> runIncremental(
     LintRunRequest request,
@@ -334,6 +363,76 @@ void main() {
         expect(container.read(lintRunProvider).statuses.keys, ['a']);
       },
     );
+
+    group('mandated engines', () {
+      // `mandatoryEngineIdsProvider` is the desktop's half of the seam the
+      // headless runner takes as `CliArgs.mandatoryEngineIds`; open core
+      // mandates nothing, the Pro overlay binds the organization's policy.
+      const project = LintProject(
+        name: 'p',
+        rootPath: '/x',
+        sourceFiles: ['/x/y.sv'],
+        enabledEngineIds: ['a'],
+      );
+
+      test('run even when enabledEngineIds leaves them out', () async {
+        final store = InMemoryViolationStore();
+        final container = ProviderContainer(
+          overrides: [
+            ...telemetryDeclinedOverrides(),
+            engineRegistryProvider.overrideWithValue(
+              EngineRegistry([
+                _ScriptedEngine('a', [_v('a', 'r')]),
+                _ScriptedEngine('b', [_v('b', 'r')]),
+              ]),
+            ),
+            violationStoreProvider.overrideWithValue(store),
+            mandatoryEngineIdsProvider.overrideWithValue(const <String>['b']),
+          ],
+        );
+        addTearDown(container.dispose);
+        await container.read(lintRunProvider.notifier).runAll(project);
+        expect(
+          container.read(lintRunProvider).statuses.keys,
+          containsAll(<String>['a', 'b']),
+        );
+        expect(store.byEngine['b'], hasLength(1));
+      });
+
+      test(
+        'one that is not installed is reported unavailable and the run still '
+        'completes',
+        () async {
+          // The desktop's answer differs from the headless runner's on
+          // purpose: refusing every run on a developer's machine would stop
+          // work rather than enforce policy, so the missing engine is shown
+          // and the others run.
+          final store = InMemoryViolationStore();
+          final container = ProviderContainer(
+            overrides: [
+              ...telemetryDeclinedOverrides(),
+              engineRegistryProvider.overrideWithValue(
+                EngineRegistry([
+                  _ScriptedEngine('a', [_v('a', 'r')]),
+                  _UnavailableEngine('b'),
+                ]),
+              ),
+              violationStoreProvider.overrideWithValue(store),
+              mandatoryEngineIdsProvider.overrideWithValue(
+                const <String>['b'],
+              ),
+            ],
+          );
+          addTearDown(container.dispose);
+          await container.read(lintRunProvider.notifier).runAll(project);
+          final state = container.read(lintRunProvider);
+          expect(state.isRunning, isFalse);
+          expect(state.statusFor('a')?.phase, EngineRunPhase.completed);
+          expect(state.statusFor('b')?.phase, EngineRunPhase.unavailable);
+          expect(store.byEngine['a'], hasLength(1));
+        },
+      );
+    });
 
     test('runStatusFor returns the live status for an engine', () async {
       final store = InMemoryViolationStore();

@@ -129,6 +129,21 @@ class HeadlessRunner {
       'No engine had a compatible source file to lint. Check the '
       "project's language declarations and enabledEngineIds.";
 
+  /// How every problem about a mandated engine begins, so a CI log can be
+  /// grepped for the organization's mandate rather than for a missing
+  /// binary in general.
+  static const String _mandatedEngineLead = 'mandated engine';
+
+  /// The problem for a mandated id no engine is registered under.
+  static String _mandatedUnknownMessage(String id, {required String known}) =>
+      '$_mandatedEngineLead "$id" is not available: no engine with that id '
+      'is registered. Registered engines: $known.';
+
+  /// The note for an engine the mandate added beyond the project's selection.
+  static String _addedByMandateMessage(String id) =>
+      'engine "$id" was added to this run by the organization policy '
+      '(mandatoryEngines)';
+
   /// Runs the pipeline described by [args].
   ///
   /// Never throws: every failure path is folded into a
@@ -173,22 +188,39 @@ class HeadlessRunner {
       project: project,
       registry: registry,
       engineIdsOverride: args.engineIds,
+      mandatoryEngineIds: args.mandatoryEngineIds,
       topModuleOverride: args.topModule,
       binaryConfigFor: (engineId) => _binaryFor(engineId, args),
     );
 
     if (plan.unknownEngineIds.isNotEmpty) {
-      final unknown = plan.unknownEngineIds.join(', ');
       final known = registry.engineIds.join(', ');
+      // A mandated id nothing registers is the strongest form of "not
+      // available", and the pipeline cannot fix it from the command line, so
+      // it is a run failure rather than a usage error.
+      final mandatedUnknown = <String>[
+        for (final id in plan.unknownEngineIds)
+          if (args.mandatoryEngineIds.contains(id)) id,
+      ];
+      final typedUnknown = <String>[
+        for (final id in plan.unknownEngineIds)
+          if (!args.mandatoryEngineIds.contains(id)) id,
+      ];
       return HeadlessRunResult.failed(
-        code: CliExitCode.usage,
+        code: mandatedUnknown.isNotEmpty
+            ? CliExitCode.runFailed
+            : CliExitCode.usage,
         problems: <String>[
-          'Unknown engine id(s): $unknown. Registered engines: $known.',
+          for (final id in mandatedUnknown)
+            _mandatedUnknownMessage(id, known: known),
+          if (typedUnknown.isNotEmpty)
+            'Unknown engine id(s): ${typedUnknown.join(', ')}. Registered engines: $known.',
         ],
       );
     }
 
     final diagnostics = <String>[
+      for (final id in plan.addedByMandate) _addedByMandateMessage(id),
       for (final id in plan.enginesWithoutSources)
         'engine "$id" received no compatible source files and was skipped',
     ];
@@ -255,16 +287,27 @@ class HeadlessRunner {
           final message =
               'engine "${status.engineId}" is unavailable: '
               '${status.error ?? 'binary not found'}';
-          if (args.allowMissingEngines) {
+          // Name only a flag that exists: CDC runs Yosys and reads
+          // --yosys-path, and an engine without a path flag gets none.
+          final binaryId = binaryEngineIdFor(status.engineId);
+          final pointAtIt = CliArgsParser.binaryPathEngineIds.contains(binaryId)
+              ? 'point at it with --$binaryId-path, '
+              : '';
+          if (args.mandatoryEngineIds.contains(status.engineId)) {
+            // A mandate is the administrator's statement and
+            // --allow-missing-engines is the pipeline's; a run that silently
+            // omits a mandated engine is the failure the mandate exists to
+            // prevent, so the flag does not reach it.
+            problems.add(
+              '$_mandatedEngineLead "${status.engineId}" is not available: '
+              '${status.error ?? 'binary not found'}. The organization '
+              'policy requires it on every run: install it, ${pointAtIt}or '
+              'ask your administrator; --allow-missing-engines does not '
+              'apply to a mandated engine.',
+            );
+          } else if (args.allowMissingEngines) {
             diagnostics.add('$message (skipped: --allow-missing-engines)');
           } else {
-            // Name only a flag that exists: CDC runs Yosys and reads
-            // --yosys-path, and an engine without a path flag gets none.
-            final binaryId = binaryEngineIdFor(status.engineId);
-            final pointAtIt =
-                CliArgsParser.binaryPathEngineIds.contains(binaryId)
-                ? 'point at it with --$binaryId-path, '
-                : '';
             problems.add(
               '$message. Install it, $pointAtIt'
               'drop it with --engine, or pass '

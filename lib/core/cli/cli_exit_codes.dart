@@ -66,7 +66,9 @@ class CliExitCode {
   ///
   /// Covers: an engine reported `EngineRunPhase.failed` (non-zero exit
   /// with nothing parseable) or `EngineRunPhase.unavailable` (binary not
-  /// found, unless `--allow-missing-engines` was passed), an engine
+  /// found, unless `--allow-missing-engines` was passed; an engine the
+  /// organization's policy mandates, `CliArgs.mandatoryEngineIds`, is
+  /// unavailable whatever that flag says), an engine
   /// exceeded its watchdog budget, the `.lintcrux` project named on the
   /// command line exists but could not be read or parsed, declares no
   /// sources, or lists a source that is missing, the `--config` overlay was

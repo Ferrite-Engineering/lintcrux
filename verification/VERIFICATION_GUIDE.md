@@ -196,6 +196,7 @@ Enable `yosys` in a project's `enabledEngineIds`; run against the committed `eng
 3. Add a `.vhd` source and set its language to `vhdl` (or leave `auto` and rely on the extension) — the schema round-trips through `ProjectFileCodec`; the GHDL engine (§6) is what lints it.
 4. Set `Settings > Engines > Yosys check` to **Custom** with a path that does not exist and run — both `yosys` and `cdc` show **Binary not available** (never Completed with 0 violations), and **Probe** reports a probe failure. Point it at a real `yosys` and **Probe** shows that binary's version. The CDC engine has no row of its own: it runs the binary the Yosys check row configures.
 5. Headless: `lintcrux project.lintcrux --engine yosys --engine cdc --yosys-path /nonexistent/yosys` exits `3` and the message for each engine names `--yosys-path` (there is no `--cdc-path`); adding `--allow-missing-engines` exits `0` with both listed as skipped.
+6. The reviewed-crossing seam, on the open-core build: a `CdcDomainAnalysis` given a `reviewedCrossing` hook that answers for `clk_a → clk_b` over `data` turns the capstone's unsynchronized bus into `CdcSyncKind.reviewed` carrying the reason, and `CdcEngine` reports it as a `cdc/reviewed-crossing` note (the reason in the message, `review_reason` in `raw`, the same anchor and `path` as the error) with the summary reading `0 unsafe, 1 reviewed`; the two-flop `req` is never asked about. Open core sets no hook, so a stock run reports the bus as `cdc/unsync-multi-bit`; the Pro overlay's `cdc.yaml` `waive:` rules are what answer it.
 
 ### 5.4 Tier-gate scenarios
 
@@ -207,6 +208,7 @@ Open Core — no gating.
 |---|---|---|
 | Yosys adapter: script build, diagnostic → violation mapping, module fallback | `[Coverage: UNIT]` | `test/services/engines/yosys/**` |
 | Missing / Custom Yosys binary for `yosys` and `cdc` (unavailable, never a clean run; exit 3 and the `--yosys-path` hint) | `[Coverage: UNIT]` | `test/services/engines/yosys/yosys_check_engine_test.dart`, `test/services/engines/cdc/cdc_engine_unavailable_test.dart`, `test/services/headless/headless_runner_test.dart` |
+| Reviewed-crossing seam: hook asked only for unprotected crossings, `reviewed` is safe with a reason, the engine emits the `cdc/reviewed-crossing` note and counts it in the summary | `[Coverage: UNIT]` | `test/services/engines/cdc/cdc_domain_analysis_test.dart`, `test/services/engines/cdc/cdc_engine_reviewed_crossing_test.dart` |
 | Yosys canned-output → golden SARIF | `[Coverage: GOLDEN]` | `engine_golden_test.dart` + `test/fixtures/engines/yosys/generated/**` |
 | GHDL availability probe (bundled → PATH → null) | `[Coverage: UNIT]` | `test/services/engines/ghdl/ghdl_availability_service_test.dart` |
 | Mixed-language schema round-trip (`ProjectSourceFileLanguage`, auto-detect) | `[Coverage: UNIT]` | `test/services/project/project_file_codec_test.dart` |
@@ -2074,6 +2076,8 @@ convenience, the code is the contract.
 | `Violation.raw` carrying the original absolute paths | Dropped before SARIF export, so a developer's home directory cannot leak into an uploaded artifact. |
 | `SIGINT` / `SIGTERM` mid-run | Any Yosys subprocess is reaped, then the process exits `128 + signal`. Cancelling a CI job must not strand an elaborating `yosys` on the runner. |
 | Engine exceeds its watchdog budget | Exit `3`. The CLI budget is 300 s (vs the GUI's 120 s) because a runner is slower than a workstation. |
+| A mandated engine (`CliArgs.mandatoryEngineIds`, populated only by the Pro CLI from the organization's policy) is unavailable, or its id is not registered | Exit `3`, `mandated engine "<id>" is not available`, whatever `--allow-missing-engines` says. A non-mandated missing engine beside it is still tolerated by the flag. |
+| A mandated engine the project or `--engine` left out | Runs, and a `note:` names the policy that added it. One with no compatible source is skipped with the usual note. |
 
 ### 19.6 Tier-gate scenarios
 

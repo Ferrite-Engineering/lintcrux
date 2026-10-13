@@ -108,7 +108,7 @@ This is the part a pipeline depends on, so it is spelled out in full.
 | `0` | `clean` | Nothing to report, **or** findings present with no gate requested. |
 | `1` | `violations` | `--exit-code` was passed and at least one non-suppressed violation remains. |
 | `2` | `new-violations` | `--fail-on-new-violations` was passed and at least one violation is absent from the baseline. |
-| `3` | `run-failed` | An engine failed, timed out, was cancelled, or was unavailable; an engine ran but reported that it could not analyse the design (CDC's `cdc/elaboration-failed` and `cdc/unsupported-sources`); no engine had a compatible source file; the project file named on the command line could not be loaded (unparseable, no source files, or a listed source file missing); the `--config` overlay was malformed; the baseline was corrupt; or the export could not be written. |
+| `3` | `run-failed` | An engine failed, timed out, was cancelled, or was unavailable (an engine the organization's policy mandates is unavailable whatever `--allow-missing-engines` says; `lintcrux-pro` only); an engine ran but reported that it could not analyse the design (CDC's `cdc/elaboration-failed` and `cdc/unsupported-sources`); no engine had a compatible source file; the project file named on the command line could not be loaded (unparseable, no source files, or a listed source file missing); the `--config` overlay was malformed; the baseline was corrupt; or the export could not be written. |
 | `4` | `over-threshold` | Never returned by the open-core binary. The Pro/Enterprise `lintcrux-pro` binary returns it when an organization's signed policy file sets a violation ceiling and the run exceeds it. |
 | `64` | `usage-error` | Bad flag, `--export` without `--out`, an unknown `--engine` id, no positional argument, an unusable positional argument, or a project or source path that does not exist. |
 | `65` | `data-error` | `--import-filelist` could not read or convert the filelist, or `--import-edam` could not read or convert the EDAM file. |
@@ -131,7 +131,7 @@ branches on the code must handle them explicitly: a catch-all that reads
     threshold:
 
     ```
-    lintcrux: the organization policy file was refused (reason=noPublicKey key=none); no ciGateThreshold applies to this run.
+    lintcrux: the organization policy file was refused (reason=noPublicKey key=none); no ciGateThreshold, mandatoryEngines or ruleSeverityOverrides applies to this run.
     ```
 
     `reason` is the refusal (`badSignature`, `untrustedUnsigned`,
@@ -208,6 +208,13 @@ the message is demoted to a note.
 This covers every engine. `cdc` runs `yosys`, so a missing `yosys`
 makes both the `yosys` and `cdc` engines unavailable, and the message
 for either names `--yosys-path`.
+
+The one thing the flag does not reach is an engine the organization's
+policy mandates (`mandatoryEngines`, Enterprise, read by `lintcrux-pro`
+only). A missing mandated engine fails the run with exit `3` whatever
+`--allow-missing-engines` says, and the message begins
+`mandated engine "<id>" is not available`. See
+[Administration](../administration.md#mandatory-engines).
 
 ## Config overlay
 
