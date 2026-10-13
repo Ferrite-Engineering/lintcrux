@@ -174,6 +174,15 @@ Per `VERIFICATION_GUIDE.md` §7.
 - [ ] `clearLintCache` / `openLintCacheStats` / `forceLintRunWithoutCache` actions are Pro-tier; rendered with the tier badge on open-core builds — `[Coverage: UNIT]` (test/core/shortcuts/lintcrux_action_test.dart)
 - [ ] Tier-gate scenarios: cache UI / SQLite persistence is Pro work verified in the Pro overlay's guide. Open-core build serves the no-op service and re-invokes engines on every run — `[Coverage: MANUAL]`
 
+## Violation bookmarks (open core; guide §8.3)
+
+- [ ] With a project open the table shows the bookmark column and the count chip; an imported SARIF report shows neither — `[Coverage: WIDGET]` (`test/features/bookmarks/widgets/bookmark_leading_cell_test.dart`)
+- [ ] Add, edit (note + color) and remove-with-Undo from the column icon; Toggle Bookmark opens the same dialog for the selection — `[Coverage: WIDGET]` (`test/features/bookmarks/widgets/bookmark_column_icon_test.dart`, `test/features/bookmarks/widgets/bookmark_dialog_test.dart`, `test/features/bookmarks/providers/bookmark_openers_test.dart`)
+- [ ] Bookmarks panel: grouping, All / Active / Stale, search, Jump / Edit / Remove — `[Coverage: WIDGET]` (`test/features/bookmarks/screens/bookmark_panel_test.dart`)
+- [ ] A run marks bookmarks whose violation fired and leaves the rest stale — `[Coverage: UNIT]` (`test/services/bookmarks/bookmark_freshness_test.dart`)
+- [ ] `.lintcrux-bookmarks.json` from an earlier release (v1 and v2, including files the Pro edition wrote) loads unchanged — `[Coverage: UNIT]` (`test/services/bookmarks/violation_bookmark_store_provider_test.dart`)
+- [ ] Tier-gate scenarios: none; both bookmark actions are Open Core and carry no tier badge — `[Coverage: UNIT]` (`test/core/shortcuts/lintcrux_action_test.dart`)
+
 ## Keyboard shortcuts (§8.5)
 
 - [ ] Default keymap is collision-free — fresh profile shows no conflict banner; Toggle Theme is Cmd/Ctrl+Shift+K (moved off New Tab's Cmd/Ctrl+T) — `[Coverage: UNIT]` (`test/core/shortcuts/shortcut_conflicts_test.dart` default-keymap guard)

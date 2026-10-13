@@ -376,8 +376,8 @@ WorkspaceRootState workspaceRootState(WidgetTester tester) =>
 ///
 /// Deliberately does NOT touch the root `currentProjectProvider`: the
 /// production open flows never write it, and the per-project services
-/// (the Pro waiver / baseline / bookmark / cache / Verible store
-/// overrides) are per-tab. A journey that only passes with a root-side
+/// (the bookmark store, and the Pro waiver / baseline / cache / Verible
+/// store overrides) are per-tab. A journey that only passes with a root-side
 /// project load is exercising a path no user can reach.
 Future<ProviderContainer> openFixtureProject(
   WidgetTester tester,

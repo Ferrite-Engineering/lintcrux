@@ -255,7 +255,7 @@ class LintRunNotifier extends Notifier<LintRunState> {
       // It is the lifecycle-bus edge every run-completion observer keys
       // on; without it a project whose violations come only from
       // custom-regex rules completes real runs that trend tracking,
-      // bookmark stale-detection, and Verible auto-run never see.
+      // bookmark freshness, and Verible auto-run never see.
       final startedAt = DateTime.now();
       state = state.copyWith(isRunning: true, runStartedAt: startedAt);
       if (project.customRegexRules.isNotEmpty) {

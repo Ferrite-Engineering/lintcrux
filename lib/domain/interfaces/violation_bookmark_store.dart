@@ -5,12 +5,10 @@ import 'package:lintcrux/domain/models/bookmarked_violation.dart';
 
 /// Persistence interface for the per-project violation bookmark set.
 ///
-/// Open Core ships [NoopViolationBookmarkStore] (`listAll` returns `[]`,
-/// mutations no-op silently) — the bookmark feature is Pro. The Pro overlay
-/// supplies `JsonFileViolationBookmarkStore` which reads/writes
-/// `<project-root>/.lintcrux-bookmarks.json` with schema-versioned content and
-/// a stale-detection hook that runs on every project-wide
-/// [LintRunCompletionEvent].
+/// A tab with a project open uses `JsonFileViolationBookmarkStore`, which
+/// reads and writes `<project-root>/.lintcrux-bookmarks.json` with
+/// schema-versioned content and records which bookmarks every completed lint
+/// run saw. With no project open the store is [NoopViolationBookmarkStore].
 ///
 /// Bookmark identity is the [BookmarkedViolation.fingerprint] (the
 /// same fingerprint the baseline system uses, computed via
@@ -42,10 +40,9 @@ abstract class ViolationBookmarkStore {
   Stream<void> get changed;
 }
 
-/// Open-core default that holds no bookmarks and silently no-ops on
-/// every mutation. The seam is still wired so consumers (the
-/// bookmark column, the count badge, the panel) can read from the
-/// provider without crashing in the open-core build.
+/// The store of a context with no project directory (no project open, the
+/// imported-report and web viewers): holds no bookmarks and silently no-ops
+/// on every mutation, so consumers can read from the provider anywhere.
 class NoopViolationBookmarkStore implements ViolationBookmarkStore {
   /// Creates a [NoopViolationBookmarkStore].
   const NoopViolationBookmarkStore();
@@ -60,10 +57,9 @@ class NoopViolationBookmarkStore implements ViolationBookmarkStore {
 
   @override
   Future<void> addOrUpdate(BookmarkedViolation bookmark) async {
-    // Intentionally silent: the bookmark feature is Pro; activating
-    // it in open-core should not throw at the call site (the Pro
-    // overlay's selector chips / panel are not rendered, so this is
-    // unreachable from the UI anyway). A throw would be a defect.
+    // Intentionally silent: with no project there is nowhere to write,
+    // and the bookmark column and badge are not rendered, so this is
+    // unreachable from the UI. A throw would be a defect.
   }
 
   @override

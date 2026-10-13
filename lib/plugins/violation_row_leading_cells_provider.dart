@@ -5,17 +5,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 
-/// One Pro-contributed cell rendered at the leftmost position of each
-/// row in the violation table, before the open-core severity / engine /
-/// rule / file / line / message columns.
+/// One leading cell rendered at the left of each row in the violation
+/// table, before the severity / engine / rule / file / line / message
+/// columns. The bookmark column (`kBookmarkLeadingCell`) is one.
 ///
-/// The violation table renders the contributions returned by
-/// [violationRowLeadingCellsProvider] as a horizontal `Row` of fixed-
-/// width cells preceding the open-core cells. Each entry is a
-/// pre-built widget builder receiving the row's [Violation]; Pro
-/// implementations typically build a tier-gated [ConsumerWidget] that
-/// reads the violation-bookmark store, queries `lookupByFingerprint`,
-/// and renders an outline / filled bookmark icon.
+/// The violation table renders its leading cells as a horizontal `Row`
+/// of fixed-width cells preceding the regular cells: the bookmark column
+/// first, then the contributions returned by
+/// [violationRowLeadingCellsProvider]. Each entry is a pre-built widget
+/// builder receiving the row's [Violation].
 ///
 /// Mirrors [violationTableTopActionsProvider] in shape so Pro
 /// contributions to row chrome feel identical to reviewers. The seam
@@ -87,10 +85,9 @@ class ViolationRowLeadingCell {
 /// contributes leading cells (prefixed before the open-core columns)
 /// to each row of the violation table.
 ///
-/// Default returns an empty list so the open-core build's violation
-/// table renders exactly the open-core columns. The Pro overlay
-/// overrides this provider via `proOverrides` with the bookmark
-/// column contribution.
+/// Default returns an empty list. The violation table always renders
+/// its own bookmark column first (when a project is open) and the
+/// contributions from this list after it.
 ///
 /// Consumers (the row + header widgets) iterate the list and render
 /// each entry's cell at the same horizontal slot, preserving table

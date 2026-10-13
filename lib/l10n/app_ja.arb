@@ -277,11 +277,11 @@
   },
   "actionOpenBookmarksManager": "ブックマークした違反を表示…",
   "@actionOpenBookmarksManager": {
-    "description": "Menu / command palette label for the Pro-tier action that opens the violation-bookmark management panel."
+    "description": "Menu / command palette label for the action that opens the violation-bookmark management panel."
   },
   "actionToggleBookmarkForCurrentViolation": "ブックマークを切り替え",
   "@actionToggleBookmarkForCurrentViolation": {
-    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the Pro-tier action that toggles a bookmark on the selected violation."
+    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the action that toggles a bookmark on the selected violation."
   },
   "actionRunVeribleDryRun": "Verible 自動修正のドライランを実行…",
   "@actionRunVeribleDryRun": {
@@ -1632,5 +1632,163 @@
   "settingsTelemetryInstallationIdLabel": "インストール ID",
   "settingsTelemetryInstallationIdDescription": "収集されるデータに付与される唯一の識別子です。ランダムな値で、あなた個人とは結び付いていません。このインストールのデータ削除をご希望の場合は、サポートまでお送りください。",
   "settingsTelemetryInstallationIdCopy": "コピー",
-  "settingsTelemetryInstallationIdCopied": "インストール ID をコピーしました。"
+  "settingsTelemetryInstallationIdCopied": "インストール ID をコピーしました。",
+  "bookmarkColumnHeaderTooltip": "ブックマーク",
+  "@bookmarkColumnHeaderTooltip": {
+    "description": "Tooltip on the bookmark column's header icon in the violations table. The column itself has no label — it is identified by the icon."
+  },
+  "bookmarkColumnIconAddTooltip": "この違反をブックマーク",
+  "@bookmarkColumnIconAddTooltip": {
+    "description": "Tooltip for the outline bookmark icon in the violations table's bookmark column. Tapping it opens the add-bookmark dialog."
+  },
+  "bookmarkColumnIconRemoveTooltip": "ブックマークを解除",
+  "@bookmarkColumnIconRemoveTooltip": {
+    "description": "Tooltip for the filled bookmark icon in the violations table's bookmark column. Tapping it removes the existing bookmark."
+  },
+  "bookmarkColumnIconStaleTooltip": "最近の実行で再発生していません",
+  "@bookmarkColumnIconStaleTooltip": {
+    "description": "Tooltip suffix appended when a bookmark hasn't been re-seen on recent lint runs, hinting that the underlying violation may have been resolved."
+  },
+  "bookmarkCountBadgeTooltip": "{count, plural, =0{ブックマークなし} =1{1 件のブックマーク} other{{count} 件のブックマーク}} — 管理パネルを開く",
+  "@bookmarkCountBadgeTooltip": {
+    "description": "Tooltip for the bookmark count badge in the violations table top action row. Tapping opens the bookmark management panel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bookmarkDialogCancelAction": "キャンセル",
+  "@bookmarkDialogCancelAction": {
+    "description": "Secondary action button in the bookmark dialog. Discards changes."
+  },
+  "bookmarkDialogColorLabel": "カラータグ",
+  "@bookmarkDialogColorLabel": {
+    "description": "Label for the color-tag picker in the bookmark dialog."
+  },
+  "bookmarkDialogColorNoneLabel": "なし",
+  "@bookmarkDialogColorNoneLabel": {
+    "description": "Label for the 'no color' option in the bookmark dialog color picker."
+  },
+  "bookmarkDialogContextFileLabel": "ファイル",
+  "@bookmarkDialogContextFileLabel": {
+    "description": "Label for the read-only file:line field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogContextMessageLabel": "メッセージ",
+  "@bookmarkDialogContextMessageLabel": {
+    "description": "Label for the read-only message field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogContextRuleLabel": "ルール",
+  "@bookmarkDialogContextRuleLabel": {
+    "description": "Label for the read-only rule field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogDiscardConfirmBody": "未保存の変更があります。破棄しますか？",
+  "@bookmarkDialogDiscardConfirmBody": {
+    "description": "Body of the discard-changes confirmation dialog."
+  },
+  "bookmarkDialogDiscardConfirmNo": "編集を続ける",
+  "@bookmarkDialogDiscardConfirmNo": {
+    "description": "Negative button on the discard-changes confirmation dialog. Returns to the bookmark dialog."
+  },
+  "bookmarkDialogDiscardConfirmTitle": "変更を破棄しますか？",
+  "@bookmarkDialogDiscardConfirmTitle": {
+    "description": "Title of the confirmation dialog shown when the user cancels the bookmark dialog with unsaved changes."
+  },
+  "bookmarkDialogDiscardConfirmYes": "破棄",
+  "@bookmarkDialogDiscardConfirmYes": {
+    "description": "Affirmative button on the discard-changes confirmation dialog."
+  },
+  "bookmarkDialogNoteHint": "なぜ後で対応したいですか？",
+  "@bookmarkDialogNoteHint": {
+    "description": "Hint text shown inside the empty note field of the bookmark dialog."
+  },
+  "bookmarkDialogNoteLabel": "メモ (Markdown)",
+  "@bookmarkDialogNoteLabel": {
+    "description": "Label for the markdown-friendly note text field in the bookmark dialog."
+  },
+  "bookmarkDialogNotePreviewLabel": "プレビュー",
+  "@bookmarkDialogNotePreviewLabel": {
+    "description": "Label above the live markdown preview pane in the bookmark dialog."
+  },
+  "bookmarkDialogSaveAction": "保存",
+  "@bookmarkDialogSaveAction": {
+    "description": "Primary action button in the bookmark dialog. Saves the bookmark."
+  },
+  "bookmarkDialogTitleCreate": "ブックマークを追加",
+  "@bookmarkDialogTitleCreate": {
+    "description": "Title of the add-bookmark dialog when creating a new bookmark."
+  },
+  "bookmarkDialogTitleEdit": "ブックマークを編集",
+  "@bookmarkDialogTitleEdit": {
+    "description": "Title of the bookmark dialog when editing an existing bookmark."
+  },
+  "bookmarkNoSelectionSnackbar": "ブックマークする違反を選択してください。",
+  "bookmarkPanelEmptyFiltered": "現在のフィルターまたは検索に一致するブックマークはありません。",
+  "@bookmarkPanelEmptyFiltered": {
+    "description": "Empty-state message shown when filters and search narrow the list to zero matches."
+  },
+  "bookmarkPanelEmptyState": "違反行のブックマークアイコンをクリックすると、実行を超えて追跡できます。",
+  "@bookmarkPanelEmptyState": {
+    "description": "Empty-state message shown when the bookmark management panel has no bookmarks to display."
+  },
+  "bookmarkPanelFilterActive": "アクティブ",
+  "@bookmarkPanelFilterActive": {
+    "description": "Filter chip label showing only bookmarks whose underlying violation fired on the most recent lint run."
+  },
+  "bookmarkPanelFilterAll": "すべて",
+  "@bookmarkPanelFilterAll": {
+    "description": "Filter chip label showing every bookmark regardless of stale status."
+  },
+  "bookmarkPanelFilterStale": "古い",
+  "@bookmarkPanelFilterStale": {
+    "description": "Filter chip label showing only bookmarks whose underlying violation has not fired in recent runs."
+  },
+  "bookmarkPanelRemoveConfirmBody": "ブックマークとそのメモは完全に削除されます。",
+  "@bookmarkPanelRemoveConfirmBody": {
+    "description": "Body of the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRemoveConfirmNo": "キャンセル",
+  "@bookmarkPanelRemoveConfirmNo": {
+    "description": "Negative button on the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRemoveConfirmTitle": "ブックマークを削除しますか？",
+  "@bookmarkPanelRemoveConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before deleting a bookmark from the management panel."
+  },
+  "bookmarkPanelRemoveConfirmYes": "削除",
+  "@bookmarkPanelRemoveConfirmYes": {
+    "description": "Affirmative button on the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRowEditAction": "メモを編集",
+  "@bookmarkPanelRowEditAction": {
+    "description": "Per-row action label that opens the bookmark dialog in edit mode."
+  },
+  "bookmarkPanelRowJumpAction": "違反へジャンプ",
+  "@bookmarkPanelRowJumpAction": {
+    "description": "Per-row action label that selects the bookmarked violation in the table and scrolls it into view."
+  },
+  "bookmarkPanelRowRemoveAction": "ブックマークを削除",
+  "@bookmarkPanelRowRemoveAction": {
+    "description": "Per-row action label that deletes the bookmark."
+  },
+  "bookmarkPanelRowStaleBadge": "古い",
+  "@bookmarkPanelRowStaleBadge": {
+    "description": "Small badge appended to a bookmark row when its lastSeenRunId lags behind the most recent run."
+  },
+  "bookmarkPanelSearchHint": "ルール、ファイル、スニペット、またはメモで検索",
+  "@bookmarkPanelSearchHint": {
+    "description": "Hint text for the search field in the bookmark management panel."
+  },
+  "bookmarkPanelTitle": "ブックマーク",
+  "@bookmarkPanelTitle": {
+    "description": "Title of the bookmark management panel."
+  },
+  "bookmarkRemovedSnackbar": "ブックマークを削除しました。",
+  "@bookmarkRemovedSnackbar": {
+    "description": "Snackbar shown after a bookmark is removed via the column icon. Pairs with an Undo action."
+  },
+  "bookmarkRemovedUndoLabel": "元に戻す",
+  "@bookmarkRemovedUndoLabel": {
+    "description": "Snackbar action label for restoring a just-removed bookmark."
+  }
 }

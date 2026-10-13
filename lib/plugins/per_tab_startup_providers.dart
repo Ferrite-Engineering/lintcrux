@@ -35,8 +35,7 @@ typedef PerTabStartupHook = ProviderListenable<Object?>;
 ///
 /// Open-core default is an empty list — nothing extra is realized per
 /// tab. The Pro overlay overrides this with its per-tab
-/// listener set (CXP selection emitter, bookmark stale-detection,
-/// Verible auto-run).
+/// listener set (Verible auto-run, the filter-preset tier watcher).
 ///
 /// Root-scoped by design: the LIST is app-wide configuration; only the
 /// subscriptions live in tab scope.

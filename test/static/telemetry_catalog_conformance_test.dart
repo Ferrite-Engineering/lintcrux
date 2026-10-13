@@ -119,7 +119,6 @@ const Set<String> _proOnlyEvents = <String>{
   'autofix.run',
   'cache.lookup',
   'custom_rule.evaluated',
-  'bookmark.saved',
   'filter_preset.saved',
   'cross_project.searched',
 };

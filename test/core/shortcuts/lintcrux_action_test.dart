@@ -56,8 +56,6 @@ void main() {
         LintcruxAction.clearLintCache,
         LintcruxAction.openLintCacheStats,
         LintcruxAction.forceLintRunWithoutCache,
-        LintcruxAction.openBookmarksManager,
-        LintcruxAction.toggleBookmarkForCurrentViolation,
         LintcruxAction.pinActiveProject,
         LintcruxAction.closeAllProjects,
         LintcruxAction.searchAcrossProjects,
@@ -75,13 +73,14 @@ void main() {
             'tier without updating this set, or a new action was added with '
             'the wrong tier.',
       );
+      // Violation bookmarks, with notes and color tags, are free.
       expect(
         LintcruxAction.openBookmarksManager.requiredTier,
-        LicenseTier.pro,
+        LicenseTier.openCore,
       );
       expect(
         LintcruxAction.toggleBookmarkForCurrentViolation.requiredTier,
-        LicenseTier.pro,
+        LicenseTier.openCore,
       );
     });
 
@@ -132,8 +131,6 @@ void main() {
         LintcruxAction.showProjectTrendChart,
         LintcruxAction.showCalendarHeatmap,
         LintcruxAction.configureTrendRetention,
-        LintcruxAction.openBookmarksManager,
-        LintcruxAction.toggleBookmarkForCurrentViolation,
         LintcruxAction.runVeribleDryRun,
         LintcruxAction.applyVeribleFixes,
         LintcruxAction.configureVeribleBinary,

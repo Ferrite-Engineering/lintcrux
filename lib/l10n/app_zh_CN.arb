@@ -277,11 +277,11 @@
   },
   "actionOpenBookmarksManager": "显示已加书签的违规…",
   "@actionOpenBookmarksManager": {
-    "description": "Menu / command palette label for the Pro-tier action that opens the violation-bookmark management panel."
+    "description": "Menu / command palette label for the action that opens the violation-bookmark management panel."
   },
   "actionToggleBookmarkForCurrentViolation": "切换书签",
   "@actionToggleBookmarkForCurrentViolation": {
-    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the Pro-tier action that toggles a bookmark on the selected violation."
+    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the action that toggles a bookmark on the selected violation."
   },
   "actionRunVeribleDryRun": "运行 Verible 自动修复试运行…",
   "@actionRunVeribleDryRun": {
@@ -1632,5 +1632,163 @@
   "settingsTelemetryInstallationIdLabel": "安装 ID",
   "settingsTelemetryInstallationIdDescription": "这是与所收集数据关联的唯一标识符。它是随机生成的，与您本人无关。如需删除本次安装的数据，请将其发送给支持人员。",
   "settingsTelemetryInstallationIdCopy": "复制",
-  "settingsTelemetryInstallationIdCopied": "已复制安装 ID。"
+  "settingsTelemetryInstallationIdCopied": "已复制安装 ID。",
+  "bookmarkColumnHeaderTooltip": "书签",
+  "@bookmarkColumnHeaderTooltip": {
+    "description": "Tooltip on the bookmark column's header icon in the violations table. The column itself has no label — it is identified by the icon."
+  },
+  "bookmarkColumnIconAddTooltip": "为此违规添加书签",
+  "@bookmarkColumnIconAddTooltip": {
+    "description": "Tooltip for the outline bookmark icon in the violations table's bookmark column. Tapping it opens the add-bookmark dialog."
+  },
+  "bookmarkColumnIconRemoveTooltip": "移除书签",
+  "@bookmarkColumnIconRemoveTooltip": {
+    "description": "Tooltip for the filled bookmark icon in the violations table's bookmark column. Tapping it removes the existing bookmark."
+  },
+  "bookmarkColumnIconStaleTooltip": "书签在最近的运行中未再触发",
+  "@bookmarkColumnIconStaleTooltip": {
+    "description": "Tooltip suffix appended when a bookmark hasn't been re-seen on recent lint runs, hinting that the underlying violation may have been resolved."
+  },
+  "bookmarkCountBadgeTooltip": "{count, plural, =0{无书签} =1{1 个书签} other{{count} 个书签}} — 打开管理面板",
+  "@bookmarkCountBadgeTooltip": {
+    "description": "Tooltip for the bookmark count badge in the violations table top action row. Tapping opens the bookmark management panel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bookmarkDialogCancelAction": "取消",
+  "@bookmarkDialogCancelAction": {
+    "description": "Secondary action button in the bookmark dialog. Discards changes."
+  },
+  "bookmarkDialogColorLabel": "颜色标签",
+  "@bookmarkDialogColorLabel": {
+    "description": "Label for the color-tag picker in the bookmark dialog."
+  },
+  "bookmarkDialogColorNoneLabel": "无",
+  "@bookmarkDialogColorNoneLabel": {
+    "description": "Label for the 'no color' option in the bookmark dialog color picker."
+  },
+  "bookmarkDialogContextFileLabel": "文件",
+  "@bookmarkDialogContextFileLabel": {
+    "description": "Label for the read-only file:line field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogContextMessageLabel": "消息",
+  "@bookmarkDialogContextMessageLabel": {
+    "description": "Label for the read-only message field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogContextRuleLabel": "规则",
+  "@bookmarkDialogContextRuleLabel": {
+    "description": "Label for the read-only rule field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogDiscardConfirmBody": "您有未保存的更改。要放弃吗？",
+  "@bookmarkDialogDiscardConfirmBody": {
+    "description": "Body of the discard-changes confirmation dialog."
+  },
+  "bookmarkDialogDiscardConfirmNo": "继续编辑",
+  "@bookmarkDialogDiscardConfirmNo": {
+    "description": "Negative button on the discard-changes confirmation dialog. Returns to the bookmark dialog."
+  },
+  "bookmarkDialogDiscardConfirmTitle": "放弃更改？",
+  "@bookmarkDialogDiscardConfirmTitle": {
+    "description": "Title of the confirmation dialog shown when the user cancels the bookmark dialog with unsaved changes."
+  },
+  "bookmarkDialogDiscardConfirmYes": "放弃",
+  "@bookmarkDialogDiscardConfirmYes": {
+    "description": "Affirmative button on the discard-changes confirmation dialog."
+  },
+  "bookmarkDialogNoteHint": "为何想稍后处理？",
+  "@bookmarkDialogNoteHint": {
+    "description": "Hint text shown inside the empty note field of the bookmark dialog."
+  },
+  "bookmarkDialogNoteLabel": "笔记 (Markdown)",
+  "@bookmarkDialogNoteLabel": {
+    "description": "Label for the markdown-friendly note text field in the bookmark dialog."
+  },
+  "bookmarkDialogNotePreviewLabel": "预览",
+  "@bookmarkDialogNotePreviewLabel": {
+    "description": "Label above the live markdown preview pane in the bookmark dialog."
+  },
+  "bookmarkDialogSaveAction": "保存",
+  "@bookmarkDialogSaveAction": {
+    "description": "Primary action button in the bookmark dialog. Saves the bookmark."
+  },
+  "bookmarkDialogTitleCreate": "添加书签",
+  "@bookmarkDialogTitleCreate": {
+    "description": "Title of the add-bookmark dialog when creating a new bookmark."
+  },
+  "bookmarkDialogTitleEdit": "编辑书签",
+  "@bookmarkDialogTitleEdit": {
+    "description": "Title of the bookmark dialog when editing an existing bookmark."
+  },
+  "bookmarkNoSelectionSnackbar": "请选择要加书签的违规。",
+  "bookmarkPanelEmptyFiltered": "没有书签符合当前筛选器或搜索条件。",
+  "@bookmarkPanelEmptyFiltered": {
+    "description": "Empty-state message shown when filters and search narrow the list to zero matches."
+  },
+  "bookmarkPanelEmptyState": "点击任何违规行上的书签图标可跨运行跟踪它。",
+  "@bookmarkPanelEmptyState": {
+    "description": "Empty-state message shown when the bookmark management panel has no bookmarks to display."
+  },
+  "bookmarkPanelFilterActive": "活跃",
+  "@bookmarkPanelFilterActive": {
+    "description": "Filter chip label showing only bookmarks whose underlying violation fired on the most recent lint run."
+  },
+  "bookmarkPanelFilterAll": "全部",
+  "@bookmarkPanelFilterAll": {
+    "description": "Filter chip label showing every bookmark regardless of stale status."
+  },
+  "bookmarkPanelFilterStale": "陈旧",
+  "@bookmarkPanelFilterStale": {
+    "description": "Filter chip label showing only bookmarks whose underlying violation has not fired in recent runs."
+  },
+  "bookmarkPanelRemoveConfirmBody": "书签及其笔记将被永久删除。",
+  "@bookmarkPanelRemoveConfirmBody": {
+    "description": "Body of the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRemoveConfirmNo": "取消",
+  "@bookmarkPanelRemoveConfirmNo": {
+    "description": "Negative button on the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRemoveConfirmTitle": "移除书签？",
+  "@bookmarkPanelRemoveConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before deleting a bookmark from the management panel."
+  },
+  "bookmarkPanelRemoveConfirmYes": "移除",
+  "@bookmarkPanelRemoveConfirmYes": {
+    "description": "Affirmative button on the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRowEditAction": "编辑笔记",
+  "@bookmarkPanelRowEditAction": {
+    "description": "Per-row action label that opens the bookmark dialog in edit mode."
+  },
+  "bookmarkPanelRowJumpAction": "跳转到违规",
+  "@bookmarkPanelRowJumpAction": {
+    "description": "Per-row action label that selects the bookmarked violation in the table and scrolls it into view."
+  },
+  "bookmarkPanelRowRemoveAction": "移除书签",
+  "@bookmarkPanelRowRemoveAction": {
+    "description": "Per-row action label that deletes the bookmark."
+  },
+  "bookmarkPanelRowStaleBadge": "陈旧",
+  "@bookmarkPanelRowStaleBadge": {
+    "description": "Small badge appended to a bookmark row when its lastSeenRunId lags behind the most recent run."
+  },
+  "bookmarkPanelSearchHint": "按规则、文件、片段或笔记搜索",
+  "@bookmarkPanelSearchHint": {
+    "description": "Hint text for the search field in the bookmark management panel."
+  },
+  "bookmarkPanelTitle": "书签",
+  "@bookmarkPanelTitle": {
+    "description": "Title of the bookmark management panel."
+  },
+  "bookmarkRemovedSnackbar": "已移除书签。",
+  "@bookmarkRemovedSnackbar": {
+    "description": "Snackbar shown after a bookmark is removed via the column icon. Pairs with an Undo action."
+  },
+  "bookmarkRemovedUndoLabel": "撤销",
+  "@bookmarkRemovedUndoLabel": {
+    "description": "Snackbar action label for restoring a just-removed bookmark."
+  }
 }

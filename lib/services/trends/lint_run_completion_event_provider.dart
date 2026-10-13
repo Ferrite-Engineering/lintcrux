@@ -16,8 +16,8 @@ import 'package:lintcrux/services/trends/lint_run_completion_event_bus.dart';
 /// [ViolationStore] and emits the aggregated event into the shared root
 /// bus — which this provider then republishes to every consumer.
 ///
-/// Consumers (the trend-store ingestion listener, bookmark stale
-/// detection, Verible auto-run) subscribe to this stream and react to each
+/// Consumers (the trend-store ingestion listener, Verible auto-run)
+/// subscribe to this stream and react to each
 /// completion. Because the producers are per-tab but this provider is
 /// root-scoped, a run completed in any tab reaches every consumer through
 /// the one bus.

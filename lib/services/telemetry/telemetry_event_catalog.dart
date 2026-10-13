@@ -247,6 +247,14 @@ const List<TelemetryCatalogEvent> kLintcruxEventCatalog =
       // for the reason given above; the conformance test holds them equal.
       TelemetryCatalogEvent('app.unclean_shutdown'),
 
+      // A violation bookmark written by the bookmark dialog. `edit` separates
+      // making a bookmark from coming back to one; `note` says whether the
+      // note field was used. The note's text never leaves the process.
+      TelemetryCatalogEvent(
+        'bookmark.saved',
+        boolProperties: <String>['edit', 'note'],
+      ),
+
       // ── the commercial group ───────────────────────────────────────────────
       // Recorded on the Pro overlay's gate-denial path (`proFeatureAvailable`),
       // which is the only place `CruxUpgradeDialog.show` is reached from. It
@@ -310,10 +318,6 @@ const List<TelemetryCatalogEvent> kLintcruxEventCatalog =
           // `CustomRulePatternKind.values` under `telemetryEnumToken`.
           'kind': <String>['source_text', 'signal_name', 'identifier'],
         },
-      ),
-      TelemetryCatalogEvent(
-        'bookmark.saved',
-        boolProperties: <String>['edit', 'note'],
       ),
       TelemetryCatalogEvent(
         'filter_preset.saved',
@@ -503,12 +507,6 @@ enum LintcruxGatedFeature {
   /// The managed-waiver review screen (`proWaiverReviewOpenerOverride`).
   waiverReview,
 
-  /// Toggling a bookmark on the selected violation (`_toggleBookmark`).
-  bookmark,
-
-  /// The bookmark panel (`proBookmarkPanelOpenerOverride`).
-  bookmarkPanel,
-
   /// Verible auto-fix: dry run, review-and-apply, and the binary setting
   /// (`_runVeribleDryRun`, `_applyVeribleFixes`, `_configureVeribleBinary`).
   autofix,
@@ -552,8 +550,6 @@ const List<String> kLintcruxGatedFeatureTokens = <String>[
   'baseline_comparison',
   'waiver_create',
   'waiver_review',
-  'bookmark',
-  'bookmark_panel',
   'autofix',
   'lint_cache',
   'trend_chart',

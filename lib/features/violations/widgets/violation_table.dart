@@ -5,6 +5,8 @@ import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:crux_table/crux_table.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lintcrux/features/bookmarks/widgets/bookmark_count_badge.dart';
+import 'package:lintcrux/features/bookmarks/widgets/bookmark_leading_cell.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/violations/widgets/filter_preset_dropdown.dart';
 import 'package:lintcrux/features/violations/widgets/violation_filter_chips.dart';
@@ -23,9 +25,10 @@ import 'package:lintcrux/services/violations/violation_store_provider.dart';
 ///
 /// Pipeline:
 ///
-/// - Contributions from `violationTableTopActionsProvider` (a wrapped row)
-///   and `dashboardBannersProvider` (full-width notices) sit above the
-///   filters; both are empty in the open core.
+/// - Contributions from `violationTableTopActionsProvider` (a wrapped row,
+///   ending in the [BookmarkCountBadge] when a project is open) and
+///   `dashboardBannersProvider` (full-width notices) sit above the
+///   filters; both lists are empty in the open core.
 /// - [ViolationFilterChips] writes to `violationTableStateProvider`,
 ///   which (combined with the store events) drives
 ///   `visibleViolationsProvider`.
@@ -81,6 +84,7 @@ class _ViolationTableState extends ConsumerState<ViolationTable> {
     _rowFocus.sync(visible);
     final store = ref.watch(violationStoreProvider);
     final topActions = ref.watch(violationTableTopActionsProvider);
+    final bookmarksAvailable = watchBookmarksAvailable(ref);
     final banners = ref.watch(dashboardBannersProvider);
     final header = Column(
       mainAxisSize: MainAxisSize.min,
@@ -88,7 +92,7 @@ class _ViolationTableState extends ConsumerState<ViolationTable> {
       children: [
         if (ref.watch(filterPresetDropdownVisibleProvider))
           const FilterPresetDropdown(),
-        if (topActions.isNotEmpty)
+        if (topActions.isNotEmpty || bookmarksAvailable)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Wrap(
@@ -98,6 +102,7 @@ class _ViolationTableState extends ConsumerState<ViolationTable> {
               children: [
                 for (final builder in topActions)
                   Builder(builder: (ctx) => builder(ctx, ref)),
+                if (bookmarksAvailable) const BookmarkCountBadge(),
               ],
             ),
           ),

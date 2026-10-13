@@ -41,8 +41,8 @@ class LintRunCompletionEvent {
   /// when the producer had no project loaded.
   ///
   /// The completion-event bus is app-wide (one root bus fed by every
-  /// tab's per-tab dispatcher), so per-tab consumers — bookmark
-  /// stale-detection, Verible auto-run — use this to ignore
+  /// tab's per-tab dispatcher), so per-tab consumers such as Verible
+  /// auto-run use this to ignore
   /// completions that belong to a different tab's project.
   final String? projectPath;
 

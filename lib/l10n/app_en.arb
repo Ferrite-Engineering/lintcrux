@@ -277,11 +277,11 @@
   },
   "actionOpenBookmarksManager": "Show Bookmarked Violations…",
   "@actionOpenBookmarksManager": {
-    "description": "Menu / command palette label for the Pro-tier action that opens the violation-bookmark management panel."
+    "description": "Menu / command palette label for the action that opens the violation-bookmark management panel."
   },
   "actionToggleBookmarkForCurrentViolation": "Toggle Bookmark",
   "@actionToggleBookmarkForCurrentViolation": {
-    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the Pro-tier action that toggles a bookmark on the selected violation."
+    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the action that toggles a bookmark on the selected violation."
   },
   "actionRunVeribleDryRun": "Run Verible Auto-Fix Dry-Run…",
   "@actionRunVeribleDryRun": {
@@ -2248,5 +2248,166 @@
   "settingsTelemetryInstallationIdCopied": "Installation ID copied.",
   "@settingsTelemetryInstallationIdCopied": {
     "description": "Confirmation shown after the installation id is copied."
+  },
+  "bookmarkColumnHeaderTooltip": "Bookmarks",
+  "@bookmarkColumnHeaderTooltip": {
+    "description": "Tooltip on the bookmark column's header icon in the violations table. The column itself has no label — it is identified by the icon."
+  },
+  "bookmarkColumnIconAddTooltip": "Bookmark this violation",
+  "@bookmarkColumnIconAddTooltip": {
+    "description": "Tooltip for the outline bookmark icon in the violations table's bookmark column. Tapping it opens the add-bookmark dialog."
+  },
+  "bookmarkColumnIconRemoveTooltip": "Remove bookmark",
+  "@bookmarkColumnIconRemoveTooltip": {
+    "description": "Tooltip for the filled bookmark icon in the violations table's bookmark column. Tapping it removes the existing bookmark."
+  },
+  "bookmarkColumnIconStaleTooltip": "Bookmark hasn't fired in recent runs",
+  "@bookmarkColumnIconStaleTooltip": {
+    "description": "Tooltip suffix appended when a bookmark hasn't been re-seen on recent lint runs, hinting that the underlying violation may have been resolved."
+  },
+  "bookmarkCountBadgeTooltip": "{count, plural, =0{No bookmarks} =1{1 bookmark} other{{count} bookmarks}} — open manager",
+  "@bookmarkCountBadgeTooltip": {
+    "description": "Tooltip for the bookmark count badge in the violations table top action row. Tapping opens the bookmark management panel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bookmarkDialogCancelAction": "Cancel",
+  "@bookmarkDialogCancelAction": {
+    "description": "Secondary action button in the bookmark dialog. Discards changes."
+  },
+  "bookmarkDialogColorLabel": "Color tag",
+  "@bookmarkDialogColorLabel": {
+    "description": "Label for the color-tag picker in the bookmark dialog."
+  },
+  "bookmarkDialogColorNoneLabel": "None",
+  "@bookmarkDialogColorNoneLabel": {
+    "description": "Label for the 'no color' option in the bookmark dialog color picker."
+  },
+  "bookmarkDialogContextFileLabel": "File",
+  "@bookmarkDialogContextFileLabel": {
+    "description": "Label for the read-only file:line field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogContextMessageLabel": "Message",
+  "@bookmarkDialogContextMessageLabel": {
+    "description": "Label for the read-only message field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogContextRuleLabel": "Rule",
+  "@bookmarkDialogContextRuleLabel": {
+    "description": "Label for the read-only rule field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogDiscardConfirmBody": "You have unsaved changes. Discard them?",
+  "@bookmarkDialogDiscardConfirmBody": {
+    "description": "Body of the discard-changes confirmation dialog."
+  },
+  "bookmarkDialogDiscardConfirmNo": "Keep editing",
+  "@bookmarkDialogDiscardConfirmNo": {
+    "description": "Negative button on the discard-changes confirmation dialog. Returns to the bookmark dialog."
+  },
+  "bookmarkDialogDiscardConfirmTitle": "Discard changes?",
+  "@bookmarkDialogDiscardConfirmTitle": {
+    "description": "Title of the confirmation dialog shown when the user cancels the bookmark dialog with unsaved changes."
+  },
+  "bookmarkDialogDiscardConfirmYes": "Discard",
+  "@bookmarkDialogDiscardConfirmYes": {
+    "description": "Affirmative button on the discard-changes confirmation dialog."
+  },
+  "bookmarkDialogNoteHint": "Why are you keeping this for later?",
+  "@bookmarkDialogNoteHint": {
+    "description": "Hint text shown inside the empty note field of the bookmark dialog."
+  },
+  "bookmarkDialogNoteLabel": "Note (markdown)",
+  "@bookmarkDialogNoteLabel": {
+    "description": "Label for the markdown-friendly note text field in the bookmark dialog."
+  },
+  "bookmarkDialogNotePreviewLabel": "Preview",
+  "@bookmarkDialogNotePreviewLabel": {
+    "description": "Label above the live markdown preview pane in the bookmark dialog."
+  },
+  "bookmarkDialogSaveAction": "Save",
+  "@bookmarkDialogSaveAction": {
+    "description": "Primary action button in the bookmark dialog. Saves the bookmark."
+  },
+  "bookmarkDialogTitleCreate": "Add bookmark",
+  "@bookmarkDialogTitleCreate": {
+    "description": "Title of the add-bookmark dialog when creating a new bookmark."
+  },
+  "bookmarkDialogTitleEdit": "Edit bookmark",
+  "@bookmarkDialogTitleEdit": {
+    "description": "Title of the bookmark dialog when editing an existing bookmark."
+  },
+  "bookmarkNoSelectionSnackbar": "Select a violation to bookmark.",
+  "@bookmarkNoSelectionSnackbar": {
+    "description": "Snackbar shown when the bookmark action is invoked with no violation selected."
+  },
+  "bookmarkPanelEmptyFiltered": "No bookmarks match the current filter or search.",
+  "@bookmarkPanelEmptyFiltered": {
+    "description": "Empty-state message shown when filters and search narrow the list to zero matches."
+  },
+  "bookmarkPanelEmptyState": "Click the bookmark icon on any violation row to keep track of it across runs.",
+  "@bookmarkPanelEmptyState": {
+    "description": "Empty-state message shown when the bookmark management panel has no bookmarks to display."
+  },
+  "bookmarkPanelFilterActive": "Active",
+  "@bookmarkPanelFilterActive": {
+    "description": "Filter chip label showing only bookmarks whose underlying violation fired on the most recent lint run."
+  },
+  "bookmarkPanelFilterAll": "All",
+  "@bookmarkPanelFilterAll": {
+    "description": "Filter chip label showing every bookmark regardless of stale status."
+  },
+  "bookmarkPanelFilterStale": "Stale",
+  "@bookmarkPanelFilterStale": {
+    "description": "Filter chip label showing only bookmarks whose underlying violation has not fired in recent runs."
+  },
+  "bookmarkPanelRemoveConfirmBody": "The bookmark and its note will be permanently deleted.",
+  "@bookmarkPanelRemoveConfirmBody": {
+    "description": "Body of the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRemoveConfirmNo": "Cancel",
+  "@bookmarkPanelRemoveConfirmNo": {
+    "description": "Negative button on the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRemoveConfirmTitle": "Remove bookmark?",
+  "@bookmarkPanelRemoveConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before deleting a bookmark from the management panel."
+  },
+  "bookmarkPanelRemoveConfirmYes": "Remove",
+  "@bookmarkPanelRemoveConfirmYes": {
+    "description": "Affirmative button on the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRowEditAction": "Edit note",
+  "@bookmarkPanelRowEditAction": {
+    "description": "Per-row action label that opens the bookmark dialog in edit mode."
+  },
+  "bookmarkPanelRowJumpAction": "Jump to violation",
+  "@bookmarkPanelRowJumpAction": {
+    "description": "Per-row action label that selects the bookmarked violation in the table and scrolls it into view."
+  },
+  "bookmarkPanelRowRemoveAction": "Remove bookmark",
+  "@bookmarkPanelRowRemoveAction": {
+    "description": "Per-row action label that deletes the bookmark."
+  },
+  "bookmarkPanelRowStaleBadge": "stale",
+  "@bookmarkPanelRowStaleBadge": {
+    "description": "Small badge appended to a bookmark row when its lastSeenRunId lags behind the most recent run."
+  },
+  "bookmarkPanelSearchHint": "Search by rule, file, snippet, or note",
+  "@bookmarkPanelSearchHint": {
+    "description": "Hint text for the search field in the bookmark management panel."
+  },
+  "bookmarkPanelTitle": "Bookmarks",
+  "@bookmarkPanelTitle": {
+    "description": "Title of the bookmark management panel."
+  },
+  "bookmarkRemovedSnackbar": "Bookmark removed.",
+  "@bookmarkRemovedSnackbar": {
+    "description": "Snackbar shown after a bookmark is removed via the column icon. Pairs with an Undo action."
+  },
+  "bookmarkRemovedUndoLabel": "Undo",
+  "@bookmarkRemovedUndoLabel": {
+    "description": "Snackbar action label for restoring a just-removed bookmark."
   }
 }

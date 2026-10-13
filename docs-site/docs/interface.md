@@ -39,7 +39,7 @@ Above the violations table is the filter strip:
 - **Filter by rule or message…** — a case-insensitive substring matched against the rule id and message.
 - **Filter by file glob** — for example `**/top.sv`.
 
-With Pro, the same row also carries the baseline buttons and the *All violations / Only new / Only resolved* toggle, the active-baseline chip, the bookmark count, and the Verible dry-run button.
+When a project is open, the row above the filters shows the bookmark count, which opens the Bookmarks panel. With Pro, the same row also carries the baseline buttons and the *All violations / Only new / Only resolved* toggle, the active-baseline chip, and the Verible dry-run button.
 
 Click any column header to sort by it; click again to reverse. For substring, glob or regex search across rule ids and messages, press ++cmd+f++ / ++ctrl+f++ — see [Search](violations.md#search).
 

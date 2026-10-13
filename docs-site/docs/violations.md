@@ -4,7 +4,7 @@ The violations table is where you spend your time. It unifies every engine's fin
 
 ## The table {#table}
 
-The table is virtualized — it renders only the rows on screen — so a run with 50,000 violations scrolls smoothly. Each row has six columns: **Severity**, **Engine**, **Rule**, **File**, **Line** and **Message**, plus a leading checkbox. Pro adds a bookmark column in front of them. Hover a truncated message to read it in full.
+The table is virtualized — it renders only the rows on screen — so a run with 50,000 violations scrolls smoothly. Each row has six columns: **Severity**, **Engine**, **Rule**, **File**, **Line** and **Message**, plus a leading checkbox and, when a project is open, a bookmark column in front of them. Hover a truncated message to read it in full.
 
 Rule ids are namespaced by engine (`verilator/UNUSEDSIGNAL`, `verible/no-tabs`), so the same defect reported by two engines shows as two rows you can tell apart.
 
@@ -59,7 +59,7 @@ Presets saved from the dropdown are written to the project's `.lintcrux` file (i
 
 With Pro, a second **Filter preset** selector <span class="tier tier-pro">Pro</span> sits in the table's action row. It lists three built-in presets — **All Violations**, **Errors Only** and **New Violations** (the new-violation view, meaningful once a baseline is set) — followed by your own presets, which it saves per project in `.lintcrux-filter-presets.json`. **Save current as preset…** adds one, with an optional description; **Manage presets…** opens the **Filter Preset Library**, where you can create, edit, duplicate and delete your presets (built-ins cannot be edited or deleted). When you change the filters after applying a preset, the selector reads **Custom filter**.
 
-**Violation bookmarks** <span class="tier tier-pro">Pro</span> pin individual violations so you can build a working set during a triage pass and return to it. Click the bookmark icon in a row's bookmark column, or run **Toggle Bookmark** from the `Tools` menu for the selected violation; a bookmark can carry a color tag and a Markdown note. The bookmark count in the table's action row opens the **Bookmarks** panel (also `Tools → Show Bookmarked Violations…`), with All / Active / Stale filters — a stale bookmark is one whose violation has not fired in recent runs. Bookmarks are saved per project in `.lintcrux-bookmarks.json`.
+**Violation bookmarks** pin individual violations so you can build a working set during a triage pass and return to it. They are free in every edition from LintCrux 1.1. Click the bookmark icon in a row's bookmark column, or run **Toggle Bookmark** from the `Tools` menu for the selected violation; a bookmark can carry a color tag and a Markdown note. The bookmark count in the table's action row opens the **Bookmarks** panel (also `Tools > Show Bookmarked Violations…`), with All / Active / Stale filters. A stale bookmark is one whose violation did not fire in the latest run. Bookmarks are saved per project in `.lintcrux-bookmarks.json`, so you can commit the file to share them; a file written by an earlier release, including one made with LintCrux Pro, opens unchanged. Bookmarks need a project: an imported SARIF report has no bookmark column.
 
 ## Keyboard {#keyboard}
 
@@ -70,7 +70,7 @@ These keys work on the table from anywhere in the window:
 | ++cmd+f++ / ++ctrl+f++ | Open the search dialog; ++arrow-up++ / ++arrow-down++ and ++enter++ select a matching violation. |
 | ++f5++ | Run all engines again. |
 | ++escape++ | Cancel the run in progress. |
-| ++cmd+shift+p++ / ++ctrl+shift+p++ | Open the command palette — for example to run **Toggle Bookmark** <span class="tier tier-pro">Pro</span> on the selected violation. |
+| ++cmd+shift+p++ / ++ctrl+shift+p++ | Open the command palette — for example to run **Toggle Bookmark** on the selected violation. |
 
 The rows themselves are a single ++tab++ stop, so ++tab++ moves on to the **Details** pane rather than through every row. With focus on a row, everything the mouse does has a key:
 

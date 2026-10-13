@@ -5,7 +5,7 @@ import 'package:lintcrux/domain/models/baseline_violation.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:meta/meta.dart';
 
-/// Pro-tier bookmark of a specific violation for follow-up.
+/// A bookmark of a specific violation for follow-up.
 ///
 /// A [BookmarkedViolation] flags a single violation the engineer wants
 /// to revisit (TODO, "ask Bob about this", "fix in v2.1"). Bookmarks

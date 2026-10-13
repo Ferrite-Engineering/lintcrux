@@ -43,7 +43,7 @@ These actions ship deliberately unbound. They are fully available from the comma
 
 - **File:** New Workspace, Open Workspace…, Open Session…, Import Vivado Filelist…, Import FuseSoC EDAM…, Import SARIF report…, Save Session…, Save Workspace As…, the four **Export Violations as …** actions, Close All Tabs, Close Active Project, Clear Recent Projects, and the Pro project actions Reopen Recent Project, Pin Project Tab and Close All Projects.
 - **View:** Save Filter Preset…, Manage Filter Presets…, Close Pane, Focus Other Pane, Move Tab to Other Pane.
-- **Tools:** Run Lint (Bypass Cache) and every Pro waiver, baseline, trend, bookmark, Verible and lint-cache action.
+- **Tools:** Run Lint (Bypass Cache), the bookmark actions, and every Pro waiver, baseline, trend, Verible and lint-cache action.
 - **Help:** Documentation, Submit Issue…, Check for Updates.
 
 Several of these also have a button: **Open Workspace…**, **Import SARIF report…**, **Save Session…** and the exports are on the toolbar, and the welcome screen offers **Open Workspace…**, **Open Session…**, **New Project…** and **Import SARIF report…**.

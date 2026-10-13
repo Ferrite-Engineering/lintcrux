@@ -38,16 +38,6 @@ final Provider<ProActionOpener?> clearBaselineOpenerProvider =
       (_) => null,
     );
 
-// ── Bookmark ──────────────────────────────────────────────────────
-
-/// Toggles the bookmark for the currently-selected violation (opens
-/// the bookmark dialog in create / edit mode as appropriate). Null in
-/// open-core; Pro overrides.
-final Provider<ProActionOpener?> toggleBookmarkOpenerProvider =
-    Provider<ProActionOpener?>(
-      (_) => null,
-    );
-
 // ── Verible ───────────────────────────────────────────────────────
 
 /// Kicks off a Verible dry-run and opens the FixReviewDialog with the

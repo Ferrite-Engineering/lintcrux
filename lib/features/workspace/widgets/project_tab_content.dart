@@ -17,6 +17,7 @@ import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/widgets/lintcrux_docks.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/per_tab_startup_providers.dart';
+import 'package:lintcrux/services/bookmarks/bookmark_freshness.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/project/project_file_codec.dart';
 import 'package:lintcrux/services/project/project_file_service.dart';
@@ -221,6 +222,11 @@ class _ProjectTabContentState extends ConsumerState<ProjectTabContent> {
       // against THIS tab's selection. Watching a plain `Provider` returns a
       // cached instance, so it causes no rebuild churn.
       ..watch(violationSelectionEmitterProvider)
+      // Keep this tab's bookmark freshness listener installed from the
+      // first frame, so every run (including the first) is recorded
+      // against the tab's bookmarks. A listen, not a watch: the run id
+      // it publishes must not rebuild the whole tab.
+      ..listen(bookmarkFreshnessProvider, (_, _) {})
       // Re-attempt hydration whenever the workspace document arrives
       // (initial load) or rebuilds. The `_hydrationKicked` flag inside
       // `_maybeHydrate` short-circuits once it actually runs, so this
@@ -231,8 +237,8 @@ class _ProjectTabContentState extends ConsumerState<ProjectTabContent> {
         }
       });
     // Pin the overlay-contributed per-tab startup providers to THIS
-    // tab's container, so side-effecting listeners (CXP selection
-    // emitter, bookmark stale-detection, Verible auto-run) observe this
+    // tab's container, so side-effecting listeners (Verible auto-run, the
+    // filter-preset tier watcher) observe this
     // tab's per-tab providers rather than the empty root-scope instances
     // and stay alive for the tab's whole lifetime. The hook list itself
     // is root configuration; re-binding is a no-op when it is unchanged.

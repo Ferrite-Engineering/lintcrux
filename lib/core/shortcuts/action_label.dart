@@ -71,7 +71,7 @@ extension LintcruxActionLabel on LintcruxAction {
     LintcruxAction.showCalendarHeatmap => l10n.actionShowCalendarHeatmap,
     LintcruxAction.configureTrendRetention =>
       l10n.actionConfigureTrendRetention,
-    // Filter presets & violation bookmarks (Pro tier).
+    // Violation bookmarks.
     LintcruxAction.openBookmarksManager => l10n.actionOpenBookmarksManager,
     LintcruxAction.toggleBookmarkForCurrentViolation =>
       l10n.actionToggleBookmarkForCurrentViolation,

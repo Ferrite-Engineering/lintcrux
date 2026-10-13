@@ -13,7 +13,6 @@ import 'package:lintcrux/core/shortcuts/lintcrux_action.dart';
 import 'package:lintcrux/core/shortcuts/shortcut_manager_widget.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/baseline_comparison_opener_provider.dart';
-import 'package:lintcrux/plugins/bookmark_panel_opener_provider.dart';
 import 'package:lintcrux/plugins/filter_preset_manager_opener_provider.dart';
 import 'package:lintcrux/plugins/pro_action_openers.dart';
 import 'package:lintcrux/plugins/pro_opener.dart';
@@ -46,13 +45,10 @@ final Map<LintcruxAction, Provider<ProActionOpener?>>
 _openerBackedActions = <LintcruxAction, Provider<ProActionOpener?>>{
   LintcruxAction.openWaiverReview: waiverReviewOpenerProvider,
   LintcruxAction.openBaselineComparison: baselineComparisonOpenerProvider,
-  LintcruxAction.openBookmarksManager: bookmarkPanelOpenerProvider,
   LintcruxAction.manageFilterPresets: filterPresetManagerOpenerProvider,
   LintcruxAction.saveFilterPreset: saveFilterPresetOpenerProvider,
   LintcruxAction.setBaseline: setBaselineOpenerProvider,
   LintcruxAction.clearBaseline: clearBaselineOpenerProvider,
-  LintcruxAction.toggleBookmarkForCurrentViolation:
-      toggleBookmarkOpenerProvider,
   LintcruxAction.runVeribleDryRun: runVeribleDryRunOpenerProvider,
   LintcruxAction.applyVeribleFixes: applyVeribleFixesOpenerProvider,
   LintcruxAction.configureVeribleBinary: configureVeribleBinaryOpenerProvider,

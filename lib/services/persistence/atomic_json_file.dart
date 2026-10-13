@@ -8,9 +8,9 @@ import 'package:meta/meta.dart';
 
 /// Crash-safe JSON persistence shared by the per-feature state stores.
 ///
-/// The Pro overlay keeps a JSON file per feature (waivers, filter presets,
-/// baselines, bookmarks) alongside the project, and is the only importer of
-/// this file. Each store validates its own `version` field on read, because
+/// A JSON file per feature (bookmarks in the open core; waivers, filter
+/// presets and baselines in the Pro overlay) lives alongside the project.
+/// Each store validates its own `version` field on read, because
 /// their rules differ; what they share is the write, which must survive a
 /// crash mid-write.
 

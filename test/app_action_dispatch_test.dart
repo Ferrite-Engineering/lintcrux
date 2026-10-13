@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/app.dart';
 import 'package:lintcrux/core/shortcuts/lintcrux_action.dart';
 import 'package:lintcrux/core/shortcuts/shortcut_manager_widget.dart';
+import 'package:lintcrux/features/bookmarks/providers/bookmark_openers.dart';
 import 'package:lintcrux/features/diagnostics/providers/diagnostics_providers.dart';
 import 'package:lintcrux/features/diagnostics/widgets/app_diagnostics_dialog.dart';
 import 'package:lintcrux/features/diagnostics/widgets/tab_diagnostics_drawer.dart';
@@ -24,7 +25,6 @@ import 'package:lintcrux/features/workspace/providers/recent_projects_provider.d
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/baseline_comparison_opener_provider.dart';
-import 'package:lintcrux/plugins/bookmark_panel_opener_provider.dart';
 import 'package:lintcrux/plugins/filter_preset_manager_opener_provider.dart';
 import 'package:lintcrux/plugins/pro_action_openers.dart';
 import 'package:lintcrux/plugins/pro_opener.dart';

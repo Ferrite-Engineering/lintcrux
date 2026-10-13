@@ -5,10 +5,10 @@ import 'package:crux_table/crux_table.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/violation_table_state.dart';
+import 'package:lintcrux/features/bookmarks/widgets/bookmark_leading_cell.dart';
 import 'package:lintcrux/features/violations/providers/violation_column_layout_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
-import 'package:lintcrux/plugins/violation_row_leading_cells_provider.dart';
 
 /// Sortable column header row above the virtualized violation list.
 ///
@@ -40,7 +40,7 @@ class ViolationTableHeader extends ConsumerWidget {
     final l10n = L10N.of(context);
     final state = ref.watch(violationTableStateProvider);
     final notifier = ref.read(violationTableStateProvider.notifier);
-    final leadingCells = ref.watch(violationRowLeadingCellsProvider);
+    final leadingCells = watchViolationLeadingCells(ref);
     final layout = ref.watch(violationColumnLayoutProvider);
     return CruxTableHeader<ViolationTableColumn>(
       tableId: tableId,

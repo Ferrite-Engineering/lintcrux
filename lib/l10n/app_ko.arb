@@ -277,11 +277,11 @@
   },
   "actionOpenBookmarksManager": "북마크된 위반 표시…",
   "@actionOpenBookmarksManager": {
-    "description": "Menu / command palette label for the Pro-tier action that opens the violation-bookmark management panel."
+    "description": "Menu / command palette label for the action that opens the violation-bookmark management panel."
   },
   "actionToggleBookmarkForCurrentViolation": "북마크 전환",
   "@actionToggleBookmarkForCurrentViolation": {
-    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the Pro-tier action that toggles a bookmark on the selected violation."
+    "description": "Menu / command palette / context-menu / keyboard-shortcut label for the action that toggles a bookmark on the selected violation."
   },
   "actionRunVeribleDryRun": "Verible 자동 수정 드라이런…",
   "@actionRunVeribleDryRun": {
@@ -1632,5 +1632,163 @@
   "settingsTelemetryInstallationIdLabel": "설치 ID",
   "settingsTelemetryInstallationIdDescription": "수집되는 데이터에 연결된 유일한 식별자입니다. 무작위 값이며 사용자와 연결되지 않습니다. 이 설치의 데이터 삭제를 원하시면 지원팀으로 보내주세요.",
   "settingsTelemetryInstallationIdCopy": "복사",
-  "settingsTelemetryInstallationIdCopied": "설치 ID가 복사되었습니다."
+  "settingsTelemetryInstallationIdCopied": "설치 ID가 복사되었습니다.",
+  "bookmarkColumnHeaderTooltip": "북마크",
+  "@bookmarkColumnHeaderTooltip": {
+    "description": "Tooltip on the bookmark column's header icon in the violations table. The column itself has no label — it is identified by the icon."
+  },
+  "bookmarkColumnIconAddTooltip": "이 위반에 북마크 추가",
+  "@bookmarkColumnIconAddTooltip": {
+    "description": "Tooltip for the outline bookmark icon in the violations table's bookmark column. Tapping it opens the add-bookmark dialog."
+  },
+  "bookmarkColumnIconRemoveTooltip": "북마크 제거",
+  "@bookmarkColumnIconRemoveTooltip": {
+    "description": "Tooltip for the filled bookmark icon in the violations table's bookmark column. Tapping it removes the existing bookmark."
+  },
+  "bookmarkColumnIconStaleTooltip": "최근 실행에서 발생하지 않음",
+  "@bookmarkColumnIconStaleTooltip": {
+    "description": "Tooltip suffix appended when a bookmark hasn't been re-seen on recent lint runs, hinting that the underlying violation may have been resolved."
+  },
+  "bookmarkCountBadgeTooltip": "{count, plural, =0{북마크 없음} =1{북마크 1개} other{북마크 {count}개}} — 관리 패널 열기",
+  "@bookmarkCountBadgeTooltip": {
+    "description": "Tooltip for the bookmark count badge in the violations table top action row. Tapping opens the bookmark management panel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bookmarkDialogCancelAction": "취소",
+  "@bookmarkDialogCancelAction": {
+    "description": "Secondary action button in the bookmark dialog. Discards changes."
+  },
+  "bookmarkDialogColorLabel": "색상 태그",
+  "@bookmarkDialogColorLabel": {
+    "description": "Label for the color-tag picker in the bookmark dialog."
+  },
+  "bookmarkDialogColorNoneLabel": "없음",
+  "@bookmarkDialogColorNoneLabel": {
+    "description": "Label for the 'no color' option in the bookmark dialog color picker."
+  },
+  "bookmarkDialogContextFileLabel": "파일",
+  "@bookmarkDialogContextFileLabel": {
+    "description": "Label for the read-only file:line field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogContextMessageLabel": "메시지",
+  "@bookmarkDialogContextMessageLabel": {
+    "description": "Label for the read-only message field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogContextRuleLabel": "규칙",
+  "@bookmarkDialogContextRuleLabel": {
+    "description": "Label for the read-only rule field at the top of the bookmark dialog (violation context preview)."
+  },
+  "bookmarkDialogDiscardConfirmBody": "저장되지 않은 변경 사항이 있습니다. 버리시겠습니까?",
+  "@bookmarkDialogDiscardConfirmBody": {
+    "description": "Body of the discard-changes confirmation dialog."
+  },
+  "bookmarkDialogDiscardConfirmNo": "계속 편집",
+  "@bookmarkDialogDiscardConfirmNo": {
+    "description": "Negative button on the discard-changes confirmation dialog. Returns to the bookmark dialog."
+  },
+  "bookmarkDialogDiscardConfirmTitle": "변경 사항을 버리시겠습니까?",
+  "@bookmarkDialogDiscardConfirmTitle": {
+    "description": "Title of the confirmation dialog shown when the user cancels the bookmark dialog with unsaved changes."
+  },
+  "bookmarkDialogDiscardConfirmYes": "버리기",
+  "@bookmarkDialogDiscardConfirmYes": {
+    "description": "Affirmative button on the discard-changes confirmation dialog."
+  },
+  "bookmarkDialogNoteHint": "왜 나중에 처리하려고 하나요?",
+  "@bookmarkDialogNoteHint": {
+    "description": "Hint text shown inside the empty note field of the bookmark dialog."
+  },
+  "bookmarkDialogNoteLabel": "메모 (Markdown)",
+  "@bookmarkDialogNoteLabel": {
+    "description": "Label for the markdown-friendly note text field in the bookmark dialog."
+  },
+  "bookmarkDialogNotePreviewLabel": "미리보기",
+  "@bookmarkDialogNotePreviewLabel": {
+    "description": "Label above the live markdown preview pane in the bookmark dialog."
+  },
+  "bookmarkDialogSaveAction": "저장",
+  "@bookmarkDialogSaveAction": {
+    "description": "Primary action button in the bookmark dialog. Saves the bookmark."
+  },
+  "bookmarkDialogTitleCreate": "북마크 추가",
+  "@bookmarkDialogTitleCreate": {
+    "description": "Title of the add-bookmark dialog when creating a new bookmark."
+  },
+  "bookmarkDialogTitleEdit": "북마크 편집",
+  "@bookmarkDialogTitleEdit": {
+    "description": "Title of the bookmark dialog when editing an existing bookmark."
+  },
+  "bookmarkNoSelectionSnackbar": "북마크할 위반을 선택하세요.",
+  "bookmarkPanelEmptyFiltered": "현재 필터 또는 검색과 일치하는 북마크가 없습니다.",
+  "@bookmarkPanelEmptyFiltered": {
+    "description": "Empty-state message shown when filters and search narrow the list to zero matches."
+  },
+  "bookmarkPanelEmptyState": "위반 행의 북마크 아이콘을 클릭하면 실행을 거쳐 추적할 수 있습니다.",
+  "@bookmarkPanelEmptyState": {
+    "description": "Empty-state message shown when the bookmark management panel has no bookmarks to display."
+  },
+  "bookmarkPanelFilterActive": "활성",
+  "@bookmarkPanelFilterActive": {
+    "description": "Filter chip label showing only bookmarks whose underlying violation fired on the most recent lint run."
+  },
+  "bookmarkPanelFilterAll": "전체",
+  "@bookmarkPanelFilterAll": {
+    "description": "Filter chip label showing every bookmark regardless of stale status."
+  },
+  "bookmarkPanelFilterStale": "오래된",
+  "@bookmarkPanelFilterStale": {
+    "description": "Filter chip label showing only bookmarks whose underlying violation has not fired in recent runs."
+  },
+  "bookmarkPanelRemoveConfirmBody": "북마크와 메모가 영구적으로 삭제됩니다.",
+  "@bookmarkPanelRemoveConfirmBody": {
+    "description": "Body of the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRemoveConfirmNo": "취소",
+  "@bookmarkPanelRemoveConfirmNo": {
+    "description": "Negative button on the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRemoveConfirmTitle": "북마크를 제거하시겠습니까?",
+  "@bookmarkPanelRemoveConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before deleting a bookmark from the management panel."
+  },
+  "bookmarkPanelRemoveConfirmYes": "제거",
+  "@bookmarkPanelRemoveConfirmYes": {
+    "description": "Affirmative button on the remove-bookmark confirmation dialog."
+  },
+  "bookmarkPanelRowEditAction": "메모 편집",
+  "@bookmarkPanelRowEditAction": {
+    "description": "Per-row action label that opens the bookmark dialog in edit mode."
+  },
+  "bookmarkPanelRowJumpAction": "위반으로 이동",
+  "@bookmarkPanelRowJumpAction": {
+    "description": "Per-row action label that selects the bookmarked violation in the table and scrolls it into view."
+  },
+  "bookmarkPanelRowRemoveAction": "북마크 제거",
+  "@bookmarkPanelRowRemoveAction": {
+    "description": "Per-row action label that deletes the bookmark."
+  },
+  "bookmarkPanelRowStaleBadge": "오래됨",
+  "@bookmarkPanelRowStaleBadge": {
+    "description": "Small badge appended to a bookmark row when its lastSeenRunId lags behind the most recent run."
+  },
+  "bookmarkPanelSearchHint": "규칙, 파일, 스니펫 또는 메모로 검색",
+  "@bookmarkPanelSearchHint": {
+    "description": "Hint text for the search field in the bookmark management panel."
+  },
+  "bookmarkPanelTitle": "북마크",
+  "@bookmarkPanelTitle": {
+    "description": "Title of the bookmark management panel."
+  },
+  "bookmarkRemovedSnackbar": "북마크가 제거되었습니다.",
+  "@bookmarkRemovedSnackbar": {
+    "description": "Snackbar shown after a bookmark is removed via the column icon. Pairs with an Undo action."
+  },
+  "bookmarkRemovedUndoLabel": "실행 취소",
+  "@bookmarkRemovedUndoLabel": {
+    "description": "Snackbar action label for restoring a just-removed bookmark."
+  }
 }

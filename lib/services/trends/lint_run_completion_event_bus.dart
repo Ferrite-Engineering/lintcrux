@@ -12,7 +12,7 @@ import 'package:lintcrux/domain/models/lint_run_completion_event.dart';
 /// run-completion *producers* (the Pro `ProLintRunCompletionDispatcher`,
 /// registered per-tab so each tab's dispatcher snapshots its own
 /// [ViolationStore]) from the app-wide *consumers* (the trend-store
-/// ingestion listener, bookmark stale-detection, Verible auto-run) that
+/// ingestion listener, Verible auto-run) that
 /// subscribe to [lintRunCompletionEventProvider].
 ///
 /// Each tab's dispatcher lives in its own per-tab `ProviderContainer`

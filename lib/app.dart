@@ -48,6 +48,7 @@ import 'package:lintcrux/domain/models/session/lintcrux_session.dart';
 import 'package:lintcrux/features/about/lintcrux_about_dialog.dart';
 import 'package:lintcrux/features/beta_expiry/beta_expiry_metrics.dart';
 import 'package:lintcrux/features/beta_expiry/widgets/beta_expiry_gate.dart';
+import 'package:lintcrux/features/bookmarks/providers/bookmark_openers.dart';
 import 'package:lintcrux/features/command_palette/widgets/command_palette_dialog.dart';
 import 'package:lintcrux/features/diagnostics/providers/diagnostics_providers.dart';
 import 'package:lintcrux/features/diagnostics/widgets/app_diagnostics_dialog.dart';
@@ -83,7 +84,6 @@ import 'package:lintcrux/features/workspace/services/open_project_in_workspace.d
 import 'package:lintcrux/features/workspace/widgets/workspace_root.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/baseline_comparison_opener_provider.dart';
-import 'package:lintcrux/plugins/bookmark_panel_opener_provider.dart';
 import 'package:lintcrux/plugins/eager_startup_providers.dart';
 import 'package:lintcrux/plugins/extra_localizations_delegates_provider.dart';
 import 'package:lintcrux/plugins/filter_preset_manager_opener_provider.dart';

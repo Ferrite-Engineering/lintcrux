@@ -245,27 +245,11 @@ const _exemptions = <_Exemption>[
 
   // Other open-core API only the Pro overlay uses.
   _Exemption(
-    'lib/plugins/bookmark_toggle_handler_provider.dart',
-    _Consumer.proOverlay,
-    'The toggle seam of the bookmark column icon. Bookmarks are a Pro '
-        'feature: the column icon that reads it and the handler bound to it '
-        'are both overlay code, and the Toggle Bookmark action dispatches '
-        'through its own opener seam instead.',
-  ),
-  _Exemption(
     'lib/services/lint_cache/cache_violation_codec.dart',
     _Consumer.proOverlay,
     'The violation codec of the lint-run cache. The open core ships the '
         'cache seam with a no-op default; the SQLite cache that encodes and '
         'decodes violations with this codec is Pro overlay code.',
-  ),
-  _Exemption(
-    'lib/services/persistence/atomic_json_file.dart',
-    _Consumer.proOverlay,
-    'The crash-safe JSON write shared by the per-project JSON stores '
-        '(waivers, filter presets, baselines, bookmarks), all of which are '
-        'Pro overlay code. Moving it into the overlay would retire this '
-        'entry.',
   ),
   _Exemption(
     'lib/services/projects/cross_project_search.dart',

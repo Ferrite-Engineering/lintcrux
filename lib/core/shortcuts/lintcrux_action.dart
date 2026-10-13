@@ -280,21 +280,16 @@ enum LintcruxAction implements CruxAction {
   /// → Trends section). Pro-tier; same badge + gate conventions.
   configureTrendRetention,
 
-  // ── Filter presets & violation bookmarks (Pro tier) ───────
+  // ── Violation bookmarks (Open Core) ───────
 
-  /// Open the bookmark management panel (the dockable list of
-  /// every bookmarked violation grouped by file path, with stale-bookmark
-  /// filter chips). Pro-tier; renders the tier badge and gates
-  /// activation via `FeatureGate.isAvailable`. The panel is mounted by
-  /// the Pro overlay through `bookmarkPanelOpenerProvider`.
+  /// Open the bookmark management panel (the list of every bookmarked
+  /// violation grouped by file path, with stale-bookmark filter chips).
+  /// Dispatches through `bookmarkPanelOpenerProvider`.
   openBookmarksManager,
 
-  /// Toggle a bookmark for the currently-selected violation
-  /// (or the row under the cursor when invoked from a row context
-  /// menu). Pro-tier; renders the tier badge and gates activation via
-  /// `FeatureGate.isAvailable`. Dispatches through
-  /// `toggleBookmarkOpenerProvider`, which is null in the open core, so the
-  /// action answers with the "requires LintCrux Pro" notice there.
+  /// Toggle a bookmark for the currently-selected violation: opens the
+  /// bookmark dialog in create or edit mode. Dispatches through
+  /// `toggleBookmarkOpenerProvider`.
   toggleBookmarkForCurrentViolation,
 
   // ─── Verible auto-fix integration (Pro tier) ───────
@@ -555,13 +550,6 @@ extension LintcruxActionRequiredTier on LintcruxAction {
         // so the runner integration is unconditional; the SQLite-backed
         // persistence + cache-management UI is Pro.
         return LicenseTier.pro;
-      case LintcruxAction.openBookmarksManager:
-      case LintcruxAction.toggleBookmarkForCurrentViolation:
-        // User-authored filter-preset persistence + violation bookmarks are a
-        // Pro feature. The open-core build still ships the three built-in
-        // presets but saving / editing / managing user presets + bookmarking
-        // individual violations require Pro.
-        return LicenseTier.pro;
       case LintcruxAction.pinActiveProject:
       case LintcruxAction.closeAllProjects:
       case LintcruxAction.searchAcrossProjects:
@@ -576,6 +564,10 @@ extension LintcruxActionRequiredTier on LintcruxAction {
         // so all five carry the PRO badge. `openProject` and
         // `closeActiveProject` stay open-core — they work standalone.
         return LicenseTier.pro;
+      // Violation bookmarks, with their notes and color tags, are free: a
+      // note on a violation is something one person does to their own work.
+      case LintcruxAction.openBookmarksManager:
+      case LintcruxAction.toggleBookmarkForCurrentViolation:
       case LintcruxAction.openProject:
       case LintcruxAction.clearRecentProjects:
       case LintcruxAction.openSources:

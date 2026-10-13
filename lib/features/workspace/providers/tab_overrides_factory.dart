@@ -16,7 +16,10 @@ import 'package:lintcrux/features/violations/providers/saved_filter_presets_prov
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_view_mode_provider.dart';
+import 'package:lintcrux/services/bookmarks/bookmark_freshness.dart';
 import 'package:lintcrux/services/bookmarks/bookmarked_violations_count_provider.dart';
+import 'package:lintcrux/services/bookmarks/violation_bookmark_lookup_provider.dart';
+import 'package:lintcrux/services/bookmarks/violation_bookmark_store_provider.dart';
 import 'package:lintcrux/services/filter_presets/active_filter_preset_provider.dart';
 import 'package:lintcrux/services/lint_cache/lint_cache_stats_provider.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
@@ -156,6 +159,20 @@ List<Override> lintcruxTabOverridesFactory(crux.TabId tabId) {
       buildLintcruxIssueSessionContext,
     ),
 
+    // Violation bookmarks. The store keys off this tab's project (its
+    // `.lintcrux-bookmarks.json` lives beside it), and the count, lookup
+    // map and freshness derive from that store, so all four are per tab;
+    // a root-scope instance would only ever see the no-op store. The
+    // freshness notifier also listens to this tab's lifecycle bus.
+    violationBookmarkStoreProvider.overrideWith(buildViolationBookmarkStore),
+    bookmarkedViolationsCountProvider.overrideWith(
+      buildBookmarkedViolationsCount,
+    ),
+    violationBookmarkLookupMapProvider.overrideWith(
+      buildViolationBookmarkLookupMap,
+    ),
+    bookmarkFreshnessProvider.overrideWith(BookmarkFreshnessNotifier.new),
+
     // Derivations over the project-keyed extension-point stores. The
     // stores themselves are overridden per-tab by the Pro overlay (via
     // `extraTabOverridesProvider` → `proTabOverrides`); these open-core
@@ -164,9 +181,6 @@ List<Override> lintcruxTabOverridesFactory(crux.TabId tabId) {
     // container's no-op default. In a pure open-core build the tab
     // binding still resolves the root no-op through parent lookup, so
     // this is behavior-neutral without the Pro overlay.
-    bookmarkedViolationsCountProvider.overrideWith(
-      buildBookmarkedViolationsCount,
-    ),
     lintCacheStatsProvider.overrideWith(buildLintCacheStats),
     lintCacheInvalidationsProvider.overrideWith(buildLintCacheInvalidations),
     veribleAvailabilityProvider.overrideWith(buildVeribleAvailability),
