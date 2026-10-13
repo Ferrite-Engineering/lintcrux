@@ -13,7 +13,7 @@ All under `products.lintcrux`.
 |---|---|---|
 | `ciGateThreshold` | The organization-wide ceiling on surviving violations. [Below.](#ci-gate) | In force |
 | `teamDatabaseSubmitter` | Who pooled runs are attributed to in the [shared trend database](team-database.md#submitter). | In force |
-| `ruleSeverityOverrides` | Intended as org-wide rule-severity overrides. | **Reserved** — nothing reads it |
+| `ruleSeverityOverrides` | Org-wide rule-severity defaults: a map of engine-namespaced rule id to `fatal`, `error`, `warning`, `note` or `none`. Applies only to rules the project file's own `severityOverrides` leaves unset; the project's entry always wins. Enterprise, like the threshold; the desktop app and `lintcrux-pro` apply it alike. [Below.](#severity-defaults) | In force (the `crux-policy lint` tool and the startup notice still list it as reserved until their registry is updated) |
 | `mandatoryEngines` | Intended to require particular engines in every run. | **Reserved** — nothing reads it |
 
 **Four keys, and that is the whole list.** `customRuleMetadata` was listed here until 2026-09-19 and was **removed from the schema**, because no release ever registered it: it was a key this page invented and nothing has ever parsed. `crux-policy lint` now reports it as unknown — *"unknown to this version of the CLI… check the spelling"* — so a file carrying it fails your own linter. Delete it from any policy file that has it.
@@ -21,7 +21,28 @@ All under `products.lintcrux`.
 !!! note "What Reserved means, precisely"
     The schema knows the key and LintCrux parses it without complaint. **Nothing consumes it, so writing it changes no behaviour.** A reserved key and a working key look identical in a file that validates and deploys without error, which is exactly why they are called out — silence here would send you to file a bug against a product doing exactly what it is built to do.
 
-    **Severity policy is per project today**, in the `.lintcrux` file committed with the RTL — see [Severity & pragmas](severity-and-pragmas.md). If a fleet-wide severity policy is what you need, [tell us](mailto:support@ferriteengineering.com): the key already exists, so what is left is the feature.
+    **Severity policy is per project first**, in the `.lintcrux` file committed with the RTL — see [Severity & pragmas](severity-and-pragmas.md). `ruleSeverityOverrides` adds the fleet-wide defaults underneath it.
+
+## Organization-wide severity defaults {#severity-defaults}
+
+```json
+"products": {
+  "lintcrux": {
+    "ruleSeverityOverrides": {
+      "value": {
+        "verilator/WIDTH": "error",
+        "verible/no-tabs": "note"
+      }
+    }
+  }
+}
+```
+
+The map goes inside the key's `value` member: a map-valued key is always written in the policy's object form, because a bare map is read as that form and refused for having no `value`. `locked` is accepted and makes no difference here, since the project's own entry wins either way.
+
+The project file wins. A rule the project's `severityOverrides` names keeps the project's severity; every other rule in the map takes the organization's. That is the defaults reading on purpose: an organization setting a default should not overrule a project that deliberately stated its own, and a project that needs to opt out of a default states its own value. A value that is not a map, a rule id without its engine prefix (`verilator/WIDTH`, never `WIDTH`), or a severity that is not one of the five names refuses the whole key with a diagnostic rather than applying half of it.
+
+The desktop app applies the defaults to every run of every tab, and `lintcrux-pro` to every headless run, so a CI gate and a developer's table agree. On a licence below Enterprise the key is read and reported (`lintcrux-pro` says so on stderr every run) and not applied.
 
 ## CI gating: what is free and what is Enterprise {#ci-gate}
 

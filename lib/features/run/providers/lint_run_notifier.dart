@@ -16,6 +16,7 @@ import 'package:lintcrux/domain/models/engine_run_outcome.dart';
 import 'package:lintcrux/domain/models/engine_run_status.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
+import 'package:lintcrux/plugins/extra_violation_transformers_provider.dart';
 import 'package:lintcrux/services/engines/engine_language_router.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
@@ -411,6 +412,9 @@ class LintRunNotifier extends Notifier<LintRunState> {
       SeverityOverrideTransformer(project.severityOverrides),
       PragmaWaiverTransformer(rangeMap),
       ManagedWaiverTransformer(waiverStore),
+      // The overlay's additions, the same seam the headless runner takes as
+      // `extraTransformers`: today the organization's severity defaults.
+      ...ref.read(extraViolationTransformersProvider),
     ]);
   }
 
