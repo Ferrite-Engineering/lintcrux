@@ -18,19 +18,16 @@ import 'package:lintcrux/plugins/violation_row_leading_cells_provider.dart';
 /// to restore the default widths. The widths come from
 /// [violationColumnLayoutProvider], which the rows read too.
 ///
-/// The chrome and the dividers are `crux_table`'s ([CruxTableHeader]); this
-/// widget supplies the columns, their labels, the sort state and the
-/// overlay's leading cells. The cells keep the `violationTableHeader-<column>`
-/// keys and the dividers the `violationTableResize-<column>` keys the tests
-/// find them by.
+/// The chrome, the dividers and the sortable cell are `crux_table`'s
+/// ([CruxTableHeader], [CruxSortableHeaderCell]); this widget supplies the
+/// columns, their labels, the sort state and the overlay's leading cells.
+/// The cells keep the `violationTableHeader-<column>` keys and the dividers
+/// the `violationTableResize-<column>` keys the tests find them by.
 ///
-/// The cell itself is [_SortableHeaderCell], LintCrux's reading of
-/// `CruxSortableHeaderCell` with one difference: the sort arrow's slot
-/// shrinks in a column narrower than the arrow. The shared cell gives the
-/// arrow a fixed 18 dp slot, and in a pane squeezed to ~450 px the sorted
-/// column (Severity at its default weight is 25 px wide there) overflows by
-/// the difference, which the squeezed-pane test catches as a RenderFlex
-/// error. Returns to the shared cell once crux-shared#33 lands.
+/// "Crop, don't crush" holds in a squeezed pane: the shared cell bounds the
+/// sort arrow's slot by the cell, so the sorted column in a ~450 px pane
+/// (Severity at its default weight is 25 px wide there) crops the arrow
+/// instead of overflowing the row. The squeezed-pane test pins it.
 class ViolationTableHeader extends ConsumerWidget {
   /// Creates a [ViolationTableHeader].
   const ViolationTableHeader({super.key});
@@ -58,7 +55,7 @@ class ViolationTableHeader extends ConsumerWidget {
             child: Builder(builder: (ctx) => lc.headerBuilder(ctx, ref)),
           ),
       ],
-      cellBuilder: (context, column) => _SortableHeaderCell(
+      cellBuilder: (context, column) => CruxSortableHeaderCell(
         key: cruxTableHeaderKey(tableId, column),
         label: _label(l10n, column),
         sorted: state.sortColumn == column,
@@ -77,81 +74,4 @@ class ViolationTableHeader extends ConsumerWidget {
         ViolationTableColumn.line => l10n.violationColumnLine,
         ViolationTableColumn.message => l10n.violationColumnMessage,
       };
-}
-
-/// A header cell that sorts its column when activated: `crux_table`'s
-/// `CruxSortableHeaderCell` (button semantics, the ellipsizing label, the
-/// arrow on the sorted column only, the shared padding and arrow size), with
-/// the arrow's slot bounded by the cell. "Crop, don't crush": a column
-/// squeezed below the arrow's width shows as much of the arrow as fits
-/// instead of overflowing the row. See [ViolationTableHeader].
-class _SortableHeaderCell extends StatelessWidget {
-  const _SortableHeaderCell({
-    required this.label,
-    required this.onTap,
-    required this.sorted,
-    required this.ascending,
-    super.key,
-  });
-
-  final String label;
-  final VoidCallback onTap;
-  final bool sorted;
-  final bool ascending;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colorScheme.onSurfaceVariant;
-    // A header cell is a control (it sorts), so it is announced as a
-    // button; a bare InkWell carries the tap action but no role, and a
-    // screen reader called each header plain "text".
-    return Semantics(
-      button: true,
-      container: true,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: kCruxTableCellPadding,
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final arrowSlot = sorted
-                  ? kCruxTableSortArrowSize.clamp(0.0, constraints.maxWidth)
-                  : 0.0;
-              return Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: color,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (sorted)
-                    SizedBox(
-                      width: arrowSlot,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Icon(
-                          ascending
-                              ? Icons.arrow_drop_up
-                              : Icons.arrow_drop_down,
-                          size: kCruxTableSortArrowSize,
-                          color: color,
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
 }
