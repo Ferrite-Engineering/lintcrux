@@ -39,7 +39,7 @@ Open core resolves each register's clock to the literal net driving it, and trea
 | Two-flop synchronizer recognition; `combo-in-sync` | ✓ | ✓ |
 | Findings in the unified table, with waivers, baselines, trends and SARIF | ✓ | ✓ |
 | Clock-tree tracing through buffers, gates, muxes and dividers | — | ✓ |
-| `cdc.yaml` constraints: declared clocks, synchronous groups, reviewed crossings | — | ✓ |
+| `cdc.yaml` constraints: declared clocks, synchronous groups, handshakes (reviewed-crossing `waive:` rules are read but not yet applied) | — | ✓ |
 | Handshake-qualified buses | — | ✓ |
 | N-flop chains (three or more stages); gray-coded pointers recognised by name | — | ✓ |
 | `cdc/per-bit-sync-bus` | — | ✓ |
@@ -75,6 +75,9 @@ handshakes:
 ```
 
 A `waive` entry without `net` covers the whole domain pair.
+
+!!! warning "`waive:` rules are read but not yet applied"
+    In this release a `waive:` rule is parsed and validated (a rule without `reason:` is still dropped with an error) and then has no effect: the crossing it names is still reported. Use a managed waiver on the finding itself, or a baseline, to accept a reviewed crossing until the constraints file applies them. The `clocks`, `synchronous_groups` and `handshakes` sections are applied.
 
 !!! note "Two rules the parser enforces on purpose"
     **`reason:` is mandatory** on a waive rule, and a rule without one is dropped with an error. An unexplained waiver is indistinguishable from a mistake six months later, and a constraints file full of them is how a CDC process quietly stops meaning anything.
