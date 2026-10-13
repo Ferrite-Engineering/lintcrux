@@ -22,6 +22,7 @@ import 'package:lintcrux/core/app_info/build_info.dart';
 import 'package:lintcrux/core/cli/cli_args.dart';
 import 'package:lintcrux/core/cli/cli_args_parser.dart';
 import 'package:lintcrux/core/cli/cli_args_provider.dart';
+import 'package:lintcrux/core/cli/macos_launch_options.dart';
 import 'package:lintcrux/core/eula/lintcrux_eula_storage.dart';
 import 'package:lintcrux/core/help_urls.dart';
 import 'package:lintcrux/core/lintcrux_url_launcher.dart';
@@ -361,12 +362,19 @@ Future<bool> bootstrap({
     return false;
   }
 
+  // macOS hands every app its own per-launch options (`-AppleLanguages`,
+  // `-AppleLocale`, `-NSDocumentRevisionsDebugMode`, …) through argv. The
+  // strict parser below would answer them with usage and exit 64 before a
+  // window opened, so the desktop front door drops them first. The headless
+  // binary keeps refusing them: nothing launches it that way.
+  final launchArgs = stripMacosLaunchOptions(args);
+
   // Suite-shared launch recovery flags (`--reset` / `--no-restore`),
   // ported from WaveCrux (`services/cli/cli_args.dart`). Parsed first and
   // stripped from the argument list so the strict `package:args` parser
   // below — shared with the headless binary, where an unknown flag is a
   // usage error by design — never sees them.
-  final launchFlags = launch_cli.parseCliArgs(args);
+  final launchFlags = launch_cli.parseCliArgs(launchArgs);
 
   // Parse the CLI surface up front so the app's startup wiring can read
   // the [CliArgs] snapshot via [cliArgsProvider]. On parse error or
@@ -374,7 +382,7 @@ Future<bool> bootstrap({
   // version string) and short-circuit before constructing the widget
   // tree.
   final parser = CliArgsParser();
-  final result = parser.parse(launch_cli.stripLaunchFlags(args));
+  final result = parser.parse(launch_cli.stripLaunchFlags(launchArgs));
   if (!result.isSuccess) {
     stderr
       ..writeln('lintcrux: ${result.error}')
