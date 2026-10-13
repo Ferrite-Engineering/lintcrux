@@ -234,6 +234,19 @@ const List<TelemetryCatalogEvent> kLintcruxEventCatalog =
         boolProperties: <String>['silent'],
       ),
 
+      // `crux_telemetry`'s `TelemetryUncleanShutdownDetector` records this at
+      // most once per launch, when the previous session's marker file is still
+      // on disk and no live process holds it: the session never reached its
+      // exit path. It counts sessions that did not end cleanly, not crashes
+      // (a force quit and a power loss look the same), and carries no
+      // properties: the envelope is the whole record. Desktop only, never in
+      // a debug build, and shipped dark behind the package's
+      // `kCruxUncleanShutdownEventEnabled`, so no build sends it until the
+      // privacy policy names the event; the entry exists so the name is
+      // vetted before that flag flips. The literal, not the package constant,
+      // for the reason given above; the conformance test holds them equal.
+      TelemetryCatalogEvent('app.unclean_shutdown'),
+
       // ── the commercial group ───────────────────────────────────────────────
       // Recorded on the Pro overlay's gate-denial path (`proFeatureAvailable`),
       // which is the only place `CruxUpgradeDialog.show` is reached from. It

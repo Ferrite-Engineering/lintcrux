@@ -126,9 +126,13 @@ const Set<String> _proOnlyEvents = <String>{
 
 /// Catalog entries recorded by a shared package rather than by a call site in
 /// either repository. `crux_telemetry` records `app.uncaught_error` from the
-/// global error handlers, so no scan of this repository's `lib/` can find it,
-/// and it is excused from the "still recorded" rule.
-const Set<String> _sharedEvents = <String>{'app.uncaught_error'};
+/// global error handlers and `app.unclean_shutdown` from the session-marker
+/// detector, so no scan of this repository's `lib/` can find either, and both
+/// are excused from the "still recorded" rule.
+const Set<String> _sharedEvents = <String>{
+  'app.uncaught_error',
+  'app.unclean_shutdown',
+};
 
 void main() {
   const catalog = kLintcruxEventCatalog;
@@ -446,6 +450,21 @@ void main() {
       }
     });
   });
+
+  test(
+    'app.unclean_shutdown is the shared detector event, with no properties',
+    () {
+      // Recorded by `crux_telemetry`'s session-marker detector, not by this
+      // repository. The catalog spells the literal because the headless CLI
+      // compiles it and cannot import the Flutter-dependent package; this holds
+      // the literal to the package's constant. No properties: the envelope is
+      // the whole record, and a property here would be a dimension the Worker
+      // never sees.
+      final entry = catalog.firstWhere((e) => e.name == 'app.unclean_shutdown');
+      expect(entry.name, kTelemetryUncleanShutdownEvent);
+      expect(entry.propertyKeys, isEmpty);
+    },
+  );
 
   test('app.uncaught_error carries the shared counter vocabulary', () {
     // Recorded by `crux_telemetry`, not by this repository, so the lists are
