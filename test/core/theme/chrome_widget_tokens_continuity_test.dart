@@ -1,25 +1,25 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
-// Every built-in preset must paint LintCrux's shared chrome exactly as it
-// always has. The status bar, splitter, document tab bar and active toolbar
-// glyph chrome tokens reach their shared widgets through `applyChromeTokens`;
-// before that they reached nothing, and the widgets painted from the Material
-// theme `app.dart` builds: the status bar `surfaceContainerHighest` behind
-// `onSurface` at 75 %, the pane resizers `outlineVariant` and `primary` on
-// hover, the active document tab `surfaceContainerHighest` under `bodyMedium`
-// titles on an unfilled strip, and a toggled toolbar glyph `primary`.
+// Every built-in preset paints LintCrux's shared chrome from its own chrome
+// tokens where it declares them, and from the Material theme `app.dart` builds
+// where it does not. The status bar, splitter, document tab bar and active
+// toolbar glyph tokens reach their shared widgets through `applyChromeTokens`
+// as `CruxChromeColors`; a null field there means the widget keeps its
+// Material default: the status bar `surfaceContainerHighest` behind `onSurface`
+// at 75 %, the pane resizers `outlineVariant` and `primary` on hover, the
+// active document tab `surfaceContainerHighest` under `bodyMedium` titles on an
+// unfilled strip, and a toggled toolbar glyph `primary`.
 //
 // This pumps those widgets under every theme `app.dart` can show for each
 // preset (the normal and the high-contrast variant of its brightness), built
-// the same way, and asserts exactly those colours. It holds before and after
-// the widgets read the tokens, which is the point: an unedited preset must not
-// change. Text reaches the engine as 32-bit ARGB, so text colour is compared
-// that way.
-//
-// One preset was edited on purpose: Solarized Dark's status-bar text. The 75 %
-// blend fell short of WCAG AA contrast on its status bar, so the preset now
-// sets an opaque `#93A1A1` there, and that one assertion expects it.
+// the same way, and asserts each colour against the resolved token or its
+// fallback. Both paths are exercised: the two default-Material presets declare
+// no chrome token, and the four branded presets declare the active glyph and
+// both splitter colours (High Contrast Dark every one of the ten), so a widget
+// that stopped reading a token would fail on the branded presets and one that
+// stopped falling back would fail on the default ones. Text reaches the engine
+// as 32-bit ARGB, so text colour is compared that way.
 
 import 'dart:io';
 
@@ -129,8 +129,8 @@ void main() {
 
   for (final preset in builtinPresets().values) {
     for (final variant in _appThemes(preset).entries) {
-      testWidgets('${preset.id} (${variant.key}) paints the chrome it always '
-          'painted', (tester) async {
+      testWidgets('${preset.id} (${variant.key}) paints its declared chrome, '
+          'else the Material fallback', (tester) async {
         final container = ProviderContainer();
         addTearDown(container.dispose);
         final ws = await container.read(provider.future);
@@ -184,6 +184,25 @@ void main() {
 
         final theme = Theme.of(tester.element(find.byType(CruxStatusBar)));
         final scheme = theme.colorScheme;
+        final resolved = theme.extension<CruxChromeColors>();
+        expect(resolved, isNotNull, reason: 'applyChromeTokens did not run');
+        final chrome = resolved ?? const CruxChromeColors();
+
+        // The premise of both paths below: the branded presets declare the
+        // tokens, the default-Material ones declare none.
+        const branded = <String>{
+          'solarized-dark',
+          'high-contrast-dark',
+          'oscilloscope',
+          'oled-xr',
+        };
+        if (branded.contains(preset.id)) {
+          expect(chrome.toolbarIconActive, isNotNull, reason: preset.id);
+          expect(chrome.splitter, isNotNull, reason: preset.id);
+          expect(chrome.splitterHover, isNotNull, reason: preset.id);
+        } else {
+          expect(chrome.isEmpty, isTrue, reason: preset.id);
+        }
 
         // Toolbar: a toggled-on glyph.
         expect(
@@ -195,10 +214,11 @@ void main() {
                 ),
               )
               .color,
-          scheme.primary,
+          chrome.toolbarIconActive ?? scheme.primary,
         );
 
-        // Document tab bar: no strip fill, the active tab, the titles.
+        // Document tab bar: the strip fill (none unless declared), the active
+        // tab, the titles.
         final strip = tester.widget<DecoratedBox>(
           find
               .descendant(
@@ -207,7 +227,10 @@ void main() {
               )
               .first,
         );
-        expect((strip.decoration as BoxDecoration).color, isNull);
+        expect(
+          (strip.decoration as BoxDecoration).color,
+          chrome.tabBarBackground,
+        );
         Color? chip(String title) =>
             (tester
                         .widget<Container>(
@@ -221,12 +244,18 @@ void main() {
                         .decoration!
                     as BoxDecoration)
                 .color;
-        expect(chip('beta'), scheme.surfaceContainerHighest);
+        expect(
+          chip('beta'),
+          chrome.tabBarSelected ?? scheme.surfaceContainerHighest,
+        );
         expect(chip('alpha'), isNull);
+        final label = chrome.tabBarLabel;
         for (final title in ['alpha', 'beta']) {
           expect(
             tester.widget<Text>(find.text(title)).style,
-            theme.textTheme.bodyMedium,
+            label == null
+                ? theme.textTheme.bodyMedium
+                : theme.textTheme.bodyMedium?.copyWith(color: label),
           );
         }
 
@@ -245,15 +274,18 @@ void main() {
             )
             .elementAt(1)
             .color;
-        expect(resizerBar(), scheme.outlineVariant);
+        expect(resizerBar(), chrome.splitter ?? scheme.outlineVariant);
         final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
         await mouse.addPointer(location: Offset.zero);
         addTearDown(mouse.removePointer);
         await mouse.moveTo(tester.getCenter(resizer));
         await tester.pump();
-        expect(resizerBar(), scheme.primary);
+        expect(resizerBar(), chrome.splitterHover ?? scheme.primary);
 
-        // Status bar: the surface and the baseline text.
+        // Status bar: the surface and the text. A declared foreground is
+        // painted exactly as given (Solarized Dark's opaque `#93A1A1`, which
+        // the 75 % blend fell short of WCAG AA on; Oscilloscope's and OLED XR's
+        // translucent ones); every other preset keeps the blend.
         final bar = tester.widget<DecoratedBox>(
           find
               .descendant(
@@ -264,16 +296,13 @@ void main() {
         );
         expect(
           (bar.decoration as BoxDecoration).color,
-          scheme.surfaceContainerHighest,
+          chrome.statusBarBackground ?? scheme.surfaceContainerHighest,
         );
-        // Solarized Dark's status-bar text changed on purpose: the 75 % blend
-        // missed WCAG AA contrast, so the preset paints an opaque `#93A1A1`.
-        // Every other preset keeps the blend it always painted.
         expect(
           tester.widget<Text>(find.text('status')).style?.color?.toARGB32(),
-          preset.id == 'solarized-dark'
-              ? const Color(0xFF93A1A1).toARGB32()
-              : scheme.onSurface.withValues(alpha: 0.75).toARGB32(),
+          (chrome.statusBarForeground ??
+                  scheme.onSurface.withValues(alpha: 0.75))
+              .toARGB32(),
         );
       });
     }
