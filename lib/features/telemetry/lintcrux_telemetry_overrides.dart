@@ -94,26 +94,7 @@ final List<Override> lintcruxTelemetryOverrides = <Override>[
   telemetryLocaleProvider.overrideWith(
     (ref) => ref.watch(appSettingsProvider).core.locale,
   ),
-
-  // The unclean-shutdown detector. Its process-wide default instance reads
-  // `dart:io`'s `pid` when it is constructed, which throws in a browser, and
-  // `telemetryServiceProvider` builds it on the first event: the web viewer's
-  // first recorded event then failed with a ProviderException. The browser
-  // keeps no session marker anyway, so it gets an inert detector.
-  if (kIsWeb)
-    telemetryUncleanShutdownDetectorProvider.overrideWith(
-      (ref) => lintcruxWebUncleanShutdownDetector,
-    ),
 ];
-
-/// The detector the browser build uses: never started, no process id read.
-/// See the override in [lintcruxTelemetryOverrides].
-final TelemetryUncleanShutdownDetector lintcruxWebUncleanShutdownDetector =
-    TelemetryUncleanShutdownDetector(
-      supported: false,
-      processId: 0,
-      installLifecycleListener: false,
-    );
 
 /// The telemetry store this build persists consent and the installation id
 /// in: `SharedPreferences` in the browser, a JSON file on the desktop.
