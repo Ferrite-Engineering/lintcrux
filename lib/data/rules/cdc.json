@@ -40,6 +40,15 @@
       ]
     },
     {
+      "id": "reviewed-crossing",
+      "defaultSeverity": "note",
+      "tags": [
+        "cdc",
+        "review",
+        "pro"
+      ]
+    },
+    {
       "id": "unsupported-sources",
       "defaultSeverity": "error",
       "tags": [
