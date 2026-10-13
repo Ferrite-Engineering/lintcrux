@@ -5,7 +5,20 @@
     {
       "tool": {
         "driver": {
-          "name": "verilator"
+          "name": "verilator",
+          "rules": [
+            {
+              "id": "UNUSEDSIGNAL",
+              "name": "UNUSEDSIGNAL",
+              "shortDescription": {
+                "text": "UNUSEDSIGNAL"
+              },
+              "helpUri": "https://verilator.org/warn/UNUSEDSIGNAL",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +34,7 @@
       "results": [
         {
           "ruleId": "UNUSEDSIGNAL",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Signal is not driven, nor used: 'tabbed'"
@@ -50,6 +64,7 @@
         },
         {
           "ruleId": "UNUSEDSIGNAL",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Signal is not used: 'unread_sig'"
@@ -80,7 +95,20 @@
     {
       "tool": {
         "driver": {
-          "name": "verible"
+          "name": "verible",
+          "rules": [
+            {
+              "id": "no-tabs",
+              "name": "no-tabs",
+              "shortDescription": {
+                "text": "no-tabs"
+              },
+              "helpUri": "https://chipsalliance.github.io/verible/lint.html#no-tabs",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -96,6 +124,7 @@
       "results": [
         {
           "ruleId": "no-tabs",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Use spaces, not tabs."
@@ -119,7 +148,20 @@
     {
       "tool": {
         "driver": {
-          "name": "slang"
+          "name": "slang",
+          "rules": [
+            {
+              "id": "empty-body",
+              "name": "empty-body",
+              "shortDescription": {
+                "text": "empty-body"
+              },
+              "helpUri": "https://sv-lang.com/warning-ref.html#empty-body",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -138,6 +180,7 @@
             "text": "if statement has empty body (put the semicolon on a separate line to silence this warning)"
           },
           "ruleId": "empty-body",
+          "ruleIndex": 0,
           "level": "warning",
           "locations": [
             {

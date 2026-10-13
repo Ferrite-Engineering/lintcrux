@@ -1287,7 +1287,13 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
     }
     final violations = active.container.read(visibleViolationsProvider);
     final project = active.container.read(currentProjectProvider);
-    final rules = ref.read(ruleDatabaseProvider).value;
+    // Consulted only when the rules panel or the inspector has already
+    // loaded the database: an export is a one-shot action and must not start
+    // an asset load of its own. A database not yet loaded yields descriptors
+    // derived from the run alone.
+    final rules = ref.exists(ruleDatabaseProvider)
+        ? ref.read(ruleDatabaseProvider).value
+        : null;
     Rule? describeRule(String engineId, String localRuleId) =>
         rules?.lookupBy(engineId: engineId, localRuleId: localRuleId);
     const exporter = ViolationExporters();

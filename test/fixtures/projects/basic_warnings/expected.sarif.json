@@ -5,7 +5,31 @@
     {
       "tool": {
         "driver": {
-          "name": "verilator"
+          "name": "verilator",
+          "rules": [
+            {
+              "id": "UNUSEDSIGNAL",
+              "name": "UNUSEDSIGNAL",
+              "shortDescription": {
+                "text": "UNUSEDSIGNAL"
+              },
+              "helpUri": "https://verilator.org/warn/UNUSEDSIGNAL",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "UNDRIVEN",
+              "name": "UNDRIVEN",
+              "shortDescription": {
+                "text": "UNDRIVEN"
+              },
+              "helpUri": "https://verilator.org/warn/UNDRIVEN",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +45,7 @@
       "results": [
         {
           "ruleId": "UNUSEDSIGNAL",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "Signal is not used: 'unread_sig'"
@@ -50,6 +75,7 @@
         },
         {
           "ruleId": "UNDRIVEN",
+          "ruleIndex": 1,
           "level": "warning",
           "message": {
             "text": "Signal is not driven: 'undriven_sig'"

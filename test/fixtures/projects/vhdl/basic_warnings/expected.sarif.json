@@ -5,7 +5,31 @@
     {
       "tool": {
         "driver": {
-          "name": "ghdl"
+          "name": "ghdl",
+          "rules": [
+            {
+              "id": "hide",
+              "name": "hide",
+              "shortDescription": {
+                "text": "hide"
+              },
+              "helpUri": "https://ghdl.github.io/ghdl/using/InvokingGHDL.html#cmdoption-ghdl-warn-hide",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "unused",
+              "name": "unused",
+              "shortDescription": {
+                "text": "unused"
+              },
+              "helpUri": "https://ghdl.github.io/ghdl/using/InvokingGHDL.html#cmdoption-ghdl-warn-unused",
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
         }
       },
       "invocations": [
@@ -21,6 +45,7 @@
       "results": [
         {
           "ruleId": "hide",
+          "ruleIndex": 0,
           "level": "warning",
           "message": {
             "text": "declaration of \"hidden_var\" hides signal \"hidden_var\""
@@ -48,6 +73,7 @@
         },
         {
           "ruleId": "unused",
+          "ruleIndex": 1,
           "level": "warning",
           "message": {
             "text": "signal \"hidden_var\" is never referenced"
@@ -75,6 +101,7 @@
         },
         {
           "ruleId": "unused",
+          "ruleIndex": 1,
           "level": "warning",
           "message": {
             "text": "signal \"unused_sig\" is never referenced"
