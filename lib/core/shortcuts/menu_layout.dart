@@ -50,6 +50,10 @@ const CruxMenuLayout<LintcruxAction> kMenuLayout = {
       LintcruxAction.importVivadoFilelist,
       LintcruxAction.importEdam,
       LintcruxAction.importSarif,
+      // Last in the open block, beside the welcome screen's list it
+      // empties, and outside the Pro projects group below: the Recent
+      // projects list is open core's.
+      LintcruxAction.clearRecentProjects,
     ],
     // The projects group, in SimCrux's order — switch, reopen, pin.
     // SimCrux is where LintCrux's multi-project implementation was
@@ -58,7 +62,6 @@ const CruxMenuLayout<LintcruxAction> kMenuLayout = {
     [
       LintcruxAction.switchProject,
       LintcruxAction.reopenRecentProject,
-      LintcruxAction.clearRecentProjects,
       LintcruxAction.pinActiveProject,
     ],
     [
