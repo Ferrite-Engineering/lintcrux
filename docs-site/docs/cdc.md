@@ -15,6 +15,7 @@ LintCrux analyses crossings **structurally**, from the elaborated netlist, and r
 | `cdc/unsync-multi-bit` | Error | Open core | A bus crosses with no synchronizer. Worse than the single-bit case: the destination can latch a mix of old and new bits — a value that never existed in the source domain. |
 | `cdc/combo-in-sync` | Error | Open core | Combinational logic sits between the two flops of a synchronizer. The chain no longer provides the settling time it exists for — and it still looks like a synchronizer to a reviewer. |
 | `cdc/per-bit-sync-bus` | Error | <span class="tier tier-pro">Pro</span> | A bus "synchronized" with a separate two-flop chain per bit. See below — this one deserves its own section. |
+| `cdc/reviewed-crossing` | Note | <span class="tier tier-pro">Pro</span> | An unprotected crossing that a `cdc.yaml` `waive:` rule covers. Reported as a note carrying the rule's `reason`, in place of the error or warning, so an accepted crossing stays visible rather than vanishing. See [below](#cdc-yaml). |
 | `cdc/elaboration-failed` | Error | Open core | Yosys could not elaborate the design, so nothing was analysed. The headless binary exits `3` on it. |
 | `cdc/unsupported-sources` | Error | Open core | The design includes VHDL; CDC refuses to analyse a partial design. The headless binary exits `3` on it. |
 | `cdc/summary`, `cdc/analysis-note` | Note | Open core | What was analysed, and anything the analysis could not do — reported even on a clean design. See [below](#summary-note). |
@@ -39,7 +40,7 @@ Open core resolves each register's clock to the literal net driving it, and trea
 | Two-flop synchronizer recognition; `combo-in-sync` | ✓ | ✓ |
 | Findings in the unified table, with waivers, baselines, trends and SARIF | ✓ | ✓ |
 | Clock-tree tracing through buffers, gates, muxes and dividers | — | ✓ |
-| `cdc.yaml` constraints: declared clocks, synchronous groups, handshakes (reviewed-crossing `waive:` rules are read but not yet applied) | — | ✓ |
+| `cdc.yaml` constraints: declared clocks, synchronous groups, reviewed crossings, handshakes | — | ✓ |
 | Handshake-qualified buses | — | ✓ |
 | N-flop chains (three or more stages); gray-coded pointers recognised by name | — | ✓ |
 | `cdc/per-bit-sync-bus` | — | ✓ |
@@ -74,10 +75,9 @@ handshakes:
     data: [payload]
 ```
 
-A `waive` entry without `net` covers the whole domain pair.
+A `waive` entry without `net` covers the whole domain pair, and `*` in `from` or `to` matches any clock. The names are the clock nets as the analysis names them, which is what the `cdc/summary` note lists and what the finding's message shows.
 
-!!! warning "`waive:` rules are read but not yet applied"
-    In this release a `waive:` rule is parsed and validated (a rule without `reason:` is still dropped with an error) and then has no effect: the crossing it names is still reported. Use a managed waiver on the finding itself, or a baseline, to accept a reviewed crossing until the constraints file applies them. The `clocks`, `synchronous_groups` and `handshakes` sections are applied.
+A crossing a `waive` rule covers is not dropped. It is reported as a `cdc/reviewed-crossing` **note** carrying the rule's `reason`, at the same position and with the same cross-probe fields as the error it replaces, and the summary note counts it separately (`2 unsafe, 1 reviewed`). An accepted crossing that disappeared from the table would be indistinguishable from one the analysis never found; a reviewer six months later should see both the crossing and why it was accepted. A rule covering a crossing the analysis already recognises as protected changes nothing: the structural answer is the more informative one.
 
 !!! note "Two rules the parser enforces on purpose"
     **`reason:` is mandatory** on a waive rule, and a rule without one is dropped with an error. An unexplained waiver is indistinguishable from a mistake six months later, and a constraints file full of them is how a CDC process quietly stops meaning anything.
@@ -95,7 +95,7 @@ CDC analysed 3 clock domain(s) (generated clock (clocking.v:24), clk, div2)
 and found 0 crossing(s), 0 unsafe.
 ```
 
-It is a *note*, so it stays out of an error-and-warning filter, and it means a clean run is self-evidently a clean run. Anything the analysis could not do — a register whose clock it could not resolve, a design that elaborated to a single domain — arrives alongside it as `cdc/analysis-note` rather than being silently dropped.
+It is a *note*, so it stays out of an error-and-warning filter, and it means a clean run is self-evidently a clean run. When a `cdc.yaml` `waive:` rule accepted a crossing, the count says so (`… 3 crossing(s), 0 unsafe, 1 reviewed.`), so a run that is clean because of a review reads differently from one that is clean by construction. Anything the analysis could not do — a register whose clock it could not resolve, a design that elaborated to a single domain — arrives alongside it as `cdc/analysis-note` rather than being silently dropped.
 
 ## Running it {#running}
 

@@ -283,6 +283,93 @@ void main() {
     );
   });
 
+  group('reviewed crossings', () {
+    // The seam the Pro overlay's `cdc.yaml` `waive:` rules answer through. It
+    // is asserted here, against the open-core analysis with a hand-written
+    // hook, because the overlay's rules once parsed and validated cleanly and
+    // then changed nothing: the lookup existed and nothing called it. A test
+    // that fails when the hook has no effect is what keeps that from
+    // recurring.
+    test('a reviewed crossing becomes a safe, reasoned crossing', () async {
+      if (!yosysAvailable) {
+        markTestSkipped('yosys not on PATH');
+        return;
+      }
+      const reason = 'written once at boot, before clk_b leaves reset';
+      final asked = <String>[];
+      final reviewed = CdcDomainAnalysis(
+        reviewedCrossing:
+            ({required sourceClock, required destClock, netName}) {
+              asked.add('$sourceClock>$destClock:$netName');
+              return sourceClock == 'clk_a' &&
+                      destClock == 'clk_b' &&
+                      netName == 'data'
+                  ? reason
+                  : null;
+            },
+      );
+      final result = reviewed.analyze((await elaborate())!);
+
+      final bus = result.crossings.singleWhere((c) => c.width > 1);
+      expect(bus.syncKind, CdcSyncKind.reviewed);
+      expect(bus.reviewReason, reason);
+      expect(
+        bus.isUnsafe,
+        isFalse,
+        reason: 'an accepted crossing is not a hazard to report',
+      );
+      expect(
+        result.crossings.where((c) => c.isUnsafe),
+        isEmpty,
+        reason: 'the bus was the only unprotected crossing in the capstone',
+      );
+      // The hook is a question about unprotected crossings only: the
+      // two-flop `req` keeps its structural answer and is never asked about.
+      expect(asked, <String>['clk_a>clk_b:data']);
+      expect(
+        result.crossings.where((c) => c.syncKind == CdcSyncKind.twoFlop),
+        isNotEmpty,
+      );
+    });
+
+    test('a hook that accepts nothing changes nothing', () async {
+      if (!yosysAvailable) {
+        markTestSkipped('yosys not on PATH');
+        return;
+      }
+      final declined = CdcDomainAnalysis(
+        reviewedCrossing:
+            ({required sourceClock, required destClock, netName}) => null,
+      );
+      final result = declined.analyze((await elaborate())!);
+      final bus = result.crossings.singleWhere((c) => c.width > 1);
+      expect(bus.syncKind, CdcSyncKind.none);
+      expect(bus.reviewReason, isNull);
+      expect(bus.isUnsafe, isTrue);
+    });
+
+    test('the kind is safe and the reason travels through copyWith', () {
+      const crossing = CdcCrossing(
+        sourceRegisterPath: 'a',
+        destRegisterPath: 'b',
+        sourceClock: 'clk_a',
+        destClock: 'clk_b',
+        width: 8,
+        syncKind: CdcSyncKind.none,
+        netName: 'data',
+      );
+      expect(crossing.isUnsafe, isTrue);
+      final reviewed = crossing.copyWith(
+        syncKind: CdcSyncKind.reviewed,
+        reviewReason: 'accepted',
+      );
+      expect(reviewed.isUnsafe, isFalse);
+      expect(reviewed.reviewReason, 'accepted');
+      expect(reviewed.netName, 'data');
+      expect(reviewed.width, 8);
+    });
+  });
+
   group('bounded by design', () {
     test('a single-domain design reports no crossings, and says why', () {
       // Silence and "nothing to analyse" look identical to a user. A design

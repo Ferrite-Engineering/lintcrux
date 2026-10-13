@@ -86,7 +86,31 @@ enum CdcSyncKind {
   /// The crossing is between clocks the user declared synchronous, so it is
   /// not an asynchronous crossing at all.
   declaredSynchronous,
+
+  /// A crossing the user has reviewed and accepted, through the
+  /// [CdcDomainAnalysis.reviewedCrossing] hook. Safe by declaration rather
+  /// than by structure: the classifier found no protection, and the reason
+  /// the user gave travels with the crossing as [CdcCrossing.reviewReason] so
+  /// the finding stays visible as a note instead of vanishing.
+  reviewed,
 }
+
+/// Answers whether the user has reviewed and accepted a crossing, and why.
+///
+/// Called for every crossing the classifier found unprotected, with the
+/// source and destination clock names as the resolver names them and the
+/// crossing net's human name ([CdcCrossing.netName], `null` when it has
+/// none). Returns the reason the crossing was accepted, or `null` when it was
+/// not reviewed and the classifier's answer stands.
+///
+/// Open core has no source for such a declaration and leaves the hook unset.
+/// The Pro overlay answers from the `waive:` rules of its `cdc.yaml`.
+typedef CdcReviewedCrossingLookup =
+    String? Function({
+      required String sourceClock,
+      required String destClock,
+      String? netName,
+    });
 
 /// One clock-domain crossing.
 @immutable
@@ -102,6 +126,7 @@ class CdcCrossing {
     this.sourceSpan,
     this.destSpan,
     this.netName,
+    this.reviewReason,
   });
 
   /// The register whose Q drives the crossing.
@@ -140,6 +165,10 @@ class CdcCrossing {
   /// The crossing net's human name, when one exists.
   final String? netName;
 
+  /// Why the user accepted this crossing, when [syncKind] is
+  /// [CdcSyncKind.reviewed]; `null` for every other kind.
+  final String? reviewReason;
+
   /// Whether this crossing is unprotected.
   ///
   /// [CdcSyncKind.perBitSyncBus] counts as unsafe **on purpose**, and it is the
@@ -155,24 +184,27 @@ class CdcCrossing {
     CdcSyncKind.multiFlop ||
     CdcSyncKind.handshakeQualified ||
     CdcSyncKind.grayCoded ||
-    CdcSyncKind.declaredSynchronous => false,
+    CdcSyncKind.declaredSynchronous ||
+    CdcSyncKind.reviewed => false,
     CdcSyncKind.none ||
     CdcSyncKind.comboInSync ||
     CdcSyncKind.perBitSyncBus => true,
   };
 
   /// Copy with replaced fields.
-  CdcCrossing copyWith({CdcSyncKind? syncKind}) => CdcCrossing(
-    sourceRegisterPath: sourceRegisterPath,
-    destRegisterPath: destRegisterPath,
-    sourceClock: sourceClock,
-    destClock: destClock,
-    width: width,
-    syncKind: syncKind ?? this.syncKind,
-    sourceSpan: sourceSpan,
-    destSpan: destSpan,
-    netName: netName,
-  );
+  CdcCrossing copyWith({CdcSyncKind? syncKind, String? reviewReason}) =>
+      CdcCrossing(
+        sourceRegisterPath: sourceRegisterPath,
+        destRegisterPath: destRegisterPath,
+        sourceClock: sourceClock,
+        destClock: destClock,
+        width: width,
+        syncKind: syncKind ?? this.syncKind,
+        sourceSpan: sourceSpan,
+        destSpan: destSpan,
+        netName: netName,
+        reviewReason: reviewReason ?? this.reviewReason,
+      );
 
   @override
   String toString() =>
@@ -400,6 +432,7 @@ class CdcDomainAnalysis {
   const CdcDomainAnalysis({
     this.clockResolver = const LiteralCdcClockResolver(),
     this.classifier = const BasicCdcSyncClassifier(),
+    this.reviewedCrossing,
   });
 
   /// How registers are grouped into domains, and which pairs are asynchronous.
@@ -407,6 +440,20 @@ class CdcDomainAnalysis {
 
   /// How the receiving side is recognized.
   final CdcSyncClassifier classifier;
+
+  /// Which unprotected crossings the user has reviewed and accepted, or
+  /// `null` when none can be.
+  ///
+  /// Asked after the classifier, and only for a crossing it left unsafe: a
+  /// crossing that is already protected needs no acceptance, and relabelling
+  /// it would hide the more informative structural answer. A match turns the
+  /// crossing into [CdcSyncKind.reviewed] carrying the reason, so the engine
+  /// reports it as a note rather than an error and it stays in the table.
+  ///
+  /// This hook, and not the classifier, is where a review belongs: the
+  /// classifier sees registers and net bits, while a review names the two
+  /// clocks and the crossing net, which the analysis has in hand only here.
+  final CdcReviewedCrossingLookup? reviewedCrossing;
 
   /// Yosys register primitives. `$dff` family plus the async-reset variants;
   /// the sync-reset `$sdff*` family carries the same `CLK` port.
@@ -578,34 +625,51 @@ class CdcDomainAnalysis {
 
       for (final e in sourcesByRegister.entries) {
         final srcReg = registers[e.key]!;
-        crossings.add(
-          CdcCrossing(
-            sourceRegisterPath: e.key,
-            destRegisterPath: dest.path,
-            sourceClock: clockResolver.domainNameFor(
-              srcReg.domainKey,
-              netNames,
-            ),
-            destClock: clockResolver.domainNameFor(dest.domainKey, netNames),
-            width: e.value,
-            sourceSpan: srcReg.span,
-            destSpan: dest.span,
-            netName: netNameFor[e.key],
-            syncKind: classifier.classify(
-              CdcClassificationContext(
-                module: module,
-                registers: registers,
-                driverOf: driverOf,
-                combSources: combSources,
-                destination: dest,
-                source: srcReg,
-                width: e.value,
-                readersOf: readersOf,
-                portBits: portBits,
-              ),
+        var crossing = CdcCrossing(
+          sourceRegisterPath: e.key,
+          destRegisterPath: dest.path,
+          sourceClock: clockResolver.domainNameFor(
+            srcReg.domainKey,
+            netNames,
+          ),
+          destClock: clockResolver.domainNameFor(dest.domainKey, netNames),
+          width: e.value,
+          sourceSpan: srcReg.span,
+          destSpan: dest.span,
+          netName: netNameFor[e.key],
+          syncKind: classifier.classify(
+            CdcClassificationContext(
+              module: module,
+              registers: registers,
+              driverOf: driverOf,
+              combSources: combSources,
+              destination: dest,
+              source: srcReg,
+              width: e.value,
+              readersOf: readersOf,
+              portBits: portBits,
             ),
           ),
         );
+        // A review is asked about the clock and net NAMES, which exist only
+        // here, and only for a crossing the classifier left unprotected: an
+        // accepted hazard becomes a reviewed crossing, a protected one keeps
+        // the structural answer that explains it.
+        final review = reviewedCrossing;
+        if (review != null && crossing.isUnsafe) {
+          final reason = review(
+            sourceClock: crossing.sourceClock,
+            destClock: crossing.destClock,
+            netName: crossing.netName,
+          );
+          if (reason != null) {
+            crossing = crossing.copyWith(
+              syncKind: CdcSyncKind.reviewed,
+              reviewReason: reason,
+            );
+          }
+        }
+        crossings.add(crossing);
       }
     }
 

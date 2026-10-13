@@ -267,7 +267,17 @@ class CdcEngine implements LintEngine {
     );
 
     var unsafe = 0;
+    var reviewed = 0;
     for (final crossing in cdc.crossings) {
+      // A reviewed crossing is one the classifier left unprotected and the
+      // user accepted with a reason. It is reported as a note rather than
+      // dropped: a waived hazard that vanishes from the table is
+      // indistinguishable from one the analysis never saw.
+      if (crossing.syncKind == CdcSyncKind.reviewed) {
+        reviewed++;
+        yield _reviewedNoteFor(crossing, fallback);
+        continue;
+      }
       if (!crossing.isUnsafe) continue;
       unsafe++;
       yield _violationFor(crossing, fallback);
@@ -300,15 +310,80 @@ class CdcEngine implements LintEngine {
           'CDC analysed ${cdc.domains.length} clock domain(s) '
           '(${cdc.domains.map((d) => humanCdcClockName(d.clockName)).join(', ')}) '
           'and found '
-          '${cdc.crossings.length} crossing(s), $unsafe unsafe.',
+          '${cdc.crossings.length} crossing(s), $unsafe unsafe'
+          '${reviewed > 0 ? ', $reviewed reviewed' : ''}.',
       location: fallback,
       raw: <String, dynamic>{
         'domains': cdc.domains.length,
         'crossings': cdc.crossings.length,
         'unsafe': unsafe,
+        'reviewed': reviewed,
       },
     );
   }
+
+  /// The note a reviewed crossing is reported as.
+  ///
+  /// Same anchor as the finding it replaces (the destination register, the
+  /// source attached), and the same `raw` keys, so a waiver, a baseline or a
+  /// cross-probe written against the error keeps working against the note.
+  /// The reason the user gave is in the message, because that is what a
+  /// reviewer six months later needs to see without opening the constraints
+  /// file.
+  Violation _reviewedNoteFor(CdcCrossing crossing, SourceLocation fallback) {
+    final location = _toLocation(crossing.destSpan) ?? fallback;
+    final related = <SourceLocation>[
+      if (_toLocation(crossing.sourceSpan) case final SourceLocation s) s,
+    ];
+    final src = humanCdcClockName(crossing.sourceClock);
+    final dst = humanCdcClockName(crossing.destClock);
+    return Violation(
+      engineId: id,
+      ruleId: 'cdc/reviewed-crossing',
+      severity: Severity.note,
+      message:
+          '${_subjectFor(crossing)} crosses $src → $dst unsynchronized and '
+          'is a reviewed crossing, accepted with the reason: '
+          '${crossing.reviewReason}',
+      location: location,
+      relatedLocations: related,
+      raw: <String, dynamic>{
+        ..._rawFor(crossing),
+        'review_reason': crossing.reviewReason,
+      },
+    );
+  }
+
+  /// The grammatical subject for [crossing]: a named or unnamed bus for a
+  /// multi-bit crossing, a named or unnamed signal for a single bit.
+  ///
+  /// Grammar, not decoration. The placeholder used to be the bare word
+  /// `Signal`, which produced "8-bit bus Signal crosses clk_a → clk_b",
+  /// reading as though the net were called Signal. An unnamed net needs an
+  /// article, and a bus and a single bit need different ones.
+  static String _subjectFor(CdcCrossing crossing) {
+    final named = crossing.netName != null;
+    if (crossing.width > 1) {
+      return named
+          ? '${crossing.width}-bit bus `${crossing.netName}`'
+          : 'An unnamed ${crossing.width}-bit bus';
+    }
+    return named ? '`${crossing.netName}`' : 'An unnamed signal';
+  }
+
+  /// The machine-readable fields every crossing finding carries.
+  static Map<String, dynamic> _rawFor(CdcCrossing crossing) =>
+      <String, dynamic>{
+        'src_domain': crossing.sourceClock,
+        'dst_domain': crossing.destClock,
+        'width': crossing.width,
+        'sync_kind': crossing.syncKind.name,
+        'src_register': crossing.sourceRegisterPath,
+        'dst_register': crossing.destRegisterPath,
+        // `path` is the field the NetCrux cross-probe reads to highlight the
+        // crossing in the schematic.
+        if (crossing.netName case final String n) 'path': n,
+      };
 
   /// Where a finding is reported: the **destination** register.
   ///
@@ -328,15 +403,9 @@ class CdcEngine implements LintEngine {
     final related = <SourceLocation>[
       if (_toLocation(crossing.sourceSpan) case final SourceLocation s) s,
     ];
-    // Grammar, not decoration. The placeholder used to be the bare word
-    // `Signal`, which produced "8-bit bus Signal crosses clk_a → clk_b" —
-    // reading as though the net were called Signal. An unnamed net needs an
-    // article, and a bus and a single bit need different ones.
-    final named = crossing.netName != null;
-    final busSubject = named
-        ? '${crossing.width}-bit bus `${crossing.netName}`'
-        : 'An unnamed ${crossing.width}-bit bus';
-    final bitSubject = named ? '`${crossing.netName}`' : 'An unnamed signal';
+    // The per-bit and multi-bit rules below fire only for width > 1, and the
+    // single-bit rule only for width 1, so one subject serves all four arms.
+    final subject = _subjectFor(crossing);
     final src = humanCdcClockName(crossing.sourceClock);
     final dst = humanCdcClockName(crossing.destClock);
     final (ruleId, severity, message) = switch (crossing) {
@@ -359,7 +428,7 @@ class CdcEngine implements LintEngine {
       CdcCrossing(syncKind: CdcSyncKind.perBitSyncBus) => (
         'cdc/per-bit-sync-bus',
         Severity.error,
-        '$busSubject crosses $src → $dst with a separate two-flop '
+        '$subject crosses $src → $dst with a separate two-flop '
             'synchronizer per bit. Each bit is safe; the bus is not — bits '
             'can resolve in different cycles and the receiver sees a value '
             'that never existed. Use a handshake or an async FIFO.',
@@ -372,14 +441,14 @@ class CdcEngine implements LintEngine {
       CdcCrossing(width: final w) when w > 1 => (
         'cdc/unsync-multi-bit',
         Severity.error,
-        '$busSubject crosses $src → $dst with no synchronizer. The '
+        '$subject crosses $src → $dst with no synchronizer. The '
             'destination can latch a mix of old and new bits — a value never '
             'present in the source domain.',
       ),
       _ => (
         'cdc/unsync-single-bit',
         Severity.warning,
-        '$bitSubject crosses $src → $dst with no synchronizer; the '
+        '$subject crosses $src → $dst with no synchronizer; the '
             'destination flop can go metastable.',
       ),
     };
@@ -391,17 +460,7 @@ class CdcEngine implements LintEngine {
       message: message,
       location: location,
       relatedLocations: related,
-      raw: <String, dynamic>{
-        'src_domain': crossing.sourceClock,
-        'dst_domain': crossing.destClock,
-        'width': crossing.width,
-        'sync_kind': crossing.syncKind.name,
-        'src_register': crossing.sourceRegisterPath,
-        'dst_register': crossing.destRegisterPath,
-        // `path` is the field the NetCrux cross-probe reads to highlight the
-        // crossing in the schematic.
-        if (crossing.netName case final String n) 'path': n,
-      },
+      raw: _rawFor(crossing),
     );
   }
 
