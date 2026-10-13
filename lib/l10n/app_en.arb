@@ -2413,5 +2413,9 @@
   "bookmarkRemovedUndoLabel": "Undo",
   "@bookmarkRemovedUndoLabel": {
     "description": "Snackbar action label for restoring a just-removed bookmark."
+  },
+  "fileWatcherIgnore": "Ignore",
+  "@fileWatcherIgnore": {
+    "description": "Button on the source-changed prompt that dismisses it without re-running. Same key and meaning as WaveCrux."
   }
 }

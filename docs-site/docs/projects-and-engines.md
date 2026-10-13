@@ -138,7 +138,7 @@ Engines rename and retire rules between releases. LintCrux carries a rule-alias 
 
 `Settings → General` has an **Auto-reload on source change** setting that decides what happens when you save a source file of an open project:
 
-- **Prompt me first** (the default) — a snackbar says the source files changed and offers **Re-run now**, which runs the tab's engines.
+- **Prompt me first** (the default) — a notice says the source files changed and offers **Re-run now**, which runs the tab's engines. From 1.1 it is a banner across the top with **Ignore** and **Re-run now**, which stays until you choose; **Ignore** dismisses it without running anything.
 - **Re-run automatically** — the engines re-run shortly after the save, re-linting only the changed files where an engine supports it.
 - **Do nothing** — no files are watched; re-run with ++f5++ or the toolbar run button.
 

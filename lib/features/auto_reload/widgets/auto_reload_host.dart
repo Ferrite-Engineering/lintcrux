@@ -35,45 +35,35 @@ class AutoReloadHost extends ConsumerStatefulWidget {
 }
 
 class _AutoReloadHostState extends ConsumerState<AutoReloadHost> {
-  bool _promptShowing = false;
-
   @override
   Widget build(BuildContext context) {
     ref
       ..watch(autoReloadControllerProvider)
       ..listen<bool>(pendingReloadProvider, (_, pending) {
-        if (pending && !_promptShowing) _showPrompt();
+        if (pending) _showPrompt();
       });
     return widget.child;
   }
 
+  /// The suite's source-changed prompt, the same banner in every product. It
+  /// stays until the user chooses, and asks once however many changes land
+  /// while it is up.
   void _showPrompt() {
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    if (messenger == null) return;
     final l10n = L10N.of(context);
-    _promptShowing = true;
-    announceCrux(context, l10n.autoReloadPromptMessage);
-    final controller = messenger.showSnackBar(
-      SnackBar(
-        content: Text(l10n.autoReloadPromptMessage),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 8),
-        action: SnackBarAction(
-          label: l10n.autoReloadActionRerun,
-          onPressed: () {
-            final project = ref.read(currentProjectProvider);
-            if (project == null) return;
-            unawaited(ref.read(lintRunProvider.notifier).runAll(project));
-          },
-        ),
-      ),
-    );
-    unawaited(
-      controller.closed.whenComplete(() {
-        _promptShowing = false;
-        if (!mounted) return;
+    void settle() =>
         ref.read(pendingReloadProvider.notifier).markPending(pending: false);
-      }),
+    showCruxReloadPrompt(
+      context,
+      message: l10n.autoReloadPromptMessage,
+      reloadLabel: l10n.autoReloadActionRerun,
+      ignoreLabel: l10n.fileWatcherIgnore,
+      onReload: () {
+        settle();
+        final project = ref.read(currentProjectProvider);
+        if (project == null) return;
+        unawaited(ref.read(lintRunProvider.notifier).runAll(project));
+      },
+      onIgnore: settle,
     );
   }
 }

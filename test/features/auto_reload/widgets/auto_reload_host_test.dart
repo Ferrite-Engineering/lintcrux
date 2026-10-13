@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:crux_settings/crux_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -110,7 +111,7 @@ void main() {
     final container = await pump(tester);
     watch.modify('/proj/a.sv');
     await settleWatch(tester);
-    // Let the snack bar finish sliding in before tapping its action.
+    // Let the banner finish sliding in before tapping its action.
     await tester.pump(const Duration(seconds: 1));
 
     final l10n = L10N.of(tester.element(find.byType(AutoReloadHost)));
@@ -121,6 +122,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(container.read(lintRunProvider).runFinishedAt, isNotNull);
     expect(container.read(pendingReloadProvider), isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('prompt mode can be declined: Ignore closes it and runs '
+      'nothing', (tester) async {
+    // The prompt used to be a snack bar whose only button was Re-run, which
+    // never timed out and could not be declined.
+    final container = await pump(tester);
+    watch.modify('/proj/a.sv');
+    await settleWatch(tester);
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.byKey(kCruxReloadPromptKey), findsOneWidget);
+    expect(find.byType(SnackBar), findsNothing);
+
+    await tester.tap(find.byKey(kCruxReloadPromptIgnoreKey));
+    await tester.pumpAndSettle();
+    expect(find.byKey(kCruxReloadPromptKey), findsNothing);
+    expect(container.read(pendingReloadProvider), isFalse);
+    expect(container.read(lintRunProvider).runFinishedAt, isNull);
     expect(tester.takeException(), isNull);
   });
 
