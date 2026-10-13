@@ -91,5 +91,7 @@ The first launch shows a one-time disclosure with a **Send anonymous usage stati
 
 What is sent: feature, engine and error counters, app and OS version, form factor, language, and license tier — never file names, rule identifiers, or the text of any lint or error message. An error the desktop app did not handle is counted by its kind alone (for example, a state error in the widgets library), never with its message or stack trace. The headless `lintcrux` binary never asks; it sends only on a machine where the desktop app has stored an affirmative answer.
 
+`Settings → Privacy` also shows the **Installation ID**, the random identifier attached to what is sent, with a **Copy** button for asking support to delete this installation's data. The ID appears only after usage statistics have been turned on; until then the row says there is none, and opening Settings does not create one.
+
 !!! note "Next steps"
     With a run on screen, take the tour of [the interface](interface.md), learn the details of [projects & engines](projects-and-engines.md), and then dig into [the violations dashboard](violations.md) to start triaging in earnest.

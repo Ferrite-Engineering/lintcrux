@@ -2249,6 +2249,10 @@
   "@settingsTelemetryInstallationIdCopied": {
     "description": "Confirmation shown after the installation id is copied."
   },
+  "settingsTelemetryInstallationIdNone": "No installation ID. One is created only when usage statistics are turned on.",
+  "@settingsTelemetryInstallationIdNone": {
+    "description": "Shown in the installation ID row of Settings > Privacy while no installation ID exists: one is created only once the user turns usage statistics on."
+  },
   "bookmarkColumnHeaderTooltip": "Bookmarks",
   "@bookmarkColumnHeaderTooltip": {
     "description": "Tooltip on the bookmark column's header icon in the violations table. The column itself has no label — it is identified by the icon."
