@@ -206,7 +206,7 @@ LintcruxActionDescriptor descriptorFor(LintcruxAction action) =>
       // ── Pane management ─────────────────────────────────────────────
       LintcruxAction.splitPaneRight => const LintcruxActionDescriptor(
         surfaces: _menuPalette,
-        isEnabled: _requiresTabSinglePane,
+        isEnabled: _canSplitPane,
       ),
       LintcruxAction.closePane ||
       LintcruxAction.focusOtherPane => const LintcruxActionDescriptor(
@@ -294,8 +294,13 @@ bool _requiresSelectedViolation(LintcruxActionContext c) =>
 bool _requiresRunInProgress(LintcruxActionContext c) => c.runInProgress;
 bool _canStartRun(LintcruxActionContext c) => c.hasProject && !c.runInProgress;
 bool _requiresMultiPane(LintcruxActionContext c) => c.paneCount >= 2;
-bool _requiresTabSinglePane(LintcruxActionContext c) =>
-    c.hasOpenTab && c.paneCount == 1;
+// Split Pane Right moves the active tab into the new pane, and
+// `crux_workspace` refuses a split that would leave a pane empty: with a
+// single tab it changes nothing. So the action is offered only when the
+// active pane holds a second tab to stay behind, which is exactly
+// `Workspace.canSplitPaneRight`.
+bool _canSplitPane(LintcruxActionContext c) =>
+    c.hasOpenTab && c.paneCount == 1 && c.tabCountInActivePane >= 2;
 bool _requiresTabMultiPane(LintcruxActionContext c) =>
     c.hasOpenTab && c.paneCount >= 2;
 bool _requiresMultipleTabs(LintcruxActionContext c) =>

@@ -135,12 +135,13 @@ class FilterPresetDropdown extends ConsumerWidget {
       context: context,
       builder: (_) => const _FilterPresetSaveDialog(),
     );
-    if (name == null || name.isEmpty) return;
+    // The dropdown may be gone by the time the dialog closes (the tab
+    // closed, the dashboard re-laid out); its ref is gone with it.
+    if (name == null || name.isEmpty || !context.mounted) return;
     final preset = ref.read(violationTableStateProvider).toPreset(name);
     final notifier = ref.read(savedFilterPresetsProvider.notifier)
       ..save(preset)
       ..activate(name);
-    if (!context.mounted) return;
     await reportPresetWriteFailure(context, notifier.persisted);
   }
 

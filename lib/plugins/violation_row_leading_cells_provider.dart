@@ -71,7 +71,7 @@ class ViolationRowLeadingCell {
   /// width-only checkbox cell on the open-core row (32 dp). Pro
   /// bookmark cells typically reserve 32 dp — enough room for a
   /// 24 dp icon with 4 dp padding on either side, fitting the
-  /// existing `kViolationRowHeight` (28 dp) row.
+  /// existing `kCruxTableRowHeight` (28 dp) row.
   final double width;
 
   /// Renders the per-row body cell. Called once per visible row in

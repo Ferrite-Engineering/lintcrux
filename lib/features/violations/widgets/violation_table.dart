@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:crux_ide_layout/crux_ide_layout.dart';
+import 'package:crux_table/crux_table.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
@@ -30,7 +31,7 @@ import 'package:lintcrux/services/violations/violation_store_provider.dart';
 ///   `visibleViolationsProvider`.
 /// - [ViolationTableHeader] cycles sort columns.
 /// - The `ListView.builder` is the virtualized list of
-///   [ViolationTableRow]s with a stable [kViolationRowHeight].
+///   [ViolationTableRow]s with a stable [kCruxTableRowHeight].
 ///
 /// The table carries **no footer summary**. It used to end in a
 /// `ViolationStatusBar` rendering `violationStatusSummary` over
@@ -40,7 +41,7 @@ import 'package:lintcrux/services/violations/violation_store_provider.dart';
 /// so the window-bottom bar (which is the suite-wide surface) is the survivor.
 ///
 /// 50,000-row sets remain interactive because each row is a fixed-
-/// height widget and the list uses `itemExtent: kViolationRowHeight`
+/// height widget and the list uses `itemExtent: kCruxTableRowHeight`
 /// so the framework knows the offset of any index in O(1).
 ///
 /// The rows are one Tab stop ([ViolationRowFocus]): Up, Down, Home and End
@@ -53,7 +54,7 @@ class ViolationTable extends ConsumerStatefulWidget {
   /// Minimum height always reserved for the virtualized list below the
   /// header chrome — three rows, enough to keep the table recognizably
   /// a table even in a heavily squeezed pane.
-  static const double _minListHeight = kViolationRowHeight * 3;
+  static const double _minListHeight = kCruxTableRowHeight * 3;
 
   @override
   ConsumerState<ViolationTable> createState() => _ViolationTableState();
@@ -63,7 +64,7 @@ class _ViolationTableState extends ConsumerState<ViolationTable> {
   final ScrollController _scroll = ScrollController();
   late final ViolationRowFocus _rowFocus = ViolationRowFocus(
     scrollController: _scroll,
-    rowExtent: kViolationRowHeight,
+    rowExtent: kCruxTableRowHeight,
   );
 
   @override
@@ -146,7 +147,7 @@ class _ViolationTableState extends ConsumerState<ViolationTable> {
                       label: l10n.accessibilityViolationTableKeyboardHint,
                       child: ListView.builder(
                         controller: _scroll,
-                        itemExtent: kViolationRowHeight,
+                        itemExtent: kCruxTableRowHeight,
                         itemCount: visible.length,
                         itemBuilder: (context, i) => ViolationTableRow(
                           key: ValueKey(visible[i]),

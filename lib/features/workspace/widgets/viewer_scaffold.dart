@@ -173,23 +173,26 @@ class ViewerScaffold extends ConsumerWidget {
     final opener = ref.read(openProjectInWorkspaceProvider)(
       WorkspaceRoot.of(context).tabs.containerFor,
     );
+    // Read before the await: both live in the root container and outlive
+    // this widget, and the open may unmount it (a welcome screen's recent
+    // list is replaced by the viewer it opens).
+    final recents = ref.read(recentProjectsListProvider.notifier);
+    final telemetry = ref.read(telemetryServiceProvider);
     final result = await opener.openProject(path);
     if (result is OpenProjectFailure) {
       // A recent entry whose file no longer opens is dropped, so the list
       // does not keep offering it.
-      ref.read(recentProjectsListProvider.notifier).remove(path);
+      recents.remove(path);
     } else {
       // The third `project.opened` telemetry source.
-      ref
-          .read(telemetryServiceProvider)
-          .record(
-            TelemetryEvent(
-              'project.opened',
-              properties: <String, Object?>{
-                'source': telemetryEnumToken(ProjectOpenSource.recent),
-              },
-            ),
-          );
+      telemetry.record(
+        TelemetryEvent(
+          'project.opened',
+          properties: <String, Object?>{
+            'source': telemetryEnumToken(ProjectOpenSource.recent),
+          },
+        ),
+      );
     }
     if (!context.mounted) return;
     if (result is OpenProjectFailure) {

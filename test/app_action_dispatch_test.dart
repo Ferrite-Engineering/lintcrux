@@ -257,12 +257,16 @@ void main() {
       },
     ),
     LintcruxAction.splitPaneRight: _DispatchCase(
-      'splits the workspace into two panes',
+      'leaves the single pane alone on an empty workspace',
       (tester) async {
+        // `crux_workspace` never opens an empty pane: with no tab to move
+        // right the split is refused, silently, and the action itself is
+        // disabled until the active pane holds two tabs.
         final workspace = rootContainer(
           tester,
         ).read(workspaceProvider).value;
-        expect(workspace?.panes.length, 2);
+        expect(workspace?.panes.length, 1);
+        expect(find.byType(SnackBar), findsNothing);
       },
     ),
     LintcruxAction.closePane: noopOnEmptyWorkspace,

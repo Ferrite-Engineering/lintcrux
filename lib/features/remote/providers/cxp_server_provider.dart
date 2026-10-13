@@ -127,7 +127,7 @@ final Provider<LintCruxCxpRequestHandler> cxpRequestHandlerProvider =
         // workspace, not a per-tab. It keeps the roots — nobody asked for
         // this design; a peer attached its id to a cross-probe.
         resolveAndOpenArtifact: (designId) async {
-          final path = resolveLintcruxSourceArtifactPath(ref, designId);
+          final path = await resolveLintcruxSourceArtifactPath(ref, designId);
           if (path == null) return false;
           // CXP §11's MUST: the artifact resolved through our OWN records
           // gets the same rule as a `file_path` on the wire, applied to the
@@ -150,7 +150,7 @@ final Provider<LintCruxCxpRequestHandler> cxpRequestHandlerProvider =
         // (CXP §9.10).
         openRequestedArtifact: (designId, hintPath) async {
           final path =
-              resolveOpenArtifactProjectPath(ref, designId) ?? hintPath;
+              await resolveOpenArtifactProjectPath(ref, designId) ?? hintPath;
           if (path == null) {
             return (
               honored: false,

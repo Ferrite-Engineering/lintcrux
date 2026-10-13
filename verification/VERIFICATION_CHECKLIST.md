@@ -326,7 +326,7 @@ See `VERIFICATION_GUIDE.md` §17.
 - [ ] `BETA_EXPIRY` 3 days out → dismissible strip with the correct day count (check the 1-day plural too) — `[Coverage: WIDGET]` (`crux-shared/packages/crux_license/test/beta_expiry_banner_test.dart`) + `[Coverage: MANUAL]`
 - [ ] The strip's **Download** opens the same download page the update banner uses — `[Coverage: WIDGET]` (`test/features/beta_expiry/widgets/beta_expiry_gate_test.dart`)
 - [ ] Dismissing the strip hides it for the session; resume brings it back — `[Coverage: WIDGET]` (dismissal), `[Coverage: MANUAL]` (resume)
-- [ ] `BETA_EXPIRY` in the past → blocking modal; content behind is non-interactive; back gesture / Escape does not dismiss — `[Coverage: WIDGET]` (`test/features/beta_expiry/widgets/beta_expiry_blocking_overlay_test.dart`) + `[Coverage: MANUAL]`
+- [ ] `BETA_EXPIRY` in the past → blocking modal; content behind is non-interactive; back gesture / Escape does not dismiss — `[Coverage: WIDGET]` (`test/features/beta_expiry/widgets/beta_expiry_gate_test.dart`, the expired cases; the modal itself is `crux_license`'s `CruxBetaExpiredOverlay`) + `[Coverage: MANUAL]`
 - [ ] **Quit LintCrux** actually terminates the process — the only way out on Windows / Linux, where the window close button is behind the barrier — `[Coverage: MANUAL]`
 - [ ] The expiry banner renders with no `Overlay` ancestor (no `Tooltip` — a regression here red-screens every launch in the warning window) — `[Coverage: WIDGET]` (`crux-shared/packages/crux_license/test/beta_expiry_banner_test.dart`)
 - [ ] Invalid dates (`20261301`, `20260230`, negative, pre-2000) resolve to "never expires" — `[Coverage: UNIT]` (`crux-shared/packages/crux_license/test/beta_expiry_test.dart`)

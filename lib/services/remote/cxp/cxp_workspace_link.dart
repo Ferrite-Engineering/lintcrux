@@ -5,6 +5,7 @@ import 'package:crux_cxp/crux_cxp.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
+import 'package:lintcrux/services/project/openable_project_path.dart';
 import 'package:lintcrux/services/remote/cxp/cxp_outbound.dart';
 import 'package:lintcrux/services/remote/cxp/cxp_project_open_handle.dart';
 import 'package:lintcrux/services/workspace/active_tab_container_handle.dart';
@@ -195,28 +196,36 @@ Future<void> publishLintcruxProjectArtifact(
 /// [designId], preferring an exact `design_id`+kind match and falling back to
 /// the descriptive [topModule] / [basename] hints.
 ///
-/// Returns the absolute path to open (a `.lintcrux` project file), or null when
-/// the design has no `source` artifact recorded. The caller opens it through
-/// LintCrux's ordinary `OpenProjectInWorkspace.openProject` path.
+/// Returns the absolute path to open (a `.lintcrux` project file or a design
+/// manifest), or null when the design has no `source` artifact LintCrux can
+/// open. The caller opens it through LintCrux's ordinary
+/// `OpenProjectInWorkspace.openProject` path.
 ///
 /// Reads through [cxpWorkspaceStoreProvider], so a record outside the
 /// directories the user has opened resolves to null: this is the
 /// `crux.design_id` fallback's resolution. `request_open_artifact` uses
 /// [resolveOpenArtifactProjectPath].
-String? resolveLintcruxSourceArtifactPath(
+///
+/// Only records whose path [isOpenableProjectPath] admits are considered:
+/// every product publishes the kind `source`, and without the filter the
+/// newest record won, whichever product wrote it. The read is the store's
+/// asynchronous one, so the document read and the per-record existence
+/// checks never block the isolate the server runs on.
+Future<String?> resolveLintcruxSourceArtifactPath(
   Ref ref,
   String designId, {
   String? topModule,
   String? basename,
-}) {
+}) async {
   if (designId.isEmpty) return null;
-  final artifact = ref
+  final artifact = await ref
       .read(cxpWorkspaceStoreProvider)
-      .resolveArtifact(
+      .resolveArtifactAsync(
         designId,
         kCxpLintcruxSourceKind,
         topModule: topModule,
         basename: basename,
+        accepts: isOpenableProjectPath,
       );
   return artifact?.path;
 }
@@ -233,13 +242,22 @@ String? resolveLintcruxSourceArtifactPath(
 /// directory costs nothing.
 ///
 /// Returns the absolute path LintCrux should open, or null when the design
-/// has no `source` artifact recorded.
-String? resolveOpenArtifactProjectPath(Ref ref, String designId) {
+/// has no `source` artifact LintCrux can open ([isOpenableProjectPath]).
+Future<String?> resolveOpenArtifactProjectPath(
+  Ref ref,
+  String designId,
+) async {
   if (designId.isEmpty) return null;
   final store = ref.read(cxpWorkspaceStoreProvider);
-  return CxpWorkspaceStore(
-    workspaceDirectory: store.workspaceDirectory,
-    ttl: store.ttl,
-    containment: kCxpOpenArtifactContainment,
-  ).resolveArtifact(designId, kCxpLintcruxSourceKind)?.path;
+  final artifact =
+      await CxpWorkspaceStore(
+        workspaceDirectory: store.workspaceDirectory,
+        ttl: store.ttl,
+        containment: kCxpOpenArtifactContainment,
+      ).resolveArtifactAsync(
+        designId,
+        kCxpLintcruxSourceKind,
+        accepts: isOpenableProjectPath,
+      );
+  return artifact?.path;
 }

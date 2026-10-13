@@ -27,7 +27,7 @@ LintCrux does not evaluate text-level lint rules itself. It orchestrates existin
 
 ### 2.3 Rendering
 
-Standard Flutter widget tree. The centerpiece is the virtualized violation table (`ListView.builder`, stable 28 px rows via `kViolationRowHeight`, comfortable at 50K+ violations) — no `CustomPainter` is required for the current surfaces. The Pro trend charts and calendar heatmap render through the standard widget tree.
+Standard Flutter widget tree. The centerpiece is the virtualized violation table (`ListView.builder`, stable 28 px rows via `crux_table`'s `kCruxTableRowHeight`, comfortable at 50K+ violations) — no `CustomPainter` is required for the current surfaces. The Pro trend charts and calendar heatmap render through the standard widget tree.
 
 ### 2.4 Panel Layout
 

@@ -111,15 +111,42 @@ void main() {
     final container = buildContainer(service);
     await container.read(workspaceProvider.future);
     final notifier = container.read(workspaceProvider.notifier);
+    // Two tabs: the split moves the active one right and the other stays,
+    // so neither pane is empty.
     await notifier.openTab(
       displayName: 'a',
       payload: const LintcruxTabPayload(projectPath: '/p/a.lintcrux'),
+    );
+    await notifier.openTab(
+      displayName: 'b',
+      payload: const LintcruxTabPayload(projectPath: '/p/b.lintcrux'),
     );
     final newPane = await notifier.splitPaneRight();
     final ws = container.read(workspaceProvider).requireValue;
     expect(ws.panes.length, 2);
     expect(ws.activePaneId, equals(newPane));
   });
+
+  test(
+    'splitPaneRight with a single tab leaves the workspace as it was',
+    () async {
+      final service = buildService();
+      final container = buildContainer(service);
+      await container.read(workspaceProvider.future);
+      final notifier = container.read(workspaceProvider.notifier);
+      await notifier.openTab(
+        displayName: 'a',
+        payload: const LintcruxTabPayload(projectPath: '/p/a.lintcrux'),
+      );
+      final before = container.read(workspaceProvider).requireValue;
+      expect(before.canSplitPaneRight, isFalse);
+      final pane = await notifier.splitPaneRight();
+      final ws = container.read(workspaceProvider).requireValue;
+      // An empty pane never exists: the active pane id comes back unchanged.
+      expect(ws.panes.length, 1);
+      expect(pane, equals(before.activePaneId));
+    },
+  );
 
   test('payload mutation via updateTabPayload is reflected in state', () async {
     final service = buildService();

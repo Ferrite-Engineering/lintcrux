@@ -10,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/core/help_urls.dart';
 import 'package:lintcrux/features/beta_expiry/beta_expiry_metrics.dart';
 import 'package:lintcrux/features/beta_expiry/lintcrux_beta_expiry_strings.dart';
-import 'package:lintcrux/features/beta_expiry/widgets/beta_expiry_blocking_overlay.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -35,7 +34,9 @@ void Function() betaExpiryExitApp = () => exit(0);
 /// * [BetaExpiryStatus.expiringSoon] → a dismissible `CruxBetaExpiryBanner` above
 ///   [child].
 /// * [BetaExpiryStatus.expired] → the blocking, non-dismissable
-///   [BetaExpiryBlockingOverlay] over [child].
+///   [CruxBetaExpiredOverlay] over [child]: the app behind it is covered by
+///   a barrier and taken out of focus and semantics, so Tab and a screen
+///   reader stay inside the modal.
 /// * [BetaExpiryStatus.active] / [BetaExpiryStatus.notApplicable] → [child]
 ///   unchanged. That is the common case and covers every developer build and
 ///   every post-beta build, where `kBetaExpiry` is `null`.
@@ -109,9 +110,15 @@ class _BetaExpiryGateState extends ConsumerState<BetaExpiryGate>
 
     switch (status) {
       case BetaExpiryStatus.expired:
-        return BetaExpiryBlockingOverlay(
+        return CruxBetaExpiredOverlay(
           onDownload: _download,
           onQuit: betaExpiryExitApp,
+          strings: LintcruxBetaExpiredStrings(L10N.of(context)),
+          // The same 13 pt body the banner below uses, so the two
+          // beta-expiry surfaces keep rendering as LintCrux's own did.
+          sizing: const CruxBetaExpirySizing(
+            bodyTextSize: BetaExpiryMetrics.bodyText,
+          ),
           child: widget.child,
         );
       case BetaExpiryStatus.expiringSoon:

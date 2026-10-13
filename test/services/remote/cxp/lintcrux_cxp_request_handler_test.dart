@@ -446,7 +446,7 @@ void main() {
   group('Messages that are not requests draw no reply (CXP §6.1, §9)', () {
     // A selection notification is informational; an ack and an error
     // response are themselves replies. Answering any of them with
-    // `unsupported` was protocol noise, and §9.8 forbids replying to an
+    // `unsupported` was protocol noise, and CXP §9.8 forbids replying to an
     // error response outright: two peers answering each other's errors
     // would never stop.
     final silent = <String, CxpMessage>{

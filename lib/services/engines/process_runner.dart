@@ -1,13 +1,15 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:crux_io/crux_io.dart';
+import 'package:crux_io/crux_io.dart' hide collectProcessOutput;
+import 'package:crux_io/crux_io.dart' as shared show collectProcessOutput;
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/services/engines/clean_engine_environment.dart';
+
+export 'package:crux_io/crux_io.dart' show CapturedProcessOutput;
 
 /// Subprocess abstraction used by [LintEngine] implementations.
 ///
@@ -149,26 +151,8 @@ class _SystemLintProcess implements LintProcess {
 /// comes into play. It bounds one case: a child the engine spawned outlives
 /// it and still holds the inherited pipes open. Waiting on those without a
 /// bound would hang the run, and a cancel of the run, until that child exits.
-const Duration kEngineOutputDrainGrace = Duration(seconds: 5);
-
-/// Everything one engine subprocess wrote, and how it exited.
-class CapturedProcessOutput {
-  /// Creates a [CapturedProcessOutput].
-  const CapturedProcessOutput({
-    required this.exitCode,
-    required this.stdout,
-    required this.stderr,
-  });
-
-  /// The process exit code.
-  final int exitCode;
-
-  /// Every stdout line, in order, through end-of-file.
-  final List<String> stdout;
-
-  /// Every stderr line, in order, through end-of-file.
-  final List<String> stderr;
-}
+/// The suite's value, from `crux_io`.
+const Duration kEngineOutputDrainGrace = kProcessOutputDrainGrace;
 
 /// Reads [process] to completion: its exit code AND all of its output.
 ///
@@ -179,8 +163,12 @@ class CapturedProcessOutput {
 /// engine that loses its output reports a clean run. So this waits for BOTH
 /// streams to end, not for the exit.
 ///
-/// Both streams are subscribed before the exit is awaited, so a chatty child
-/// can never stall on a full pipe.
+/// The read itself is `crux_io`'s `collectProcessOutput`, the one subprocess
+/// drain the suite shares: both streams are subscribed before the exit is
+/// awaited, so a chatty child can never stall on a full pipe. This wrapper
+/// keeps the lint adapters' signature and turns the shared package's
+/// [ProcessOutputIncompleteException] into the [EngineRunFailedException] the
+/// engines and the headless runner already report.
 ///
 /// Throws [EngineRunFailedException] for [engineId] rather than returning
 /// output it cannot vouch for: when a stream is still open [drainGrace] after
@@ -193,85 +181,28 @@ Future<CapturedProcessOutput> collectProcessOutput(
   required String executable,
   Duration drainGrace = kEngineOutputDrainGrace,
 }) async {
-  final stdout = _LineDrain(process.stdout);
-  final stderr = _LineDrain(process.stderr);
   try {
-    final exitCode = await process.exitCode;
-    final drained = await Future.wait(<Future<void>>[
-      stdout.done,
-      stderr.done,
-    ]).then((_) => true).timeout(drainGrace, onTimeout: () => false);
-
-    List<String> excerpt() => <String>[
-      ...stdout.lines,
-      ...stderr.lines,
-    ].where((l) => l.trim().isNotEmpty).take(10).toList(growable: false);
-
-    if (!drained) {
-      final grace = drainGrace.inSeconds >= 1
-          ? '${drainGrace.inSeconds} s'
-          : '${drainGrace.inMilliseconds} ms';
-      throw EngineRunFailedException(
-        engineId: engineId,
-        exitCode: exitCode,
-        reason:
-            'exited $exitCode but its output was still open $grace later, '
-            'so its findings may be incomplete',
-        outputExcerpt: excerpt(),
-        resolvedPath: executable,
-      );
-    }
-    final readError = stdout.error ?? stderr.error;
-    if (readError != null) {
-      throw EngineRunFailedException(
-        engineId: engineId,
-        exitCode: exitCode,
-        reason:
-            'exited $exitCode but reading its output failed '
-            '($readError), so its findings may be incomplete',
-        outputExcerpt: excerpt(),
-        resolvedPath: executable,
-      );
-    }
-    return CapturedProcessOutput(
-      exitCode: exitCode,
-      stdout: stdout.lines,
-      stderr: stderr.lines,
+    return await shared.collectProcessOutput(
+      stdout: process.stdout,
+      stderr: process.stderr,
+      exitCode: process.exitCode,
+      drainGrace: drainGrace,
     );
-  } finally {
-    // A no-op for a stream that ended; releases one that outlived the grace.
-    await stdout.cancel();
-    await stderr.cancel();
-  }
-}
-
-/// One output stream read to its end.
-class _LineDrain {
-  _LineDrain(Stream<String> stream) {
-    _subscription = stream.listen(
-      lines.add,
-      onError: (Object e, StackTrace _) {
-        error ??= e;
-        _finish();
+  } on ProcessOutputIncompleteException catch (e) {
+    throw EngineRunFailedException(
+      engineId: engineId,
+      exitCode: e.exitCode,
+      reason: switch (e.loss) {
+        ProcessOutputLoss.streamStillOpen =>
+          'exited ${e.exitCode} but its output was still open '
+              '${ProcessOutputIncompleteException.formatDrainGrace(e.drainGrace)} '
+              'later, so its findings may be incomplete',
+        ProcessOutputLoss.readFailed =>
+          'exited ${e.exitCode} but reading its output failed '
+              '(${e.readError}), so its findings may be incomplete',
       },
-      onDone: _finish,
-      cancelOnError: true,
+      outputExcerpt: e.excerpt,
+      resolvedPath: executable,
     );
   }
-
-  final List<String> lines = <String>[];
-  final Completer<void> _done = Completer<void>();
-  late final StreamSubscription<String> _subscription;
-
-  /// The first read error, if the stream failed rather than ended.
-  Object? error;
-
-  /// Completes when the stream has ended, cleanly or with an error.
-  Future<void> get done => _done.future;
-
-  void _finish() {
-    if (!_done.isCompleted) _done.complete();
-  }
-
-  Future<void> cancel() => _subscription.cancel();
 }

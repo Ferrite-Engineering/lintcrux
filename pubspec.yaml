@@ -151,6 +151,12 @@ dependencies:
   # chrome so LintCrux gains a window-bottom bar matching WaveCrux.
   crux_status_bar:
     path: ./crux-shared/packages/crux_status_bar
+  # The shared table model behind the violation table: weighted, resizable,
+  # persisted column widths, the sortable header and the body cell. LintCrux
+  # keeps its column enum, default weights, preference key and row widget;
+  # the layout model, codec, providers and header chrome are the suite's.
+  crux_table:
+    path: ./crux-shared/packages/crux_table
   # Cross-suite anonymous usage-statistics pipeline: the
   # event model, the disk queue, the coalescing batcher, the never-throwing
   # ingest client, the beta × dev × consent gate, and both consent surfaces.
@@ -295,6 +301,11 @@ dev_dependencies:
   # `CruxAuditRecorder`, so the runtime dependency stays where the binding is.
   crux_audit:
     path: ./crux-shared/packages/crux_audit
+  # The suite's static-guard scanners (outline-token text, unused l10n keys,
+  # Ref after an await), run by thin tests under `test/static/` with this
+  # repository's own file list and exemptions.
+  crux_guards:
+    path: ./crux-shared/packages/crux_guards
   flutter_test:
     sdk: flutter
   integration_test:

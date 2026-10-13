@@ -58,8 +58,10 @@ void main() {
     );
   });
 
-  /// The exemption is asserted, not just declared: if the seam stops reading
-  /// the process itself, it no longer needs one.
+  /// The exemption is asserted, not just declared: the seam is where the
+  /// process's streams and exit code are handed to `crux_io`'s shared drain,
+  /// which is the one read-to-end-of-file in the suite. If the seam stops
+  /// doing that, it no longer needs an exemption.
   test('the seam is still the one place that reads a subprocess', () {
     final seam = File(p.join('lib', 'services', 'engines', _seam));
     expect(seam.existsSync(), isTrue, reason: '$_seam must exist');
@@ -68,7 +70,27 @@ void main() {
       source,
       contains('Future<CapturedProcessOutput> collectProcessOutput('),
     );
-    expect(_directReads.first.hasMatch(source), isTrue);
+    expect(
+      source,
+      contains('shared.collectProcessOutput('),
+      reason:
+          'The seam reads the process through crux_io, which subscribes to '
+          'both streams before awaiting the exit and waits for end-of-file.',
+    );
+    for (final handed in const [
+      'stdout: process.stdout',
+      'stderr: process.stderr',
+      'exitCode: process.exitCode',
+    ]) {
+      expect(source, contains(handed));
+    }
+    expect(
+      source,
+      contains('on ProcessOutputIncompleteException'),
+      reason:
+          'Incomplete output must become an EngineRunFailedException, not a '
+          'clean-looking result.',
+    );
   });
 }
 

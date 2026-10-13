@@ -757,7 +757,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       confirmButtonText: l10n.filePickerOpenProjectButton,
       typeLabel: l10n.filePickerTypeProjectLabel,
     );
-    if (path == null) return;
+    if (path == null || !mounted) return;
     final opener = ref.read(openProjectInWorkspaceProvider)(tabsForId);
     final result = await opener.openProject(path);
     if (ctx.mounted) showOpenProjectOutcome(ctx, result);
@@ -1384,7 +1384,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       body: (l10n) => l10n.workspaceResetConfirmBody,
       confirmLabel: (l10n) => l10n.workspaceResetConfirmAction,
     );
-    if (!confirmed) return false;
+    if (!confirmed || !mounted) return false;
     await ref.read(workspaceProvider.notifier).resetWorkspace();
     return true;
   }
@@ -1412,7 +1412,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       body: (l10n) => l10n.closeAllTabsConfirmBody,
       confirmLabel: (l10n) => l10n.closeAllTabsConfirmConfirm,
     );
-    if (!confirmed) return;
+    if (!confirmed || !mounted) return;
     final workspace = ref.read(workspaceProvider).value;
     if (workspace == null) return;
     final notifier = ref.read(workspaceProvider.notifier);
@@ -1469,7 +1469,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       confirmButtonText: l10n.filePickerOpenSessionButton,
       typeLabel: l10n.filePickerTypeSessionLabel,
     );
-    if (path == null) return;
+    if (path == null || !mounted) return;
     final opener = ref.read(openProjectInWorkspaceProvider)(tabsForId);
     // The welcome screen's Open Session reports a failure; this one, reached
     // from the menu, the palette and the shortcut, dropped it.
@@ -1493,7 +1493,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       confirmButtonText: l10n.filePickerOpenWorkspaceButton,
       typeLabel: l10n.filePickerTypeWorkspaceLabel,
     );
-    if (path == null) return;
+    if (path == null || !mounted) return;
     final opener = ref.read(openProjectInWorkspaceProvider)(tabsForId);
     // As the welcome screen's Open Workspace does: a corrupt or newer-version
     // workspace document otherwise did nothing, with no word why.
@@ -2018,7 +2018,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       confirmButtonText: L10N.of(ctx).filePickerImportEdamButton,
       typeLabel: L10N.of(ctx).filePickerTypeEdamLabel,
     );
-    if (edamPath == null) return;
+    if (edamPath == null || !mounted) return;
     try {
       const service = EdamImportService();
       final result = service.importEdam(edamPath: edamPath);

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/core/help_urls.dart';
-import 'package:lintcrux/features/beta_expiry/widgets/beta_expiry_blocking_overlay.dart';
+import 'package:lintcrux/features/beta_expiry/beta_expiry_metrics.dart';
 import 'package:lintcrux/features/beta_expiry/widgets/beta_expiry_gate.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 
@@ -62,14 +62,14 @@ void main() {
       );
       expect(find.text('routed-content'), findsOneWidget);
       expect(find.byType(CruxBetaExpiryBanner), findsNothing);
-      expect(find.byType(BetaExpiryBlockingOverlay), findsNothing);
+      expect(find.byType(CruxBetaExpiredOverlay), findsNothing);
     });
 
     testWidgets('active renders the child untouched', (tester) async {
       await tester.pumpWidget(_harness(status: BetaExpiryStatus.active));
       expect(find.text('routed-content'), findsOneWidget);
       expect(find.byType(CruxBetaExpiryBanner), findsNothing);
-      expect(find.byType(BetaExpiryBlockingOverlay), findsNothing);
+      expect(find.byType(CruxBetaExpiredOverlay), findsNothing);
     });
 
     testWidgets('expiringSoon renders the banner above the child', (
@@ -111,14 +111,56 @@ void main() {
       expect(launched, [Uri.parse(HelpUrls.download)]);
     });
 
-    testWidgets('expired renders the blocking overlay', (tester) async {
+    testWidgets("expired renders the shared blocking overlay, in LintCrux's "
+        'words', (tester) async {
       await tester.pumpWidget(_harness(status: BetaExpiryStatus.expired));
-      expect(find.byType(BetaExpiryBlockingOverlay), findsOneWidget);
+      expect(find.byType(CruxBetaExpiredOverlay), findsOneWidget);
       expect(find.byType(CruxBetaExpiryBanner), findsNothing);
-      expect(
-        find.text(lookupL10N(const Locale('en')).betaExpiryExpiredTitle),
-        findsOneWidget,
-      );
+      final l10n = lookupL10N(const Locale('en'));
+      expect(find.text(l10n.betaExpiryExpiredTitle), findsOneWidget);
+      expect(find.text(l10n.betaExpiryExpiredBody), findsOneWidget);
+      expect(find.text(l10n.betaExpiryExpiredAction), findsOneWidget);
+      expect(find.text(l10n.betaExpiryExpiredQuit), findsOneWidget);
+    });
+
+    testWidgets('expired keeps the routed content behind a blocking barrier', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_harness(status: BetaExpiryStatus.expired));
+      // The child stays mounted (its element and state survive the flip)
+      // but is covered: at least one NON-dismissible barrier is present.
+      // `MaterialApp` mounts barriers of its own, so the count is not one.
+      expect(find.text('routed-content'), findsOneWidget);
+      final barriers = tester
+          .widgetList<ModalBarrier>(find.byType(ModalBarrier))
+          .where((b) => !b.dismissible);
+      expect(barriers, isNotEmpty);
+    });
+
+    testWidgets('expired blocks the system back gesture', (tester) async {
+      await tester.pumpWidget(_harness(status: BetaExpiryStatus.expired));
+      final blocking = tester
+          .widgetList<Widget>(
+            find.byWidgetPredicate((w) => w is PopScope<dynamic>),
+          )
+          .cast<PopScope<dynamic>>()
+          .where((p) => !p.canPop);
+      expect(blocking, isNotEmpty);
+    });
+
+    testWidgets('both expired actions meet the 44 dp touch target', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_harness(status: BetaExpiryStatus.expired));
+      for (final finder in <Finder>[
+        find.byKey(CruxBetaExpiredOverlay.downloadButtonKey),
+        find.byKey(CruxBetaExpiredOverlay.quitButtonKey),
+      ]) {
+        expect(
+          tester.getSize(finder).height,
+          greaterThanOrEqualTo(BetaExpiryMetrics.touchTarget),
+        );
+      }
     });
 
     testWidgets('the expired overlay download action opens the page', (
@@ -194,7 +236,7 @@ void main() {
             ),
           ),
         );
-        expect(find.byType(BetaExpiryBlockingOverlay), findsOneWidget);
+        expect(find.byType(CruxBetaExpiredOverlay), findsOneWidget);
       });
     }
   });

@@ -132,12 +132,38 @@ void main() {
       final c = workspaceContainer();
       final notifier = c.read(workspaceProvider.notifier);
       await c.read(workspaceProvider.future);
+      await notifier.openTab(displayName: 'a', payload: payload('/a.lintcrux'));
+      await notifier.openTab(displayName: 'b', payload: payload('/b.lintcrux'));
 
       await notifier.splitPaneRight();
       await notifier.splitPaneRight();
 
       expect(telemetry.named('pane.split'), hasLength(1));
     });
+
+    test(
+      'pane.split does not fire when the package refuses the split',
+      () async {
+        final c = workspaceContainer();
+        final notifier = c.read(workspaceProvider.notifier);
+        await c.read(workspaceProvider.future);
+
+        // No tab: the workspace package leaves the single pane as it is, so
+        // counting this would report a split nobody saw.
+        await notifier.splitPaneRight();
+        expect(telemetry.named('pane.split'), isEmpty);
+
+        // One tab: moving it right would leave the left pane empty, which the
+        // package refuses too.
+        await notifier.openTab(
+          displayName: 'a',
+          payload: payload('/a.lintcrux'),
+        );
+        await notifier.splitPaneRight();
+        expect(telemetry.named('pane.split'), isEmpty);
+        expect(c.read(workspaceProvider).requireValue.panes, hasLength(1));
+      },
+    );
 
     test('pane.closed fires only when a pane actually closes', () async {
       final c = workspaceContainer();
@@ -148,6 +174,8 @@ void main() {
       await notifier.closePane(initial.activePaneId);
       expect(telemetry.named('pane.closed'), isEmpty);
 
+      await notifier.openTab(displayName: 'a', payload: payload('/a.lintcrux'));
+      await notifier.openTab(displayName: 'b', payload: payload('/b.lintcrux'));
       final second = await notifier.splitPaneRight();
       await notifier.closePane(second);
       expect(telemetry.named('pane.closed'), hasLength(1));

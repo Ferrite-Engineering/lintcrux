@@ -12,11 +12,11 @@ import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/domain/models/violation_column_layout.dart';
+import 'package:lintcrux/domain/models/violation_table_state.dart';
 import 'package:lintcrux/features/violations/providers/violation_column_layout_provider.dart';
 import 'package:lintcrux/features/violations/widgets/violation_table.dart';
 import 'package:lintcrux/features/violations/widgets/violation_table_row.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
-import 'package:lintcrux/services/persistence/violation_column_layout_codec.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
@@ -62,7 +62,7 @@ void main() {
           violationStoreProvider.overrideWithValue(store),
           violationColumnLayoutSettingsServiceProvider.overrideWithValue(
             SettingsService<ViolationColumnLayout>(
-              const ViolationColumnLayoutCodec(),
+              violationColumnLayout.codec,
               prefsOverride: prefs,
             ),
           ),
@@ -131,8 +131,8 @@ void main() {
     expect(rowAfter - rowBefore, closeTo(80, 2));
 
     expect(
-      await const ViolationColumnLayoutCodec().load(prefs),
-      isNot(ViolationColumnLayout.defaults),
+      await violationColumnLayout.codec.load(prefs),
+      isNot(violationTableColumns.defaults),
     );
   });
 
@@ -148,7 +148,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       container.read(violationColumnLayoutProvider),
-      isNot(ViolationColumnLayout.defaults),
+      isNot(violationTableColumns.defaults),
     );
 
     final handle = find.byKey(const ValueKey('violationTableResize-file'));
@@ -158,8 +158,31 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       container.read(violationColumnLayoutProvider),
-      ViolationColumnLayout.defaults,
+      violationTableColumns.defaults,
     );
+  });
+
+  testWidgets('widths saved by an earlier release draw on the first frame', (
+    tester,
+  ) async {
+    // The preference key and its JSON shape predate the shared table model;
+    // a layout the product's own codec wrote reads back unchanged, and the
+    // launch provider puts it on screen before any storage round trip.
+    SharedPreferences.setMockInitialValues(<String, Object>{
+      kViolationColumnWeightsPrefsKey:
+          '{"severity":1.0,"engine":1.0,"rule":4.0,"file":2.2,'
+          '"line":0.8,"message":5.0}',
+    });
+    prefs = await SharedPreferences.getInstance();
+    final loaded = await loadViolationColumnLayout(
+      service: SettingsService<ViolationColumnLayout>(
+        violationColumnLayout.codec,
+        prefsOverride: prefs,
+      ),
+    );
+    expect(loaded.weights[ViolationTableColumn.rule], 4);
+    expect(loaded.weights[ViolationTableColumn.file], 2.2);
+    expect(loaded.isDefault, isFalse);
   });
 
   for (final locale in const [

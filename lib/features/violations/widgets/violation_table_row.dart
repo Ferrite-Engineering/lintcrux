@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:crux_license/crux_license.dart';
+import 'package:crux_table/crux_table.dart';
 import 'package:flutter/gestures.dart' show kPrimaryButton;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,10 +25,8 @@ import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/shared/widgets/lintcrux_feature_tier_badge.dart';
 import 'package:path/path.dart' as p;
 
-/// Stable row height used by the virtualized list.
-const double kViolationRowHeight = 28;
-
-/// One row in the violation table.
+/// One row in the violation table, [kCruxTableRowHeight] tall: the stable
+/// row extent the virtualized list is built on.
 ///
 /// The keyboard does what the pointer does. Focus arriving on the row selects
 /// the violation, as a click does, so the Details pane follows the arrow
@@ -170,7 +169,6 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
       currentProjectProvider.select((p) => p?.rootPath),
     );
     final scheme = Theme.of(context).colorScheme;
-    final textStyle = Theme.of(context).textTheme.bodySmall;
     // ONE announcement per row, not five.
     //
     // The cells are five separate `Text` widgets, which a screen reader reads
@@ -193,7 +191,7 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
       violation.message,
     );
     final row = SizedBox(
-      height: kViolationRowHeight,
+      height: kCruxTableRowHeight,
       child: DecoratedBox(
         key: const ValueKey('violationRowBackground'),
         decoration: BoxDecoration(
@@ -287,47 +285,45 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
                       // The visual cells stay exactly as they are: excluding
                       // them changes what is announced, not what is drawn.
                       // Widths follow the header's, from the shared layout.
-                      // Every text cell carries its full value as a tooltip,
-                      // so a truncated rule ID or path is still readable.
+                      // Every text cell (`CruxTableCell`) carries its full
+                      // value as a hover tooltip, so a truncated rule ID or
+                      // path is still readable.
                       child: Row(
                         children: [
                           Expanded(
                             flex: layout.flexOf(ViolationTableColumn.severity),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
+                                horizontal: kCruxTableCellPadding,
                               ),
                               child: SeverityIcon(
                                 severity: violation.severity,
                               ),
                             ),
                           ),
-                          Expanded(
+                          CruxTableCell(
+                            text: violation.engineId,
                             flex: layout.flexOf(ViolationTableColumn.engine),
-                            child: _cell(violation.engineId, textStyle),
                           ),
-                          Expanded(
+                          CruxTableCell(
+                            text: violation.ruleId,
                             flex: layout.flexOf(ViolationTableColumn.rule),
-                            child: _cell(violation.ruleId, textStyle),
                           ),
-                          Expanded(
+                          CruxTableCell(
+                            text: displayPath(
+                              violation.location.file,
+                              projectRoot,
+                            ),
                             flex: layout.flexOf(ViolationTableColumn.file),
-                            child: _cell(
-                              displayPath(violation.location.file, projectRoot),
-                              textStyle,
-                              tooltip: violation.location.file,
-                            ),
+                            tooltip: violation.location.file,
                           ),
-                          Expanded(
+                          CruxTableCell(
+                            text: '${violation.location.line}',
                             flex: layout.flexOf(ViolationTableColumn.line),
-                            child: _cell(
-                              '${violation.location.line}',
-                              textStyle,
-                            ),
                           ),
-                          Expanded(
+                          CruxTableCell(
+                            text: violation.message,
                             flex: layout.flexOf(ViolationTableColumn.message),
-                            child: _cell(violation.message, textStyle),
                           ),
                         ],
                       ),
@@ -396,23 +392,6 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
     );
     if (!mounted) return;
     await Future.sync(() => entry.onActivate(context, ref, violation));
-  }
-
-  Widget _cell(String text, TextStyle? style, {String? tooltip}) {
-    // Hover only: a tooltip's default long-press trigger would claim the
-    // long-press the row uses for its context menu on touch hosts.
-    return Tooltip(
-      message: tooltip ?? text,
-      triggerMode: TooltipTriggerMode.manual,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Text(
-          text,
-          style: style,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    );
   }
 }
 

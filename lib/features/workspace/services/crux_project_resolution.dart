@@ -4,6 +4,13 @@
 import 'package:crux_project/crux_project.dart';
 import 'package:path/path.dart' as p;
 
+// `isOpenableProjectPath` (a `.lintcrux` file or a design manifest) is
+// declared in `services/project/openable_project_path.dart`, where the CXP
+// workspace link can reach it too: the layering rule keeps `services/` from
+// importing `features/`. Re-exported here for the workspace's callers.
+export 'package:lintcrux/services/project/openable_project_path.dart'
+    show isOpenableProjectPath;
+
 /// The `<design>.crux-project` `artifacts:` key LintCrux consumes.
 ///
 /// The key lives here rather than in `crux_project` on purpose: artifact kinds
@@ -75,16 +82,6 @@ class ManifestUnusable extends CruxProjectResolution {
   /// User-facing explanation.
   final String message;
 }
-
-/// Whether [path] is something the desktop app opens as a project: a
-/// `.lintcrux` project file, or a `<design>.crux-project` design manifest
-/// (which [CruxProjectResolver] swaps for the lint project it names).
-///
-/// The manifest test is [CruxProjectParser.isManifestPath]: the
-/// `crux-project` extension, compared case-insensitively, after a non-empty
-/// name — or the legacy bare `.crux-project`, which still opens.
-bool isOpenableProjectPath(String path) =>
-    path.endsWith('.lintcrux') || CruxProjectParser.isManifestPath(path);
 
 /// Resolves a possible design manifest path to the lint project LintCrux
 /// opens.

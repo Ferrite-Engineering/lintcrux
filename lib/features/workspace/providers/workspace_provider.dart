@@ -195,9 +195,12 @@ class LintcruxWorkspaceNotifier
 
   @override
   Future<crux.PaneId> splitPaneRight() async {
-    final wasSplit = (stateOrNull?.panes.length ?? 0) >= 2;
+    // The package leaves the workspace as it was when a split would open an
+    // empty pane (one tab, or already split), so the event counts the splits
+    // that happened, not the times the action was invoked.
+    final willSplit = stateOrNull?.canSplitPaneRight ?? false;
     final id = await super.splitPaneRight();
-    if (!wasSplit) _emit('pane.split');
+    if (willSplit) _emit('pane.split');
     return id;
   }
 
