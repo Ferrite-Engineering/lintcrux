@@ -8,6 +8,8 @@ import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:crux_issue_reporter/crux_issue_reporter.dart';
 import 'package:crux_license/crux_license.dart';
 import 'package:crux_linux_integration/crux_linux_integration.dart';
+import 'package:crux_settings_ui/crux_settings_ui.dart'
+    show CruxPolicyLockScope, kCruxPolicyLockNoteEn;
 import 'package:crux_telemetry/crux_telemetry.dart';
 import 'package:crux_theme/crux_theme.dart';
 import 'package:crux_updates/crux_updates.dart';
@@ -84,6 +86,7 @@ import 'package:lintcrux/plugins/bookmark_panel_opener_provider.dart';
 import 'package:lintcrux/plugins/eager_startup_providers.dart';
 import 'package:lintcrux/plugins/extra_localizations_delegates_provider.dart';
 import 'package:lintcrux/plugins/filter_preset_manager_opener_provider.dart';
+import 'package:lintcrux/plugins/policy_lock_message_provider.dart';
 import 'package:lintcrux/plugins/pro_action_openers.dart';
 import 'package:lintcrux/plugins/pro_opener.dart';
 import 'package:lintcrux/plugins/save_filter_preset_opener_provider.dart';
@@ -853,6 +856,9 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
     // from a root-scope provider rather than a BuildContext and must land on
     // the same language this MaterialApp is about to draw.
     final locale = localeForSettingsTag(localeTag);
+    // The sentence every policy-locked control shows, from the overlay's
+    // localizations when one is bound; the shared English default otherwise.
+    final lockMessageFor = ref.watch(policyLockMessageProvider);
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       onGenerateTitle: (context) => L10N.of(context).appTitle,
@@ -983,9 +989,17 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
             ),
           ),
         );
+        // The suite's one mount of the policy-lock sentence, above the root
+        // navigator so a locked control in a dialog reads the same sentence
+        // as one in Settings. The builder's context already carries the
+        // localizations, which is what lets the sentence be resolved here.
+        final scoped = CruxPolicyLockScope(
+          message: lockMessageFor?.call(context) ?? kCruxPolicyLockNoteEn,
+          child: app,
+        );
         // Windows/Linux: restore the drop shadow + drag-to-resize edges the
         // frameless window loses. No-op wrapper elsewhere.
-        return useCustomWindowChrome ? buildWindowFrame(app) : app;
+        return useCustomWindowChrome ? buildWindowFrame(scoped) : scoped;
       },
     );
   }
