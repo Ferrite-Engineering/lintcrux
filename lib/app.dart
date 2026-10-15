@@ -240,7 +240,7 @@ Future<void> runLintcrux({
 Future<void> _flushAndExit(int code) async {
   await stdout.flush();
   await stderr.flush();
-  exit(code);
+  cruxExit(code);
 }
 
 /// Starts capturing diagnostics. Idempotent under hot restart.
@@ -1070,7 +1070,9 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
         unawaited(_handleCloseTab());
       // ── App ────────────────────────────────────────────────────
       case LintcruxAction.quit:
-        exit(0);
+        // `cruxExit`, so the session is recorded as ended cleanly before
+        // the process goes.
+        cruxExit();
       case LintcruxAction.openSettings:
         if (ctx != null) {
           unawaited(_handleOpenSettings(ctx));
