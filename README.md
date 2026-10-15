@@ -13,7 +13,7 @@ across all of them. Open core, part of Ferrite Engineering's EDACrux suite.
 
 ## Status
 
-Public beta. Implemented in this repository today:
+Stable since 1.0. Implemented in this repository today:
 
 - Six engine adapters — Verilator, Verible, Slang, Yosys `check`, GHDL and Svlint —
   each normalizing its output into the common `Violation` model.
@@ -25,7 +25,7 @@ Public beta. Implemented in this repository today:
 - Export to SARIF 2.1.0, JSON, CSV and HTML.
 - A CXP cross-probe server for the rest of the EDACrux suite.
 - A read-only web SARIF viewer built from this same package.
-- Update checks, the beta issue reporter, and en/zh_CN/zh/ja/ko localization.
+- Update checks, the in-app issue reporter, and en/zh_CN/zh/ja/ko localization.
 
 ## Pattern reference
 
