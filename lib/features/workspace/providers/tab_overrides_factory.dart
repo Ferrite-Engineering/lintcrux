@@ -144,8 +144,9 @@ List<Override> lintcruxTabOverridesFactory(crux.TabId tabId) {
     // Diagnostics reports. Per-tab because they read the per-tab
     // `currentProjectProvider` / `lintRunProvider` / `violationStoreProvider`;
     // a root-scope instance would always report "no project loaded" /
-    // zero violations. The diagnostics dialogs mount inside the active
-    // tab's scope (`wrapInActiveTabScope`), so their reads resolve here.
+    // zero violations. The diagnostics dialog and drawer mount on the active
+    // tab's navigator (`ActiveTab.navigatorFor`), under the tab's scope, so
+    // their reads resolve here.
     tabDiagnosticsReportProvider.overrideWith(buildTabDiagnosticsReport),
     appDiagnosticsReportProvider.overrideWith(buildAppDiagnosticsReport),
 

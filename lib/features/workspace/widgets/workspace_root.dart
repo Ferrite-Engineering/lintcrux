@@ -88,6 +88,12 @@ class _WorkspaceRootState extends WorkspaceRootState {
   late final crux.TabContainerManager _tabs;
   late final crux.PaneContainerManager _panes;
 
+  /// One nested navigator per tab, so a dialog that reads a tab's providers
+  /// is built under that tab's own scope (`ActiveTab.navigatorFor`) rather
+  /// than under a second scope over its container. Also a scope
+  /// reconciler: a closing tab's dialogs are closed with it.
+  final crux.CruxTabNavigators _tabNavigators = crux.CruxTabNavigators();
+
   /// The notifier this state registered its scope reconcilers with;
   /// retained so [dispose] can unregister them. The notifier outlives
   /// this widget (it is root-scoped), so leaving stale reconcilers
@@ -152,7 +158,12 @@ class _WorkspaceRootState extends WorkspaceRootState {
     // Registered here rather than at notifier construction because the
     // managers need the root `ProviderContainer`, which does not exist
     // until this State is mounted.
+    //
+    // The tab navigators go first: they close a closing tab's dialogs, whose
+    // widgets are still mounted under that tab's container until the next
+    // frame, so they are popped before the container manager disposes it.
     final workspaceNotifier = root.read(workspaceProvider.notifier)
+      ..addScopeReconciler(_tabNavigators)
       ..addScopeReconciler(_tabs)
       ..addScopeReconciler(_panes);
     _workspaceNotifier = workspaceNotifier;
@@ -217,7 +228,8 @@ class _WorkspaceRootState extends WorkspaceRootState {
     _tabManagerHolder?.manager = null;
     _tabManagerHolder = null;
     _workspaceNotifier
-      ?..removeScopeReconciler(_tabs)
+      ?..removeScopeReconciler(_tabNavigators)
+      ..removeScopeReconciler(_tabs)
       ..removeScopeReconciler(_panes);
     _workspaceNotifier = null;
     _tabs.dispose();
@@ -230,6 +242,7 @@ class _WorkspaceRootState extends WorkspaceRootState {
     return WorkspaceRootScope(
       tabs: _tabs,
       panes: _panes,
+      tabNavigators: _tabNavigators,
       child: crux.WorkspaceLifecycleObserver(
         provider: workspaceProvider,
         // Reaps Yosys child processes on `detached` so a hard quit does
@@ -252,6 +265,7 @@ class WorkspaceRootScope extends InheritedWidget {
     required this.tabs,
     required this.panes,
     required super.child,
+    this.tabNavigators,
     super.key,
   });
 
@@ -261,7 +275,14 @@ class WorkspaceRootScope extends InheritedWidget {
   /// Per-pane `ProviderContainer` manager.
   final crux.PaneContainerManager panes;
 
+  /// Each tab's nested navigator, handed to `PaneHost.tabNavigators`.
+  /// [WorkspaceRoot] always provides one; null only in a test that builds
+  /// this scope by hand without tab navigators.
+  final crux.CruxTabNavigators? tabNavigators;
+
   @override
   bool updateShouldNotify(WorkspaceRootScope oldWidget) =>
-      tabs != oldWidget.tabs || panes != oldWidget.panes;
+      tabs != oldWidget.tabs ||
+      panes != oldWidget.panes ||
+      tabNavigators != oldWidget.tabNavigators;
 }

@@ -155,22 +155,20 @@ class FilterPresetDropdown extends ConsumerWidget {
 /// replaces [FilterPresetDropdown] (see `filterPresetDropdownVisibleProvider`)
 /// can still offer it. [context] must be inside the tab's scope.
 Future<void> showProjectFilterPresetManageDialog(BuildContext context) async {
-  // `wrapInActiveTabScope`, unlike the dropdown's save dialog: the manage
-  // dialog READS `savedFilterPresetsProvider` (and deletes through it)
-  // with its own `ref`, and a dialog route is a child of the Navigator,
-  // which sits ABOVE the per-tab `UncontrolledProviderScope`. Without the
-  // wrapper its reads resolve the ROOT container, whose presets list is
-  // always empty — the dialog rendered "No saved presets" over a dropdown
-  // that was visibly listing several, and Delete wrote to the root
-  // notifier so nothing disappeared. The save dialog needs no wrapper
-  // because it reads nothing: it returns a name by `pop` and the caller
-  // above (still inside the tab scope) does the per-tab write.
+  // On the tab's own navigator, unlike the dropdown's save dialog: the
+  // manage dialog READS `savedFilterPresetsProvider` (and deletes through
+  // it) with its own `ref`, and a dialog route on the root Navigator sits
+  // ABOVE the per-tab `UncontrolledProviderScope`. There its reads resolve
+  // the ROOT container, whose presets list is always empty — the dialog
+  // rendered "No saved presets" over a dropdown that was visibly listing
+  // several, and Delete wrote to the root notifier so nothing disappeared.
+  // The save dialog needs no tab because it reads nothing: it returns a
+  // name by `pop` and the caller above (inside the tab scope) does the
+  // per-tab write.
   await showCruxDialog<void>(
     context: context,
-    builder: (_) => wrapInActiveTabScope(
-      context,
-      const _FilterPresetManageDialog(),
-    ),
+    navigator: ActiveTab.navigatorFor(context),
+    builder: (_) => const _FilterPresetManageDialog(),
   );
 }
 

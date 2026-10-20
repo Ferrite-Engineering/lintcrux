@@ -257,13 +257,25 @@ rules:
    `lintCacheInvalidationsProvider`, `veribleAvailabilityProvider`) are
    re-bound in `lintcruxTabOverridesFactory` so the whole chain resolves in
    tab scope.
-3. **Dialogs mount in the active tab's scope.** `showDialog` pushes onto the
-   root navigator, so a dialog's `ref` resolves the ROOT container no
-   matter where the call site sits. Any dialog/screen whose content reads
-   per-tab providers wraps its content in `wrapInActiveTabScope`
-   (`lib/features/workspace/services/active_tab_scope.dart`); imperative
-   action handlers use the sibling `activeTabContainerOf` to read/mutate
-   the active tab's providers directly.
+3. **Dialogs mount on the active tab's navigator.** `showDialog` pushes onto
+   the root navigator, so a dialog's `ref` resolves the ROOT container no
+   matter where the call site sits. Each tab's content is built on its own
+   nested navigator (`PaneHost.tabNavigators`, owned by `WorkspaceRoot`),
+   and any dialog/screen whose content reads per-tab providers is shown
+   with `showCruxDialog(navigator: ActiveTab.navigatorFor(context), ...)`
+   (`lib/features/workspace/services/active_tab_scope.dart`), so it is
+   built under the tab's one `UncontrolledProviderScope`. Never wrap a
+   dialog in a second scope over a tab's container: Riverpod flushes a
+   container's rebuilds from inside the build of every scope that mounts
+   it, so the second scope marks the tab's own widgets dirty mid-build
+   ("setState() or markNeedsBuild() called during build"). A tab dialog
+   covers the tab's area, stays with its tab
+   across a tab switch, keys its `ModalGuard` per tab
+   (`ActiveTab.guardKey`), and closes when its tab closes (the navigators
+   are a scope reconciler). The diagnostics drawer is an overlay entry on
+   the active tab's navigator and moves when the active tab changes.
+   Imperative action handlers use the sibling `activeTabContainerOf` to
+   read/mutate the active tab's providers directly.
 4. **Root-scoped services that must act on tab state resolve it through
    `ActiveTabContainerHandle`** (`lib/services/workspace/
    active_tab_container_handle.dart`), published by `WorkspaceRoot` — the

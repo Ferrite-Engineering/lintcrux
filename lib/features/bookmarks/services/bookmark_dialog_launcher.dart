@@ -16,14 +16,16 @@ import 'package:lintcrux/services/project/current_project_provider.dart';
 /// Opens [BookmarkDialog] for [violation]: in edit mode when it is already
 /// bookmarked, in create mode otherwise.
 ///
-/// [container] is the tab's `ProviderContainer`. The dialog is mounted on
-/// the root navigator, so it is wrapped in that container's scope to read
-/// and write the tab's own bookmark store.
+/// [container] is the tab's `ProviderContainer`, read here for the existing
+/// bookmark. The dialog itself reads and writes the tab's own bookmark store,
+/// so it is shown on that tab's navigator ([ActiveTab.navigatorFor]: every
+/// caller is either inside the tab or acting on the active tab) and built
+/// under the tab's one scope.
 ///
 /// The column icon, the Toggle Bookmark action and the bookmark panel's
-/// Edit entry all reach this dialog, so they share one `ModalGuard` key:
-/// a fast double-fire from any of them must not stack two dialogs over the
-/// same violation.
+/// Edit entry all reach this dialog, so they share one `ModalGuard` key per
+/// tab: a fast double-fire from any of them must not stack two dialogs over
+/// the same violation.
 Future<void> showBookmarkDialogFor(
   BuildContext context,
   ProviderContainer container,
@@ -36,16 +38,14 @@ Future<void> showBookmarkDialogFor(
   );
   final existing = await store.lookupByFingerprint(fingerprint);
   if (!context.mounted) return;
-  await ModalGuard.run('bookmarkDialog', () async {
+  await ModalGuard.run(ActiveTab.guardKey(context, 'bookmarkDialog'), () async {
     await showCruxDialog<void>(
       context: context,
       // A note + color-tag editor holding in-progress user input: closing
       // must be a deliberate act, never a stray scrim click.
       barrierDismissible: false,
-      builder: (_) => UncontrolledProviderScope(
-        container: container,
-        child: BookmarkDialog(existing: existing, violation: violation),
-      ),
+      navigator: ActiveTab.navigatorFor(context),
+      builder: (_) => BookmarkDialog(existing: existing, violation: violation),
     );
   });
 }

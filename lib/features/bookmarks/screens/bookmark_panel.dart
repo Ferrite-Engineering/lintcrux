@@ -28,8 +28,9 @@ class BookmarkPanel extends ConsumerStatefulWidget {
   /// Creates the bookmark management panel.
   const BookmarkPanel({super.key});
 
-  /// Convenience launcher. Mounts the panel as a full-screen dialog
-  /// rooted at [context].
+  /// Convenience launcher. Mounts the panel as a full-screen dialog over
+  /// the active tab, on that tab's navigator ([ActiveTab.navigatorFor]),
+  /// so it reads the tab's bookmark store under the tab's one scope.
   ///
   /// Guarded: reached from `bookmarkPanelOpenerProvider` (keyboard
   /// shortcut / command dispatch), so a fast double-fire must not stack two
@@ -39,15 +40,13 @@ class BookmarkPanel extends ConsumerStatefulWidget {
   /// the barrier stays non-dismissible.
   static Future<void> showAsDialog(BuildContext context) {
     return ModalGuard.run(
-      'bookmarkPanel',
+      ActiveTab.guardKey(context, 'bookmarkPanel'),
       () => showCruxDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (_) => wrapInActiveTabScope(
-          context,
-          const Dialog.fullscreen(
-            child: EscapeDismissible(child: BookmarkPanel()),
-          ),
+        navigator: ActiveTab.navigatorFor(context),
+        builder: (_) => const Dialog.fullscreen(
+          child: EscapeDismissible(child: BookmarkPanel()),
         ),
       ),
     );
@@ -393,22 +392,22 @@ class _BookmarkRow extends ConsumerWidget {
     // the Toggle Bookmark action and the column icon all reach the same
     // `BookmarkDialog`, so a fast double-fire from any of them must not
     // stack two dialogs over the same bookmark.
-    await ModalGuard.run('bookmarkDialog', () async {
-      // The edit dialog writes the per-tab bookmark store; showDialog
-      // mounts on the root navigator, so re-wrap in the active tab scope
-      // (the panel itself is already wrapped, but that wrap does not
-      // extend to routes pushed from inside it).
-      await showCruxDialog<void>(
-        context: context,
-        // A note + color-tag editor holding in-progress user input:
-        // closing must be a deliberate act, never a stray scrim click.
-        barrierDismissible: false,
-        builder: (_) => wrapInActiveTabScope(
-          context,
-          BookmarkDialog(existing: bookmark),
-        ),
-      );
-    });
+    await ModalGuard.run(
+      ActiveTab.guardKey(context, 'bookmarkDialog'),
+      () async {
+        // The edit dialog writes the per-tab bookmark store, so it goes on
+        // the same tab navigator as the panel it is opened from (a plain
+        // showDialog would mount it on the root navigator, outside the tab).
+        await showCruxDialog<void>(
+          context: context,
+          // A note + color-tag editor holding in-progress user input:
+          // closing must be a deliberate act, never a stray scrim click.
+          barrierDismissible: false,
+          navigator: ActiveTab.navigatorFor(context),
+          builder: (_) => BookmarkDialog(existing: bookmark),
+        );
+      },
+    );
   }
 
   Future<void> _confirmAndRemove(

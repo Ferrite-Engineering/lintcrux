@@ -472,7 +472,7 @@ The multi-window tab pop-out / panel detachment surface (`kMultiWindowAvailable`
 **What:** A tab IS the project scope (ARCHITECTURE.md §10 "Per-tab scope contract"). Three consequences a release must verify:
 
 1. **Every open flow lands in a tab, never the root container.** File → Open, CLI positional paths, filelist import, and session/workspace restore all route through `OpenProjectInWorkspace`; there is no root-container project loader anymore (the former `OpenProjectController.openFromPath` was removed — a root-held project could diverge from every visible tab and mislead root-resolved project-keyed services).
-2. **Dialogs that read per-tab state mount inside the active tab's scope.** Tab Diagnostics, App Diagnostics, Settings (its Engines → severity-override list edits the tab's project; the Pro lint-cache stats card reads the tab's cache), and the Find-in-Violations search dialog all wrap in `wrapInActiveTabScope`.
+2. **Dialogs that read per-tab state mount on the active tab's own navigator, under the tab's one scope.** Tab Diagnostics (an overlay entry on that navigator), App Diagnostics, Settings (the Pro lint-cache stats card reads the tab's cache), the bookmark dialogs, the issue reporter, the filter-preset manager and the Find-in-Violations search dialog are all shown with `navigator: ActiveTab.navigatorFor(context)`. None of them wraps itself in a second `UncontrolledProviderScope` over the tab's container (see §6.5.10b).
 3. **The root-hosted CXP server acts on the ACTIVE tab** (see §7.3 "Active-tab scoping").
 
 **Setup:** Open two projects (A with violations, B clean) in two tabs.
@@ -484,11 +484,38 @@ The multi-window tab pop-out / panel detachment surface (`kMultiWindowAvailable`
 - Import Vivado filelist opens the generated project as a NEW TAB (same as File → Open), not into an invisible root scope.
 
 **Edge cases:**
-- Empty workspace (no tab): the dialogs open against root scope and render their no-project empty states — unchanged behavior.
-- Closing the active tab while a wrapped dialog is open: the dialog keeps its captured container until dismissed; reopening resolves the new active tab.
+- Empty workspace (no tab): the dialogs open on the root navigator against root scope and render their no-project empty states — unchanged behavior.
+- Closing a tab while one of its dialogs is open closes the dialog with the tab; reopening resolves the new active tab.
 
-**Automation status:** `[Coverage: UNIT]` `test/features/workspace/services/open_project_in_workspace_test.dart` (project loads into the new tab's container; root `currentProjectProvider` stays null; two tabs isolate); `[Coverage: UNIT]` `test/static/per_tab_provider_scope_leak_test.dart` (structural guard over the whole provider graph); dialog-scope mounting `[Coverage: MANUAL]`.
+**Automation status:** `[Coverage: UNIT]` `test/features/workspace/services/open_project_in_workspace_test.dart` (project loads into the new tab's container; root `currentProjectProvider` stays null; two tabs isolate); `[Coverage: UNIT]` `test/static/per_tab_provider_scope_leak_test.dart` (structural guard over the whole provider graph); dialog-scope mounting `[Coverage: WIDGET]` `test/features/workspace/services/active_tab_dialog_test.dart` (§6.5.10b).
 
+
+### 6.5.10b Tab dialogs: one scope per tab container
+
+**What:** Before 1.2 a dialog that read per-tab state was given a second `UncontrolledProviderScope` over the tab's container. Riverpod flushes a container's pending rebuilds from inside the build of every scope that mounts it, and the dialog's scope builds first, so a per-tab change while the dialog was open marked the tab's own widgets dirty in the middle of a build: "setState() or markNeedsBuild() called during build" in debug builds, widgets rebuilt out of order in release builds. From 1.2 each tab's content sits on its own nested navigator and those dialogs are pushed on it, so they are built under the tab's one scope. The trade: a tab dialog covers the tab's area, not the window, and belongs to its tab.
+
+**Setup:** Open two projects in two tabs (A with violations, B clean). Debug build, or a release build with the console visible.
+
+**Expected:**
+1. Over tab A, open Tools > App Diagnostics. Leave it open and re-run tab A's lint (toolbar Run, still reachable). The dialog's violation count updates, the table behind it updates, and nothing is logged.
+2. Open Tools > Tab Diagnostics (the drawer) over tab A and re-run the lint: the drawer's counts update, nothing is logged. Click tab B's chip: the drawer now shows B's report. Close tab B: it shows A's. Close tab A as well: the drawer closes.
+3. Over tab A, open Settings (Cmd/Ctrl+,). It covers tab A's area; the toolbar and the tab strip stay usable. Click tab B: Settings is hidden with tab A. Press Cmd/Ctrl+, again: tab B opens its own Settings. Click tab A: tab A's Settings is still there.
+4. With a dialog open over tab A (Find in Violations, Cmd/Ctrl+F), close tab A from its chip's close button. The dialog closes with the tab, and Cmd/Ctrl+F opens the search again on the tab that is now active.
+5. With no tab open, Settings and App Diagnostics open over the whole window, as before.
+
+**Edge cases:**
+- Split panes: a tab dialog covers only its pane; the other pane stays usable.
+- A dialog opened from inside a tab dialog (the preset manager's New / Edit, Settings > Lint Cache > Show log) lands on the same tab's navigator, above the first.
+- Confirmation prompts and the upgrade dialog read nothing per tab and still open over the whole window.
+
+| Check | Automatable? | How |
+|---|---|---|
+| A per-tab write while a dialog reads the same tab, no mid-build dirtying | **WIDGET** | `test/features/workspace/services/active_tab_dialog_test.dart`: the real `WorkspaceRoot` and a pane host with tab navigators; App Diagnostics open over tab A while A's project changes three times. Mutation-verified: putting the dialog back on the root navigator under a second scope fails it with the field assertion. |
+| Closing a tab closes its dialog and frees its re-entrancy guard | **WIDGET** | same file, "closing a tab with its dialog open". |
+| A dialog stays with its tab; another tab opens its own | **WIDGET** | same file, "a dialog stays with its tab". |
+| The drawer follows the active tab and closes with the last tab | **WIDGET** | same file, "the diagnostics drawer". |
+| No route builder wraps a second scope over a tab's container | **STATIC** | `test/static/route_mounted_scope_leak_test.dart` accepts a route given `ActiveTab.navigatorFor(...)`. |
+| Steps 1 to 5 in the running app | MANUAL | Release check. |
 
 ### 6.5.10a Route-mounted dialogs — the leak §6.5.10 cannot see by inspection
 
@@ -507,7 +534,7 @@ Fixed 2026-07-21 in `_FilterPresetManageDialog` (violation-table → filter-pres
 
 **Edge cases:**
 - **Invisible in a single-tab session in the general case** — with one tab, root and tab hold equivalent state for most providers. Filter presets are the exception that made this one visible even single-tab, because nothing ever writes presets at root scope, so the root list is *always* empty. Other members of this class will not be so obvious; two tabs is the reliable reproduction.
-- Empty workspace (no tab): `wrapInActiveTabScope` returns the child unchanged and the dialog opens against root — unchanged, correct behaviour.
+- Empty workspace (no tab): `ActiveTab.navigatorFor` returns null and the dialog opens on the root navigator against root — unchanged, correct behaviour.
 
 | Check | Automatable? | How |
 |---|---|---|
@@ -840,7 +867,7 @@ Each button dispatches through `Actions.maybeInvoke<ShortcutActionIntent>` — t
 
 ### 8.7.1 Find in Violations (search dialog)
 
-**What it does.** `focusSearch` (Cmd/Ctrl+F, the toolbar **Search** button, "Find in Violations…" in the menu / command palette) opens the modal `SearchDialog` over the **active tab's** violation store — substring (default), glob, and regex matching over each violation's rule id + message. Picking a result selects that violation (`selectedViolationProvider`), which scrolls the table to the row, and closes the dialog. The dialog is wrapped in `wrapInActiveTabScope` so it reads the active tab's providers rather than the root scope. The inline rule-id filter chip in the violations panel is unchanged and still available for quick filtering; the dialog is the richer find surface. With no project open the action is a silent no-op.
+**What it does.** `focusSearch` (Cmd/Ctrl+F, the toolbar **Search** button, "Find in Violations…" in the menu / command palette) opens the modal `SearchDialog` over the **active tab's** violation store — substring (default), glob, and regex matching over each violation's rule id + message. Picking a result selects that violation (`selectedViolationProvider`), which scrolls the table to the row, and closes the dialog. The dialog is shown on the active tab's navigator (`ActiveTab.navigatorFor`) so it reads the active tab's providers rather than the root scope. The inline rule-id filter chip in the violations panel is unchanged and still available for quick filtering; the dialog is the richer find surface. With no project open the action is a silent no-op.
 
 In the web viewer there is no workspace: on the viewer screen Cmd/Ctrl+F opens the same dialog over the loaded report (the root scope's violation store, via `showViolationSearchDialog(activeTab: false)`), and on the landing screen it is a silent no-op.
 
@@ -862,7 +889,7 @@ In the web viewer there is no workspace: on the viewer screen Cmd/Ctrl+F opens t
 | Tapping a result selects the violation and closes the dialog | `[Coverage: WIDGET]` (same file) |
 | Four-locale sweep (en / zh_CN / ja / ko) renders without exceptions | `[Coverage: WIDGET]` (same file) |
 | `focusSearch` dispatch no-ops on an empty workspace | `[Coverage: WIDGET]` (`test/app_action_dispatch_test.dart`) |
-| Active-tab scoping (dialog reads the active tab's store) | `[Coverage: MANUAL]` (step 5) — `wrapInActiveTabScope` is exercised by the Pro opener tests; the search-specific wiring is manual. |
+| Active-tab scoping (dialog reads the active tab's store) | `[Coverage: MANUAL]` (step 5) — `ActiveTab.navigatorFor` is exercised by `test/features/workspace/services/active_tab_dialog_test.dart` and the Pro opener tests; the search-specific wiring is manual. |
 
 **Automation Assessment.**
 

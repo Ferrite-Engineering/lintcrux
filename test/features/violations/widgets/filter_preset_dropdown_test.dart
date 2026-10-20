@@ -401,6 +401,9 @@ void main() {
           .save(const NamedFilterPreset(name: 'TabOnly'));
       expect(root.read(savedFilterPresetsProvider).presets, isEmpty);
 
+      // The tab's content on its own navigator inside the tab's scope, as
+      // `PaneHost(tabNavigators:)` builds it in the app.
+      final navigators = crux.CruxTabNavigators();
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: root,
@@ -415,10 +418,14 @@ void main() {
             home: WorkspaceRootScope(
               tabs: tabs,
               panes: panes,
+              tabNavigators: navigators,
               child: Scaffold(
                 body: UncontrolledProviderScope(
                   container: tabContainer,
-                  child: const FilterPresetDropdown(),
+                  child: crux.CruxTabNavigatorHost(
+                    navigatorKey: navigators.keyFor(tabId),
+                    builder: (_) => const FilterPresetDropdown(),
+                  ),
                 ),
               ),
             ),
@@ -432,9 +439,9 @@ void main() {
       await tester.tap(find.text('Manage presets…'));
       await tester.pumpAndSettle();
 
-      // Mutation-verified: drop `wrapInActiveTabScope` from
-      // `_showManageDialog` and this fails with the dialog showing the
-      // empty state instead of the tab's preset.
+      // Mutation-verified: drop the tab navigator from
+      // `showProjectFilterPresetManageDialog` and this fails with the dialog
+      // showing the empty state instead of the tab's preset.
       expect(
         find.descendant(
           of: find.byType(CruxDialog),

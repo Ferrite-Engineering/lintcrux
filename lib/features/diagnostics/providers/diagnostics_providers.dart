@@ -166,8 +166,8 @@ TabDiagnosticsReport? buildTabDiagnosticsReport(Ref ref) {
 ///
 /// Per-tab: re-bound in `lintcruxTabOverridesFactory` (with the same
 /// [buildTabDiagnosticsReport] body) so the report reflects the tab the
-/// diagnostics drawer was opened over. The drawer itself is mounted
-/// inside the active tab's scope (`wrapInActiveTabScope`), so its
+/// diagnostics drawer is showing. The drawer itself is mounted on the
+/// active tab's navigator overlay, under the tab's scope, so its
 /// `ref.watch` resolves the per-tab instance.
 final Provider<TabDiagnosticsReport?> tabDiagnosticsReportProvider =
     Provider<TabDiagnosticsReport?>(buildTabDiagnosticsReport);

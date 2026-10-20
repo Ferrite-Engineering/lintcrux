@@ -43,30 +43,28 @@ class SettingsScreen extends ConsumerWidget {
 
   /// Opens settings in a dialog on desktop or as a pushed route on mobile.
   ///
-  /// Wrapped in [wrapInActiveTabScope] so the project-scoped sections
-  /// (the Engines section's severity-override list writes
-  /// `currentProjectProvider`; the Pro lint-cache stats card reads the
-  /// per-tab cache service) resolve the ACTIVE tab's providers. App-wide
-  /// sections are unaffected — their providers are not re-bound per tab,
-  /// so reads inside the tab scope parent-delegate to the root
-  /// instances as before.
+  /// Shown on the active tab's navigator ([ActiveTab.navigatorFor]) so the
+  /// project-scoped sections (the Pro lint-cache stats card and Verible
+  /// test-fix read the tab's cache and fix services) resolve the ACTIVE
+  /// tab's providers under the tab's one scope. App-wide sections are
+  /// unaffected: their providers are not re-bound per tab, so reads inside
+  /// the tab scope parent-delegate to the root instances. With no tab
+  /// open, Settings covers the window as before.
   static Future<void> openAdaptive(BuildContext context) {
     final l10n = L10N.of(context);
-    final launchContext = context;
     // Re-entrancy guard: Cmd/Ctrl+, auto-repeat, a double-tap on the menu
     // item, or the palette entry must not stack a second settings surface.
-    // Guarded inside the opener so every caller is covered.
+    // Guarded inside the opener so every caller is covered; per tab, since
+    // Settings stays with the tab it was opened on.
     return ModalGuard.run(
-      'settings',
+      ActiveTab.guardKey(context, 'settings'),
       () => openCruxSettings(
         context,
         title: l10n.settingsTitle,
         closeTooltip: l10n.settingsClose,
         asDialog: isDesktopPlatform,
+        navigator: ActiveTab.navigatorFor(context),
         bodyBuilder: (_) => const _SettingsBody(),
-        // The tab-scope wrap resolves the ACTIVE tab's providers against the
-        // LAUNCHING context (the dialog/route context lives outside the tab).
-        wrap: (_, shell) => wrapInActiveTabScope(launchContext, shell),
       ),
     );
   }

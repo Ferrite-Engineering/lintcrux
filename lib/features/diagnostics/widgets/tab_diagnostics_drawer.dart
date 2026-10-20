@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:crux_ide_layout/crux_ide_layout.dart';
+import 'package:crux_workspace/crux_workspace.dart' as crux;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +13,7 @@ import 'package:lintcrux/domain/models/diagnostics/diagnostics_report.dart';
 import 'package:lintcrux/features/diagnostics/providers/diagnostics_providers.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/active_tab_scope.dart';
+import 'package:lintcrux/features/workspace/widgets/workspace_root.dart';
 import 'package:lintcrux/features/yosys/widgets/yosys_diagnostics_section.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/services/yosys/yosys_diagnostics_provider.dart';
@@ -37,47 +39,26 @@ class TabDiagnosticsDrawer extends ConsumerWidget {
 
   /// Opens the drawer as a right-aligned non-modal overlay.
   ///
-  /// Inserts an [OverlayEntry] into the root [Overlay] rather than
-  /// pushing a modal dialog route. The content is scoped to the ACTIVE
-  /// tab's per-tab `ProviderContainer` (via [wrapInActiveTabScope]
-  /// semantics, re-resolved on every workspace change so the drawer
-  /// follows the active tab) — a bare root-scope mount would render the
-  /// "no project loaded" empty state even with a tab active.
+  /// Inserts an [OverlayEntry] into the ACTIVE tab's navigator overlay
+  /// ([ActiveTab.navigatorFor]) rather than pushing a modal dialog route,
+  /// so the drawer is built under the tab's one provider scope and reads
+  /// the tab's report (a root-scope mount would render the "no project
+  /// loaded" empty state even with a tab active). When another tab becomes
+  /// active the drawer moves to that tab's overlay, so it keeps following
+  /// the active tab. With no workspace above [context] (the web viewer) it
+  /// goes on the root overlay and shows its own empty state.
   ///
-  /// Returns when the drawer is closed (close via Escape, or the
-  /// no-tabs-remaining auto-dismiss).
+  /// Returns when the drawer is closed (close via Escape or the close
+  /// button, the no-tabs-remaining auto-dismiss, or diagnostics turned off).
   ///
   /// Re-entrancy guarded via the suite-shared [ModalGuard]
   /// (Cmd/Ctrl+Shift+I auto-repeat, or the menu while the drawer is
-  /// already up, must not stack a second drawer) — this previously
-  /// mirrored the guard with a local `_open` flag.
+  /// already up, must not stack a second drawer). One key for the window:
+  /// there is one drawer, and it follows the active tab.
   static Future<void> open(BuildContext context) {
     return ModalGuard.run('tabDiagnostics', () async {
-      // The dispatch path hands over the routerDelegate NAVIGATOR's own
-      // context, whose Overlay is a descendant (not an ancestor), so an
-      // ancestor-only Overlay.of lookup finds nothing there. Resolve the
-      // overlay through the navigator itself in that case.
-      final navigator =
-          context is StatefulElement && context.state is NavigatorState
-          ? context.state as NavigatorState
-          : Navigator.maybeOf(context, rootNavigator: true);
-      final overlay =
-          navigator?.overlay ?? Overlay.of(context, rootOverlay: true);
-      final completer = Completer<void>();
-      late OverlayEntry entry;
-      void close() {
-        if (entry.mounted) entry.remove();
-        if (!completer.isCompleted) completer.complete();
-      }
-
-      entry = OverlayEntry(
-        builder: (_) => _TabDiagnosticsDrawerHost(
-          callerContext: context,
-          onClose: close,
-        ),
-      );
-      overlay.insert(entry);
-      await completer.future;
+      final drawer = _TabDiagnosticsDrawerPlacement(context)..show();
+      await drawer.closed;
     });
   }
 
@@ -199,24 +180,119 @@ class TabDiagnosticsDrawer extends ConsumerWidget {
   MapEntry<String, String> _row(String k, String v) => MapEntry(k, v);
 }
 
+/// Keeps the drawer's one overlay entry on the active tab's navigator.
+///
+/// The entry is built under whichever tab's scope owns that navigator, so
+/// following the active tab means moving the entry: when the workspace's
+/// active tab changes (a switch, or the drawer's own tab closing) the entry
+/// is re-inserted into the new active tab's overlay after the frame that
+/// built it. No tab left closes the drawer.
+class _TabDiagnosticsDrawerPlacement {
+  _TabDiagnosticsDrawerPlacement(BuildContext callerContext)
+    : _navigators = callerContext
+          .getInheritedWidgetOfExactType<WorkspaceRootScope>()
+          ?.tabNavigators,
+      _rootOverlay = _rootOverlayOf(callerContext);
+
+  /// The routerDelegate NAVIGATOR's own context (the dispatch path hands it
+  /// over) has its Overlay as a descendant, not an ancestor, so an
+  /// ancestor-only Overlay.of lookup finds nothing there: resolve the
+  /// overlay through the navigator itself in that case.
+  static OverlayState _rootOverlayOf(BuildContext context) {
+    final navigator =
+        context is StatefulElement && context.state is NavigatorState
+        ? context.state as NavigatorState
+        : Navigator.maybeOf(context, rootNavigator: true);
+    return navigator?.overlay ?? Overlay.of(context, rootOverlay: true);
+  }
+
+  final crux.CruxTabNavigators? _navigators;
+  final OverlayState _rootOverlay;
+  final Completer<void> _closed = Completer<void>();
+  ProviderSubscription<AsyncValue<Workspace>>? _subscription;
+  OverlayEntry? _entry;
+  crux.TabId? _tab;
+  bool _syncScheduled = false;
+
+  /// The ROOT container: the root overlay sits above every tab scope. Not a
+  /// tab's container, which closes with its tab.
+  ProviderContainer get _root =>
+      ProviderScope.containerOf(_rootOverlay.context, listen: false);
+
+  /// Completes when the drawer has closed.
+  Future<void> get closed => _closed.future;
+
+  void show() {
+    _place(animateIn: true);
+    if (_navigators != null && !_closed.isCompleted) {
+      _subscription = _root.listen<AsyncValue<Workspace>>(
+        workspaceProvider,
+        (_, _) => _scheduleSync(),
+      );
+    }
+  }
+
+  void close() {
+    _subscription?.close();
+    _subscription = null;
+    _entry?.remove();
+    _entry = null;
+    if (!_closed.isCompleted) _closed.complete();
+  }
+
+  void _place({required bool animateIn}) {
+    final navigators = _navigators;
+    final workspace = _root.read(workspaceProvider).value;
+    final active = workspace?.activeTabId;
+    if (navigators != null && workspace != null && active == null) {
+      close(); // the no-tabs auto-dismiss
+      return;
+    }
+    final navigator = navigators != null && active != null
+        ? navigators.navigatorFor(active)
+        : null;
+    _entry?.remove();
+    _tab = navigator == null ? null : active;
+    final entry = OverlayEntry(
+      builder: (_) =>
+          _TabDiagnosticsDrawerHost(onClose: close, animateIn: animateIn),
+    );
+    _entry = entry;
+    (navigator?.overlay ?? _rootOverlay).insert(entry);
+  }
+
+  void _scheduleSync() {
+    if (_syncScheduled || _closed.isCompleted) return;
+    _syncScheduled = true;
+    WidgetsBinding.instance
+      ..addPostFrameCallback((_) {
+        _syncScheduled = false;
+        if (_closed.isCompleted) return;
+        final active = _root.read(workspaceProvider).value?.activeTabId;
+        if (active != _tab) _place(animateIn: false);
+      })
+      ..ensureVisualUpdate();
+  }
+}
+
 /// Hosts [TabDiagnosticsDrawer] inside the overlay entry: right-aligned
-/// slide-in transition, an Escape-to-close shortcut, active-tab provider
-/// scoping, and the no-tabs auto-dismiss. Mirrors WaveCrux's
+/// slide-in transition, an Escape-to-close shortcut, and the
+/// diagnostics-off auto-dismiss. It is built under the tab scope of the
+/// navigator its entry is on, so the drawer reads that tab's report
+/// without a scope of its own. Mirrors WaveCrux's
 /// `_TabDiagnosticsDrawerHost`.
 class _TabDiagnosticsDrawerHost extends ConsumerStatefulWidget {
   const _TabDiagnosticsDrawerHost({
-    required this.callerContext,
     required this.onClose,
+    required this.animateIn,
   });
-
-  /// The activating context — has `WorkspaceRoot` in its ancestor chain,
-  /// which the overlay entry's own context does not in every host, so
-  /// the per-tab container is resolved through it (the same contract as
-  /// `wrapInActiveTabScope`).
-  final BuildContext callerContext;
 
   /// Removes the overlay entry and completes the open future.
   final VoidCallback onClose;
+
+  /// False when the drawer moves to another tab: it is already open, so it
+  /// neither slides in again nor takes focus.
+  final bool animateIn;
 
   @override
   ConsumerState<_TabDiagnosticsDrawerHost> createState() =>
@@ -247,6 +323,10 @@ class _TabDiagnosticsDrawerHostState
         ).animate(
           CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
         );
+    if (!widget.animateIn) {
+      _controller.value = 1;
+      return;
+    }
     _controller.forward();
     // Take keyboard focus explicitly: an `autofocus` request is ignored
     // when the underlying route's scope already holds focus (an overlay
@@ -280,43 +360,15 @@ class _TabDiagnosticsDrawerHostState
 
   @override
   Widget build(BuildContext context) {
-    // Watching the workspace keeps the drawer following the ACTIVE tab
-    // (the per-tab scope below is re-resolved on every change) and makes
-    // the no-tabs auto-dismiss reactive: closing the last tab triggers a
-    // rebuild and the post-frame close fires — WaveCrux behavior.
-    final workspace = ref.watch(workspaceProvider).value;
-    final activeTabId = workspace?.activeTabId;
-    // Also closes when diagnostics are turned off in Settings while the
-    // drawer is open, rather than leaving a surface the gate now refuses.
-    if ((workspace != null && activeTabId == null) ||
-        !ref.watch(diagnosticsEnabledProvider) ||
-        !widget.callerContext.mounted) {
+    // Closes when diagnostics are turned off in Settings while the drawer
+    // is open, rather than leaving a surface the gate now refuses. (Following
+    // the active tab and the no-tabs auto-dismiss are the placement's.)
+    if (!ref.watch(diagnosticsEnabledProvider)) {
       _scheduleClose();
       return const SizedBox.shrink();
     }
 
-    // Per-tab scoping through the caller context (`wrapInActiveTabScope`
-    // semantics): the report provider reads the tab's project / run
-    // state / violation store, which only the tab's container overrides.
-    // Falls back to the unscoped drawer (its own empty state) when no
-    // container resolves — the same fallback wrapInActiveTabScope has.
-    Widget content = TabDiagnosticsDrawer(onClose: _close);
-    ProviderContainer? container;
-    try {
-      container = activeTabContainerOf(widget.callerContext);
-    } on Object {
-      container = null; // no WorkspaceRoot above the caller (web host).
-    }
-    if (container != null) {
-      content = UncontrolledProviderScope(
-        // Keyed by the tab id so a tab switch fully remounts the subtree
-        // against the new tab's container (the WaveCrux drawer's
-        // remount-on-switch behavior).
-        key: ValueKey('tabScope.diag:$activeTabId'),
-        container: container,
-        child: content,
-      );
-    }
+    final content = TabDiagnosticsDrawer(onClose: _close);
 
     // Escape-to-close binds at this host's level so the key is consumed
     // even when no inner widget has focus.
@@ -339,10 +391,9 @@ class _TabDiagnosticsDrawerHostState
             alignment: AlignmentDirectional.centerEnd,
             child: SlideTransition(
               position: _offset,
-              child: SizedBox(
-                height: MediaQuery.sizeOf(context).height,
-                child: content,
-              ),
+              // The full height of the overlay it is on: the tab's area,
+              // or the window on the root overlay.
+              child: SizedBox(height: double.infinity, child: content),
             ),
           ),
         ),

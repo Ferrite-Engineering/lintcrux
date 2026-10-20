@@ -61,7 +61,6 @@ void main() {
     'Open Workspace… skips a tab whose project file is missing instead '
     'of aborting the whole load',
     (tester) async {
-      tolerateKnownFirstBuildWart();
       final dir = Directory.systemTemp.createTempSync(
         'lintcrux_ws_error_path_',
       );

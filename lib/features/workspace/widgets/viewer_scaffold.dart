@@ -39,9 +39,9 @@ import 'package:path/path.dart' as p;
 /// canvas can open projects / sessions / workspaces without
 /// re-implementing the file-picker logic.
 ///
-/// Reads the per-tab and per-pane container managers from the
-/// surrounding [WorkspaceRoot] via [WorkspaceRoot.of] and hands them
-/// to [crux.PaneHost].
+/// Reads the per-tab and per-pane container managers and the tab
+/// navigators from the surrounding [WorkspaceRoot] via
+/// [WorkspaceRoot.of] and hands them to [crux.PaneHost].
 class ViewerScaffold extends ConsumerWidget {
   /// Creates a [ViewerScaffold].
   const ViewerScaffold({super.key});
@@ -231,6 +231,10 @@ class ViewerScaffold extends ConsumerWidget {
                       provider: workspaceProvider,
                       tabs: scope.tabs,
                       panes: scope.panes,
+                      // Each tab on its own navigator, so a dialog that reads
+                      // the tab's providers is built under the tab's one
+                      // scope (`ActiveTab.navigatorFor`).
+                      tabNavigators: scope.tabNavigators,
                       strings: LintcruxViewerTabBarStrings(l10n),
                       // Match WaveCrux/NetCrux/SimCrux: only show the
                       // tab-strip scroll chevrons when the strip actually

@@ -52,7 +52,6 @@ void main() {
     'Open Session… loads the referenced project and replays its '
     'filter/sort state onto the new tab',
     (tester) async {
-      tolerateKnownFirstBuildWart();
       final dir = Directory.systemTemp.createTempSync(
         'lintcrux_session_replay_',
       );

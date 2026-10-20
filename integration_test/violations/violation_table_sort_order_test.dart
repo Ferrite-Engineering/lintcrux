@@ -29,11 +29,6 @@ void main() {
   testWidgets(
     'violation-table sort order: header tap cycles sort and reorders rows',
     (tester) async {
-      // Seeding the violation table trips the debug-only first-build
-      // provider self-invalidation wart (PENDING.md "Known issues"). It
-      // can land on a frame after the triggering line, so filter it at
-      // the source rather than reaching for `takeException` later.
-      tolerateKnownFirstBuildWart();
       final projectDir = Directory.systemTemp.createTempSync(
         'lintcrux_vt_sort',
       );

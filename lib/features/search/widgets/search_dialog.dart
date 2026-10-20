@@ -16,12 +16,12 @@ import 'package:lintcrux/services/violations/violation_store_provider.dart';
 /// command-palette entry.
 ///
 /// On the desktop the dialog reads the *active tab's*
-/// `violationStoreProvider` / `selectedViolationProvider`, so it is wrapped
-/// in [wrapInActiveTabScope]: a bare `showDialog` mounts the dialog on the
-/// root Navigator, whose `ProviderScope` is the root container (empty
-/// violation store) rather than the active tab's. [context] must carry
-/// `WorkspaceRoot` in its ancestor chain — pass the activating context
-/// (the routerDelegate navigator's context), not the dialog builder's.
+/// `violationStoreProvider` / `selectedViolationProvider`, so it is shown
+/// on the active tab's navigator ([ActiveTab.navigatorFor]): a bare
+/// `showDialog` mounts the dialog on the root Navigator, whose
+/// `ProviderScope` is the root container (empty violation store) rather
+/// than the active tab's. [context] is the activating context (the
+/// routerDelegate navigator's, or one inside the tab).
 ///
 /// Pass [activeTab] `false` where the violations on screen live in the root
 /// scope instead: the browser viewer, which has no workspace and no tabs, and
@@ -35,12 +35,11 @@ Future<void> showViolationSearchDialog(
   // palette entry must not stack a second search dialog. Guarded inside the
   // launcher so every caller is covered.
   return ModalGuard.run(
-    'search',
+    activeTab ? ActiveTab.guardKey(context, 'search') : 'search',
     () => showCruxDialog<void>(
       context: context,
-      builder: (_) => activeTab
-          ? wrapInActiveTabScope(context, const SearchDialog())
-          : const SearchDialog(),
+      navigator: activeTab ? ActiveTab.navigatorFor(context) : null,
+      builder: (_) => const SearchDialog(),
     ),
   );
 }

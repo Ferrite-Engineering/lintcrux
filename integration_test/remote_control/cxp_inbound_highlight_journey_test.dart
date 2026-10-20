@@ -42,11 +42,6 @@ void main() {
     'inbound RequestHighlight resolves against the ACTIVE tab and acks '
     'honored (real socket over the live app server)',
     (tester) async {
-      // Seeding the violation table trips the debug-only first-build
-      // provider self-invalidation wart (PENDING.md "Known issues"). It
-      // can land on a frame after the triggering line, so filter it at
-      // the source rather than reaching for `takeException` later.
-      tolerateKnownFirstBuildWart();
       final projectDir = Directory.systemTemp.createTempSync(
         'lintcrux_cxp_inbound_',
       );

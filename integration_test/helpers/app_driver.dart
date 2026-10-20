@@ -91,44 +91,6 @@ void disablePlatformSemantics() {
       false;
 }
 
-/// Installs a [FlutterError.onError] filter for the duration of the
-/// current test that swallows the known debug-only wart: the
-/// markNeedsBuild-during-build assert trips when one tab's
-/// `ProviderContainer` is mounted under two sibling
-/// `UncontrolledProviderScope`s (the tab content and an open dialog or
-/// the diagnostics drawer), because whichever flushes the Riverpod
-/// scheduler first notifies listeners in the other subtree. Every OTHER
-/// error still reaches the original handler and fails the test normally.
-///
-/// The wart can fire on a frame that lands after the triggering test
-/// body line has already moved on (including during teardown), so a
-/// plain `tester.takeException()` call site misses it; filtering at the
-/// source catches those.
-///
-/// **This does not make a seeding journey reliable.** Riverpod reports
-/// the assert through `Zone.handleUncaughtError`, which `flutter_test`
-/// turns into a test failure however the filter answers. Those reports
-/// arrive tagged with the test framework as their library and are passed
-/// through, so the failure names the real assertion; swallowing them only
-/// traded it for flutter_test's opaque "A test overrode
-/// FlutterError.onError" assertion. The workspace status bar no longer
-/// shares a tab's container this way; dialogs and the diagnostics drawer
-/// still do. See the Pro overlay's `integration_test/PENDING.md` "Known
-/// issues" for the mechanism.
-void tolerateKnownFirstBuildWart() {
-  final original = FlutterError.onError;
-  FlutterError.onError = (details) {
-    if (details.library != 'Flutter test framework' &&
-        details.exceptionAsString().contains(
-          'setState() or markNeedsBuild() called during build',
-        )) {
-      return;
-    }
-    original?.call(details);
-  };
-  addTearDown(() => FlutterError.onError = original);
-}
-
 /// Bounded condition-poll — use this, NOT `pumpAndSettle(Duration)`. Under the
 /// live binding the pump `duration` is a per-pump interval, not a timeout.
 Future<bool> pumpUntil(

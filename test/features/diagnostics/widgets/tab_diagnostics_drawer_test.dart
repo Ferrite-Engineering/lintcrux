@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crux_workspace/crux_workspace.dart' as crux;
 import 'package:crux_yosys/crux_yosys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/models/diagnostics/diagnostics_report.dart';
+import 'package:lintcrux/domain/models/lintcrux_tab_payload.dart';
 import 'package:lintcrux/features/diagnostics/providers/diagnostics_providers.dart';
 import 'package:lintcrux/features/diagnostics/widgets/tab_diagnostics_drawer.dart';
 import 'package:lintcrux/features/project/services/open_project_service.dart';
@@ -308,13 +310,28 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: L10N.supportedLocales,
+            // A pane host with tab navigators, as `ViewerScaffold` builds
+            // it: the drawer goes on the active tab's navigator overlay.
             home: WorkspaceRoot(
-              child: Builder(
-                builder: (context) => Scaffold(
-                  body: ElevatedButton(
-                    onPressed: () => TabDiagnosticsDrawer.open(context),
-                    child: const Text('open drawer'),
-                  ),
+              child: Scaffold(
+                body: Builder(
+                  builder: (context) {
+                    final scope = WorkspaceRoot.of(context);
+                    Widget button() => Builder(
+                      builder: (context) => ElevatedButton(
+                        onPressed: () => TabDiagnosticsDrawer.open(context),
+                        child: const Text('open drawer'),
+                      ),
+                    );
+                    return crux.PaneHost<LintcruxTabPayload>(
+                      provider: workspaceProvider,
+                      tabs: scope.tabs,
+                      panes: scope.panes,
+                      tabNavigators: scope.tabNavigators,
+                      emptyCanvasContent: button(),
+                      tabContentBuilder: (_, _) => button(),
+                    );
+                  },
                 ),
               ),
             ),
@@ -362,7 +379,9 @@ void main() {
         expect(result, isA<OpenProjectSuccess>());
         await tester.pump();
 
-        final l10n = L10N.of(buttonContext);
+        // The empty canvas the first button sat on is gone: the tab's
+        // content (with its own button) replaced it.
+        final l10n = L10N.of(tester.element(find.byType(WorkspaceRoot)));
         await tester.runAsync(() => tester.tap(find.text('open drawer')));
         // Poll the drawer open (its title renders) instead of a fixed
         // sleep: advance real time in steps inside `runAsync`, pump the

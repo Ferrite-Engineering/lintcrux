@@ -24,9 +24,13 @@
 // the existing tests because every one of them used a single `ProviderScope`,
 // so the dropdown and the dialog shared a container.
 //
-// LintCrux's re-binding shape is the helper form: `wrapInActiveTabScope(
-// context, child)` (`lib/features/workspace/services/active_tab_scope.dart`),
-// which the guard resolves one hop and accepts.
+// LintCrux's shape is the tab-navigator form: a dialog that reads a tab is
+// shown with `navigator: ActiveTab.navigatorFor(context)`
+// (`lib/features/workspace/services/active_tab_scope.dart`), which pushes it
+// on the tab's own nested navigator, under the tab's one scope; the guard
+// accepts a `navigatorFor(...)` navigator. A second scope over a tab's
+// container is not a fix here: two scopes on one container mark each
+// other's widgets dirty mid-build.
 //
 // The allowlist is deliberately empty. A violation is fixed, not listed.
 

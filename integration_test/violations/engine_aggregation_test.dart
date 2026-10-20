@@ -30,11 +30,6 @@ void main() {
   testWidgets(
     'engine aggregation: two engines merge into the combined violation table',
     (tester) async {
-      // Seeding the violation table trips the debug-only first-build
-      // provider self-invalidation wart (PENDING.md "Known issues"). It
-      // can land on a frame after the triggering line, so filter it at
-      // the source rather than reaching for `takeException` later.
-      tolerateKnownFirstBuildWart();
       final projectDir = Directory.systemTemp.createTempSync(
         'lintcrux_vt_engines',
       );

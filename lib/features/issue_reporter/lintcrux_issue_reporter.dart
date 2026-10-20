@@ -26,14 +26,16 @@ import 'package:lintcrux/features/workspace/services/active_tab_scope.dart';
 ///    report, because rule ids and their meanings drift between engine
 ///    releases (the reason `RuleAliasTable` exists at all).
 ///
-/// 2. **Mount the dialog inside the ACTIVE TAB's `ProviderContainer`.** The
-///    session contributor reads `currentProjectProvider`,
-///    `violationStoreProvider` and the table state, all of which are per-tab.
+/// 2. **Mount the dialog on the ACTIVE TAB's navigator.** The session
+///    contributor reads `currentProjectProvider`, `violationStoreProvider` and
+///    the table state, all of which are per-tab.
 ///    `CruxIssueReporterDialog.openAdaptive` resolves its container from the
 ///    context it is handed — which, from an action dispatch, is the router's
 ///    navigator context in the ROOT scope, where every one of those providers
 ///    reads empty. The report would faithfully record "no project loaded, 0
-///    violations" while the user is staring at a full violations table.
+///    violations" while the user is staring at a full violations table. On the
+///    tab's own navigator ([ActiveTab.navigatorFor]) the dialog is built under
+///    the tab's one scope.
 ///
 /// The per-tab binding is a plain `Provider` that `ref.watch`es its inputs, so
 /// it recomputes on its own; the package's `openAdaptive` invalidation (aimed
@@ -56,8 +58,10 @@ abstract final class LintcruxIssueReporter {
   /// Re-entrancy guarded ([ModalGuard]) inside the opener: a repeated gesture
   /// while the reporter is open (or while the engine-version probe /
   /// screenshot capture is still running) must not stack a second copy.
-  static Future<void> open(BuildContext context) =>
-      ModalGuard.run('issueReporter', () => _open(context));
+  static Future<void> open(BuildContext context) => ModalGuard.run(
+    ActiveTab.guardKey(context, 'issueReporter'),
+    () => _open(context),
+  );
 
   static Future<void> _open(BuildContext context) async {
     final rootContainer = ProviderScope.containerOf(context, listen: false);
@@ -81,16 +85,14 @@ abstract final class LintcruxIssueReporter {
     await showCruxDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => UncontrolledProviderScope(
-        container: container,
-        child: CruxDialog(
-          width: _dialogWidth,
-          scrollable: false,
-          contentPadding: EdgeInsets.zero,
-          content: SizedBox(
-            height: _dialogHeight,
-            child: CruxIssueReporterDialog(screenshotPng: screenshot),
-          ),
+      navigator: ActiveTab.navigatorFor(context),
+      builder: (_) => CruxDialog(
+        width: _dialogWidth,
+        scrollable: false,
+        contentPadding: EdgeInsets.zero,
+        content: SizedBox(
+          height: _dialogHeight,
+          child: CruxIssueReporterDialog(screenshotPng: screenshot),
         ),
       ),
     );

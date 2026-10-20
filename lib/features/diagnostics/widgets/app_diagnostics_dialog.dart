@@ -22,21 +22,20 @@ class AppDiagnosticsDialog extends ConsumerStatefulWidget {
   /// Mounts the dialog as a modal rooted at [context]. Returns when
   /// dismissed.
   ///
-  /// Wrapped in [wrapInActiveTabScope]: the report's violation count
-  /// derives from the per-tab violation store, so a bare `showDialog`
-  /// would read the empty root-scope store and always report zero.
+  /// Shown on the active tab's navigator ([ActiveTab.navigatorFor]): the
+  /// report's violation count derives from the per-tab violation store, so
+  /// a bare `showDialog` would read the empty root-scope store and always
+  /// report zero.
   static Future<void> show(BuildContext context) {
     // Re-entrancy guard: shortcut auto-repeat, a double-tap on the menu
     // item, or the palette entry must not stack a second dialog. Guarded
     // inside the opener so every caller is covered.
     return ModalGuard.run(
-      'appDiagnostics',
+      ActiveTab.guardKey(context, 'appDiagnostics'),
       () => showCruxDialog<void>(
         context: context,
-        builder: (_) => wrapInActiveTabScope(
-          context,
-          const AppDiagnosticsDialog(),
-        ),
+        navigator: ActiveTab.navigatorFor(context),
+        builder: (_) => const AppDiagnosticsDialog(),
       ),
     );
   }
