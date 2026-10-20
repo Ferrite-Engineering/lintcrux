@@ -15,8 +15,8 @@ Twenty-one actions ship with a default binding. Everything else is reachable fro
 | ++cmd+w++ / ++ctrl+w++ | Close Tab | File |
 | ++cmd+shift+r++ / ++ctrl+shift+r++ | Reset Workspace… | File |
 | ++cmd+shift+p++ / ++ctrl+shift+p++ | Command Palette… | View |
-| ++cmd+shift+x++ / ++ctrl+shift+x++ | Show Cross-Probe Panel | View |
-| ++cmd+shift+enter++ / ++ctrl+shift+enter++ | Cross-probe Selection… (from 1.2; a focused text field keeps the key) | View |
+| ++cmd+shift+x++ / ++ctrl+shift+x++ | Cross-probe Peers | View |
+| ++cmd+shift+enter++ / ++ctrl+shift+enter++ | Cross-probe Selection… (from LintCrux 1.2; a focused text field keeps the key) | View |
 | ++cmd+backslash++ / ++ctrl+backslash++ | Split Pane Right | View |
 | ++ctrl+tab++ | Next Tab | View |
 | ++ctrl+shift+tab++ | Previous Tab | View |
@@ -81,7 +81,7 @@ The violations table is the gesture surface in LintCrux. These are the gestures 
 
 Every row gesture has a keyboard equivalent once a row has focus — ++arrow-up++ / ++arrow-down++ select, ++enter++ opens in the editor, ++space++ ticks the checkbox, ++shift+f10++ opens the context menu; see [the violations table's keyboard section](violations.md#keyboard).
 
-Right-clicking selects the row first, so the context menu always acts on the row under the pointer. From 1.2 every build has **Cross-probe to**, free in every tier; the Pro overlay adds **Waive…** and **Suggest fix with Verible**, each badged <span class="tier tier-pro">Pro</span>.
+Right-clicking selects the row first, so the context menu always acts on the row under the pointer. The menu's entries come from the Pro overlay: **Waive…** and **Suggest fix with Verible**, each badged <span class="tier tier-pro">Pro</span>, and **Cross-probe to peer…**, which is free in every tier from 1.1. An Open Core build has no row context menu. From LintCrux 1.2 the entry reads **Cross-probe to** and every build, Open Core included, has it, free in every tier.
 
 !!! note "No other pointer gestures"
     LintCrux binds no scroll-wheel, middle-click or drag gestures on the table. Editor integration is configured under `Settings → Editors`; see [Cross-probe & the suite](integrations.md#editors).
