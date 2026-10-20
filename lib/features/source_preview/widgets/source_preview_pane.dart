@@ -62,12 +62,61 @@ class SourcePreviewPane extends ConsumerWidget {
   }
 }
 
-class _SourceListing extends StatelessWidget {
+/// The listing, scrolled so the violation's own line is on screen.
+///
+/// The window starts several lines above the violation, so in a short pane the
+/// violation line starts below the visible part. After each layout of a new
+/// window the line is brought to the middle of the viewport: with context on
+/// both sides while the window is longer than the pane, and simply in place
+/// when everything fits.
+///
+/// Rows are built eagerly (a window is a few dozen lines at most), so the
+/// highlighted row always exists to be scrolled to.
+class _SourceListing extends StatefulWidget {
   const _SourceListing({required this.window});
   final SourceWindow window;
 
   @override
+  State<_SourceListing> createState() => _SourceListingState();
+}
+
+class _SourceListingState extends State<_SourceListing> {
+  final _scrollController = ScrollController();
+  final GlobalKey _primaryKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    _revealPrimaryLine();
+  }
+
+  @override
+  void didUpdateWidget(_SourceListing oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.window, widget.window)) _revealPrimaryLine();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _revealPrimaryLine() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final primary = _primaryKey.currentContext;
+      if (primary == null) return;
+      // Jump, never animate: a selection change should land on its line, and
+      // an animation would still be running when the user selects the next
+      // row.
+      Scrollable.ensureVisible(primary, alignment: 0.5);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final window = widget.window;
     final scheme = Theme.of(context).colorScheme;
     final textStyle = TextStyle(
       fontFamily: 'monospace',
@@ -91,49 +140,60 @@ class _SourceListing extends StatelessWidget {
         ),
         Expanded(
           child: Scrollbar(
-            child: ListView.builder(
-              itemCount: window.lines.length,
-              itemBuilder: (context, i) {
-                final lineNumber = window.startLine + i;
-                final isPrimary = lineNumber == window.highlightLine;
-                final isRelated = window.highlightedRelated.contains(
-                  lineNumber,
-                );
-                final bg = isPrimary
-                    ? scheme.primaryContainer
-                    : (isRelated ? scheme.secondaryContainer : null);
-                return Container(
-                  color: bg,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 48,
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        color: scheme.surfaceContainerHighest.withAlpha(96),
-                        child: Text(
-                          '$lineNumber',
-                          textAlign: TextAlign.right,
-                          style: textStyle.copyWith(
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: SelectableText(
-                          window.lines[i],
-                          style: textStyle,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+            controller: _scrollController,
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (var i = 0; i < window.lines.length; i++)
+                    _row(
+                      scheme: scheme,
+                      textStyle: textStyle,
+                      lineNumber: window.startLine + i,
+                      text: window.lines[i],
+                    ),
+                ],
+              ),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _row({
+    required ColorScheme scheme,
+    required TextStyle textStyle,
+    required int lineNumber,
+    required String text,
+  }) {
+    final window = widget.window;
+    final isPrimary = lineNumber == window.highlightLine;
+    final isRelated = window.highlightedRelated.contains(lineNumber);
+    final bg = isPrimary
+        ? scheme.primaryContainer
+        : (isRelated ? scheme.secondaryContainer : null);
+    return Container(
+      key: isPrimary ? _primaryKey : null,
+      color: bg,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 48,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            color: scheme.surfaceContainerHighest.withAlpha(96),
+            child: Text(
+              '$lineNumber',
+              textAlign: TextAlign.right,
+              style: textStyle.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: SelectableText(text, style: textStyle)),
+        ],
+      ),
     );
   }
 }

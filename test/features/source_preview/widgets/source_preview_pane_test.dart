@@ -247,6 +247,114 @@ void main() {
     );
   });
 
+  group('SourcePreviewPane in a short pane', () {
+    // The window starts ten lines above the finding, so with the default
+    // ten lines of context the finding sits about 160 px down a listing that
+    // a short pane shows only the top of.
+    final lines = List<String>.generate(60, (i) => 'line ${i + 1}');
+    Violation at(int line) => violation.copyWith(
+      location: SourceLocation(file: '/p/a.sv', line: line, column: 1),
+    );
+
+    Future<void> pumpShortPane(
+      WidgetTester tester, {
+      required List<Violation> violations,
+      double height = 140,
+    }) async {
+      await tester.pumpWidget(
+        wrap(
+          Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(height: height, child: const SourcePreviewPane()),
+          ),
+          overrides: [
+            readerOverride({'/p/a.sv': lines}, contextLines: 10),
+          ],
+          storeViolations: violations,
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    /// Whether the whole row for [lineNumber] sits inside the listing's
+    /// viewport.
+    bool isOnScreen(WidgetTester tester, int lineNumber) {
+      final viewport = tester.getRect(find.byType(Scrollable).first);
+      final row = tester.getRect(find.text('line $lineNumber'));
+      return row.top >= viewport.top && row.bottom <= viewport.bottom;
+    }
+
+    testWidgets("keeps the finding's own line visible", (tester) async {
+      final finding = at(30);
+      await pumpShortPane(tester, violations: [finding]);
+      await selectViolation(tester, finding);
+      await tester.pumpAndSettle();
+
+      expect(find.text('line 30'), findsOneWidget);
+      expect(
+        isOnScreen(tester, 30),
+        isTrue,
+        reason: 'the highlighted line must be inside the visible preview',
+      );
+    });
+
+    testWidgets('sits near the middle, with context above and below', (
+      tester,
+    ) async {
+      final finding = at(30);
+      await pumpShortPane(tester, violations: [finding]);
+      await selectViolation(tester, finding);
+      await tester.pumpAndSettle();
+
+      final viewport = tester.getRect(find.byType(Scrollable).first);
+      final row = tester.getRect(find.text('line 30'));
+      expect(
+        (row.center.dy - viewport.center.dy).abs(),
+        lessThan(row.height),
+        reason: 'the finding is centred in the viewport',
+      );
+      expect(isOnScreen(tester, 29), isTrue, reason: 'a line above shows');
+      expect(isOnScreen(tester, 31), isTrue, reason: 'a line below shows');
+    });
+
+    testWidgets('follows the selection to the next finding', (tester) async {
+      final first = at(15);
+      final second = at(45);
+      await pumpShortPane(tester, violations: [first, second]);
+      await selectViolation(tester, first);
+      await tester.pumpAndSettle();
+      expect(isOnScreen(tester, 15), isTrue);
+
+      await selectViolation(tester, second);
+      await tester.pumpAndSettle();
+      expect(isOnScreen(tester, 45), isTrue);
+    });
+
+    testWidgets('still shows a finding near the top of the file', (
+      tester,
+    ) async {
+      final finding = at(2);
+      await pumpShortPane(tester, violations: [finding]);
+      await selectViolation(tester, finding);
+      await tester.pumpAndSettle();
+
+      expect(isOnScreen(tester, 2), isTrue);
+    });
+
+    testWidgets('a pane tall enough for the whole window needs no scrolling', (
+      tester,
+    ) async {
+      final finding = at(30);
+      await pumpShortPane(tester, violations: [finding], height: 600);
+      await selectViolation(tester, finding);
+      await tester.pumpAndSettle();
+
+      expect(isOnScreen(tester, 20), isTrue, reason: 'first line of window');
+      expect(isOnScreen(tester, 30), isTrue);
+      expect(isOnScreen(tester, 40), isTrue, reason: 'last line of window');
+    });
+  });
+
   group('SourcePreviewPane locale sweep', () {
     for (final locale in const [
       Locale('en'),
