@@ -7,9 +7,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/core/lintcrux_url_launcher.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
 import 'package:lintcrux/features/workspace/widgets/empty_canvas_content.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
+
+import '../../../support/in_memory_recent_store.dart';
 
 Future<void> _pump(
   WidgetTester tester, {
@@ -19,7 +20,7 @@ Future<void> _pump(
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [recentProjectsProvider.overrideWithValue(const <String>[])],
+      overrides: [recentProjectsSeed()],
       child: MaterialApp(
         locale: locale,
         localizationsDelegates: const [
@@ -35,7 +36,7 @@ Future<void> _pump(
             onOpenSession: () {},
             onOpenWorkspace: () {},
             onNewProject: () {},
-            onOpenRecentProject: (_) {},
+            onOpenRecentProject: (_) async => true,
           ),
         ),
       ),

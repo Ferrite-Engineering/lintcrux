@@ -27,7 +27,26 @@ class _TextAwareShortcutManager extends ShortcutManager {
     if (_isBareEscape(event) && _isPopupFocused()) {
       return KeyEventResult.ignored;
     }
+    // Cross-probe Selection's chord ends in Enter, which a text field owns (a
+    // multi-line field inserts a line break on it). A modifier chord passes
+    // through text fields on purpose, so this one is held back explicitly.
+    if (_isTextInputFocused() && _matchesCrossProbeSelection(event)) {
+      return KeyEventResult.ignored;
+    }
     return super.handleKeypress(context, event);
+  }
+
+  /// Whether [event] is the chord currently bound to Cross-probe Selection.
+  bool _matchesCrossProbeSelection(KeyEvent event) {
+    for (final entry in shortcuts.entries) {
+      final intent = entry.value;
+      if (intent is ShortcutActionIntent &&
+          intent.action == LintcruxAction.crossProbeSelection &&
+          entry.key.accepts(event, HardwareKeyboard.instance)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Escape with no modifier at all.

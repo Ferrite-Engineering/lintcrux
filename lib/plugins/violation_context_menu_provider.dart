@@ -7,14 +7,14 @@ import 'package:crux_license/crux_license.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/violation.dart';
+import 'package:lintcrux/features/remote/widgets/cross_probe_violation_menu_entry.dart';
 
 /// One context-menu entry shown on right-click / long-press of a row in
 /// the violation table.
 ///
 /// The Pro overlay contributes entries (e.g. "Waive…") via the
 /// `violationContextMenuEntriesProvider` extension point; open-core
-/// ships the seam with a default empty list so right-clicking a
-/// violation in the open-core build does nothing visible.
+/// ships the seam with the free "Cross-probe to" entry as its default.
 ///
 /// Activation runs inside the row widget's `BuildContext`, with a live
 /// `WidgetRef` and the right-clicked [Violation] in hand — so handlers
@@ -66,14 +66,16 @@ class ViolationContextMenuEntry {
 /// contributes entries to the violation table row's right-click /
 /// long-press context menu.
 ///
-/// Default returns an empty list so the open-core build's violation
-/// rows have no context menu (matches today's behavior). The Pro
-/// overlay's `proOverrides` replaces this provider with one that
-/// returns the "Waive…" entry plus future Pro context actions.
+/// The default is the one free entry every tier has, "Cross-probe to",
+/// which sends the right-clicked violation to a running peer product. The Pro
+/// overlay's `proOverrides` replaces this provider with one that returns the
+/// same entry plus "Waive…" and the other Pro context actions.
 ///
 /// Consumers (the row widget) iterate the list, build a popup-menu
 /// item per entry — with a [LintCruxFeatureTierBadge] next to the label
 /// derived from [ViolationContextMenuEntry.requiredTier] — and route
 /// activation through [ViolationContextMenuEntry.onActivate].
 final violationContextMenuEntriesProvider =
-    Provider<List<ViolationContextMenuEntry>>((_) => const []);
+    Provider<List<ViolationContextMenuEntry>>(
+      (_) => <ViolationContextMenuEntry>[buildCrossProbeViolationMenuEntry()],
+    );

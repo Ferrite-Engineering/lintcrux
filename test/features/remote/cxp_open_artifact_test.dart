@@ -7,18 +7,17 @@ library;
 import 'dart:io';
 
 import 'package:crux_cxp/crux_cxp.dart';
-import 'package:crux_window_chrome/crux_window_chrome.dart';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
-import 'package:lintcrux/domain/models/app_settings.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
-import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
+import 'package:lintcrux/features/remote/providers/cxp_request_handler_provider.dart';
 import 'package:lintcrux/services/remote/cxp/cxp_project_open_handle.dart';
 import 'package:lintcrux/services/remote/cxp/cxp_workspace_link.dart';
+import 'package:lintcrux/services/remote/cxp/lintcrux_cxp_binding.dart';
 import 'package:lintcrux/services/remote/cxp/lintcrux_name_resolver.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
@@ -43,8 +42,7 @@ import '../../support/telemetry_test_store.dart';
 /// and the real `cxpPathContainmentProvider`, whose roots are the directories
 /// of the projects the handle reports opened. Most tests dispatch straight to
 /// the handler, so it sees exactly what a peer sent; the socket tests go
-/// through the server the lifecycle provider builds, whose wire screen runs
-/// first.
+/// through the shared runtime, whose wire screen runs first.
 void main() {
   late Directory opened;
   late Directory never;
@@ -58,13 +56,9 @@ void main() {
     storeDir = Directory.systemTemp.createTempSync('lc_artifact_store_');
     peersDir = Directory.systemTemp.createTempSync('lc_artifact_peers_');
     openerCalls = <String>[];
-    // An honoured open nudges the window's attention; these plain `test()`
-    // bodies have no binding for the platform channel.
-    windowAttentionRequester = const NoopWindowAttentionRequester();
   });
 
   tearDown(() {
-    windowAttentionRequester = const MethodChannelWindowAttentionRequester();
     <Directory>[opened, never, storeDir, peersDir].forEach(_deleteQuietly);
   });
 
@@ -110,9 +104,20 @@ void main() {
               return true;
             },
         ),
-        appSettingsProvider.overrideWith(_CxpOnEphemeralPort.new),
+        // CXP on, bound to an ephemeral port so the test never collides with
+        // a running LintCrux on the default one.
+        cruxCxpProductBindingProvider.overrideWithValue(kLintcruxCxpBinding),
+        cruxCxpLaunchSettingsProvider.overrideWithValue(
+          const CruxCxpSettings(enabled: true, port: 0),
+        ),
+        cruxCxpTransportAvailableProvider.overrideWithValue(true),
+        cruxCxpRequestHandlerProvider.overrideWith(
+          LintCruxCxpWrappedHandler.new,
+        ),
         violationStoreProvider.overrideWithValue(InMemoryViolationStore()),
-        cxpManifestDirectoryProvider.overrideWith((ref) async => peersDir.path),
+        cruxCxpManifestDirectoryProvider.overrideWith(
+          (ref) async => peersDir.path,
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -357,10 +362,10 @@ void main() {
       expect(openerCalls, isEmpty);
     });
 
-    group('over a socket, through the server the lifecycle builds', () {
+    group('over a socket, through the shared runtime', () {
       Future<LocalCxpClient> connect(ProviderContainer container) async {
-        final state = await container.read(cxpServerLifecycleProvider.future);
-        expect(state.running, isTrue);
+        final runtime = await container.read(cruxCxpRuntimeProvider.future);
+        expect(runtime?.isAvailable, isTrue);
         final client = LocalCxpClient(
           selfIdentity: const PeerIdentity(
             peerId: 'open-artifact-test',
@@ -370,7 +375,7 @@ void main() {
         );
         await client.connect(
           host: '127.0.0.1',
-          port: state.boundPort!,
+          port: runtime!.boundPort!,
           token: cxpProcessAuthToken,
         );
         addTearDown(client.dispose);
@@ -395,11 +400,11 @@ void main() {
             as RequestOpenArtifactAck;
       }
 
-      // `LocalCxpServer` screens the hint on the wire before the handler
+      // The runtime's server screens the hint on the wire before the handler
       // sees it, and a rooted screen there strips the hint for a project
       // never opened. No record is written, so the hint is all the handler
-      // has. MUTATION: handing `LintCruxCxpServer` the rooted
-      // `cxpPathContainmentProvider` in `CxpServerLifecycle.build` makes this
+      // has. MUTATION: giving `kLintcruxCxpBinding` the rooted
+      // `cxpPathContainmentProvider` rule as its `containment` makes this
       // red.
       test('the hint for a project never opened crosses the wire, and it is '
           'opened', () async {
@@ -414,10 +419,10 @@ void main() {
       // a padded hint is stripped before the handler sees it (a refused hint
       // is simply no fallback, CXP §9.10). With nothing recorded, the
       // request is declined for want of a record, which is how this tells
-      // the wire's refusal from the handler's. MUTATION: handing
-      // `LintCruxCxpServer` a containment that admits padded paths in
-      // `CxpServerLifecycle.build` lets the hint through to the handler,
-      // which refuses it with a different reason, and this goes red.
+      // the wire's refusal from the handler's. MUTATION: giving
+      // `kLintcruxCxpBinding` a containment that admits padded paths lets the
+      // hint through to the handler, which refuses it with a different
+      // reason, and this goes red.
       test('a padded hint is stripped on the wire, and the request is '
           'declined', () async {
         project(never, 'padded.lintcrux');
@@ -559,13 +564,6 @@ InboundCxpMessage _inbound(CxpMessage body) => InboundCxpMessage(
     productVersion: '0.0.0-test',
   ),
 );
-
-/// CXP on (the default), bound to an ephemeral port so the test never
-/// collides with a running LintCrux on the default one.
-class _CxpOnEphemeralPort extends AppSettingsNotifier {
-  @override
-  AppSettings build() => const AppSettings(cxpServerPort: 0);
-}
 
 /// Deletes [dir], tolerating a server that is still removing its manifest
 /// from it.

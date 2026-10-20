@@ -235,7 +235,7 @@
   "@actionOpenAbout": {
     "description": "Menu / command palette label for the action that shows the About box."
   },
-  "actionOpenCrossProbePanel": "Cross-probe Peers",
+  "actionOpenCrossProbePanel": "Show Cross-Probe Panel",
   "@actionOpenCrossProbePanel": {
     "description": "Menu / command palette label for the action that opens the cross-probe panel showing connected CXP peers and recent cross-probe events."
   },
@@ -307,131 +307,9 @@
   "@actionForceLintRunWithoutCache": {
     "description": "Menu / command palette label for the Pro-tier action that runs lint once with the cache bypassed in both directions for that single invocation."
   },
-  "crossProbePanelTitle": "Cross-probe Peers",
-  "@crossProbePanelTitle": {
-    "description": "Title of the cross-probe panel."
-  },
-  "crossProbePanelServerStopped": "Cross-probe server is disabled.",
-  "@crossProbePanelServerStopped": {
-    "description": "Status text shown in the cross-probe panel when the CXP server is disabled in Settings."
-  },
-  "crossProbePanelPeersHeader": "Discovered peers",
-  "@crossProbePanelPeersHeader": {
-    "description": "Header above the discovered-peers list in the cross-probe panel."
-  },
-  "crossProbePanelPeersEmpty": "No peers discovered yet.",
-  "@crossProbePanelPeersEmpty": {
-    "description": "Empty-state text shown when no CXP peers have been discovered."
-  },
-  "crossProbePanelEventsHeader": "Recent events",
-  "@crossProbePanelEventsHeader": {
-    "description": "Header above the rolling event log in the cross-probe panel."
-  },
-  "crossProbePanelEventsEmpty": "No cross-probe events yet.",
-  "@crossProbePanelEventsEmpty": {
-    "description": "Empty-state text shown when the cross-probe event log is empty."
-  },
-  "crossProbePanelClearEvents": "Clear events",
-  "@crossProbePanelClearEvents": {
-    "description": "Button that clears the cross-probe event log."
-  },
-  "crossProbePanelClose": "Close",
-  "@crossProbePanelClose": {
-    "description": "Button that closes the cross-probe panel dialog."
-  },
-  "crossProbeSendTooltip": "Send selection to this peer",
-  "@crossProbeSendTooltip": {
-    "description": "Tooltip on the per-peer direct-send button in the docked cross-probe panel."
-  },
-  "crossProbeUnreachableTitle": "Unreachable peers",
-  "@crossProbeUnreachableTitle": {
-    "description": "Section header for discovered-but-unreachable peers in the docked cross-probe panel."
-  },
-  "crossProbeSendFailed": "The cross-probe to {peer} did not go through",
-  "@crossProbeSendFailed": {
-    "description": "Toast in the docked cross-probe panel when a send failed and the peer gave no reason: it never reached the peer, the peer never answered, or the peer declined without saying why. {peer} is the peer's product name.",
-    "placeholders": {
-      "peer": {
-        "type": "String",
-        "example": "WaveCrux"
-      }
-    }
-  },
-  "crossProbeSendRefused": "Cross-probe to {peer}: {reason}",
-  "@crossProbeSendRefused": {
-    "description": "Toast in the docked cross-probe panel when a send came back with an explanation: a refusal, a partial result, or a delivery failure the carrier explained. {peer} is the peer's product name; {reason} is that explanation, as sent.",
-    "placeholders": {
-      "peer": {
-        "type": "String",
-        "example": "WaveCrux"
-      },
-      "reason": {
-        "type": "String",
-        "example": "no signal matches this rule"
-      }
-    }
-  },
   "toolbarToggleCrossProbe": "Cross-Probe Panel",
   "@toolbarToggleCrossProbe": {
     "description": "Tooltip on the toolbar button that shows/hides the docked cross-probe panel."
-  },
-  "settingsCxpEnabledLabel": "Enable CXP server",
-  "@settingsCxpEnabledLabel": {
-    "description": "Label of the toggle controlling whether the CXP cross-probe server starts at boot."
-  },
-  "settingsCxpEnabledDescription": "Lets other Crux tools (WaveCrux, NetCrux, SimCrux) discover LintCrux and send cross-probe requests.",
-  "@settingsCxpEnabledDescription": {
-    "description": "Helper text explaining what the cross-probe server does."
-  },
-  "settingsCxpPortLabel": "CXP port",
-  "@settingsCxpPortLabel": {
-    "description": "Label of the port input for the CXP server."
-  },
-  "settingsCxpPortDescription": "Default 54324",
-  "@settingsCxpPortDescription": {
-    "description": "Hint text for the CXP port input showing the suite default."
-  },
-  "settingsRequestAttentionOnCrossProbeLabel": "Request attention on cross-probe",
-  "@settingsRequestAttentionOnCrossProbeLabel": {
-    "description": "Title for the toggle that requests OS attention on an inbound cross-probe."
-  },
-  "settingsRequestAttentionOnCrossProbeDescription": "Bounce the dock (or flash the taskbar) when a peer sends a cross-probe. Never steals focus.",
-  "@settingsRequestAttentionOnCrossProbeDescription": {
-    "description": "Description for the request-attention toggle."
-  },
-  "settingsBroadcastSelectionOnCrossProbeLabel": "Broadcast selection automatically",
-  "@settingsBroadcastSelectionOnCrossProbeLabel": {
-    "description": "Title for the toggle that controls the live selection auto-broadcast (notify_selection) on cross-probe."
-  },
-  "settingsBroadcastSelectionOnCrossProbeDescription": "Announce your selection to connected peers as you select it (live cross-probe). When off, only explicit sends are shared.",
-  "@settingsBroadcastSelectionOnCrossProbeDescription": {
-    "description": "Description for the auto-broadcast-selection toggle."
-  },
-  "settingsCxpStatus": "CXP Status",
-  "@settingsCxpStatus": {
-    "description": "Label for the CXP server status line in Settings, above the running-state and connected-peer readout."
-  },
-  "settingsCxpStatusRunning": "Running on port {port}",
-  "@settingsCxpStatusRunning": {
-    "description": "CXP status line shown when the server is running, naming the bound TCP port.",
-    "placeholders": {
-      "port": {
-        "type": "String"
-      }
-    }
-  },
-  "settingsCxpStatusStopped": "Stopped",
-  "@settingsCxpStatusStopped": {
-    "description": "CXP status line shown when the server is not running."
-  },
-  "settingsCxpPeersConnected": "{count, plural, =0{No peers connected} =1{1 peer connected} other{{count} peers connected}}",
-  "@settingsCxpPeersConnected": {
-    "description": "CXP status line showing how many peers are currently connected.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
   },
   "violationColumnSeverity": "Severity",
   "@violationColumnSeverity": {
@@ -1185,25 +1063,9 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
-  "emptyCanvasRecentProjectMissing": "Project file not found",
-  "@emptyCanvasRecentProjectMissing": {
-    "description": "Second line of a welcome-screen Recent projects row whose project file no longer exists (moved or deleted); the row is greyed."
-  },
-  "emptyCanvasRemoveRecentProject": "Remove from Recent Projects",
-  "@emptyCanvasRemoveRecentProject": {
-    "description": "Tooltip and accessible name of the button on a welcome-screen Recent projects row that removes that one entry from the list."
-  },
-  "emptyCanvasRecentProjectsHeading": "Recent projects",
-  "@emptyCanvasRecentProjectsHeading": {
-    "description": "Section heading above the recent-projects list on the empty-canvas state."
-  },
   "emptyCanvasRecentWorkspacesHeading": "Recent workspaces",
   "@emptyCanvasRecentWorkspacesHeading": {
     "description": "Section heading above the recent-workspaces list on the empty-canvas state."
-  },
-  "emptyCanvasNoRecentProjects": "No recent projects yet.",
-  "@emptyCanvasNoRecentProjects": {
-    "description": "Placeholder shown in the recent-projects section when the list is empty."
   },
   "emptyCanvasNoRecentWorkspaces": "No recent workspaces yet.",
   "@emptyCanvasNoRecentWorkspaces": {
@@ -1496,10 +1358,6 @@
   "actionClearRecentProjects": "Clear Recent Projects",
   "@actionClearRecentProjects": {
     "description": "Command palette and File menu label: empties the welcome screen Recent projects list."
-  },
-  "recentProjectsClearedSnack": "Recent projects cleared.",
-  "@recentProjectsClearedSnack": {
-    "description": "Confirmation shown (and announced to screen readers) after Clear Recent Projects empties the list."
   },
   "actionReopenRecentProject": "Reopen Recent Project",
   "@actionReopenRecentProject": {
@@ -2047,10 +1905,6 @@
   "@settingsAutoReloadDescription": {
     "description": "Description for the auto-reload segmented control."
   },
-  "settingsCxpPortError": "Enter a port between 1 and 65535.",
-  "@settingsCxpPortError": {
-    "description": "Error under the CXP port field for an invalid value."
-  },
   "tabContextMenuRevealInFinder": "Reveal in Finder",
   "@tabContextMenuRevealInFinder": {
     "description": "Tab context-menu reveal label on macOS."
@@ -2417,5 +2271,9 @@
   "fileWatcherIgnore": "Ignore",
   "@fileWatcherIgnore": {
     "description": "Button on the source-changed prompt that dismisses it without re-running. Same key and meaning as WaveCrux."
+  },
+  "actionCrossProbeSelection": "Cross-probe Selection…",
+  "@actionCrossProbeSelection": {
+    "description": "Menu / command palette label for the action that sends the selected violation to a running peer product (WaveCrux, NetCrux or SimCrux)."
   }
 }

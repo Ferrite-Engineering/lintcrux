@@ -217,6 +217,14 @@ enum LintcruxAction implements CruxAction {
   /// also reachable via the platform menu bar and the command palette.
   openCrossProbePanel,
 
+  /// Send the selected violation to a running peer product (WaveCrux, NetCrux
+  /// or SimCrux). One peer receives it at once; with several the target list
+  /// opens as a menu. Open Core.
+  ///
+  /// Default binding: Cmd/Ctrl+Shift+Enter; a focused text field keeps the
+  /// key. Also reachable via the menu bar and the command palette.
+  crossProbeSelection,
+
   // ── Waivers (Pro tier) ─────────────────────────────────────
   /// Open the managed-waiver review screen for the active
   /// project (the table of every waiver with edit / delete row
@@ -358,7 +366,7 @@ enum LintcruxAction implements CruxAction {
   reopenRecentProject,
 
   /// Empty the welcome screen's Recent projects list. Open-core: the list
-  /// is open-core's own (`recentProjectsListProvider`), not the Pro
+  /// is open-core's own (`recentProjects`), not the Pro
   /// registry's recents. File menu and palette; no shortcut.
   clearRecentProjects,
 
@@ -450,6 +458,7 @@ enum LintcruxAction implements CruxAction {
     // toggles — the suite's flagship cross-product feature was in a
     // different menu in half the products.
     LintcruxAction.openCrossProbePanel => ActionCategory.view,
+    LintcruxAction.crossProbeSelection => ActionCategory.view,
     // Managed-waiver review screen. Lives under Tools
     // alongside the other developer-facing surfaces (the platform
     // menu builds a dedicated "Lint" section in Pro, but the
@@ -608,6 +617,7 @@ extension LintcruxActionRequiredTier on LintcruxAction {
       case LintcruxAction.nextTab:
       case LintcruxAction.previousTab:
       case LintcruxAction.openCrossProbePanel:
+      case LintcruxAction.crossProbeSelection:
       case LintcruxAction.closeActiveProject:
       // Closing every workspace tab works standalone under
       // [NoopProjectRegistry] — no registry, no pinning — so it stays

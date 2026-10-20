@@ -95,6 +95,7 @@ const CruxMenuLayout<LintcruxAction> kMenuLayout = {
     ],
     [
       LintcruxAction.openCrossProbePanel,
+      LintcruxAction.crossProbeSelection,
     ],
     [
       LintcruxAction.saveFilterPreset,

@@ -2,16 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:crux_app_info/crux_app_info.dart';
+import 'package:crux_workspace/crux_workspace.dart' as crux;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/core/app_info/about_providers.dart';
-import 'package:lintcrux/features/workspace/providers/recent_project_exists_provider.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/widgets/empty_canvas_content.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../support/in_memory_recent_store.dart';
 
 /// Fixed build metadata for the version-line test, so the assertion does not
 /// track the real `pubspec.yaml` version.
@@ -34,19 +36,17 @@ void main() {
     WidgetTester tester, {
     required Locale locale,
     required List<VoidCallback> callbacks,
-    List<String> recentProjects = const <String>[],
-    void Function(String path)? onOpenRecent,
+    List<String> seededRecents = const <String>[],
+    Future<bool> Function(String path)? onOpenRecent,
     ApplicationBuildInfo? buildInfo,
-    RecentProjectExists exists = _allExist,
-    bool liveRecentList = false,
+    bool Function(String path) exists = _allExist,
   }) async {
     final [openProject, openSession, openWorkspace, newProject] = callbacks;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          if (!liveRecentList)
-            recentProjectsProvider.overrideWithValue(recentProjects),
-          recentProjectExistsProvider.overrideWithValue(exists),
+          recentProjectsSeed(seededRecents),
+          recentProjectsExist(exists),
           if (buildInfo != null)
             aboutBuildInfoProvider.overrideWith((ref) async => buildInfo),
         ],
@@ -65,12 +65,15 @@ void main() {
               onOpenSession: openSession,
               onOpenWorkspace: openWorkspace,
               onNewProject: newProject,
-              onOpenRecentProject: onOpenRecent ?? (_) {},
+              onOpenRecentProject: onOpenRecent ?? (_) async => true,
             ),
           ),
         ),
       ),
     );
+    // The Recent list reads its store in the background; one more frame
+    // shows what it found.
+    await tester.pump();
   }
 
   testWidgets('renders title, subtitle, and primary actions', (tester) async {
@@ -135,10 +138,7 @@ void main() {
       var imports = 0;
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            recentProjectsProvider.overrideWithValue(const <String>[]),
-            recentProjectExistsProvider.overrideWithValue(_allExist),
-          ],
+          overrides: [recentProjectsSeed(), recentProjectsExist()],
           child: MaterialApp(
             locale: const Locale('en'),
             localizationsDelegates: const [
@@ -154,7 +154,7 @@ void main() {
                 onOpenSession: () {},
                 onOpenWorkspace: () {},
                 onNewProject: () {},
-                onOpenRecentProject: (_) {},
+                onOpenRecentProject: (_) async => true,
                 onImportSarif: () => imports++,
               ),
             ),
@@ -194,7 +194,8 @@ void main() {
       locale: const Locale('en'),
       callbacks: [() {}, () {}, () {}, () {}],
     );
-    expect(find.text('No recent projects yet.'), findsOneWidget);
+    expect(find.text('No recent projects'), findsOneWidget);
+    expect(find.text('Recent projects'), findsOneWidget);
   });
 
   testWidgets('populated recent-projects shows tappable rows', (tester) async {
@@ -203,12 +204,15 @@ void main() {
       tester,
       locale: const Locale('en'),
       callbacks: [() {}, () {}, () {}, () {}],
-      recentProjects: const ['/p/a.lintcrux', '/p/b.lintcrux'],
-      onOpenRecent: (path) => tapped = path,
+      seededRecents: const ['/p/a.lintcrux', '/p/b.lintcrux'],
+      onOpenRecent: (path) async {
+        tapped = path;
+        return true;
+      },
     );
     expect(find.text('/p/a.lintcrux'), findsOneWidget);
     expect(find.text('/p/b.lintcrux'), findsOneWidget);
-    expect(find.text('No recent projects yet.'), findsNothing);
+    expect(find.text('No recent projects'), findsNothing);
     await tester.tap(find.text('/p/a.lintcrux'));
     await tester.pump();
     expect(tapped, '/p/a.lintcrux');
@@ -221,19 +225,15 @@ void main() {
       tester,
       locale: const Locale('en'),
       callbacks: [() {}, () {}, () {}, () {}],
-      liveRecentList: true,
+      seededRecents: const ['/p/a.lintcrux', '/p/b.lintcrux'],
     );
     final container = ProviderScope.containerOf(
       tester.element(find.byType(EmptyCanvasContent)),
     );
-    container.read(recentProjectsListProvider.notifier)
-      ..markOpened('/p/b.lintcrux')
-      ..markOpened('/p/a.lintcrux');
-    await tester.pump();
     expect(find.text('/p/a.lintcrux'), findsOneWidget);
 
     final removeA = find.descendant(
-      of: find.widgetWithText(ListTile, '/p/a.lintcrux'),
+      of: find.widgetWithText(ListTile, 'a.lintcrux'),
       matching: find.byTooltip('Remove from Recent Projects'),
     );
     await tester.ensureVisible(removeA);
@@ -241,7 +241,25 @@ void main() {
     await tester.pump();
     expect(find.text('/p/a.lintcrux'), findsNothing);
     expect(find.text('/p/b.lintcrux'), findsOneWidget);
-    expect(container.read(recentProjectsProvider), ['/p/b.lintcrux']);
+    expect(container.read(recentProjects.provider), ['/p/b.lintcrux']);
+  });
+
+  testWidgets('Clear Recent Projects empties the list and says so', (
+    tester,
+  ) async {
+    await pumpContent(
+      tester,
+      locale: const Locale('en'),
+      callbacks: [() {}, () {}, () {}, () {}],
+      seededRecents: const ['/p/a.lintcrux', '/p/b.lintcrux'],
+    );
+    final clear = find.byKey(const ValueKey('cruxRecentClear:recentProjects'));
+    await tester.ensureVisible(clear);
+    await tester.tap(clear);
+    await tester.pump();
+    expect(find.text('/p/a.lintcrux'), findsNothing);
+    expect(find.text('No recent projects'), findsOneWidget);
+    expect(find.text('Recent projects cleared.'), findsOneWidget);
   });
 
   testWidgets('a row whose project file is gone is greyed, says so, and can '
@@ -251,23 +269,45 @@ void main() {
       tester,
       locale: const Locale('en'),
       callbacks: [() {}, () {}, () {}, () {}],
-      recentProjects: const ['/p/here.lintcrux', '/p/gone.lintcrux'],
+      seededRecents: const ['/p/here.lintcrux', '/p/gone.lintcrux'],
       exists: (path) => path != '/p/gone.lintcrux',
-      onOpenRecent: (path) => tapped = path,
+      onOpenRecent: (path) async {
+        tapped = path;
+        return true;
+      },
     );
     expect(find.text('Project file not found'), findsOneWidget);
     expect(
       find.descendant(
-        of: find.widgetWithText(ListTile, '/p/gone.lintcrux'),
+        of: find.widgetWithText(ListTile, 'gone.lintcrux'),
         matching: find.text('Project file not found'),
       ),
       findsOneWidget,
     );
-    expect(find.byIcon(Icons.folder_off_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.do_not_disturb_on_outlined), findsOneWidget);
     expect(find.byTooltip('Remove from Recent Projects'), findsNWidgets(2));
-    await tester.tap(find.text('/p/gone.lintcrux'));
+    await tester.tap(find.text('gone.lintcrux'));
     await tester.pump();
     expect(tapped, '/p/gone.lintcrux');
+  });
+
+  testWidgets('an entry that fails to open is dropped from the list', (
+    tester,
+  ) async {
+    await pumpContent(
+      tester,
+      locale: const Locale('en'),
+      callbacks: [() {}, () {}, () {}, () {}],
+      seededRecents: const ['/p/a.lintcrux'],
+      onOpenRecent: (_) async => false,
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(EmptyCanvasContent)),
+    );
+    await tester.tap(find.text('a.lintcrux'));
+    await tester.pump();
+    await tester.pump();
+    expect(container.read(recentProjects.provider), isEmpty);
   });
 
   testWidgets('locale sweep: renders the localized chrome for every supported '
@@ -306,8 +346,14 @@ void main() {
         findsOneWidget,
         reason: 'new-project button missing for $locale',
       );
+      // The shared Recent list's own words (en, zh, ja, ko).
       expect(
-        find.text(l10n.emptyCanvasNoRecentProjects),
+        find.text(
+          crux.CruxRecentListStrings.forLocale(
+            locale,
+            crux.CruxRecentKind.projects,
+          ).empty,
+        ),
         findsOneWidget,
         reason: 'recent-projects placeholder missing for $locale',
       );

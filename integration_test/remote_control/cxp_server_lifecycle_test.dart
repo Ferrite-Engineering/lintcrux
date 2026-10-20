@@ -4,23 +4,19 @@
 // integration_test/remote_control/cxp_server_lifecycle_test.dart
 //
 // Verification driver for Verification Guide §7.1 (CXP server start /
-// stop). With `cxpServerEnabled = true` (the default) the app starts
-// the CXP server at boot; flipping the Settings → CXP Cross-Probe
-// toggle tears it down and back up. This drives the real
-// `cxpServerLifecycleProvider` + `appSettingsProvider` through a live
-// app rather than a bare `ProviderContainer`.
+// stop). With the CXP enable setting on (the default) the app starts the CXP
+// server at boot; flipping the Settings → CXP Cross-Probe toggle tears it
+// down and back up. This drives the real shared `cruxCxpRuntimeProvider` and
+// `cruxCxpSettingsProvider` through a live app rather than a bare
+// `ProviderContainer`.
 //
-// LintCrux's `CxpServerLifecycle` is an `AsyncNotifier<
-// CxpServerLifecycleState>` — a different shape than NetCrux's
-// `cxpServerHostProvider` (which resolves to a nullable server
-// instance). Here the state itself carries `running` / `boundPort` /
-// `error` fields, so the assertions read the state rather than a
-// server handle.
+// The runtime is a nullable value: null when CXP is off, otherwise the
+// running server, whose `isAvailable` / `unavailableReason` say whether the
+// socket bound.
 
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
-import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
 
 import '../helpers/app_driver.dart';
 
@@ -34,37 +30,39 @@ void main() {
       await bootLintcrux(tester);
       final root = rootContainer(tester);
 
-      // Default settings enable the server — the lifecycle resolves to
-      // a state that is either running or records why it could not
-      // bind. Never a hard crash. On a clean macOS test host it binds.
-      final started = await root.read(cxpServerLifecycleProvider.future);
+      // Default settings enable the server — the runtime resolves to a
+      // server that is either available or records why it could not bind.
+      // Never a hard crash. On a clean macOS test host it binds.
+      final started = await root.read(cruxCxpRuntimeProvider.future);
       expect(
-        started.running || started.error != null,
+        started != null &&
+            (started.isAvailable || started.unavailableReason != null),
         isTrue,
         reason:
-            'cxpServerEnabled defaults to true → server either runs or '
-            'records why it could not bind',
+            'the enable setting defaults to true → the server either runs '
+            'or records why it could not bind',
       );
 
-      // Disable CXP — the lifecycle tears down to a non-running state.
-      root
-          .read(appSettingsProvider.notifier)
-          .setCxpServerEnabled(enabled: false);
-      final disabled = await root.read(cxpServerLifecycleProvider.future);
+      // Disable CXP — the runtime tears down.
+      await root
+          .read(cruxCxpSettingsProvider.notifier)
+          .setEnabled(enabled: false);
+      final disabled = await root.read(cruxCxpRuntimeProvider.future);
       expect(
-        disabled.running,
-        isFalse,
+        disabled,
+        isNull,
         reason: 'disabling the setting stops the server',
       );
-      expect(disabled.boundPort, isNull);
+      expect(root.read(cruxCxpServerStatusProvider).running, isFalse);
 
       // Re-enable — a fresh server is constructed.
-      root
-          .read(appSettingsProvider.notifier)
-          .setCxpServerEnabled(enabled: true);
-      final reenabled = await root.read(cxpServerLifecycleProvider.future);
+      await root
+          .read(cruxCxpSettingsProvider.notifier)
+          .setEnabled(enabled: true);
+      final reenabled = await root.read(cruxCxpRuntimeProvider.future);
       expect(
-        reenabled.running || reenabled.error != null,
+        reenabled != null &&
+            (reenabled.isAvailable || reenabled.unavailableReason != null),
         isTrue,
         reason: 're-enabling the setting restarts the server',
       );

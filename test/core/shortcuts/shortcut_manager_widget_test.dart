@@ -140,6 +140,55 @@ void main() {
     );
   });
 
+  group('Cross-probe Selection chord (Ctrl+Shift+Enter)', () {
+    // Modifier chords pass through text fields on purpose, so the chord that
+    // ends in Enter is held back explicitly: a text field owns Enter, and a
+    // multi-line one (the bookmark note, the waiver reason) needs it for a
+    // line break.
+    Future<void> chord(WidgetTester tester) async {
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pump();
+    }
+
+    testWidgets('fires the command when nothing is typing', (tester) async {
+      var fired = 0;
+      await tester.pumpWidget(
+        _harness(
+          handlers: {LintcruxAction.crossProbeSelection: () => fired++},
+        ),
+      );
+      await tester.pump();
+      await chord(tester);
+      expect(fired, 1);
+    });
+
+    testWidgets('sends nothing while a text field has focus, and the field '
+        'receives the key', (tester) async {
+      var fired = 0;
+      final seenByField = <LogicalKeyboardKey>[];
+      await tester.pumpWidget(
+        _harness(
+          handlers: {LintcruxAction.crossProbeSelection: () => fired++},
+          child: Focus(
+            onKeyEvent: (node, event) {
+              if (event is KeyDownEvent) seenByField.add(event.logicalKey);
+              return KeyEventResult.ignored;
+            },
+            child: const TextField(autofocus: true, maxLines: null),
+          ),
+        ),
+      );
+      await tester.pump();
+      await chord(tester);
+      expect(fired, 0);
+      expect(seenByField, contains(LogicalKeyboardKey.enter));
+    });
+  });
+
   group('ShortcutManagerWidget — Escape and popups', () {
     // As the app mounts it: above the Navigator, so popup routes sit below
     // the manager and a key reaches the manager before the framework's own

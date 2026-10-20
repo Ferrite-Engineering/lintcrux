@@ -1,6 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:crux_toolbar/crux_toolbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +12,6 @@ import 'package:lintcrux/core/shortcuts/lintcrux_action_context.dart';
 import 'package:lintcrux/core/shortcuts/lintcrux_action_descriptor.dart';
 import 'package:lintcrux/core/shortcuts/lintcrux_action_descriptors.dart';
 import 'package:lintcrux/core/shortcuts/shortcut_bindings_provider.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
 import 'package:lintcrux/features/viewer/providers/right_dock_provider.dart';
 import 'package:lintcrux/features/workspace/providers/lintcrux_action_context_provider.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
@@ -49,7 +49,7 @@ class LintcruxToolbar extends ConsumerWidget {
     final bindings = ref.watch(shortcutBindingsProvider);
     // Dock-aware glyph: lit only when the CXP tab is the one on screen.
     final crossProbeVisible = ref.watch(crossProbeShowingProvider);
-    final peerCount = ref.watch(cxpPeersProvider).length;
+    final peerCount = ref.watch(cruxCxpConnectedPeerCountProvider);
 
     return CruxToolbar<LintcruxAction>(
       common: [

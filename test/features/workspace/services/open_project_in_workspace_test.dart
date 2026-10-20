@@ -12,7 +12,7 @@ import 'package:lintcrux/domain/models/session/lintcrux_session.dart';
 import 'package:lintcrux/domain/models/violation_table_state.dart';
 import 'package:lintcrux/features/project/services/open_project_service.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/tab_overrides_factory.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/open_project_in_workspace.dart';
@@ -141,7 +141,7 @@ void main() {
       await root.read(workspaceProvider.future);
       final opener = root.read(openProjectInWorkspaceProvider)(tabsForId);
       await opener.openProject(path);
-      expect(root.read(recentProjectsProvider).first, path);
+      expect(root.read(recentProjects.provider).first, path);
     });
 
     test('the tab remembers the file it was opened from, so an edit made '

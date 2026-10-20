@@ -25,9 +25,9 @@
 import 'dart:io';
 
 import 'package:crux_cxp/crux_cxp.dart';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/services/remote/cxp/lintcrux_name_resolver.dart';
 
@@ -63,7 +63,7 @@ void main() {
       await bootLintcrux(
         tester,
         extraOverrides: [
-          cxpManifestDirectoryProvider.overrideWith((ref) async {
+          cruxCxpManifestDirectoryProvider.overrideWith((ref) async {
             return manifestDir.path;
           }),
         ],
@@ -92,15 +92,15 @@ void main() {
       expect(tab.read(selectedViolationProvider), isNull);
 
       // Connect a real peer to the live server's socket.
-      final serverState = await root.read(cxpServerLifecycleProvider.future);
+      final runtime = await root.read(cruxCxpRuntimeProvider.future);
       expect(
-        serverState.running,
+        runtime?.isAvailable,
         isTrue,
         reason:
             'the CXP server did not start on this host '
-            '(error: ${serverState.error})',
+            '(error: ${runtime?.unavailableReason})',
       );
-      final port = serverState.boundPort;
+      final port = runtime?.boundPort;
       expect(port, isNotNull);
 
       final peer = LocalCxpClient(

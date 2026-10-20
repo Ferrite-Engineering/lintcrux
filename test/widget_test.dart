@@ -57,7 +57,7 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.textContaining('LintCrux'), findsWidgets);
     // Empty-canvas state shows the recent-projects empty placeholder.
-    expect(find.text('No recent projects yet.'), findsOneWidget);
+    expect(find.text('No recent projects'), findsOneWidget);
   });
 
   testWidgets('LintcruxApp wires the high-contrast accessibility themes', (

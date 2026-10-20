@@ -9,7 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/models/lintcrux_tab_payload.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/widgets/workspace_root.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
@@ -17,6 +17,7 @@ import 'package:lintcrux/services/remote/cxp/cxp_project_open_handle.dart';
 import 'package:lintcrux/services/remote/cxp/cxp_workspace_link.dart';
 import 'package:lintcrux/services/workspace/lintcrux_workspace_codec.dart';
 import '../../../support/host_absolute_path.dart';
+import '../../../support/in_memory_recent_store.dart';
 import '../../../support/telemetry_test_store.dart';
 
 void main() {
@@ -229,10 +230,15 @@ void main() {
         overrides: [
           ...telemetryDeclinedOverrides(),
           workspaceServiceProvider.overrideWithValue(buildService()),
-          recentProjectsProvider.overrideWithValue(<String>[recent]),
+          recentProjectsSeed(<String>[recent]),
         ],
       );
       addTearDown(container.dispose);
+      // The list reads its store in the background; wait for it, as the
+      // welcome screen's first frame does not.
+      await tester.runAsync(
+        () => container.read(recentProjects.provider.notifier).restored,
+      );
 
       final (_, notifier) = await pumpRoot(tester, () => container);
       await notifier.openTab(

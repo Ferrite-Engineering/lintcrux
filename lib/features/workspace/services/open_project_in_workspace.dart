@@ -11,7 +11,7 @@ import 'package:lintcrux/domain/models/session/lintcrux_session.dart';
 import 'package:lintcrux/features/project/services/open_project_service.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/crux_project_resolution.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
@@ -108,7 +108,7 @@ class OpenProjectInWorkspace {
     // Every successful open — picker, command line, recents, session,
     // cross-probe — feeds the welcome screen's Recent projects list.
     ref
-        .read(recentProjectsListProvider.notifier)
+        .read(recentProjects.provider.notifier)
         .markOpened(p.normalize(p.absolute(path)));
     if (existing != null) {
       return OpenProjectSuccess(

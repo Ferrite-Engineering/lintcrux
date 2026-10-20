@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:crux_cxp/crux_cxp.dart';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/project/openable_project_path.dart';
-import 'package:lintcrux/services/remote/cxp/cxp_outbound.dart';
 import 'package:lintcrux/services/remote/cxp/cxp_project_open_handle.dart';
 import 'package:lintcrux/services/workspace/active_tab_container_handle.dart';
 import 'package:path/path.dart' as p;
@@ -17,7 +17,7 @@ import 'package:path/path.dart' as p;
 /// `source` record naming the opened project file (the producer side, see
 /// [publishLintcruxProjectArtifact]) and *consumes* one when a peer asks it to
 /// open a design it has none of loaded (the consumer side, in
-/// `cxp_server_provider.dart` / `lintcrux_cxp_request_handler.dart`).
+/// `cxp_request_handler_provider.dart` / `lintcrux_cxp_request_handler.dart`).
 const String kCxpLintcruxSourceKind = 'source';
 
 /// LintCrux's producer short-name stamped into workspace records.
@@ -74,7 +74,7 @@ Iterable<String> cxpOpenDirectories(Ref ref) {
 /// which is what CXP §11 requires of an artifact resolved through our own
 /// records: [cxpWorkspaceStoreProvider] screens what it resolves for the
 /// `crux.design_id` fallback, the `resolveAndOpenArtifact` wiring in
-/// `cxp_server_provider.dart` checks the project path that fallback is about
+/// `cxp_request_handler_provider.dart` checks the project path that fallback is about
 /// to open, and `LintCruxCxpRequestHandler` checks the value it is about to
 /// hand to an editor argv (`request_open_source`).
 ///
@@ -162,9 +162,8 @@ String cxpLintcruxDesignId(LintProject project) =>
 /// file's containing directory via the one shared [cxpDesignIdForPath] helper,
 /// so it byte-matches the id the other apps compute for the same design folder.
 ///
-/// Gated on the CXP server running (read through the services-layer
-/// [CxpServerHandle], so this file stays in the services layer without reaching
-/// up into the feature lifecycle): with CXP off there is no peer to serve and
+/// Gated on the CXP server running (read from the shared runtime's status):
+/// with CXP off there is no peer to serve and
 /// no reason to write into the shared workspace directory — which also keeps
 /// the wide swath of project-open tests from writing into the real per-user
 /// workspace. Best-effort throughout: a failed upsert must never break opening
@@ -174,7 +173,7 @@ Future<void> publishLintcruxProjectArtifact(
   String projectPath,
   LintProject project,
 ) async {
-  if (ref.read(cxpServerHandleProvider).server == null) return;
+  if (!ref.read(cruxCxpServerStatusProvider).running) return;
   try {
     await ref
         .read(cxpWorkspaceStoreProvider)

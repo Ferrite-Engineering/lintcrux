@@ -71,10 +71,6 @@ const Map<String, String> allowlist = <String, String>{
       'Root-hosted CXP inbound handler. Resolves the ACTIVE tab container per '
       'request through ActiveTabContainerHandle; the direct ref.read of the '
       'per-tab providers is the empty-workspace fallback only.',
-  'cxpServerLifecycleProvider':
-      'Root-hosted CXP server (one socket per app). Inbound mutations resolve '
-      'the ACTIVE tab container through ActiveTabContainerHandle; the direct '
-      'ref.read of the per-tab notifiers is the empty-workspace fallback only.',
 };
 
 /// Source roots contributing provider definitions to the read-graph. The Pro

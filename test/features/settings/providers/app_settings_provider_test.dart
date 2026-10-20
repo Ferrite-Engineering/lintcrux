@@ -8,6 +8,7 @@ import 'package:lintcrux/domain/models/app_settings.dart';
 import 'package:lintcrux/domain/models/engine_binary_override.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('AppSettingsNotifier', () {
@@ -63,7 +64,7 @@ void main() {
     test('replace swaps in a different AppSettings snapshot', () {
       final c = ProviderContainer();
       addTearDown(c.dispose);
-      const next = AppSettings(recentProjects: ['/tmp/a.lintcrux']);
+      const next = AppSettings(autoCheckForUpdates: false);
       c.read(appSettingsProvider.notifier).replace(next);
       expect(c.read(appSettingsProvider), next);
     });
@@ -137,33 +138,29 @@ void main() {
       expect(c.read(appSettingsProvider).engineBinaryOverrides, isEmpty);
     });
 
-    test('setCxpServerEnabled flips the flag', () {
+    // The CXP settings belong to `cruxCxpSettingsProvider`. A save of the
+    // settings model once wrote all four keys back from its own copy, which
+    // overwrote what the CXP settings had just saved.
+    test('a settings change leaves the saved CXP keys alone', () async {
+      SharedPreferences.setMockInitialValues(<String, Object>{
+        'settings.cxpServerEnabled': false,
+        'settings.cxpServerPort': 60000,
+        'settings.requestAttentionOnCrossProbe': false,
+        'settings.broadcastSelectionOnCrossProbe': false,
+      });
       final c = ProviderContainer();
       addTearDown(c.dispose);
-      expect(c.read(appSettingsProvider).cxpServerEnabled, isTrue);
-      c.read(appSettingsProvider.notifier).setCxpServerEnabled(enabled: false);
-      expect(c.read(appSettingsProvider).cxpServerEnabled, isFalse);
-    });
+      c
+          .read(appSettingsProvider.notifier)
+          .setAutoCheckForUpdates(enabled: false);
+      c.read(appSettingsProvider.notifier).setDiagnosticsEnabled(enabled: true);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
-    test('setCxpServerPort accepts valid ports', () {
-      final c = ProviderContainer();
-      addTearDown(c.dispose);
-      c.read(appSettingsProvider.notifier).setCxpServerPort(60000);
-      expect(c.read(appSettingsProvider).cxpServerPort, 60000);
-    });
-
-    test('setCxpServerPort clamps out-of-range values back to the default', () {
-      final c = ProviderContainer();
-      addTearDown(c.dispose);
-      final notifier = c.read(appSettingsProvider.notifier);
-      for (final bad in <int>[0, -1, 70000, 65536]) {
-        notifier.setCxpServerPort(bad);
-        expect(
-          c.read(appSettingsProvider).cxpServerPort,
-          AppSettings.defaultCxpServerPort,
-          reason: 'port: $bad',
-        );
-      }
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getBool('settings.cxpServerEnabled'), isFalse);
+      expect(prefs.getInt('settings.cxpServerPort'), 60000);
+      expect(prefs.getBool('settings.requestAttentionOnCrossProbe'), isFalse);
+      expect(prefs.getBool('settings.broadcastSelectionOnCrossProbe'), isFalse);
     });
   });
 }

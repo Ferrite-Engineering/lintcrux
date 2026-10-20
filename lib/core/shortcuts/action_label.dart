@@ -57,6 +57,7 @@ extension LintcruxActionLabel on LintcruxAction {
     LintcruxAction.previousTab => l10n.actionPreviousTab,
     // Cross-probe panel.
     LintcruxAction.openCrossProbePanel => l10n.actionOpenCrossProbePanel,
+    LintcruxAction.crossProbeSelection => l10n.actionCrossProbeSelection,
     // Managed-waiver review screen (Pro tier).
     LintcruxAction.openWaiverReview => l10n.actionOpenWaiverReview,
     // Baseline & delta actions (Pro tier).

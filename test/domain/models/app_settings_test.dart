@@ -13,7 +13,6 @@ void main() {
       () {
         const settings = AppSettings();
         expect(settings.core, const CoreSettings.defaults());
-        expect(settings.recentProjects, isEmpty);
         expect(settings.panelLayout, const PanelLayoutState());
       },
     );
@@ -42,7 +41,7 @@ void main() {
       );
       // Nothing else moved.
       expect(off.core, base.core);
-      expect(off.recentProjects, base.recentProjects);
+      expect(off.panelLayout, base.panelLayout);
     });
 
     test('autoCheckForUpdates participates in equality and hashCode', () {
@@ -57,20 +56,12 @@ void main() {
       expect(const AppSettings().toString(), contains('autoCheckForUpdates'));
     });
 
-    test('copyWith — LintCrux-specific recentProjects override', () {
-      const base = AppSettings();
-      final next = base.copyWith(recentProjects: const ['/tmp/foo.lintcrux']);
-      expect(next.recentProjects, ['/tmp/foo.lintcrux']);
-      // Core is unchanged.
-      expect(next.core, base.core);
-    });
-
     test('copyWith — flat-core forwarder updates the inner CoreSettings', () {
       const base = AppSettings();
       final next = base.copyWith(themeMode: AppThemeMode.light);
       expect(next.themeMode, AppThemeMode.light);
-      // recentProjects is unchanged.
-      expect(next.recentProjects, base.recentProjects);
+      // panelLayout is unchanged.
+      expect(next.panelLayout, base.panelLayout);
     });
 
     test('copyWith — explicit core override wins over flat forwarders', () {
@@ -86,20 +77,10 @@ void main() {
     });
 
     test('== and hashCode treat equal field values as equal', () {
-      const a = AppSettings(recentProjects: ['/x', '/y']);
-      const b = AppSettings(recentProjects: ['/x', '/y']);
+      const a = AppSettings(autoCheckForUpdates: false);
+      const b = AppSettings(autoCheckForUpdates: false);
       expect(a, b);
       expect(a.hashCode, b.hashCode);
-    });
-
-    test('== rejects differing recentProjects order', () {
-      const a = AppSettings(recentProjects: ['/x', '/y']);
-      const b = AppSettings(recentProjects: ['/y', '/x']);
-      expect(a, isNot(b));
-    });
-
-    test('maxRecentProjects is the documented cap', () {
-      expect(AppSettings.maxRecentProjects, 10);
     });
 
     test('copyWith — panelLayout field round-trips', () {
@@ -110,7 +91,6 @@ void main() {
       );
       final next = base.copyWith(panelLayout: tweaked);
       expect(next.panelLayout, tweaked);
-      expect(next.recentProjects, base.recentProjects);
       expect(next.core, base.core);
     });
 
@@ -122,32 +102,13 @@ void main() {
       expect(a, isNot(b));
     });
 
-    test('defaults cxpServerEnabled=true and cxpServerPort=54324', () {
-      const settings = AppSettings();
-      expect(settings.cxpServerEnabled, isTrue);
-      expect(settings.cxpServerPort, AppSettings.defaultCxpServerPort);
-      expect(AppSettings.defaultCxpServerPort, 54324);
-    });
-
-    test('copyWith — cxpServerEnabled / cxpServerPort round-trip', () {
-      const base = AppSettings();
-      final next = base.copyWith(
-        cxpServerEnabled: false,
-        cxpServerPort: 60000,
-      );
-      expect(next.cxpServerEnabled, isFalse);
-      expect(next.cxpServerPort, 60000);
-      // Other fields preserved.
-      expect(next.recentProjects, base.recentProjects);
-      expect(next.core, base.core);
-    });
-
-    test('== rejects differing cxpServerEnabled / cxpServerPort', () {
-      const a = AppSettings();
-      const b = AppSettings(cxpServerEnabled: false);
-      const c = AppSettings(cxpServerPort: 60000);
-      expect(a, isNot(b));
-      expect(a, isNot(c));
+    // The four CXP settings are not here: the shared runtime owns and saves
+    // them (`cruxCxpSettingsProvider`), and `AppSettings` carrying a second
+    // copy is how an unrelated settings save once overwrote them.
+    test('toString names none of the CXP settings', () {
+      final text = const AppSettings().toString();
+      expect(text, isNot(contains('cxpServer')));
+      expect(text, isNot(contains('CrossProbe')));
     });
   });
 }

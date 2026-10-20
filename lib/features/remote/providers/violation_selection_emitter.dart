@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:crux_cxp/crux_cxp.dart';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/violation.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
-import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/remote/cxp/cxp_workspace_link.dart';
@@ -26,8 +25,8 @@ import 'package:lintcrux/services/remote/cxp/cxp_workspace_link.dart';
 ///   [kMessageTruncationLimit] characters to keep wire payloads bounded).
 /// * Reads the broadcast setting on each selection, so turning it off takes
 ///   effect immediately; explicit sends are unaffected.
-/// * Broadcasts through `cxpServerLifecycleProvider`; when the server is not
-///   running the broadcast is a no-op.
+/// * Broadcasts through the shared runtime; when the server is not running
+///   the broadcast is a no-op.
 ///
 /// Realized PER TAB: re-bound in `lintcruxTabOverridesFactory` and watched
 /// from `ProjectTabContent`, so the listener observes the tab's own
@@ -53,16 +52,15 @@ class ViolationSelectionEmitter {
   static const int kMessageTruncationLimit = 200;
 
   void _maybeEmit(Violation v) {
-    if (!_ref.read(appSettingsProvider).broadcastSelectionOnCrossProbe) return;
-
-    final lifecycle = _ref.read(cxpServerLifecycleProvider.notifier);
     final element = ElementId(kind: ElementKind.rule, path: cxpPathFor(v));
     // Tag the selection with this design's `crux.design_id` so a receiver
     // with none of this design open can resolve and open it from the shared
     // workspace. `currentProjectProvider` is per-tab, like this emitter.
     final project = _ref.read(currentProjectProvider);
     final designId = project == null ? null : cxpLintcruxDesignId(project);
-    lifecycle.broadcast(
+    // Gated on the broadcast setting and a running server inside the call.
+    broadcastCruxCxpSelection(
+      _ref.read,
       NotifySelection(
         elements: [element],
         displayName: v.ruleId,

@@ -115,6 +115,15 @@ Map<LintcruxAction, ShortcutActivator> defaultBindings() {
       control: !isMac,
       shift: true,
     ),
+    // Cmd/Ctrl+Shift+Enter — Cross-probe Selection, the same chord in all four
+    // products. A focused text field keeps the key (the shortcut manager and
+    // the handler both stand aside for it).
+    LintcruxAction.crossProbeSelection: SingleActivator(
+      LogicalKeyboardKey.enter,
+      meta: isMac,
+      control: !isMac,
+      shift: true,
+    ),
     // F1 = About, the suite-wide convention (WaveCrux / NetCrux /
     // SimCrux all bind it).
     LintcruxAction.openAbout: const SingleActivator(LogicalKeyboardKey.f1),

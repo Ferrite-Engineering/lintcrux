@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/bookmarked_violation.dart';
@@ -143,7 +144,7 @@ class BookmarkColumnIcon extends ConsumerWidget {
     //
     // Undo holds the tab's container, not the store. The per-tab store is
     // rebuilt whenever the tab's project changes (a severity-override edit
-    // is enough), and the snackbar outlives that. The old store still holds
+    // is enough), and the toast outlives that. The old store still holds
     // its snapshot from before the rebuild, and every write replaces the
     // whole file with the writer's snapshot, so an Undo through it would
     // erase every bookmark made since. Nor can it hold `ref`: the row may be
@@ -153,14 +154,12 @@ class BookmarkColumnIcon extends ConsumerWidget {
     await ref.read(violationBookmarkStoreProvider).remove(removed.id);
     if (!context.mounted) return;
     final l10n = L10N.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.bookmarkRemovedSnackbar),
-        behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(
-          label: l10n.bookmarkRemovedUndoLabel,
-          onPressed: () => _undoRemove(container, removed),
-        ),
+    showCruxInfoSnack(
+      context,
+      l10n.bookmarkRemovedSnackbar,
+      action: CruxToastAction(
+        label: l10n.bookmarkRemovedUndoLabel,
+        onPressed: () => _undoRemove(container, removed),
       ),
     );
   }

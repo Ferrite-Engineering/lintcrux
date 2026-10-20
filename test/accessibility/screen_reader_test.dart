@@ -35,7 +35,6 @@ import 'package:lintcrux/features/project/services/project_picker.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/features/violations/widgets/severity_chip.dart';
 import 'package:lintcrux/features/violations/widgets/violation_table.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/widgets/viewer_scaffold.dart';
 import 'package:lintcrux/features/workspace/widgets/workspace_root.dart';
@@ -48,6 +47,7 @@ import 'package:lintcrux/services/rules/rule_database_provider.dart';
 import 'package:lintcrux/services/sarif/sarif_file_loader.dart';
 import 'package:lintcrux/services/workspace/lintcrux_workspace_codec.dart';
 
+import '../support/in_memory_recent_store.dart';
 import '../support/telemetry_test_store.dart';
 
 // ── harness ─────────────────────────────────────────────────────────────────
@@ -86,7 +86,7 @@ Future<void> _pumpStartScreen(WidgetTester tester, Directory dir) async {
         ),
         engineRegistryProvider.overrideWithValue(EngineRegistry(const [])),
         projectPickerProvider.overrideWithValue(_IdlePicker()),
-        recentProjectsProvider.overrideWithValue(const <String>[]),
+        recentProjectsSeed(),
       ],
       child: MaterialApp(
         theme: ThemeData(platform: TargetPlatform.windows),
@@ -134,7 +134,7 @@ Future<void> _pumpFirstLaunchDisclosure(
         ),
         engineRegistryProvider.overrideWithValue(EngineRegistry(const [])),
         projectPickerProvider.overrideWithValue(_IdlePicker()),
-        recentProjectsProvider.overrideWithValue(const <String>[]),
+        recentProjectsSeed(),
       ],
       child: MaterialApp(
         theme: ThemeData(platform: TargetPlatform.windows),

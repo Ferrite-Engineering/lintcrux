@@ -36,7 +36,6 @@ import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/open_project_in_workspace.dart';
 import 'package:lintcrux/features/workspace/widgets/workspace_root.dart';
 import 'package:lintcrux/services/engines/verilator/verilator_parser.dart';
-import 'package:lintcrux/services/persistence/recent_projects_settings_codec.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/project/project_file_service.dart';
 import 'package:lintcrux/services/transformers/managed_waiver_transformer.dart';
@@ -173,6 +172,10 @@ Future<void> clearPersistedWorkspace() async {
   await WorkspaceService(codec: const LintcruxWorkspaceCodec()).clear();
 }
 
+/// The preference key the Recent projects list (`recent_lists.dart`) saves its
+/// string list under.
+const String kRecentProjectsPrefsKey = 'settings.lintcrux.recentProjects';
+
 /// Gives the booting app the preferences of an installation that has
 /// accepted the current EULA and never opened a project, restoring whatever
 /// was there before once the test ends.
@@ -188,7 +191,7 @@ Future<void> clearPersistedWorkspace() async {
 ///   reads.
 /// * **Recent projects.** Every project a test opens is recorded and
 ///   persisted, so a later file's cold boot showed the fixtures an earlier
-///   file opened instead of the empty-canvas "No recent projects yet."
+///   file opened instead of the empty-canvas "No recent projects".
 /// * **Telemetry consent.** Since the public beta ended, an installation
 ///   that has not answered the usage-statistics disclosure gets it over the
 ///   app on launch, a second blocker of the EULA gate's kind. Seeded as an
@@ -215,7 +218,7 @@ Future<void> seedFreshInstallPreferences() async {
   final prefs = await SharedPreferences.getInstance();
   final keys = <String>[
     ...kEulaAcceptedPrefs.keys,
-    RecentProjectsSettingsCodec.prefsKey,
+    kRecentProjectsPrefsKey,
   ];
   final saved = <String, Object?>{for (final key in keys) key: prefs.get(key)};
   addTearDown(() async {
@@ -233,7 +236,7 @@ Future<void> seedFreshInstallPreferences() async {
   for (final MapEntry(:key, :value) in kEulaAcceptedPrefs.entries) {
     await prefs.setString(key, value as String);
   }
-  await prefs.remove(RecentProjectsSettingsCodec.prefsKey);
+  await prefs.remove(kRecentProjectsPrefsKey);
 }
 
 /// Boots the open-core LintCrux app via [bootstrap] and pumps until the

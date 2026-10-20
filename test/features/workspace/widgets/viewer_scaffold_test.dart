@@ -4,13 +4,15 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crux_workspace/crux_workspace.dart' as crux;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/features/project/providers/project_picker_provider.dart';
 import 'package:lintcrux/features/project/services/project_picker.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/widgets/empty_canvas_content.dart';
 import 'package:lintcrux/features/workspace/widgets/lintcrux_toolbar.dart';
@@ -21,6 +23,7 @@ import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
 import 'package:lintcrux/services/workspace/lintcrux_workspace_codec.dart';
 import 'package:path/path.dart' as p;
+import '../../../support/in_memory_recent_store.dart';
 import '../../../support/telemetry_test_store.dart';
 
 /// Test double for [ProjectPicker]. Each `pick*` method returns the
@@ -145,6 +148,7 @@ void main() {
     required ProjectPicker picker,
     WorkspaceService? workspaceService,
     List<String> recentProjects = const <String>[],
+    List<Override>? extraOverrides,
     Locale locale = const Locale('en'),
   }) {
     return ProviderScope(
@@ -155,7 +159,8 @@ void main() {
         ),
         engineRegistryProvider.overrideWithValue(EngineRegistry(const [])),
         projectPickerProvider.overrideWithValue(picker),
-        recentProjectsProvider.overrideWithValue(recentProjects),
+        recentProjectsSeed(recentProjects),
+        ...?extraOverrides,
       ],
       child: MaterialApp(
         locale: locale,
@@ -558,9 +563,11 @@ void main() {
       },
     );
 
+    // A file that is gone is greyed ("File not found"), stays openable, and
+    // opening it says so by name and drops it from the list.
     testWidgets(
-      'tapping a recent-project row whose file no longer exists surfaces '
-      'a failure snackbar and leaves the workspace empty',
+      'a recent project whose file is gone is greyed, and opening it reports '
+      'it by name, drops it and leaves the workspace empty',
       (tester) async {
         final missingPath = p.join(tempDir.path, 'vanished.lintcrux');
         await tester.pumpWidget(
@@ -570,10 +577,50 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
+        final strings = crux.CruxRecentListStrings.forLocale(
+          const Locale('en'),
+          crux.CruxRecentKind.projects,
+        );
+        expect(find.text(strings.missing), findsOneWidget);
+        expect(find.text(missingPath), findsNothing);
+
+        await tester.tap(find.text('vanished.lintcrux'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text(strings.removedMissing('vanished.lintcrux')),
+          findsOneWidget,
+        );
+        expect(
+          rootContainerOf(tester).read(recentProjects.provider),
+          isNot(contains(missingPath)),
+        );
+        final workspace = rootContainerOf(
+          tester,
+        ).read(workspaceProvider).requireValue;
+        expect(workspace.tabs, isEmpty);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    // The file is there as far as the list can tell, but reading it fails: the
+    // open reports its own, more specific message, once, and drops the entry.
+    testWidgets(
+      'a recent project that cannot be read keeps reporting its own failure',
+      (tester) async {
+        final unreadable = p.join(tempDir.path, 'unreadable.lintcrux');
+        await tester.pumpWidget(
+          harness(
+            picker: _FakeProjectPicker(),
+            recentProjects: [unreadable],
+            extraOverrides: [recentProjectsExist()],
+          ),
+        );
+        await tester.pumpAndSettle();
 
         await tapAndAwaitRealWork(
           tester,
-          find.text(missingPath),
+          find.text(unreadable),
           until: () => find
               .textContaining('could not read project file')
               .evaluate()
@@ -584,11 +631,46 @@ void main() {
           find.textContaining('could not read project file'),
           findsOneWidget,
         );
+        expect(
+          rootContainerOf(tester).read(recentProjects.provider),
+          isNot(contains(unreadable)),
+        );
         final workspace = rootContainerOf(
           tester,
         ).read(workspaceProvider).requireValue;
         expect(workspace.tabs, isEmpty);
         expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'removing a row and Clear Recent Projects empty the list',
+      (tester) async {
+        final a = p.join(tempDir.path, 'a.lintcrux');
+        final b = p.join(tempDir.path, 'b.lintcrux');
+        await tester.pumpWidget(
+          harness(
+            picker: _FakeProjectPicker(),
+            recentProjects: [a, b],
+            extraOverrides: [recentProjectsExist()],
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text(a), findsOneWidget);
+        expect(find.text(b), findsOneWidget);
+
+        await tester.tap(find.byKey(const ValueKey('cruxRecentRemove')).first);
+        await tester.pumpAndSettle();
+        expect(rootContainerOf(tester).read(recentProjects.provider), [b]);
+        expect(find.text(a), findsNothing);
+
+        await tester.tap(
+          find.byKey(const ValueKey('cruxRecentClear:recentProjects')),
+        );
+        await tester.pumpAndSettle();
+        expect(rootContainerOf(tester).read(recentProjects.provider), isEmpty);
+        expect(find.text('No recent projects'), findsOneWidget);
+        expect(find.text('Recent projects cleared.'), findsOneWidget);
       },
     );
   });

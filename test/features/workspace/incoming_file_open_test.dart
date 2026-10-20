@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:crux_workspace/crux_workspace.dart' as crux;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/app.dart';
 import 'package:lintcrux/features/project/services/open_project_service.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/incoming_file_kind.dart';
 import 'package:lintcrux/features/workspace/services/open_project_in_workspace.dart';
@@ -265,7 +265,7 @@ void main() {
             incomingFileSourceProvider.overrideWithValue(incoming),
             // The SARIF case advances real time; a live CXP server would
             // bind a socket and leave its manifest timer behind.
-            cxpServerLifecycleProvider.overrideWith(_StoppedCxpServer.new),
+            cruxCxpRuntimeProvider.overrideWith((_) async => null),
             openProjectInWorkspaceProvider.overrideWithValue((_) => opener),
           ],
           child: const LintcruxApp(),
@@ -448,10 +448,4 @@ class _RecordingOpener implements OpenProjectInWorkspace {
   @override
   ProviderContainer Function(crux.TabId tabId) get tabsForId =>
       throw UnimplementedError();
-}
-
-class _StoppedCxpServer extends CxpServerLifecycle {
-  @override
-  Future<CxpServerLifecycleState> build() async =>
-      const CxpServerLifecycleState(running: false, boundPort: null);
 }

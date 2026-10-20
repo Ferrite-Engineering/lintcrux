@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:crux_cxp/crux_cxp.dart';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
-import 'package:lintcrux/domain/models/app_settings.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
 import 'package:lintcrux/features/remote/providers/violation_selection_emitter.dart';
-import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
-import 'package:lintcrux/services/remote/cxp/lintcrux_cxp_server.dart';
+import 'package:lintcrux/services/remote/cxp/lintcrux_cxp_binding.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _pollUntil(bool Function() condition) async {
   final deadline = DateTime.now().add(const Duration(seconds: 2));
@@ -44,16 +44,6 @@ class _FakeSelectedViolationNotifier extends SelectedViolationNotifier {
   Violation? build() => state;
 }
 
-/// Seeds [appSettingsProvider] with a fixed [AppSettings] so tests can flip
-/// `broadcastSelectionOnCrossProbe` for the auto-broadcast gate.
-class _SeedSettingsNotifier extends AppSettingsNotifier {
-  _SeedSettingsNotifier(this._seed);
-  final AppSettings _seed;
-
-  @override
-  AppSettings build() => _seed;
-}
-
 const _v = Violation(
   engineId: 'verilator',
   ruleId: 'verilator/UNUSEDSIGNAL',
@@ -71,19 +61,52 @@ const _vError = Violation(
 );
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('ViolationSelectionEmitter', () {
-    late LintCruxCxpServer server;
+    late Directory peersDir;
     late LocalCxpClient client;
     final receivedFrames = <CxpMessage>[];
 
-    setUp(() async {
+    setUp(() {
+      SharedPreferences.setMockInitialValues(<String, Object>{});
+      peersDir = Directory.systemTemp.createTempSync('lintcrux_emitter_');
       receivedFrames.clear();
-      server = LintCruxCxpServer(
-        peerId: 'lintcrux-test',
-        port: 0,
-        onInbound: (_) {},
+    });
+
+    tearDown(() async {
+      try {
+        await client.disconnect();
+      } on Object {
+        // best effort
+      }
+      if (peersDir.existsSync()) peersDir.deleteSync(recursive: true);
+    });
+
+    /// The shared runtime on an OS-chosen port, with a peer connected that
+    /// subscribed to `notify_selection`, as a WaveCrux next to LintCrux is.
+    Future<ProviderContainer> start({bool broadcastSelection = true}) async {
+      final container = ProviderContainer(
+        overrides: [
+          selectedViolationProvider.overrideWith(
+            _FakeSelectedViolationNotifier.new,
+          ),
+          cruxCxpProductBindingProvider.overrideWithValue(kLintcruxCxpBinding),
+          cruxCxpLaunchSettingsProvider.overrideWithValue(
+            CruxCxpSettings(
+              enabled: true,
+              port: 0,
+              broadcastSelection: broadcastSelection,
+            ),
+          ),
+          cruxCxpTransportAvailableProvider.overrideWithValue(true),
+          cruxCxpManifestDirectoryProvider.overrideWith(
+            (ref) async => peersDir.path,
+          ),
+        ],
       );
-      await server.start();
+      addTearDown(container.dispose);
+      final runtime = await container.read(cruxCxpRuntimeProvider.future);
       client = LocalCxpClient(
         selfIdentity: const PeerIdentity(
           peerId: 'wavecrux-test',
@@ -94,7 +117,7 @@ void main() {
       client.inbound.listen((m) => receivedFrames.add(m.message));
       await client.connect(
         host: '127.0.0.1',
-        port: server.boundPort!,
+        port: runtime!.boundPort!,
         token: cxpProcessAuthToken,
       );
       client.send(
@@ -105,48 +128,21 @@ void main() {
       // Wait for the subscribe handshake before broadcasting. Not
       // poll-able: `crux_cxp`'s server applies a peer's `Subscribe`
       // message synchronously in its line handler and returns before
-      // ever reaching the `onInbound` callback (see
-      // `_PeerConnection._onLine` in crux_cxp/cxp_server.dart), so
-      // there is no publicly observable "subscription applied" signal
-      // from this package's API short of adding one to the shared
-      // `crux_cxp` package (out of scope here — it's consumed by
-      // WaveCrux/NetCrux/SimCrux too).
+      // ever reaching the inbound stream, so there is no publicly observable
+      // "subscription applied" signal from that package's API.
       await Future<void>.delayed(const Duration(milliseconds: 100));
-    });
-
-    tearDown(() async {
-      try {
-        await client.disconnect();
-      } on Object {
-        // best effort
-      }
-      await server.stop();
-    });
+      // Realize the emitter (`ProjectTabContent` watches it per tab in
+      // production).
+      container.read(violationSelectionEmitterProvider);
+      // Wait one microtask for the listen subscription to install.
+      await Future<void>.delayed(Duration.zero);
+      return container;
+    }
 
     test(
       'emitter broadcasts NotifySelection on a violation selection, in every tier',
       () async {
-        final container = ProviderContainer(
-          overrides: [
-            selectedViolationProvider.overrideWith(
-              _FakeSelectedViolationNotifier.new,
-            ),
-            // Inject the running server via the lifecycle's broadcast
-            // surface — the emitter calls
-            // `ref.read(cxpServerLifecycleProvider.notifier).broadcast`.
-            cxpServerLifecycleProvider.overrideWith(
-              () => _RealLifecycleStub(server),
-            ),
-          ],
-        );
-        addTearDown(container.dispose);
-
-        // Realize the emitter (`ProjectTabContent` watches it per tab in
-        // production).
-        container.read(violationSelectionEmitterProvider);
-
-        // Wait one microtask for the listen subscription to install.
-        await Future<void>.delayed(Duration.zero);
+        final container = await start();
 
         container.read(selectedViolationProvider.notifier).select(_v);
         await _pollUntil(() => receivedFrames.isNotEmpty);
@@ -170,20 +166,7 @@ void main() {
     test(
       'severity metadata is the enum.name (e.g. "error" for an error)',
       () async {
-        final container = ProviderContainer(
-          overrides: [
-            selectedViolationProvider.overrideWith(
-              _FakeSelectedViolationNotifier.new,
-            ),
-            cxpServerLifecycleProvider.overrideWith(
-              () => _RealLifecycleStub(server),
-            ),
-          ],
-        );
-        addTearDown(container.dispose);
-
-        container.read(violationSelectionEmitterProvider);
-        await Future<void>.delayed(Duration.zero);
+        final container = await start();
 
         container.read(selectedViolationProvider.notifier).select(_vError);
         await _pollUntil(() => receivedFrames.isNotEmpty);
@@ -198,20 +181,7 @@ void main() {
     test(
       'long messages are truncated to 200 chars with trailing ellipsis',
       () async {
-        final container = ProviderContainer(
-          overrides: [
-            selectedViolationProvider.overrideWith(
-              _FakeSelectedViolationNotifier.new,
-            ),
-            cxpServerLifecycleProvider.overrideWith(
-              () => _RealLifecycleStub(server),
-            ),
-          ],
-        );
-        addTearDown(container.dispose);
-
-        container.read(violationSelectionEmitterProvider);
-        await Future<void>.delayed(Duration.zero);
+        final container = await start();
 
         final longMessage = 'X' * 500;
         final longViolation = Violation(
@@ -247,31 +217,29 @@ void main() {
     test(
       'auto-broadcast off: selecting a violation does NOT broadcast',
       () async {
-        // `broadcastSelectionOnCrossProbe: false` must keep the emitter
-        // silent so only explicit sends reach peers.
-        final container = ProviderContainer(
-          overrides: [
-            appSettingsProvider.overrideWith(
-              () => _SeedSettingsNotifier(
-                const AppSettings(broadcastSelectionOnCrossProbe: false),
-              ),
-            ),
-            selectedViolationProvider.overrideWith(
-              _FakeSelectedViolationNotifier.new,
-            ),
-            cxpServerLifecycleProvider.overrideWith(
-              () => _RealLifecycleStub(server),
-            ),
-          ],
-        );
-        addTearDown(container.dispose);
-
-        container.read(violationSelectionEmitterProvider);
-        await Future<void>.delayed(Duration.zero);
+        // The shared broadcast setting off must keep the emitter silent so
+        // only explicit sends reach peers.
+        final container = await start(broadcastSelection: false);
 
         container.read(selectedViolationProvider.notifier).select(_v);
         await _expectNeverTrue(() => receivedFrames.isNotEmpty);
         expect(receivedFrames, isEmpty);
+      },
+    );
+
+    test(
+      'auto-broadcast follows the setting at once: off, then on again',
+      () async {
+        final container = await start(broadcastSelection: false);
+        final settings = container.read(cruxCxpSettingsProvider.notifier);
+
+        container.read(selectedViolationProvider.notifier).select(_v);
+        await _expectNeverTrue(() => receivedFrames.isNotEmpty);
+
+        await settings.setBroadcastSelection(broadcastSelection: true);
+        container.read(selectedViolationProvider.notifier).select(_vError);
+        await _pollUntil(() => receivedFrames.isNotEmpty);
+        expect(receivedFrames.single, isA<NotifySelection>());
       },
     );
 
@@ -281,23 +249,7 @@ void main() {
         // Positive control: the same setup with the default (broadcast on)
         // still emits — pins that the setting above is what suppresses the
         // broadcast, not the harness.
-        final container = ProviderContainer(
-          overrides: [
-            appSettingsProvider.overrideWith(
-              () => _SeedSettingsNotifier(const AppSettings()),
-            ),
-            selectedViolationProvider.overrideWith(
-              _FakeSelectedViolationNotifier.new,
-            ),
-            cxpServerLifecycleProvider.overrideWith(
-              () => _RealLifecycleStub(server),
-            ),
-          ],
-        );
-        addTearDown(container.dispose);
-
-        container.read(violationSelectionEmitterProvider);
-        await Future<void>.delayed(Duration.zero);
+        final container = await start();
 
         container.read(selectedViolationProvider.notifier).select(_v);
         await _pollUntil(() => receivedFrames.isNotEmpty);
@@ -306,26 +258,4 @@ void main() {
       },
     );
   });
-}
-
-/// Override of [CxpServerLifecycle] that points at the real, already-
-/// running [LintCruxCxpServer] supplied by the test. The constructor
-/// installs the server reference via the private `_server` field —
-/// not legal — so we instead rebuild the base class to expose
-/// `broadcast` that delegates to our server directly.
-class _RealLifecycleStub extends CxpServerLifecycle {
-  _RealLifecycleStub(this._injected);
-  final LintCruxCxpServer _injected;
-
-  @override
-  Future<CxpServerLifecycleState> build() async {
-    return CxpServerLifecycleState(
-      running: true,
-      boundPort: _injected.boundPort,
-      peerId: _injected.selfIdentity.peerId,
-    );
-  }
-
-  @override
-  void broadcast(CxpMessage message) => _injected.broadcast(message);
 }

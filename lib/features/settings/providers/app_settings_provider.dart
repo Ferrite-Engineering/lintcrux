@@ -10,8 +10,6 @@ import 'package:lintcrux/core/policy/lintcrux_policy_keys.dart';
 import 'package:lintcrux/domain/models/app_settings.dart';
 import 'package:lintcrux/domain/models/engine_binary_override.dart';
 import 'package:lintcrux/services/persistence/auto_update_check_settings_provider.dart';
-import 'package:lintcrux/services/persistence/cxp_settings_codec.dart';
-import 'package:lintcrux/services/persistence/cxp_settings_provider.dart';
 import 'package:lintcrux/services/persistence/diagnostics_enabled_settings_provider.dart';
 import 'package:lintcrux/services/persistence/engine_binary_overrides_settings_provider.dart';
 import 'package:lintcrux/services/persistence/locale_settings_provider.dart';
@@ -25,11 +23,11 @@ import 'package:lintcrux/services/persistence/restore_tabs_settings_provider.dar
 /// [autoUpdateCheckSettingsServiceProvider], [setDiagnosticsEnabled] through
 /// [diagnosticsEnabledSettingsServiceProvider], the engine binary overrides
 /// through [engineBinaryOverridesSettingsServiceProvider] (seeded at launch
-/// from [launchEngineBinaryOverridesProvider]), the four CXP Cross-Probe
-/// fields through [cxpSettingsServiceProvider] (seeded at launch from
-/// [launchCxpSettingsProvider]), and the theme name / token overrides reach
-/// `cruxColorThemeProvider` through the bootstrap bridge. The remaining
-/// fields (panel layout, recent projects) are session-scoped in open-core.
+/// from [launchEngineBinaryOverridesProvider]), and the theme name / token
+/// overrides reach `cruxColorThemeProvider` through the bootstrap bridge. The
+/// CXP Cross-Probe settings are not here: `cruxCxpSettingsProvider` owns and
+/// saves them. The remaining fields (panel layout) are session-scoped in
+/// open-core.
 ///
 /// Mirrors the WaveCrux `appSettingsProvider` notifier pattern.
 final NotifierProvider<AppSettingsNotifier, AppSettings> appSettingsProvider =
@@ -50,17 +48,10 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
     unawaited(_restoreLocale());
     unawaited(_restoreDiagnosticsEnabled());
     // Synchronous, unlike the restores above: the overrides pick the binary
-    // the first run starts, and a restored tab runs as soon as it opens. The
-    // CXP fields likewise decide whether the server starts at all.
-    return ref
-        .read(launchCxpSettingsProvider)
-        .applyTo(
-          AppSettings(
-            engineBinaryOverrides: ref.read(
-              launchEngineBinaryOverridesProvider,
-            ),
-          ),
-        );
+    // the first run starts, and a restored tab runs as soon as it opens.
+    return AppSettings(
+      engineBinaryOverrides: ref.read(launchEngineBinaryOverridesProvider),
+    );
   }
 
   /// Set once the user changes the Language preference at run time — same
@@ -307,63 +298,6 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
           LintCruxAuditKinds.engineConfigChanged,
           payload: payload,
         );
-  }
-
-  /// Toggles the CXP cross-probe server's start-at-boot flag.
-  /// Effect on the running server (starting / stopping it now) is
-  /// applied by `cxpServerLifecycleProvider` via a `ref.listen` on
-  /// this provider — the notifier updates and persists the state.
-  void setCxpServerEnabled({required bool enabled}) {
-    if (state.cxpServerEnabled == enabled) return;
-    state = state.copyWith(cxpServerEnabled: enabled);
-    unawaited(_persistCxpSettings());
-  }
-
-  /// Sets the CXP server's bound port. Out-of-range values
-  /// (≤ 0 or > 65535) are clamped to [AppSettings.defaultCxpServerPort]
-  /// so a Settings-UI typo can't strand the server on an illegal port.
-  /// The running server is restarted on the new port by
-  /// `cxpServerLifecycleProvider`.
-  void setCxpServerPort(int port) {
-    final clamped = (port <= 0 || port > 65535)
-        ? AppSettings.defaultCxpServerPort
-        : port;
-    if (state.cxpServerPort == clamped) return;
-    state = state.copyWith(cxpServerPort: clamped);
-    unawaited(_persistCxpSettings());
-  }
-
-  /// Toggles whether an actionable inbound cross-probe requests the OS's
-  /// attention (dock bounce / taskbar flash / Wayland urgency) without stealing
-  /// focus. The effect on the running `windowAttentionRequester` seam is
-  /// applied by `cxpAttentionGateProvider` via a `ref.listen` on this provider
-  /// — the notifier updates and persists state, with the other CXP fields.
-  void setRequestAttentionOnCrossProbe({required bool enabled}) {
-    if (state.requestAttentionOnCrossProbe == enabled) return;
-    state = state.copyWith(requestAttentionOnCrossProbe: enabled);
-    unawaited(_persistCxpSettings());
-  }
-
-  /// CXP Cross-Probe — toggles the live selection auto-broadcast. When off,
-  /// the per-tab `ViolationSelectionEmitter` stops announcing selections to
-  /// peers (`notify_selection`); explicit sends still work. The emitter reads
-  /// this flag on each selection, so a change takes effect immediately. The
-  /// notifier updates and persists state, with the other CXP fields.
-  void setBroadcastSelectionOnCrossProbe({required bool enabled}) {
-    if (state.broadcastSelectionOnCrossProbe == enabled) return;
-    state = state.copyWith(broadcastSelectionOnCrossProbe: enabled);
-    unawaited(_persistCxpSettings());
-  }
-
-  /// Saves the four Settings → CXP Cross-Probe fields as they stand now.
-  Future<void> _persistCxpSettings() async {
-    try {
-      await ref.read(cxpSettingsServiceProvider).save(CxpSettings.of(state));
-    } on Object {
-      // See [_persistAutoCheckForUpdates]: no preferences backend. The
-      // in-memory state already changed, so the setting still applies to
-      // the running session.
-    }
   }
 
   /// Toggles whether the automatic (launch / periodic / on-resume)

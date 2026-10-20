@@ -1,98 +1,47 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
-import 'dart:async';
-
 import 'package:crux_cxp/crux_cxp.dart';
-import 'package:crux_license/crux_license.dart';
-import 'package:crux_telemetry/crux_telemetry.dart';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:flutter_riverpod/misc.dart' show Override, ProviderListenable;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
 import 'package:lintcrux/features/remote/widgets/cross_probe_panel.dart';
+import 'package:lintcrux/features/viewer/providers/panel_layout_provider.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
+import 'package:lintcrux/services/remote/cxp/lintcrux_cxp_binding.dart';
 
 import '../../support/telemetry_test_store.dart';
 
-/// Widget tests for the docked cross-probe panel host
-/// ([LintCruxCrossProbePanel]) — a thin host
-/// over the shared `crux_cxp_ui.CrossProbePanel`, bridging LintCrux's live CXP
-/// providers onto the shared controller contract.
-Widget _wrap({
-  required List<Override> overrides,
-  Locale locale = const Locale('en'),
-  Widget panel = const LintCruxCrossProbePanel(),
-}) {
-  return ProviderScope(
-    overrides: [...telemetryDeclinedOverrides(), ...overrides],
-    child: MaterialApp(
-      locale: locale,
-      localizationsDelegates: const [
-        L10N.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: L10N.supportedLocales,
-      home: Scaffold(
-        body: SizedBox(
-          width: 360,
-          height: 640,
-          child: panel,
-        ),
-      ),
-    ),
-  );
-}
+/// Widget tests for the docked cross-probe panel ([LintCruxCrossProbePanel]):
+/// the shared, bound panel with LintCrux's selection and close behaviour. The
+/// peer list, the event log, the unreachable rows and the send outcomes are the
+/// shared runtime's own tests; what is LintCrux's is which selection a row
+/// sends and how the panel closes.
 
-class _FakeLifecycle extends CxpServerLifecycle {
-  _FakeLifecycle(
-    this._state, {
-    this.ackHonored = true,
-    this.ackReason,
-    this.delivered = true,
-    this.ackWait,
-  });
+/// Every send the fake dispatcher saw in the current test.
+final List<(PeerIdentity, CrossProbeSelection?)> _sent = [];
 
-  final CxpServerLifecycleState _state;
-  final bool ackHonored;
-  final String? ackReason;
+class _FakeDispatcher extends CrossProbeDispatcher {
+  _FakeDispatcher() : super(_unread);
 
-  /// False models a peer that went away between the panel listing it and
-  /// the send: the server reports `delivered: false` with no ack.
-  final bool delivered;
-
-  /// When set, the ack is held until this completes — the real server waits
-  /// up to five seconds for it.
-  final Future<void>? ackWait;
-  final List<(String, CxpMessage)> sent = <(String, CxpMessage)>[];
+  static T _unread<T>(ProviderListenable<T> provider) =>
+      throw UnimplementedError('the fake reads nothing');
 
   @override
-  Future<CxpServerLifecycleState> build() async => _state;
-
-  @override
-  Future<({bool delivered, RequestHighlightAck? ack})> requestHighlight(
-    String peerId,
-    RequestHighlight request,
-  ) async {
-    sent.add((peerId, request));
-    if (ackWait != null) await ackWait;
-    if (!delivered) return (delivered: false, ack: null);
-    return (
-      delivered: true,
-      ack: RequestHighlightAck(
-        inReplyTo: 'req',
-        honored: ackHonored,
-        reason: ackReason,
-      ),
-    );
+  Future<CrossProbeOutcome> send(
+    PeerIdentity peer,
+    CrossProbeSelection? selection, {
+    String? label,
+  }) async {
+    _sent.add((peer, selection));
+    return CrossProbeOutcome(CrossProbeOutcomeKind.sent, target: label);
   }
 }
 
@@ -100,7 +49,7 @@ class _FakeLifecycle extends CxpServerLifecycle {
 /// violation to encode without wiring the whole violation-table pipeline.
 class _FixedSelectedViolation extends SelectedViolationNotifier {
   _FixedSelectedViolation(this._fixed);
-  final Violation _fixed;
+  final Violation? _fixed;
 
   @override
   Violation? build() => _fixed;
@@ -114,572 +63,164 @@ const _violation = Violation(
   message: 'unused',
 );
 
-CxpServerLifecycleState _running() =>
-    const CxpServerLifecycleState(running: true, boundPort: 54324);
+const _wavecrux = PeerIdentity(
+  peerId: 'wavecrux-1',
+  productName: 'wavecrux',
+  productVersion: '0.7.0',
+);
+
+Widget _wrap({
+  List<PeerIdentity> peers = const <PeerIdentity>[],
+  bool running = true,
+  Violation? selected = _violation,
+  Locale locale = const Locale('en'),
+  List<Override> extra = const <Override>[],
+}) {
+  return ProviderScope(
+    overrides: [
+      ...telemetryDeclinedOverrides(),
+      cruxCxpProductBindingProvider.overrideWithValue(kLintcruxCxpBinding),
+      cruxCxpPeersProvider.overrideWithValue(peers),
+      cruxCxpServerStatusProvider.overrideWithValue((
+        running: running,
+        port: running ? 54324 : null,
+        problem: null,
+      )),
+      cruxCxpUnreachablePeersProvider.overrideWith(
+        (_) => Stream<List<CxpDialFailure>>.value(const <CxpDialFailure>[]),
+      ),
+      cruxCxpRuntimeProvider.overrideWith((_) async => null),
+      crossProbeDispatcherProvider.overrideWith((_) => _FakeDispatcher()),
+      selectedViolationProvider.overrideWith(
+        () => _FixedSelectedViolation(selected),
+      ),
+      ...extra,
+    ],
+    child: MaterialApp(
+      locale: locale,
+      localizationsDelegates: const [
+        L10N.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: L10N.supportedLocales,
+      home: const Scaffold(
+        body: SizedBox(
+          width: 360,
+          height: 640,
+          child: LintCruxCrossProbePanel(),
+        ),
+      ),
+    ),
+  );
+}
 
 void main() {
+  setUp(_sent.clear);
+
   group('LintCruxCrossProbePanel', () {
-    testWidgets('shows the offline banner when the server is stopped', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                const CxpServerLifecycleState(running: false, boundPort: null),
-              ),
-            ),
-          ],
-        ),
-      );
+    testWidgets('is the shared bound panel', (tester) async {
+      await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('cross_probe_offline_banner')),
-        findsOneWidget,
-      );
+      expect(find.byType(CruxCrossProbePanel), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('hides the offline banner when the server is running', (
+    testWidgets('shows the shared peers-empty placeholder with no peers', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                _running(),
-              ),
-            ),
-          ],
-        ),
-      );
+      await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('cross_probe_offline_banner')),
-        findsNothing,
-      );
+      expect(find.text('No peers connected'), findsOneWidget);
     });
 
-    testWidgets('shows the peers-empty placeholder when no peers discovered', (
+    testWidgets('renders a connected peer row with its send button', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                _running(),
-              ),
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.textContaining('No peers discovered'), findsOneWidget);
-    });
-
-    testWidgets('renders a peer row (product + version + peerId)', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                _running(),
-              ),
-            ),
-            cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
-          ],
-        ),
-      );
+      await tester.pumpWidget(_wrap(peers: const [_wavecrux]));
       await tester.pumpAndSettle();
       expect(find.textContaining('wavecrux 0.7.0'), findsOneWidget);
-      expect(find.textContaining('wavecrux-1'), findsOneWidget);
-      // Each peer row carries the direct-send button, keyed by peer id.
       expect(
         find.byKey(const Key('cross_probe_send_wavecrux-1')),
         findsOneWidget,
       );
     });
 
-    testWidgets('a rejected send (honored:false ack) raises a panel toast', (
-      tester,
-    ) async {
-      final lifecycle = _FakeLifecycle(
-        _running(),
-        ackHonored: false,
-        ackReason: 'no violation matches this rule in the current project',
+    testWidgets('a peer row sends the active tab’s selected violation, named '
+        'in every kind it has', (tester) async {
+      await tester.pumpWidget(_wrap(peers: const [_wavecrux]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
+      await tester.pumpAndSettle();
+
+      expect(_sent, hasLength(1));
+      expect(_sent.single.$1.peerId, 'wavecrux-1');
+      final selection = _sent.single.$2!;
+      expect(
+        selection.candidates.map((c) => c.kind),
+        <ElementKind>[
+          ElementKind.rule,
+          ElementKind.scope,
+          ElementKind.source,
+        ],
       );
+      expect(selection.metadata['lintcrux.violation_severity'], 'warning');
+      // WaveCrux is shown the source citation.
+      expect(
+        crossProbeElementFor(selection, _wavecrux)?.path,
+        '/a.sv:3:1',
+      );
+    });
+
+    testWidgets('with nothing selected the send carries no selection, and the '
+        'shared send says so', (tester) async {
       await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(() => lifecycle),
-            cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
-            selectedViolationProvider.overrideWith(
-              () => _FixedSelectedViolation(_violation),
-            ),
-          ],
-        ),
+        _wrap(peers: const [_wavecrux], selected: null),
       );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
       await tester.pumpAndSettle();
 
-      expect(lifecycle.sent, hasLength(1));
-      expect(lifecycle.sent.single.$2, isA<RequestHighlight>());
-      expect(
-        find.byKey(const Key('cross_probe_send_failure')),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('no violation matches this rule'),
-        findsOneWidget,
-      );
+      expect(_sent.single.$2, isNull);
     });
 
-    testWidgets('a send to a peer that can no longer be reached raises a '
-        'panel toast', (tester) async {
-      // The peer is still listed, but it went away before the send: the
-      // server reports the request as never delivered.
-      final lifecycle = _FakeLifecycle(_running(), delivered: false);
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(() => lifecycle),
-            cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
-            selectedViolationProvider.overrideWith(
-              () => _FixedSelectedViolation(_violation),
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-      await tester.pumpAndSettle();
-
-      expect(lifecycle.sent, hasLength(1));
-      final toast = find.byKey(const Key('cross_probe_send_failure'));
-      expect(
-        toast,
-        findsOneWidget,
-        reason:
-            'a send is never a silent no-op; a press that reached nobody '
-            'must say so',
-      );
-      expect(
-        find.descendant(of: toast, matching: find.textContaining('wavecrux')),
-        findsOneWidget,
-        reason: 'the toast names the peer the send did not reach',
-      );
-    });
-
-    testWidgets('a second failed send to the same peer raises its own toast', (
+    testWidgets('the shared panel closes through the panel-layout flag', (
       tester,
     ) async {
-      // Two failures to one peer compare equal. Published as-is, the second
-      // would not notify the panel and the second press would be silent.
-      final lifecycle = _FakeLifecycle(_running(), delivered: false);
+      late ProviderContainer container;
       await tester.pumpWidget(
         _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(() => lifecycle),
-            cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
-            selectedViolationProvider.overrideWith(
-              () => _FixedSelectedViolation(_violation),
-            ),
+          extra: [
+            panelLayoutProvider.overrideWith(PanelLayoutNotifier.new),
           ],
         ),
       );
-      await tester.pumpAndSettle();
-      final send = find.byKey(const Key('cross_probe_send_wavecrux-1'));
-      final toast = find.byKey(const Key('cross_probe_send_failure'));
+      container = ProviderScope.containerOf(
+        tester.element(find.byType(LintCruxCrossProbePanel)),
+      );
+      container
+          .read(panelLayoutProvider.notifier)
+          .setCrossProbeVisible(visible: true);
+      expect(container.read(panelLayoutProvider).crossProbeVisible, isTrue);
 
-      await tester.tap(send);
-      await tester.pumpAndSettle();
-      expect(toast, findsOneWidget);
-
-      // The first toast is gone by the time the user tries again.
-      tester
-          .state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger))
-          .removeCurrentSnackBar();
-      await tester.pumpAndSettle();
-      expect(toast, findsNothing);
-
-      await tester.tap(send);
-      await tester.pumpAndSettle();
-      expect(lifecycle.sent, hasLength(2));
-      expect(toast, findsOneWidget, reason: 'the second press is not silent');
+      final panel = tester.widget<CruxCrossProbePanel>(
+        find.byType(CruxCrossProbePanel),
+      );
+      panel.onClose();
+      expect(container.read(panelLayoutProvider).crossProbeVisible, isFalse);
     });
 
-    testWidgets('closing the panel while a send waits for its ack neither '
-        'throws nor loses the probe count', (tester) async {
-      final ackWait = Completer<void>();
-      final lifecycle = _FakeLifecycle(
-        _running(),
-        // A refusal, so the send would also raise the failure toast on the
-        // panel that is no longer there.
-        ackHonored: false,
-        ackWait: ackWait.future,
-      );
-      final telemetry = RecordingTelemetryService();
-      final showPanel = ValueNotifier<bool>(true);
-      addTearDown(showPanel.dispose);
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            telemetryServiceProvider.overrideWithValue(telemetry),
-            cxpServerLifecycleProvider.overrideWith(() => lifecycle),
-            cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
-            selectedViolationProvider.overrideWith(
-              () => _FixedSelectedViolation(_violation),
-            ),
-          ],
-          panel: ValueListenableBuilder<bool>(
-            valueListenable: showPanel,
-            builder: (_, show, _) => show
-                ? const LintCruxCrossProbePanel()
-                : const SizedBox.shrink(),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-      await tester.pump();
-      expect(lifecycle.sent, hasLength(1));
-
-      // The user closes the panel inside the ack wait (up to five seconds in
-      // the real server), which disposes the controller and its notifiers.
-      showPanel.value = false;
-      await tester.pump();
-      expect(find.byType(LintCruxCrossProbePanel), findsNothing);
-
-      ackWait.complete();
-      await tester.pumpAndSettle();
-
-      expect(tester.takeException(), isNull);
-      expect(
-        telemetry.only('cxp.crossprobe').properties,
-        containsPair('honored', false),
-        reason:
-            'the probe reached the peer; closing the panel does not undo '
-            'that, so it still counts',
-      );
-    });
-
-    testWidgets('renders no unreachable rows when every peer is reachable', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                _running(),
-              ),
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.warning_amber_rounded), findsNothing);
-    });
-
-    testWidgets('renders a persistent warning row per unreachable peer', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                _running(),
-              ),
-            ),
-            cxpDialFailuresProvider.overrideWith(_FakeDialFailuresNotifier.new),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
-      expect(find.textContaining('wavecrux-9'), findsOneWidget);
-      expect(find.textContaining('127.0.0.1:54399'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('shows the events-empty placeholder with an empty log', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                _running(),
-              ),
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.textContaining('No cross-probe events'), findsOneWidget);
-    });
-
-    testWidgets('maps an inbound-request event onto the shared row', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                _running(),
-              ),
-            ),
-            cxpEventLogProvider.overrideWith(
-              () => _SeededLogNotifier(
-                CxpEventLog(
-                  entries: [
-                    CxpEventEntry(
-                      timestamp: DateTime(2026, 5, 24, 12, 34, 56),
-                      kind: CxpEventKind.inboundRequest,
-                      summary: 'request_highlight from peer-99',
-                      peerId: 'peer-99',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-      // The shared row subtitle is "<peerLabel> · <summary>"; the summary
-      // carries the original wire text.
-      expect(
-        find.textContaining('request_highlight from peer-99'),
-        findsOneWidget,
-      );
-      expect(find.textContaining('12:34:56'), findsOneWidget);
-    });
-
-    testWidgets('the clear-events button empties the log', (tester) async {
-      await tester.pumpWidget(
-        _wrap(
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(
-              () => _FakeLifecycle(
-                _running(),
-              ),
-            ),
-            cxpEventLogProvider.overrideWith(
-              () => _SeededLogNotifier(
-                CxpEventLog(
-                  entries: [
-                    CxpEventEntry(
-                      timestamp: DateTime(2026),
-                      kind: CxpEventKind.peerConnected,
-                      summary: 'wavecrux 0.7.0',
-                      peerId: 'peer-99',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('cross_probe_clear_events')));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('No cross-probe events'), findsOneWidget);
-    });
-
-    for (final locale in const [
-      Locale('en'),
-      Locale('zh', 'CN'),
-      Locale('zh'),
-      Locale('ja'),
-      Locale('ko'),
-    ]) {
+    for (final locale in L10N.supportedLocales) {
       testWidgets('renders without exception in $locale', (tester) async {
         await tester.pumpWidget(
-          _wrap(
-            overrides: [
-              cxpServerLifecycleProvider.overrideWith(
-                () => _FakeLifecycle(
-                  _running(),
-                ),
-              ),
-              // Exercise the unreachable-peer warning row in every locale.
-              cxpDialFailuresProvider.overrideWith(
-                _FakeDialFailuresNotifier.new,
-              ),
-            ],
-            locale: locale,
-          ),
+          _wrap(peers: const [_wavecrux], locale: locale),
         );
         await tester.pumpAndSettle();
-        expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     }
   });
-
-  group('sending is free in every tier', () {
-    // Cross-probing is free in both directions: an unlicensed seat after the
-    // beta sends exactly as a Pro seat does. Every test pins the selection,
-    // so a send that does not go through can only be a gate.
-    List<Override> seat({
-      required LicenseTier tier,
-      required _FakeLifecycle lifecycle,
-    }) => [
-      betaPeriodProvider.overrideWithValue(false),
-      licenseTierProvider.overrideWithValue(tier),
-      cxpServerLifecycleProvider.overrideWith(() => lifecycle),
-      cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
-      selectedViolationProvider.overrideWith(
-        () => _FixedSelectedViolation(_violation),
-      ),
-    ];
-
-    for (final tier in LicenseTier.values) {
-      testWidgets('post-beta at ${tier.name}: the send goes through with no '
-          'upgrade prompt', (tester) async {
-        final lifecycle = _FakeLifecycle(_running());
-        await tester.pumpWidget(
-          _wrap(
-            overrides: seat(tier: tier, lifecycle: lifecycle),
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-        await tester.pumpAndSettle();
-
-        expect(lifecycle.sent, hasLength(1));
-        expect(lifecycle.sent.single.$1, 'wavecrux-1');
-        expect(find.textContaining('requires LintCrux Pro'), findsNothing);
-        expect(find.byType(SnackBar), findsNothing);
-        expect(find.byType(AlertDialog), findsNothing);
-      });
-    }
-  });
-
-  group('the send-failure toast is in the user language', () {
-    // The shared panel falls back to English for this toast. Without the
-    // app's strings it stayed English in every locale.
-    Future<void> sendAndSettle(
-      WidgetTester tester, {
-      required Locale locale,
-      required _FakeLifecycle lifecycle,
-    }) async {
-      await tester.pumpWidget(
-        _wrap(
-          locale: locale,
-          overrides: [
-            cxpServerLifecycleProvider.overrideWith(() => lifecycle),
-            cxpPeersProvider.overrideWith(_FakePeersNotifier.new),
-            selectedViolationProvider.overrideWith(
-              () => _FixedSelectedViolation(_violation),
-            ),
-          ],
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('cross_probe_send_wavecrux-1')));
-      await tester.pumpAndSettle();
-    }
-
-    for (final locale in const [
-      Locale('en'),
-      Locale('zh', 'CN'),
-      Locale('zh'),
-      Locale('ja'),
-      Locale('ko'),
-    ]) {
-      testWidgets('a send that went nowhere, in $locale', (tester) async {
-        await sendAndSettle(
-          tester,
-          locale: locale,
-          lifecycle: _FakeLifecycle(_running(), delivered: false),
-        );
-        expect(
-          find.text(lookupL10N(locale).crossProbeSendFailed('wavecrux')),
-          findsOneWidget,
-        );
-      });
-
-      testWidgets('a refusal with the peer reason, in $locale', (
-        tester,
-      ) async {
-        const reason = 'no violation matches this rule';
-        await sendAndSettle(
-          tester,
-          locale: locale,
-          lifecycle: _FakeLifecycle(
-            _running(),
-            ackHonored: false,
-            ackReason: reason,
-          ),
-        );
-        expect(
-          find.text(
-            lookupL10N(locale).crossProbeSendRefused('wavecrux', reason),
-          ),
-          findsOneWidget,
-          reason: 'the frame is translated; the reason is the peer words',
-        );
-      });
-    }
-  });
-}
-
-class _FakePeersNotifier extends CxpPeersNotifier {
-  @override
-  List<CxpPeerManifest> build() {
-    return [
-      CxpPeerManifest(
-        identity: const PeerIdentity(
-          peerId: 'wavecrux-1',
-          productName: 'wavecrux',
-          productVersion: '0.7.0',
-        ),
-        host: '127.0.0.1',
-        port: 54322,
-        startedAt: DateTime.utc(2026),
-        manifestPath: '/tmp/wavecrux-1.json',
-      ),
-    ];
-  }
-}
-
-class _SeededLogNotifier extends CxpEventLogNotifier {
-  _SeededLogNotifier(this._seed);
-
-  final CxpEventLog _seed;
-
-  @override
-  CxpEventLog build() => _seed;
-}
-
-class _FakeDialFailuresNotifier extends CxpDialFailuresNotifier {
-  @override
-  List<CxpDialFailure> build() {
-    return const [
-      CxpDialFailure(
-        peerId: 'wavecrux-9',
-        host: '127.0.0.1',
-        port: 54399,
-        error: 'Connection refused',
-        consecutiveFailures: 3,
-        nextRetryAfterTicks: 4,
-      ),
-    ];
-  }
 }

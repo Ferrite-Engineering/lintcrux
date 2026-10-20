@@ -235,7 +235,7 @@
   "@actionOpenAbout": {
     "description": "Menu / command palette label for the action that shows the About box."
   },
-  "actionOpenCrossProbePanel": "クロスプローブピア",
+  "actionOpenCrossProbePanel": "クロスプローブパネルを表示",
   "@actionOpenCrossProbePanel": {
     "description": "Menu / command palette label for the action that opens the cross-probe panel showing connected CXP peers and recent cross-probe events."
   },
@@ -306,54 +306,6 @@
   "actionForceLintRunWithoutCache": "リントを実行（キャッシュをバイパス）",
   "@actionForceLintRunWithoutCache": {
     "description": "Menu / command palette label for the Pro-tier action that runs lint once with the cache bypassed in both directions for that single invocation."
-  },
-  "crossProbePanelTitle": "クロスプローブピア",
-  "@crossProbePanelTitle": {
-    "description": "Title of the cross-probe panel."
-  },
-  "crossProbePanelServerStopped": "クロスプローブサーバーは無効です。",
-  "@crossProbePanelServerStopped": {
-    "description": "Status text shown in the cross-probe panel when the CXP server is disabled in Settings."
-  },
-  "crossProbePanelPeersHeader": "検出されたピア",
-  "@crossProbePanelPeersHeader": {
-    "description": "Header above the discovered-peers list in the cross-probe panel."
-  },
-  "crossProbePanelPeersEmpty": "ピアはまだ検出されていません。",
-  "@crossProbePanelPeersEmpty": {
-    "description": "Empty-state text shown when no CXP peers have been discovered."
-  },
-  "crossProbePanelEventsHeader": "最近のイベント",
-  "@crossProbePanelEventsHeader": {
-    "description": "Header above the rolling event log in the cross-probe panel."
-  },
-  "crossProbePanelEventsEmpty": "クロスプローブイベントはまだありません。",
-  "@crossProbePanelEventsEmpty": {
-    "description": "Empty-state text shown when the cross-probe event log is empty."
-  },
-  "crossProbePanelClearEvents": "イベントを消去",
-  "@crossProbePanelClearEvents": {
-    "description": "Button that clears the cross-probe event log."
-  },
-  "crossProbePanelClose": "閉じる",
-  "@crossProbePanelClose": {
-    "description": "Button that closes the cross-probe panel dialog."
-  },
-  "settingsCxpEnabledLabel": "CXP サーバーを有効化",
-  "@settingsCxpEnabledLabel": {
-    "description": "Label of the toggle controlling whether the CXP cross-probe server starts at boot."
-  },
-  "settingsCxpEnabledDescription": "他の Crux ツール (WaveCrux、NetCrux、SimCrux) が LintCrux を検出してクロスプローブ要求を送信できるようにします。",
-  "@settingsCxpEnabledDescription": {
-    "description": "Helper text explaining what the cross-probe server does."
-  },
-  "settingsCxpPortLabel": "CXP ポート",
-  "@settingsCxpPortLabel": {
-    "description": "Label of the port input for the CXP server."
-  },
-  "settingsCxpPortDescription": "デフォルト 54324",
-  "@settingsCxpPortDescription": {
-    "description": "Hint text for the CXP port input showing the suite default."
   },
   "violationColumnSeverity": "重大度",
   "@violationColumnSeverity": {
@@ -1072,25 +1024,9 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
-  "emptyCanvasRecentProjectMissing": "プロジェクトファイルが見つかりません",
-  "@emptyCanvasRecentProjectMissing": {
-    "description": "Second line of a welcome-screen Recent projects row whose project file no longer exists (moved or deleted); the row is greyed."
-  },
-  "emptyCanvasRemoveRecentProject": "最近のプロジェクトから削除",
-  "@emptyCanvasRemoveRecentProject": {
-    "description": "Tooltip and accessible name of the button on a welcome-screen Recent projects row that removes that one entry from the list."
-  },
-  "emptyCanvasRecentProjectsHeading": "最近のプロジェクト",
-  "@emptyCanvasRecentProjectsHeading": {
-    "description": "Section heading above the recent-projects list on the empty-canvas state."
-  },
   "emptyCanvasRecentWorkspacesHeading": "最近のワークスペース",
   "@emptyCanvasRecentWorkspacesHeading": {
     "description": "Section heading above the recent-workspaces list on the empty-canvas state."
-  },
-  "emptyCanvasNoRecentProjects": "最近のプロジェクトはまだありません。",
-  "@emptyCanvasNoRecentProjects": {
-    "description": "Placeholder shown in the recent-projects section when the list is empty."
   },
   "emptyCanvasNoRecentWorkspaces": "最近のワークスペースはまだありません。",
   "@emptyCanvasNoRecentWorkspaces": {
@@ -1344,10 +1280,6 @@
   "@actionClearRecentProjects": {
     "description": "Command palette and File menu label: empties the welcome screen Recent projects list."
   },
-  "recentProjectsClearedSnack": "最近のプロジェクトを消去しました。",
-  "@recentProjectsClearedSnack": {
-    "description": "Confirmation shown (and announced to screen readers) after Clear Recent Projects empties the list."
-  },
   "actionReopenRecentProject": "最近のプロジェクトを再度開く",
   "@actionReopenRecentProject": {
     "description": "Menu / command palette label for the action that re-opens the most-recently-closed project from the recent-projects list."
@@ -1527,19 +1459,7 @@
   "betaExpiryExpiredBody": "この LintCrux ベータ版は有効期限に達しました。LintCrux を引き続き使用するには、最新ビルドをダウンロードしてください。",
   "betaExpiryExpiredAction": "最新ビルドをダウンロード",
   "betaExpiryExpiredQuit": "LintCrux を終了",
-  "crossProbeSendTooltip": "この相手に選択項目を送信",
-  "crossProbeUnreachableTitle": "到達できない相手",
-  "crossProbeSendFailed": "{peer} へのクロスプローブは完了しませんでした",
-  "crossProbeSendRefused": "{peer} へのクロスプローブ: {reason}",
   "toolbarToggleCrossProbe": "クロスプローブパネル",
-  "settingsRequestAttentionOnCrossProbeLabel": "クロスプローブ時に注意を要求",
-  "settingsRequestAttentionOnCrossProbeDescription": "クロスプローブ受信時にDockをバウンス（またはタスクバーを点滅）。フォーカスは奪いません。",
-  "settingsBroadcastSelectionOnCrossProbeLabel": "選択を自動的にブロードキャスト",
-  "settingsBroadcastSelectionOnCrossProbeDescription": "選択と同時に、接続中のピアへ選択内容を通知します（ライブクロスプローブ）。オフの場合は、明示的な送信のみが共有されます。",
-  "settingsCxpStatus": "CXP ステータス",
-  "settingsCxpStatusRunning": "ポート {port} で実行中",
-  "settingsCxpStatusStopped": "停止",
-  "settingsCxpPeersConnected": "{count, plural, =0{接続中のピアなし} =1{1 個のピアが接続中} other{{count} 個のピアが接続中}}",
   "actionCategoryFileMnemonic": "ファイル(&F)",
   "actionCategoryEditMnemonic": "編集(&E)",
   "actionCategoryViewMnemonic": "表示(&V)",
@@ -1592,7 +1512,6 @@
   "settingsLanguageDescription": "アプリケーションインターフェースに使用する言語",
   "settingsCxpSectionTitle": "CXP クロスプローブ",
   "settingsAutoReloadDescription": "読み込んだプロジェクトがディスク上で変更されたときの LintCrux の動作",
-  "settingsCxpPortError": "1 から 65535 の範囲でポートを入力してください。",
   "tabContextMenuRevealInFinder": "Finder で表示",
   "tabContextMenuRevealInExplorer": "エクスプローラーで表示",
   "tabContextMenuRevealInFiles": "ファイルマネージャーで表示",
@@ -1795,5 +1714,6 @@
   "fileWatcherIgnore": "無視",
   "@fileWatcherIgnore": {
     "description": "Button on the source-changed prompt that dismisses it without re-running. Same key and meaning as WaveCrux."
-  }
+  },
+  "actionCrossProbeSelection": "選択をクロスプローブ…"
 }

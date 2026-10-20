@@ -14,7 +14,7 @@ import 'package:lintcrux/features/import_viewer/services/sarif_import_flow.dart'
 import 'package:lintcrux/features/project/providers/project_picker_provider.dart';
 import 'package:lintcrux/features/project/services/open_project_feedback.dart';
 import 'package:lintcrux/features/project/services/open_project_service.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/open_project_in_workspace.dart';
 import 'package:lintcrux/features/workspace/widgets/empty_canvas_content.dart';
@@ -165,39 +165,44 @@ class ViewerScaffold extends ConsumerWidget {
     }
   }
 
-  Future<void> _handleOpenRecentProject(
+  /// Opens a Recent projects entry and reports whether it opened. The shared
+  /// Recent list drops an entry that did not, so the list stops offering it;
+  /// this reports the failure itself, in the words of what went wrong.
+  Future<bool> _handleOpenRecentProject(
     BuildContext context,
     WidgetRef ref,
     String path,
   ) async {
+    // Read before any await: the telemetry service lives in the root
+    // container and outlives this widget, and the open may unmount it (a
+    // welcome screen's recent list is replaced by the viewer it opens).
+    final telemetry = ref.read(telemetryServiceProvider);
+    if (!ref.read(recentProjects.existsProvider)(path)) {
+      final strings = crux.CruxRecentListStrings.of(
+        context,
+        crux.CruxRecentKind.projects,
+      );
+      showCruxErrorSnack(context, strings.removedMissing(p.basename(path)));
+      return false;
+    }
     final opener = ref.read(openProjectInWorkspaceProvider)(
       WorkspaceRoot.of(context).tabs.containerFor,
     );
-    // Read before the await: both live in the root container and outlive
-    // this widget, and the open may unmount it (a welcome screen's recent
-    // list is replaced by the viewer it opens).
-    final recents = ref.read(recentProjectsListProvider.notifier);
-    final telemetry = ref.read(telemetryServiceProvider);
     final result = await opener.openProject(path);
     if (result is OpenProjectFailure) {
-      // A recent entry whose file no longer opens is dropped, so the list
-      // does not keep offering it.
-      recents.remove(path);
-    } else {
-      // The third `project.opened` telemetry source.
-      telemetry.record(
-        TelemetryEvent(
-          'project.opened',
-          properties: <String, Object?>{
-            'source': telemetryEnumToken(ProjectOpenSource.recent),
-          },
-        ),
-      );
+      if (context.mounted) showCruxErrorSnack(context, result.message);
+      return false;
     }
-    if (!context.mounted) return;
-    if (result is OpenProjectFailure) {
-      showCruxErrorSnack(context, result.message);
-    }
+    // The third `project.opened` telemetry source.
+    telemetry.record(
+      TelemetryEvent(
+        'project.opened',
+        properties: <String, Object?>{
+          'source': telemetryEnumToken(ProjectOpenSource.recent),
+        },
+      ),
+    );
+    return true;
   }
 
   @override
@@ -268,15 +273,8 @@ class ViewerScaffold extends ConsumerWidget {
                               unawaited(_handleNewProject(context, ref)),
                           onImportSarif: () =>
                               unawaited(runSarifImportFlow(context, ref)),
-                          onOpenRecentProject: (path) {
-                            // Fire-and-forget — the EmptyCanvasContent
-                            // callback is void-returning and there is no
-                            // meaningful "in flight" UI state to surface at
-                            // the empty-canvas level.
-                            unawaited(
+                          onOpenRecentProject: (path) =>
                               _handleOpenRecentProject(context, ref, path),
-                            );
-                          },
                         ),
                       ),
                       tabContentBuilder: (ctx, tab) =>

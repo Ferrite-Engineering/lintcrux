@@ -235,7 +235,7 @@
   "@actionOpenAbout": {
     "description": "Menu / command palette label for the action that shows the About box."
   },
-  "actionOpenCrossProbePanel": "교차 프로브 피어",
+  "actionOpenCrossProbePanel": "교차 프로브 패널 표시",
   "@actionOpenCrossProbePanel": {
     "description": "Menu / command palette label for the action that opens the cross-probe panel showing connected CXP peers and recent cross-probe events."
   },
@@ -306,54 +306,6 @@
   "actionForceLintRunWithoutCache": "린트 실행(캐시 우회)",
   "@actionForceLintRunWithoutCache": {
     "description": "Menu / command palette label for the Pro-tier action that runs lint once with the cache bypassed in both directions for that single invocation."
-  },
-  "crossProbePanelTitle": "교차 프로브 피어",
-  "@crossProbePanelTitle": {
-    "description": "Title of the cross-probe panel."
-  },
-  "crossProbePanelServerStopped": "교차 프로브 서버가 비활성화되어 있습니다.",
-  "@crossProbePanelServerStopped": {
-    "description": "Status text shown in the cross-probe panel when the CXP server is disabled in Settings."
-  },
-  "crossProbePanelPeersHeader": "발견된 피어",
-  "@crossProbePanelPeersHeader": {
-    "description": "Header above the discovered-peers list in the cross-probe panel."
-  },
-  "crossProbePanelPeersEmpty": "아직 발견된 피어가 없습니다.",
-  "@crossProbePanelPeersEmpty": {
-    "description": "Empty-state text shown when no CXP peers have been discovered."
-  },
-  "crossProbePanelEventsHeader": "최근 이벤트",
-  "@crossProbePanelEventsHeader": {
-    "description": "Header above the rolling event log in the cross-probe panel."
-  },
-  "crossProbePanelEventsEmpty": "교차 프로브 이벤트가 아직 없습니다.",
-  "@crossProbePanelEventsEmpty": {
-    "description": "Empty-state text shown when the cross-probe event log is empty."
-  },
-  "crossProbePanelClearEvents": "이벤트 지우기",
-  "@crossProbePanelClearEvents": {
-    "description": "Button that clears the cross-probe event log."
-  },
-  "crossProbePanelClose": "닫기",
-  "@crossProbePanelClose": {
-    "description": "Button that closes the cross-probe panel dialog."
-  },
-  "settingsCxpEnabledLabel": "CXP 서버 활성화",
-  "@settingsCxpEnabledLabel": {
-    "description": "Label of the toggle controlling whether the CXP cross-probe server starts at boot."
-  },
-  "settingsCxpEnabledDescription": "다른 Crux 도구(WaveCrux, NetCrux, SimCrux)가 LintCrux를 발견하고 교차 프로브 요청을 보낼 수 있도록 합니다.",
-  "@settingsCxpEnabledDescription": {
-    "description": "Helper text explaining what the cross-probe server does."
-  },
-  "settingsCxpPortLabel": "CXP 포트",
-  "@settingsCxpPortLabel": {
-    "description": "Label of the port input for the CXP server."
-  },
-  "settingsCxpPortDescription": "기본값 54324",
-  "@settingsCxpPortDescription": {
-    "description": "Hint text for the CXP port input showing the suite default."
   },
   "violationColumnSeverity": "심각도",
   "@violationColumnSeverity": {
@@ -1072,25 +1024,9 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
-  "emptyCanvasRecentProjectMissing": "프로젝트 파일을 찾을 수 없음",
-  "@emptyCanvasRecentProjectMissing": {
-    "description": "Second line of a welcome-screen Recent projects row whose project file no longer exists (moved or deleted); the row is greyed."
-  },
-  "emptyCanvasRemoveRecentProject": "최근 프로젝트에서 제거",
-  "@emptyCanvasRemoveRecentProject": {
-    "description": "Tooltip and accessible name of the button on a welcome-screen Recent projects row that removes that one entry from the list."
-  },
-  "emptyCanvasRecentProjectsHeading": "최근 프로젝트",
-  "@emptyCanvasRecentProjectsHeading": {
-    "description": "Section heading above the recent-projects list on the empty-canvas state."
-  },
   "emptyCanvasRecentWorkspacesHeading": "최근 워크스페이스",
   "@emptyCanvasRecentWorkspacesHeading": {
     "description": "Section heading above the recent-workspaces list on the empty-canvas state."
-  },
-  "emptyCanvasNoRecentProjects": "최근 프로젝트가 없습니다.",
-  "@emptyCanvasNoRecentProjects": {
-    "description": "Placeholder shown in the recent-projects section when the list is empty."
   },
   "emptyCanvasNoRecentWorkspaces": "최근 워크스페이스가 없습니다.",
   "@emptyCanvasNoRecentWorkspaces": {
@@ -1344,10 +1280,6 @@
   "@actionClearRecentProjects": {
     "description": "Command palette and File menu label: empties the welcome screen Recent projects list."
   },
-  "recentProjectsClearedSnack": "최근 프로젝트를 지웠습니다.",
-  "@recentProjectsClearedSnack": {
-    "description": "Confirmation shown (and announced to screen readers) after Clear Recent Projects empties the list."
-  },
   "actionReopenRecentProject": "최근 프로젝트 다시 열기",
   "@actionReopenRecentProject": {
     "description": "Menu / command palette label for the action that re-opens the most-recently-closed project from the recent-projects list."
@@ -1527,19 +1459,7 @@
   "betaExpiryExpiredBody": "이 LintCrux 베타 빌드는 만료일에 도달했습니다. LintCrux를 계속 사용하려면 최신 빌드를 다운로드하세요.",
   "betaExpiryExpiredAction": "최신 빌드 다운로드",
   "betaExpiryExpiredQuit": "LintCrux 종료",
-  "crossProbeSendTooltip": "이 피어로 선택 항목 보내기",
-  "crossProbeUnreachableTitle": "연결할 수 없는 피어",
-  "crossProbeSendFailed": "{peer}에 보낸 교차 프로브가 완료되지 않았습니다",
-  "crossProbeSendRefused": "{peer}에 보낸 교차 프로브: {reason}",
   "toolbarToggleCrossProbe": "크로스프로브 패널",
-  "settingsRequestAttentionOnCrossProbeLabel": "크로스 프로브 시 주의 요청",
-  "settingsRequestAttentionOnCrossProbeDescription": "크로스 프로브가 도착하면 독을 튕기거나 작업 표시줄을 깜박입니다. 포커스를 가로채지 않습니다.",
-  "settingsBroadcastSelectionOnCrossProbeLabel": "선택 항목 자동 브로드캐스트",
-  "settingsBroadcastSelectionOnCrossProbeDescription": "선택하는 즉시 연결된 피어에 선택 항목을 알립니다(라이브 크로스 프로브). 끄면 명시적으로 보낸 항목만 공유됩니다.",
-  "settingsCxpStatus": "CXP 상태",
-  "settingsCxpStatusRunning": "포트 {port}에서 실행 중",
-  "settingsCxpStatusStopped": "중지됨",
-  "settingsCxpPeersConnected": "{count, plural, =0{연결된 피어 없음} =1{피어 1개 연결됨} other{피어 {count}개 연결됨}}",
   "actionCategoryFileMnemonic": "파일(&F)",
   "actionCategoryEditMnemonic": "편집(&E)",
   "actionCategoryViewMnemonic": "보기(&V)",
@@ -1592,7 +1512,6 @@
   "settingsLanguageDescription": "애플리케이션 인터페이스에 사용할 언어",
   "settingsCxpSectionTitle": "CXP 교차 프로브",
   "settingsAutoReloadDescription": "불러온 프로젝트가 디스크에서 변경될 때 LintCrux의 응답 방식",
-  "settingsCxpPortError": "1부터 65535 사이의 포트를 입력하세요.",
   "tabContextMenuRevealInFinder": "Finder에서 표시",
   "tabContextMenuRevealInExplorer": "Explorer에서 표시",
   "tabContextMenuRevealInFiles": "파일 관리자에서 표시",
@@ -1795,5 +1714,6 @@
   "fileWatcherIgnore": "무시",
   "@fileWatcherIgnore": {
     "description": "Button on the source-changed prompt that dismisses it without re-running. Same key and meaning as WaveCrux."
-  }
+  },
+  "actionCrossProbeSelection": "선택 항목 교차 프로브…"
 }

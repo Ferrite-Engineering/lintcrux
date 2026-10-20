@@ -58,11 +58,11 @@ typedef CxpArtifactOpenOutcome = ({bool honored, String? reason});
 
 /// Receive-side dispatcher for CXP messages targeting LintCrux.
 ///
-/// One instance lives behind `cxpServerLifecycleProvider`. The
-/// lifecycle wires the [LintCruxCxpServer.onInbound] callback to
-/// [dispatch], applies the returned state to the table / selection
-/// notifiers, and sends the ack back to the originator via
-/// [LintCruxCxpServer.sendTo].
+/// One instance lives behind `cxpRequestHandlerProvider`. The shared CXP
+/// runtime's handler (`LintCruxCxpWrappedHandler`) calls [dispatch], applies
+/// the returned state to the table / selection notifiers, and returns the
+/// ack's outcome; the runtime itself sends the acknowledgement back to the
+/// originator.
 ///
 /// The handler is *pure* — it does not directly touch the violation
 /// table notifier or the selection notifier. Returning the computed
@@ -90,7 +90,7 @@ class LintCruxCxpRequestHandler {
   /// CXP §11's rule for a path about to become an editor argv — in
   /// production the rooted rule, the directories the user has opened.
   ///
-  /// `LintCruxCxpServer` screens the wire with the floor only, because its
+  /// The CXP runtime screens the wire with the floor only, because its
   /// one rule also screens a `request_open_artifact` hint, which must not be
   /// rooted; so this check is the one that keeps a `request_open_source` to
   /// the directories the user has opened. The default is the floor rule
@@ -135,7 +135,7 @@ class LintCruxCxpRequestHandler {
   /// LintCrux Desktop"), so production holds it to the floor, not the
   /// directories the user has opened (`kCxpOpenArtifactContainment` says
   /// why). When null the request is declined gracefully. Wired in production
-  /// in `cxp_server_provider.dart`.
+  /// in `cxp_request_handler_provider.dart`.
   final Future<CxpArtifactOpenOutcome> Function(
     String designId,
     String? hintPath,

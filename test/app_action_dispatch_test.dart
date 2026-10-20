@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:crux_about_dialog/crux_about_dialog.dart';
 import 'package:crux_command_palette/crux_command_palette.dart';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:crux_settings_ui/crux_settings_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +22,7 @@ import 'package:lintcrux/features/project/providers/project_picker_provider.dart
 import 'package:lintcrux/features/project/services/project_picker.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
 import 'package:lintcrux/features/viewer/providers/panel_layout_provider.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/baseline_comparison_opener_provider.dart';
@@ -30,6 +31,7 @@ import 'package:lintcrux/plugins/pro_action_openers.dart';
 import 'package:lintcrux/plugins/pro_opener.dart';
 import 'package:lintcrux/plugins/save_filter_preset_opener_provider.dart';
 import 'package:lintcrux/plugins/waiver_review_opener_provider.dart';
+import 'package:lintcrux/services/remote/cxp/lintcrux_cxp_binding.dart';
 import 'package:lintcrux/services/workspace/lintcrux_workspace_codec.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,6 +90,9 @@ void main() {
       ProviderScope(
         overrides: [
           ...telemetryDeclinedOverrides(),
+          // Who LintCrux is on CXP, as `bootstrap()` binds it; the CXP
+          // transport itself is off under the default mobile target platform.
+          cruxCxpProductBindingProvider.overrideWithValue(kLintcruxCxpBinding),
           ...extraOverrides,
           // The beta-distribution wiring (`crux_updates` /
           // `crux_issue_reporter` / beta-expiry clock) is part of
@@ -246,11 +251,9 @@ void main() {
     LintcruxAction.clearRecentProjects: _DispatchCase(
       'empties Recent projects and confirms with a snackbar',
       (tester) async {
-        expect(rootContainer(tester).read(recentProjectsProvider), isEmpty);
-        expect(
-          find.text(l10nOf(tester).recentProjectsClearedSnack),
-          findsOneWidget,
-        );
+        expect(rootContainer(tester).read(recentProjects.provider), isEmpty);
+        // The shared Recent list's words, not a LintCrux string.
+        expect(find.text('Recent projects cleared.'), findsOneWidget);
       },
     ),
     // ── App ──────────────────────────────────────────────────────
@@ -323,6 +326,17 @@ void main() {
         expect(
           rootContainer(tester).read(panelLayoutProvider).crossProbeVisible,
           isTrue,
+        );
+      },
+    ),
+    // Nothing is selected in this harness, so the command says so rather
+    // than doing nothing (the shared cross-probe wording).
+    LintcruxAction.crossProbeSelection: _DispatchCase(
+      'reports that there is nothing to cross-probe',
+      (tester) async {
+        expect(
+          find.text('Select something to cross-probe first.'),
+          findsOneWidget,
         );
       },
     ),

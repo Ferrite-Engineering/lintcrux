@@ -32,23 +32,10 @@ class AppSettings {
   /// they don't have a cross-suite home.
   const AppSettings({
     this.core = const CoreSettings.defaults(),
-    this.recentProjects = const <String>[],
     this.panelLayout = const PanelLayoutState(),
     this.engineBinaryOverrides = const <String, EngineBinaryOverride>{},
-    this.cxpServerEnabled = true,
-    this.cxpServerPort = defaultCxpServerPort,
-    this.requestAttentionOnCrossProbe = true,
-    this.broadcastSelectionOnCrossProbe = true,
     this.autoCheckForUpdates = true,
   });
-
-  /// Default port the LintCrux CXP server binds to.
-  ///
-  /// Picked from the suite-wide CXP port assignment: WaveCrux
-  /// uses 54322, NetCrux 54323, LintCrux 54324, SimCrux 54325.
-  /// Users can override via [cxpServerPort] in Settings → Remote
-  /// Control.
-  static const int defaultCxpServerPort = 54324;
 
   /// The cross-suite shared subset of settings (theme, locale,
   /// diagnostics flag, plugin directories, theme overrides, …). Stored
@@ -57,14 +44,6 @@ class AppSettings {
   final CoreSettings core;
 
   // ─── LintCrux-specific fields ────────────────────────────────────────
-
-  /// Absolute paths of the most recently opened `.lintcrux` project
-  /// files. Most-recent first. Capped at [maxRecentProjects] entries.
-  /// Surfaced on the Welcome screen and (later) the empty-canvas state.
-  final List<String> recentProjects;
-
-  /// Maximum number of entries retained in [recentProjects].
-  static const int maxRecentProjects = 10;
 
   /// Persistent visibility and size state for the viewer's four panes
   /// (rule browser, violations, violation details, run log). Driven by
@@ -84,34 +63,6 @@ class AppSettings {
   /// [EngineBinaryOverride.autoDetect] when no override is stored.
   EngineBinaryOverride engineBinaryOverrideFor(String engineId) =>
       engineBinaryOverrides[engineId] ?? EngineBinaryOverride.autoDetect;
-
-  /// Whether the CXP cross-probe server is started at boot.
-  /// Defaults to `true` so first-launch users see cross-probe working
-  /// without any configuration. Toggled in Settings → Remote Control.
-  final bool cxpServerEnabled;
-
-  /// TCP port the CXP server binds to on `127.0.0.1`. Defaults
-  /// to [defaultCxpServerPort] (`54324`). Configurable in Settings →
-  /// Remote Control so engineers running multiple LintCrux instances
-  /// (or with a port conflict) can pick a different port.
-  final int cxpServerPort;
-
-  /// Whether an actionable inbound cross-probe (a highlight applied, a design
-  /// artifact opened) requests the OS's attention (dock bounce / taskbar flash
-  /// / Wayland urgency) without stealing focus. Defaults to `true`. Toggled in
-  /// Settings → Remote Control. Gates the swappable `windowAttentionRequester`
-  /// seam in `crux_window_chrome` via the CXP attention-gate provider.
-  final bool requestAttentionOnCrossProbe;
-
-  /// CXP Cross-Probe — whether the live selection auto-broadcast is active.
-  /// When `true` (the default), selecting a violation announces it to
-  /// connected peers via the Pro-tier `ViolationSelectionEmitter`
-  /// (`notify_selection`), driving live cross-probe. When `false`, the
-  /// automatic emitter is gated off and only explicit sends (the
-  /// "Cross-probe to peer →" menu) reach peers. Toggled in Settings →
-  /// Remote Control. Session-scoped in open-core (no preferences backend),
-  /// matching the other CXP server fields.
-  final bool broadcastSelectionOnCrossProbe;
 
   /// Whether the *automatic* update check (launch, periodic and
   /// on-resume) may run. Defaults to `true`.
@@ -192,13 +143,8 @@ class AppSettings {
     Map<String, String>? themeOverrides,
     bool? restoreTabsOnLaunch,
     // LintCrux-specific:
-    List<String>? recentProjects,
     PanelLayoutState? panelLayout,
     Map<String, EngineBinaryOverride>? engineBinaryOverrides,
-    bool? cxpServerEnabled,
-    int? cxpServerPort,
-    bool? requestAttentionOnCrossProbe,
-    bool? broadcastSelectionOnCrossProbe,
     bool? autoCheckForUpdates,
   }) {
     final newCore =
@@ -221,16 +167,9 @@ class AppSettings {
         );
     return AppSettings(
       core: newCore,
-      recentProjects: recentProjects ?? this.recentProjects,
       panelLayout: panelLayout ?? this.panelLayout,
       engineBinaryOverrides:
           engineBinaryOverrides ?? this.engineBinaryOverrides,
-      cxpServerEnabled: cxpServerEnabled ?? this.cxpServerEnabled,
-      cxpServerPort: cxpServerPort ?? this.cxpServerPort,
-      requestAttentionOnCrossProbe:
-          requestAttentionOnCrossProbe ?? this.requestAttentionOnCrossProbe,
-      broadcastSelectionOnCrossProbe:
-          broadcastSelectionOnCrossProbe ?? this.broadcastSelectionOnCrossProbe,
       autoCheckForUpdates: autoCheckForUpdates ?? this.autoCheckForUpdates,
     );
   }
@@ -241,24 +180,11 @@ class AppSettings {
     if (other is! AppSettings) return false;
     if (other.core != core) return false;
     if (other.panelLayout != panelLayout) return false;
-    if (other.recentProjects.length != recentProjects.length) return false;
-    for (var i = 0; i < recentProjects.length; i++) {
-      if (other.recentProjects[i] != recentProjects[i]) return false;
-    }
     if (other.engineBinaryOverrides.length != engineBinaryOverrides.length) {
       return false;
     }
     for (final entry in engineBinaryOverrides.entries) {
       if (other.engineBinaryOverrides[entry.key] != entry.value) return false;
-    }
-    if (other.cxpServerEnabled != cxpServerEnabled) return false;
-    if (other.cxpServerPort != cxpServerPort) return false;
-    if (other.requestAttentionOnCrossProbe != requestAttentionOnCrossProbe) {
-      return false;
-    }
-    if (other.broadcastSelectionOnCrossProbe !=
-        broadcastSelectionOnCrossProbe) {
-      return false;
     }
     if (other.autoCheckForUpdates != autoCheckForUpdates) return false;
     return true;
@@ -272,13 +198,8 @@ class AppSettings {
     );
     return Object.hash(
       core,
-      Object.hashAll(recentProjects),
       panelLayout,
       overrideHash,
-      cxpServerEnabled,
-      cxpServerPort,
-      requestAttentionOnCrossProbe,
-      broadcastSelectionOnCrossProbe,
       autoCheckForUpdates,
     );
   }
@@ -290,12 +211,7 @@ class AppSettings {
       'locale: $locale, '
       'diagnosticsEnabled: $diagnosticsEnabled, '
       'activeThemeName: $activeThemeName, '
-      'recentProjects: $recentProjects, '
       'panelLayout: $panelLayout, '
-      'cxpServerEnabled: $cxpServerEnabled, '
-      'cxpServerPort: $cxpServerPort, '
-      'requestAttentionOnCrossProbe: $requestAttentionOnCrossProbe, '
-      'broadcastSelectionOnCrossProbe: $broadcastSelectionOnCrossProbe, '
       'autoCheckForUpdates: $autoCheckForUpdates'
       ')';
 }

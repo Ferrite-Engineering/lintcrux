@@ -235,7 +235,7 @@
   "@actionOpenAbout": {
     "description": "Menu / command palette label for the action that shows the About box."
   },
-  "actionOpenCrossProbePanel": "交叉探测对等端",
+  "actionOpenCrossProbePanel": "显示交叉探测面板",
   "@actionOpenCrossProbePanel": {
     "description": "Menu / command palette label for the action that opens the cross-probe panel showing connected CXP peers and recent cross-probe events."
   },
@@ -306,54 +306,6 @@
   "actionForceLintRunWithoutCache": "运行 Lint（绕过缓存）",
   "@actionForceLintRunWithoutCache": {
     "description": "Menu / command palette label for the Pro-tier action that runs lint once with the cache bypassed in both directions for that single invocation."
-  },
-  "crossProbePanelTitle": "交叉探测对等端",
-  "@crossProbePanelTitle": {
-    "description": "Title of the cross-probe panel."
-  },
-  "crossProbePanelServerStopped": "交叉探测服务器已禁用。",
-  "@crossProbePanelServerStopped": {
-    "description": "Status text shown in the cross-probe panel when the CXP server is disabled in Settings."
-  },
-  "crossProbePanelPeersHeader": "发现的对等端",
-  "@crossProbePanelPeersHeader": {
-    "description": "Header above the discovered-peers list in the cross-probe panel."
-  },
-  "crossProbePanelPeersEmpty": "尚未发现对等端。",
-  "@crossProbePanelPeersEmpty": {
-    "description": "Empty-state text shown when no CXP peers have been discovered."
-  },
-  "crossProbePanelEventsHeader": "最近事件",
-  "@crossProbePanelEventsHeader": {
-    "description": "Header above the rolling event log in the cross-probe panel."
-  },
-  "crossProbePanelEventsEmpty": "尚无交叉探测事件。",
-  "@crossProbePanelEventsEmpty": {
-    "description": "Empty-state text shown when the cross-probe event log is empty."
-  },
-  "crossProbePanelClearEvents": "清除事件",
-  "@crossProbePanelClearEvents": {
-    "description": "Button that clears the cross-probe event log."
-  },
-  "crossProbePanelClose": "关闭",
-  "@crossProbePanelClose": {
-    "description": "Button that closes the cross-probe panel dialog."
-  },
-  "settingsCxpEnabledLabel": "启用 CXP 服务器",
-  "@settingsCxpEnabledLabel": {
-    "description": "Label of the toggle controlling whether the CXP cross-probe server starts at boot."
-  },
-  "settingsCxpEnabledDescription": "让其他 Crux 工具(WaveCrux、NetCrux、SimCrux)发现 LintCrux 并发送交叉探测请求。",
-  "@settingsCxpEnabledDescription": {
-    "description": "Helper text explaining what the cross-probe server does."
-  },
-  "settingsCxpPortLabel": "CXP 端口",
-  "@settingsCxpPortLabel": {
-    "description": "Label of the port input for the CXP server."
-  },
-  "settingsCxpPortDescription": "默认 54324",
-  "@settingsCxpPortDescription": {
-    "description": "Hint text for the CXP port input showing the suite default."
   },
   "violationColumnSeverity": "严重程度",
   "@violationColumnSeverity": {
@@ -1072,25 +1024,9 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
-  "emptyCanvasRecentProjectMissing": "未找到项目文件",
-  "@emptyCanvasRecentProjectMissing": {
-    "description": "Second line of a welcome-screen Recent projects row whose project file no longer exists (moved or deleted); the row is greyed."
-  },
-  "emptyCanvasRemoveRecentProject": "从最近的项目中移除",
-  "@emptyCanvasRemoveRecentProject": {
-    "description": "Tooltip and accessible name of the button on a welcome-screen Recent projects row that removes that one entry from the list."
-  },
-  "emptyCanvasRecentProjectsHeading": "最近的项目",
-  "@emptyCanvasRecentProjectsHeading": {
-    "description": "Section heading above the recent-projects list on the empty-canvas state."
-  },
   "emptyCanvasRecentWorkspacesHeading": "最近的工作区",
   "@emptyCanvasRecentWorkspacesHeading": {
     "description": "Section heading above the recent-workspaces list on the empty-canvas state."
-  },
-  "emptyCanvasNoRecentProjects": "暂无最近的项目。",
-  "@emptyCanvasNoRecentProjects": {
-    "description": "Placeholder shown in the recent-projects section when the list is empty."
   },
   "emptyCanvasNoRecentWorkspaces": "暂无最近的工作区。",
   "@emptyCanvasNoRecentWorkspaces": {
@@ -1344,10 +1280,6 @@
   "@actionClearRecentProjects": {
     "description": "Command palette and File menu label: empties the welcome screen Recent projects list."
   },
-  "recentProjectsClearedSnack": "已清除最近的项目。",
-  "@recentProjectsClearedSnack": {
-    "description": "Confirmation shown (and announced to screen readers) after Clear Recent Projects empties the list."
-  },
   "actionReopenRecentProject": "重新打开最近的项目",
   "@actionReopenRecentProject": {
     "description": "Menu / command palette label for the action that re-opens the most-recently-closed project from the recent-projects list."
@@ -1527,19 +1459,7 @@
   "betaExpiryExpiredBody": "此 LintCrux Beta 版已到达过期日期。请下载最新版本以继续使用 LintCrux。",
   "betaExpiryExpiredAction": "下载最新版本",
   "betaExpiryExpiredQuit": "退出 LintCrux",
-  "crossProbeSendTooltip": "将所选发送到此对等端",
-  "crossProbeUnreachableTitle": "无法访问的对等端",
-  "crossProbeSendFailed": "发送到 {peer} 的交叉探测未能完成",
-  "crossProbeSendRefused": "发送到 {peer} 的交叉探测：{reason}",
   "toolbarToggleCrossProbe": "交叉探测面板",
-  "settingsRequestAttentionOnCrossProbeLabel": "交叉探测时请求注意",
-  "settingsRequestAttentionOnCrossProbeDescription": "交叉探测到达时弹跳程序坞（或闪烁任务栏）。绝不抢占焦点。",
-  "settingsBroadcastSelectionOnCrossProbeLabel": "自动广播选择",
-  "settingsBroadcastSelectionOnCrossProbeDescription": "在您选择时，将选择内容通知已连接的对等端（实时交叉探测）。关闭时，仅共享显式发送的内容。",
-  "settingsCxpStatus": "CXP 状态",
-  "settingsCxpStatusRunning": "正在端口 {port} 上运行",
-  "settingsCxpStatusStopped": "已停止",
-  "settingsCxpPeersConnected": "{count, plural, =0{无已连接的对等端} =1{已连接 1 个对等端} other{已连接 {count} 个对等端}}",
   "actionCategoryFileMnemonic": "文件(&F)",
   "actionCategoryEditMnemonic": "编辑(&E)",
   "actionCategoryViewMnemonic": "视图(&V)",
@@ -1592,7 +1512,6 @@
   "settingsLanguageDescription": "应用界面使用的语言",
   "settingsCxpSectionTitle": "CXP 交叉探测",
   "settingsAutoReloadDescription": "已加载项目在磁盘上更改时 LintCrux 的响应方式",
-  "settingsCxpPortError": "请输入 1 到 65535 之间的端口。",
   "tabContextMenuRevealInFinder": "在 Finder 中显示",
   "tabContextMenuRevealInExplorer": "在 Explorer 中显示",
   "tabContextMenuRevealInFiles": "在文件管理器中显示",
@@ -1795,5 +1714,6 @@
   "fileWatcherIgnore": "忽略",
   "@fileWatcherIgnore": {
     "description": "Button on the source-changed prompt that dismisses it without re-running. Same key and meaning as WaveCrux."
-  }
+  },
+  "actionCrossProbeSelection": "交叉探测所选内容…"
 }

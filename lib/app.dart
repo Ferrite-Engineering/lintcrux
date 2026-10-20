@@ -3,6 +3,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:crux_eula/crux_eula.dart';
 import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:crux_issue_reporter/crux_issue_reporter.dart';
@@ -62,7 +63,8 @@ import 'package:lintcrux/features/menu_bar/widgets/desktop_menu_bar.dart';
 import 'package:lintcrux/features/project/providers/project_picker_provider.dart';
 import 'package:lintcrux/features/project/services/open_project_feedback.dart';
 import 'package:lintcrux/features/project/services/open_project_service.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
+import 'package:lintcrux/features/remote/providers/cross_probe_selection.dart';
+import 'package:lintcrux/features/remote/providers/lintcrux_cxp_overrides.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/search/widgets/search_dialog.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
@@ -76,7 +78,7 @@ import 'package:lintcrux/features/violations/providers/violation_column_layout_p
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/workspace/providers/lintcrux_action_context_provider.dart';
 import 'package:lintcrux/features/workspace/providers/project_workspace_sync.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/crux_project_resolution.dart';
 import 'package:lintcrux/features/workspace/services/incoming_file_kind.dart';
@@ -100,7 +102,6 @@ import 'package:lintcrux/services/import/edam_reader.dart';
 import 'package:lintcrux/services/import/filelist_import_service.dart';
 import 'package:lintcrux/services/import/filelist_reader.dart';
 import 'package:lintcrux/services/logging/severe_log_stderr_sink.dart';
-import 'package:lintcrux/services/persistence/cxp_settings_provider.dart';
 import 'package:lintcrux/services/persistence/engine_binary_overrides_settings_provider.dart';
 import 'package:lintcrux/services/persistence/restore_tabs_settings_provider.dart';
 import 'package:lintcrux/services/platform/incoming_file_source.dart';
@@ -108,6 +109,7 @@ import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/project/project_file_codec.dart';
 import 'package:lintcrux/services/project/project_file_service.dart';
 import 'package:lintcrux/services/project/project_path_resolver.dart';
+import 'package:lintcrux/services/remote/cxp/lintcrux_cxp_binding.dart';
 import 'package:lintcrux/services/rules/rule_database_provider.dart';
 import 'package:lintcrux/services/session/session_service.dart';
 import 'package:lintcrux/services/telemetry/telemetry_event_catalog.dart';
@@ -498,8 +500,8 @@ Future<bool> bootstrap({
   // in Settings > Engines. See [launchEngineBinaryOverridesProvider].
   final engineBinaryOverrides = await loadEngineBinaryOverrides();
   // And for the CXP server: a launch with CXP turned off must never start
-  // it, even briefly. See [launchCxpSettingsProvider].
-  final cxpSettings = await loadCxpSettings();
+  // it, even briefly. See [cruxCxpLaunchSettingsProvider].
+  final cxpSettings = await loadCruxCxpLaunchSettings(kLintcruxCxpBinding);
   // The violation table's column widths, so a restored tab draws its first
   // frame at the saved widths. See [launchViolationColumnLayoutProvider].
   final violationColumnLayout = await loadViolationColumnLayout();
@@ -529,7 +531,7 @@ Future<bool> bootstrap({
         launchEngineBinaryOverridesProvider.overrideWithValue(
           engineBinaryOverrides,
         ),
-        launchCxpSettingsProvider.overrideWithValue(cxpSettings),
+        ...lintcruxCxpOverrides(launchSettings: cxpSettings),
         launchViolationColumnLayoutProvider.overrideWithValue(
           violationColumnLayout,
         ),
@@ -791,22 +793,13 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
         // Start the CXP server eagerly whenever Settings → CXP Cross-Probe →
         // "Enable CXP server" is on, decoupled from the cross-probe panel.
         // Watching the lifecycle here (app shell, alive for the whole
-        // session) builds `CxpServerLifecycle`, which binds the socket,
-        // publishes this peer's manifest under the suite-shared
+        // session) builds the shared `CruxCxpRuntime`, which binds the
+        // socket, publishes this peer's manifest under the suite-shared
         // `crux/cxp/peers/` directory, and starts discovery + the peer
         // connector — so enabling the setting has an observable effect
-        // without opening any panel. Mirrors
-        // SimCrux's `_SimcruxAppChrome` eager watch and NetCrux's
-        // `CxpInboundListener`. Gated internally on the persisted
-        // `cxpServerEnabled` setting: disabled resolves to a non-running
-        // state and binds nothing.
-        ..watch(cxpServerLifecycleProvider)
-        // Install the attention gate for the whole session so the
-        // `requestAttentionOnCrossProbe` setting swaps the global
-        // `windowAttentionRequester` backend (dock bounce / taskbar flash /
-        // Wayland urgency, vs a no-op) as it changes, applying the persisted
-        // value at boot via `fireImmediately`.
-        ..watch(cxpAttentionGateProvider);
+        // without opening any panel. Gated by the persisted enable flag:
+        // disabled resolves to no runtime and binds nothing.
+        ..watch(cruxCxpRuntimeProvider);
     }
     // Drive the Material brightness from the active preset (so picking
     // Crux Light flips the chrome to light, Solarized Dark to dark,
@@ -1124,6 +1117,8 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
         unawaited(lintcruxLaunchUrl(Uri.parse(HelpUrls.docs)));
       case LintcruxAction.openCrossProbePanel:
         _handleOpenCrossProbePanel();
+      case LintcruxAction.crossProbeSelection:
+        _handleCrossProbeSelection();
       // saveFilterPreset / manageFilterPresets are open-core aliases
       // for the Pro savePresetFromCurrentFilter / openFilterPresetManager
       // actions. Open-core has no save/manage UI of its own (preset
@@ -1198,11 +1193,37 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
   /// confirmation: the list is a convenience, every entry is one Open
   /// Project away, and other editors clear theirs the same way.
   void _handleClearRecentProjects() {
-    ref.read(recentProjectsListProvider.notifier).clear();
+    final router = ref.read(appRouterProvider);
+    final ctx = router.routerDelegate.navigatorKey.currentState?.context;
+    if (ctx == null || !ctx.mounted) {
+      ref.read(recentProjects.provider.notifier).clear();
+      return;
+    }
+    crux.clearCruxRecentList(
+      ctx,
+      ref,
+      list: recentProjects,
+      strings: crux.CruxRecentListStrings.of(ctx, crux.CruxRecentKind.projects),
+    );
+  }
+
+  /// Cross-probe Selection: sends the active tab's selected violation to the
+  /// one running peer, or opens the target list when several run. The key
+  /// belongs to a focused text field, so there it does nothing.
+  void _handleCrossProbeSelection() {
+    if (cruxTextInputFocused()) return;
     final router = ref.read(appRouterProvider);
     final ctx = router.routerDelegate.navigatorKey.currentState?.context;
     if (ctx == null || !ctx.mounted) return;
-    showCruxInfoSnack(ctx, L10N.of(ctx).recentProjectsClearedSnack);
+    unawaited(
+      runCrossProbeSelection(
+        ctx,
+        ref,
+        // No anchor: the target list opens at the focused row, which is
+        // where the keyboard is when the user is selecting violations.
+        selection: activeTabCrossProbeSelection(ref.read),
+      ),
+    );
   }
 
   /// Records one telemetry counter from the event catalog.

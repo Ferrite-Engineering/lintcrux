@@ -6,14 +6,14 @@ LintCrux is part of the EDACrux suite, and it talks to its siblings — WaveCrux
 
 Cross-probe (CXP) is the suite's lightweight protocol for "show me this location over there". It is [specified publicly](https://edacrux.app/cxp). The CXP server is configured in `Settings → CXP Cross-Probe`:
 
-- **Enable CXP server** turns it on, and **CXP port** sets where it listens. The section also shows whether the server is running and how many peers are connected.
+- **Enable CXP server** turns it on, and **CXP port** sets where it listens. The section also shows whether the server is running and how many peers are connected. Each setting takes effect as soon as you change it: a new port restarts the server on it.
 - **Request attention on cross-probe** bounces the dock icon (or flashes the taskbar) when a peer sends a cross-probe. It never steals focus.
 - **Broadcast selection automatically** (on by default) announces every violation you select to connected peers, so a waveform or schematic viewer can follow along. Turn it off to keep selections to yourself; explicit sends still work.
 
 Two directions exist, and from 1.1 both are free in every tier, with no license key:
 
-- **Receive** — a connected peer can ask LintCrux to highlight a rule or a source location, which filters the table and selects the matching violation; to open a source location in your editor; or to open a design's LintCrux project that the suite's shared workspace knows about. Every request is acknowledged, including the ones LintCrux cannot act on, so the sending tool can tell you why.
-- **Send** — press a peer's send button in the [Cross-Probe panel](#panel), or right-click a violation and choose **Cross-probe to peer…** and pick a connected peer, and LintCrux sends it the selected violation's location. The send is acknowledged: LintCrux tells you whether the peer acted on it (*Sent to …*), declined it with the peer's reason, or did not respond.
+- **Receive**: a connected peer can ask LintCrux to highlight a rule or a source location, which filters the table and selects the matching violation; to open a source location in your editor; or to open a design's LintCrux project that the suite's shared workspace knows about. Every request is acknowledged, including the ones LintCrux cannot act on, so the sending tool can tell you why.
+- **Send**: press a peer's send button in the [Cross-Probe panel](#panel), or, from 1.2, right-click a violation and choose **Cross-probe to** and pick a running product, or run **Cross-probe Selection…** from the `View` menu or the command palette (++cmd+shift+enter++ / ++ctrl+shift+enter++). LintCrux sends the selected violation's location in the form that product shows. The command sends at once when one peer is running and lists the running products as a menu when several are. The send is acknowledged: LintCrux tells you whether the peer acted on it (*Cross-probed to …*), declined it with the peer's reason, or did not respond. While a text field has focus, the shortcut belongs to the field.
 
 ![Two EDACrux apps running side by side with their Cross-Probe panels open: NetCrux showing the VexRiscv schematic with its peer list (simcrux, wavecrux, lintcrux), and WaveCrux showing waveform lanes with the same connected peers plus a live 'Selection received' cross-probe event from LintCrux.](img/CrossProbe.png)
 
@@ -21,7 +21,7 @@ Two directions exist, and from 1.1 both are free in every tier, with no license 
 
 ## The Cross-Probe panel {#panel}
 
-The [Cross-Probe panel](interface.md#crossprobe) (++cmd+shift+x++ / ++ctrl+shift+x++) lists connected peers, shows the event log of probes sent and received, and reports the server status, so you can see at a glance which suite tools are wired up. It opens as a tab in the right dock, and you can drag it to the bottom dock. A CDC finding in LintCrux, for example, can be sent to NetCrux to inspect the crossing in the schematic.
+The [Cross-Probe panel](interface.md#crossprobe) (`View → Show Cross-Probe Panel`, ++cmd+shift+x++ / ++ctrl+shift+x++) lists connected peers, shows the event log of probes sent and received, and reports the server status, so you can see at a glance which suite tools are wired up. From 1.2 the toolbar badge counts the peers that are connected. It opens as a tab in the right dock, and you can drag it to the bottom dock. A CDC finding in LintCrux, for example, can be sent to NetCrux to inspect the crossing in the schematic.
 
 ## Editor presets & click-to-source {#editors}
 

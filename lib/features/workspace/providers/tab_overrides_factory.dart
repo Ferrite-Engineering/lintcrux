@@ -44,7 +44,7 @@ import 'package:lintcrux/services/violations/violation_store_provider.dart';
 /// Providers NOT listed here stay root-scoped: they resolve through
 /// the standard Riverpod parent-container lookup. Examples:
 /// `engineRegistryProvider`, `appSettingsProvider`, `appRouterProvider`,
-/// `cliArgsProvider`, `recentProjectsProvider`, `shortcutBindingsProvider`,
+/// `cliArgsProvider`, `recentProjects.provider`, `shortcutBindingsProvider`,
 /// `appLicenseTierProvider` (when added), the panel-layout state, the
 /// workspace provider itself.
 ///

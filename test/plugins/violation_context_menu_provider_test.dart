@@ -9,12 +9,13 @@ import 'package:lintcrux/plugins/violation_context_menu_provider.dart';
 
 void main() {
   group('violationContextMenuEntriesProvider', () {
-    test('open-core default is empty list', () {
+    test('open-core default is the one free Cross-probe to entry', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
       final entries = container.read(violationContextMenuEntriesProvider);
-      expect(entries, isEmpty);
+      expect(entries.map((e) => e.id), <String>['crossProbeTo']);
+      expect(entries.single.requiredTier, LicenseTier.openCore);
     });
 
     test('Pro overlay-style override surfaces a populated list', () {

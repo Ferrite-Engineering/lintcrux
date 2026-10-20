@@ -9,9 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/core/app_info/about_providers.dart';
 import 'package:lintcrux/core/help_urls.dart';
 import 'package:lintcrux/core/lintcrux_url_launcher.dart';
-import 'package:lintcrux/features/workspace/providers/recent_project_exists_provider.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
-import 'package:lintcrux/features/workspace/widgets/recent_project_tile.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/shared/widgets/glowing_app_icon.dart';
 
@@ -20,8 +18,8 @@ import 'package:lintcrux/shared/widgets/glowing_app_icon.dart';
 ///
 /// Renders the empty-canvas shell with:
 /// * the LintCrux title + subtitle,
-/// * a recent-projects section (sourced from
-///   [recentProjectsProvider]),
+/// * a recent-projects section (the shared [crux.CruxRecentListSection] over
+///   [recentProjects]),
 /// * a recent-workspaces section (currently an empty placeholder),
 /// * the primary actions wired through callbacks supplied by the host
 ///   scaffold (so the empty-canvas widget doesn't re-implement the
@@ -55,8 +53,10 @@ class EmptyCanvasContent extends ConsumerWidget {
   final VoidCallback onNewProject;
 
   /// Invoked when the user taps a row in the recent-projects list.
-  /// Receives the absolute path of the chosen project.
-  final void Function(String path) onOpenRecentProject;
+  /// Receives the absolute path of the chosen project and returns whether it
+  /// opened; an entry that does not open is dropped from the list. It reports
+  /// its own failure.
+  final Future<bool> Function(String path) onOpenRecentProject;
 
   /// Invoked when the user taps the "Import SARIF report…" button, or
   /// `null` to hide it. Imports a CI-generated SARIF report into a
@@ -67,8 +67,6 @@ class EmptyCanvasContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10N.of(context);
     final theme = Theme.of(context);
-    final recentProjects = ref.watch(recentProjectsProvider);
-    final exists = ref.watch(recentProjectExistsProvider);
     // The running version, shown as a muted line under the subtitle. On web
     // there is no native menu bar, so this is the only always-visible place a
     // user can read the version without knowing the palette / overflow About
@@ -80,18 +78,16 @@ class EmptyCanvasContent extends ConsumerWidget {
       title: l10n.emptyCanvasTitle,
       subtitle: l10n.emptyCanvasSubtitle,
       versionLabel: version == null ? null : l10n.emptyCanvasVersion(version),
-      recentFilesSection: _RecentSection(
-        heading: l10n.emptyCanvasRecentProjectsHeading,
-        emptyPlaceholder: l10n.emptyCanvasNoRecentProjects,
-        items: recentProjects,
-        rowBuilder: (path) => RecentProjectTile(
-          path: path,
-          exists: exists(path),
-          onOpen: () => onOpenRecentProject(path),
-          onRemove: () =>
-              ref.read(recentProjectsListProvider.notifier).remove(path),
+      recentFilesSection: crux.CruxRecentListSection(
+        list: recentProjects,
+        strings: crux.CruxRecentListStrings.of(
+          context,
+          crux.CruxRecentKind.projects,
         ),
-        theme: theme,
+        icon: Icons.folder_outlined,
+        onOpen: onOpenRecentProject,
+        // The open reports its own failure, in its own words.
+        reportFailure: false,
       ),
       recentWorkspacesSection: _RecentSection(
         heading: l10n.emptyCanvasRecentWorkspacesHeading,

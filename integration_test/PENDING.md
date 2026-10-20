@@ -51,11 +51,11 @@ flutter test integration_test/workspace/restore_round_trip_test.dart -d macos
       `.lintcrux` project paths (not raw source files), so this uses
       `createFixtureProject` × 3 rather than a literal port of NetCrux's
       raw-source-file version.
-- [x] CXP server lifecycle (LintCrux uses `CxpServerLifecycle` AsyncNotifier —
-      different provider shape than NetCrux's `cxpServerHostProvider`) —
+- [x] CXP server lifecycle (the suite-shared `cruxCxpRuntimeProvider`, a
+      nullable runtime that is null while CXP is off) —
       `remote_control/cxp_server_lifecycle_test.dart`. Asserts on the
-      `CxpServerLifecycleState.running`/`error`/`boundPort` fields instead
-      of a nullable server handle.
+      runtime's `isAvailable`/`unavailableReason` and on the
+      `cruxCxpSettingsProvider` toggle.
 - [x] Violation table sort-order contract (header taps) —
       `violations/violation_table_sort_order_test.dart`.
 - [x] Source preview jump-to-source — extended

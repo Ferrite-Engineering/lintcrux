@@ -16,30 +16,16 @@ import 'package:flutter_test/flutter_test.dart';
 // `cruxAuditCruxDesktop`; a call site that renders only in a phone layout
 // carries a `crux-desktop: phone-only` comment with its reason.
 //
-// The one allowance is the bookmark-removed toast, whose Undo action the shared
-// toast helpers cannot carry yet; it moves onto them once they take an action.
-// It never grows, and the list is empty when that site moves.
+// There are no allowances, and the list never grows: the bookmark-removed
+// toast carries its Undo through the shared toast helpers' action.
 
-const _allowances = [
-  CruxDesktopAllowance(
-    file: 'lib/features/bookmarks/widgets/bookmark_column_icon.dart',
-    pattern: CruxDesktopPattern.showSnackBar,
-    count: 1,
-    reason:
-        'The bookmark Undo toast needs the shared toast action; it moves '
-        'when the helpers take one.',
-  ),
-  CruxDesktopAllowance(
-    file: 'lib/features/bookmarks/widgets/bookmark_column_icon.dart',
-    pattern: CruxDesktopPattern.snackBar,
-    count: 1,
-    reason:
-        'The bookmark Undo toast needs the shared toast action; it moves '
-        'when the helpers take one.',
-  ),
-];
+const _allowances = <CruxDesktopAllowance>[];
 
 void main() {
+  test('the allow-list is empty', () {
+    expect(_allowances, isEmpty);
+  });
+
   test('no raw Material dialog, snackbar, switch or overflow icon in lib/', () {
     final sources = [
       for (final f in Directory(
@@ -54,6 +40,9 @@ void main() {
 
     final result = cruxAuditCruxDesktop(
       sources: sources,
+      // The empty list is the default; passing it keeps the claim above
+      // checked by the test above.
+      // ignore: avoid_redundant_argument_values
       allowances: _allowances,
     );
 

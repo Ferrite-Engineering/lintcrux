@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:crux_telemetry/crux_telemetry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +16,6 @@ import 'package:lintcrux/core/shortcuts/shortcut_manager_widget.dart';
 import 'package:lintcrux/core/telemetry/lintcrux_telemetry_config.dart';
 import 'package:lintcrux/features/project/providers/project_picker_provider.dart';
 import 'package:lintcrux/features/project/services/project_picker.dart';
-import 'package:lintcrux/features/remote/providers/cxp_server_provider.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
@@ -97,12 +97,7 @@ void main() {
           // Left enabled, boot starts a real cross-probe server: a socket, a
           // manifest in the peer directory and periodic discovery timers
           // that outlive the test. None of these cases is about cross-probe.
-          cxpServerConfigProvider.overrideWithValue(
-            const CxpServerConfig(enabled: false, port: 0),
-          ),
-          cxpManifestDirectoryProvider.overrideWith(
-            (ref) async => tempDir.path,
-          ),
+          cruxCxpRuntimeProvider.overrideWith((_) async => null),
         ],
         child: const LintcruxApp(),
       ),

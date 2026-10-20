@@ -77,6 +77,13 @@ LintcruxActionDescriptor descriptorFor(LintcruxAction action) =>
         surfaces: _everywhere,
       ),
 
+      // ── Cross-probe the selection — menu and palette ────────────────
+      // Enabled with no selection too: the command reports "Select something
+      // to cross-probe first" rather than greying out without a reason.
+      LintcruxAction.crossProbeSelection => const LintcruxActionDescriptor(
+        surfaces: _menuPalette,
+      ),
+
       // ── Needs an open tab ───────────────────────────────────────────
       // These read or mutate per-tab state through the active tab's
       // container; with no tab they resolve the empty root scope.

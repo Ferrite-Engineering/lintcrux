@@ -42,7 +42,7 @@ All fixtures live under `verification/fixtures/` and are committed to the repo. 
 Notes:
 
 - **No `captured/` fixtures are committed today.** The corpus is entirely `generated/`. The captured-license static guard (`captured_fixture_licenses_test.dart`) is therefore vacuous-by-design until the first real-world capture lands.
-- **CXP receive** uses in-test fixtures only — no committed protocol-trace files, because the v1 CXP wire format is exhaustively round-tripped by the `crux_cxp` package's own tests; the receive scenarios are covered by `test/services/remote/cxp/lintcrux_cxp_request_handler_test.dart` and `test/features/remote/cxp_server_lifecycle_test.dart`.
+- **CXP receive** uses in-test fixtures only — no committed protocol-trace files, because the v1 CXP wire format is exhaustively round-tripped by the `crux_cxp` package's own tests; the receive scenarios are covered by `test/services/remote/cxp/lintcrux_cxp_request_handler_test.dart` and `test/features/remote/cxp_runtime_wiring_test.dart`.
 
 ---
 
@@ -278,7 +278,7 @@ The violation-table row's right-click / long-press context menu (the seam the Pr
 - A centered card with the localized title (`emptyCanvasTitle`) and subtitle (`emptyCanvasSubtitle`) appears.
 - `lintcrux path/to/uart_tx/uart_tx.crux-project` (a manifest whose `lint:` names a `.lintcrux`) opens that lint project in a tab, and `File → Open Project…` offers the manifest on macOS, Windows and Linux. A manifest with no `lint:` entry shows an error snackbar and opens nothing.
 - A manifest still named with the legacy bare `.crux-project` opens the same project and shows an info snackbar asking to rename it to `<folder name>.crux-project`. With both `uart_tx.crux-project` and `.crux-project` in one folder, opening either shows an error snackbar naming both files and opens nothing.
-- Below the subtitle: "Recent projects" heading; if no projects have been opened, the placeholder "No recent projects yet." renders. Open a project (picker or command line), close its tab, quit and relaunch: the project is listed first, and clicking it reopens it. An entry whose file has been deleted is removed from the list when clicked, with an error snackbar. An entry whose project file has been moved or deleted is shown greyed, with the line "Project file not found" and a folder-off icon, before it is clicked. Every row has a trailing X button ("Remove from Recent Projects") that drops that entry only. `File > Clear Recent Projects` (also in the command palette, no shortcut) empties the list and shows "Recent projects cleared."; the list stays empty after a relaunch, and a project opened afterwards is listed again. `[Coverage: UNIT]` (`test/features/workspace/providers/recent_projects_provider_test.dart`, `test/features/workspace/providers/recent_project_exists_provider_test.dart`) + `[Coverage: WIDGET]` (`test/features/workspace/widgets/empty_canvas_content_test.dart`, `test/features/workspace/widgets/recent_project_tile_test.dart`) + `[Coverage: MANUAL]` (the menu entry and the relaunch).
+- Below the subtitle: "Recent projects" heading; if no projects have been opened, the placeholder "No recent projects" renders. Open a project (picker or command line), close its tab, quit and relaunch: the project is listed first, and clicking it reopens it. An entry whose file has been deleted is removed from the list when clicked, with an error toast naming the file. An entry whose project file has been moved or deleted is shown greyed, with the line "Project file not found" and a "not available" icon, before it is clicked. Every row has a trailing X button ("Remove from Recent Projects") that drops that entry only. `File > Clear Recent Projects` (also in the command palette, no shortcut) empties the list and shows "Recent projects cleared."; the list stays empty after a relaunch, and a project opened afterwards is listed again. The list is the suite's shared Recent list (`CruxRecentList`, in `lib/features/workspace/providers/recent_lists.dart`) under the same preference key as before, so a list saved by an earlier release is still read. `[Coverage: UNIT]` (`test/features/workspace/services/open_project_in_workspace_test.dart`, `test/features/workspace/widgets/workspace_root_test.dart`; the list's own behaviour is the shared suite's, `crux-shared/packages/crux_workspace/test/recent/`) + `[Coverage: WIDGET]` (`test/features/workspace/widgets/empty_canvas_content_test.dart`, `test/features/workspace/widgets/viewer_scaffold_test.dart`) + `[Coverage: MANUAL]` (the menu entry and the relaunch).
 - "Recent workspaces" heading with placeholder "No recent workspaces yet." (the recent-workspaces persistence layer is a follow-on).
 - Four primary buttons: **Open Project…** (filled), **Open Workspace…** (outlined), **Open Session…** (outlined), **New Project…** (outlined).
 - Toolbar / status bar / menu bar / settings are reachable without opening a project.
@@ -457,7 +457,7 @@ The multi-window tab pop-out / panel detachment surface (`kMultiWindowAvailable`
 **Setup (open-core build — `NoopProjectRegistry`):** Open two `.lintcrux` projects in two tabs.
 
 **Expected (open-core):**
-- No user-visible change vs. before. Under `NoopProjectRegistry` (replace-on-open, single-project semantics) the sync auto-detects the single-project mode and records only the active tab, so it never livelocks and the registry mirrors the active tab. Recents stay empty (the open-core `recentProjectsProvider` is still the `AppSettings` stub) and there is no project switcher — the registry-driven surfaces are Pro-tier.
+- No user-visible change vs. before. Under `NoopProjectRegistry` (replace-on-open, single-project semantics) the sync auto-detects the single-project mode and records only the active tab, so it never livelocks and the registry mirrors the active tab. The registry's own recents stay empty (the welcome screen's Recent projects list is the open core's shared `recentProjects` list, not the registry's) and there is no project switcher — the registry-driven surfaces are Pro-tier.
 
 **Diagnostics-assisted verification:** With the Pro overlay build (`JsonFileProjectRegistry`), open two projects and inspect `{appSupportDir}/lintcrux/workspace.json` — it now lists both open projects with the active-selection flag on the front tab. Before this seam the file was created empty and never populated. The `projectWorkspaceProvider` snapshot (readable in a debug REPL / test) has two `openProjects` and a non-null `activeProjectId`.
 
@@ -547,24 +547,23 @@ Fixed 2026-07-21 in `_FilterPresetManageDialog` (violation-table → filter-pres
 
 ## 7. Cross-Probing & CXP Receive
 
-LintCrux Free participates in the CXP ecosystem on both the **receive** and the **send** side via the `crux_cxp` package shipped from the `crux-shared` Melos workspace. The four user-visible surfaces are: (a) the CXP server that boots when `cxpServerEnabled` is true, (b) the discovery manifest written into the **suite-shared** directory resolved by `sharedCxpManifestDirectory()` (`~/Library/Application Support/crux/cxp/peers/` on macOS — NOT the per-app container; the mutual-connection fix also added the ~30 s manifest heartbeat and the `CxpPeerConnector` that dials every discovered peer so both sides’ servers actually connect; the connector is wired with `server:` so a request arriving purely over the socket LintCrux dialed — from a peer that never dialed back — still reaches the receive handler and gets an ack, and with a narrowed subscription set so LintCrux subscribes only to the two request kinds it honours, never `notify_selection`), (c) the cross-probe panel reachable from Tools → Cross-probe Peers, (d) the Settings → Remote Control section that owns the enabled/port toggles, and (e) the live selection broadcast: with **Broadcast selection automatically** on (the default), selecting a violation in a tab sends a `notify_selection` (`ElementKind.rule`, path `<ruleId>@<file>:<line>:<column>`, severity and message metadata) to every connected peer in every tier; turning the switch off silences it at once. The panel's per-peer "Send selection to this peer" button sends in every tier with no licence check (`test/features/remote/cross_probe_panel_test.dart`, group "sending is free in every tier").
+LintCrux Free participates in the CXP ecosystem on both the **receive** and the **send** side. The lifecycle, the surfaces and their words are the suite-shared `crux_cxp_ui` package's (the `crux-shared` Melos workspace), bound to LintCrux by `lib/services/remote/cxp/lintcrux_cxp_binding.dart` and `lib/features/remote/providers/lintcrux_cxp_overrides.dart`; what LintCrux owns is what a received request does (`LintCruxCxpWrappedHandler`) and which selection it sends. The user-visible surfaces are: (a) the CXP server that boots when the enable setting is on, (b) the discovery manifest written into the **suite-shared** directory (`~/Library/Application Support/crux/cxp/peers/` on macOS — NOT the per-app container; a ~30 s manifest heartbeat and a connector that dials every discovered peer make both sides’ servers connect, and a request arriving purely over the socket LintCrux dialed still reaches the handler and gets an ack), (c) the cross-probe panel, shown with View > Show Cross-Probe Panel (Cmd/Ctrl+Shift+X) or its toolbar button, whose badge counts the **connected** peers, (d) the Settings → CXP Cross-Probe section that owns the four settings (enable, port, request attention, broadcast selection), each saved the moment it changes, (e) the live selection broadcast: with **Broadcast selection automatically** on (the default), selecting a violation in a tab sends a `notify_selection` (`ElementKind.rule`, path `<ruleId>@<file>:<line>:<column>`, severity and message metadata) to every connected peer in every tier; turning the switch off silences it at once, and (f) the explicit sends: right-click a violation and choose **Cross-probe to**, then a product; or run View > **Cross-probe Selection…** (Cmd/Ctrl+Shift+Enter; a focused text field keeps that key), which sends at once when one peer runs and lists the targets as a menu when several do. Sending is free in every tier with no licence check (`test/features/remote/cross_probe_panel_test.dart`, `test/features/remote/cross_probe_violation_menu_entry_test.dart`).
 
 ### 7.1 CXP server start / stop
 
-**What:** Toggle `cxpServerEnabled` and verify the lifecycle provider starts/stops the underlying `LocalCxpServer` accordingly.
+**What:** Toggle the enable setting and verify the shared runtime (`cruxCxpRuntimeProvider`) starts/stops the underlying server accordingly.
 
-**Setup:** Launch `lintcrux`. Open Tools → Cross-probe Peers (or `LintcruxAction.openCrossProbePanel` from the command palette).
+**Setup:** Launch `lintcrux`. Open the cross-probe panel (View > Show Cross-Probe Panel, or the command palette).
 
 **Expected:**
-- On first launch the status line reads "Listening on port 54324." (or whichever port `cxpServerPort` is set to).
-- Open Settings → Remote Control. Flip the **Enable CXP cross-probe server** switch off.
-- Return to the cross-probe panel: status line now reads "Cross-probe server is disabled.".
-- Flip the switch back on. Status line returns to "Listening on port N." with no app restart required.
+- On first launch Settings → CXP Cross-Probe reads "Running on port 54324" (or whichever port is set), and the panel shows no "server is off" notice.
+- In Settings → CXP Cross-Probe, flip **Enable CXP server** off. The status line reads "Stopped".
+- Flip the switch back on. The status line returns to "Running on port N" with no app restart required. A new port applies at once, too: the server restarts on it.
 
 **Edge cases:**
-- Port already in use: status line shows "Server error: ...". A `SocketException` from `bind()` produces the error path; the lifecycle returns a non-running state with the error message attached.
+- Port already in use: the status line shows the problem (the runtime's `unavailableReason`) in the error colour. A `SocketException` from `bind()` produces it; the server is not running.
 
-**Coverage:** automated via `test/features/remote/cxp_server_lifecycle_test.dart` for the start / disabled / running states, and end-to-end on a live macOS build via `integration_test/remote_control/cxp_server_lifecycle_test.dart` (drives the real `cxpServerLifecycleProvider` + `appSettingsProvider` through a booted app: starts at boot, tears down on disable, restarts on re-enable); manual sign-off for the live-restart UX.
+**Coverage:** automated by the shared runtime's own suite (`crux-shared/packages/crux_cxp_ui/test/cxp_lifecycle_test.dart`: settings survive a relaunch, a launch with CXP off never starts the server, the port rule), `test/features/remote/cxp_runtime_wiring_test.dart` (LintCrux on that runtime: its binding and capabilities), and end-to-end on a live macOS build via `integration_test/remote_control/cxp_server_lifecycle_test.dart` (drives the real `cruxCxpRuntimeProvider` + `cruxCxpSettingsProvider` through a booted app: starts at boot, tears down on disable, restarts on re-enable); manual sign-off for the live-restart UX.
 
 ### 7.2 Discovery manifest read/write
 
@@ -581,26 +580,26 @@ LintCrux Free participates in the CXP ecosystem on both the **receive** and the 
 - **Mutual connection:** launch a second suite app (WaveCrux/NetCrux/SimCrux). Within ~5 s each app lists the other as a **connected** peer (discovered manifest → symmetric `CxpPeerConnector` dial → inbound Hello on both servers), and the rows persist past 5 minutes.
 - Delete the hand-written file. The panel's list removes the entry on the next scan.
 
-**Coverage:** automated via the "discovers peers that appear in the manifest directory" case in `cxp_server_lifecycle_test.dart`; mutual-connection regression via `lintcrux_cxp_server_test.dart` ("peer connector (mutual-connection regression)"); connector-link inbound receipt (a request arriving over the dialed socket reaches the handler, its ack returns over the same link, and the announced subscription set excludes `notify_selection`) via the "arriving purely over LintCrux's own connector link" case in `cxp_server_lifecycle_test.dart`; and the shared-package suite (`crux-shared/packages/crux_cxp/test/conformance/peer_connectivity_test.dart` — shared-dir resolver, heartbeat-vs-stale-prune, two-server mutual connect); manual sign-off for the lifecycle on quit and the real two-app flow.
+**Coverage:** automated by the shared runtime's suite (`crux-shared/packages/crux_cxp_ui/test/cxp_lifecycle_test.dart` — two products find each other, turning CXP off empties the peer list and the badge, a peer that quits leaves) and the shared-package suite (`crux-shared/packages/crux_cxp/test/conformance/peer_connectivity_test.dart` — shared-dir resolver, heartbeat-vs-stale-prune, two-server mutual connect); LintCrux's own wiring on that runtime in `test/features/remote/cxp_runtime_wiring_test.dart`; manual sign-off for the lifecycle on quit and the real two-app flow.
 
 ### 7.2.1 Unreachable-peer indicator (discovered but undialable)
 
-**What:** A peer's discovery manifest can be present while its CXP server is unreachable — it crashed without removing its manifest, hasn't finished binding, or a firewall blocks the dial. The `CxpPeerConnector` records each failed outbound dial (`CxpPeerConnector.dialFailures` / `lastDialFailures`); LintCrux surfaces the current set through `cxpDialFailuresProvider` and renders a **persistent** warning row per unreachable peer in the cross-probe panel, directly beneath the "Discovered peers" list. This distinguishes a discovered-but-unreachable peer from an absent one instead of leaving one-way connectivity invisible.
+**What:** A peer's discovery manifest can be present while its CXP server is unreachable — it crashed without removing its manifest, hasn't finished binding, or a firewall blocks the dial. The shared runtime records each failed outbound dial; LintCrux surfaces the current set through `cruxCxpUnreachablePeersProvider` and the shared panel renders a **persistent** warning row per unreachable peer, directly beneath the connected peers list. This distinguishes a discovered-but-unreachable peer from an absent one instead of leaving one-way connectivity invisible.
 
-**Setup:** Start LintCrux with the CXP server enabled. Open Tools → Cross-probe Peers. Drop a hand-written manifest into the suite-shared directory whose `host`/`port` point at a port nobody is listening on (e.g. `wavecrux-dead-1.json` with `"port": 1` — reserved/unbindable).
+**Setup:** Start LintCrux with the CXP server enabled. Open the cross-probe panel (View > Show Cross-Probe Panel). Drop a hand-written manifest into the suite-shared directory whose `host`/`port` point at a port nobody is listening on (e.g. `wavecrux-dead-1.json` with `"port": 1` — reserved/unbindable).
 
 **Expected:**
-- The peer appears in "Discovered peers" (discovery only proves the manifest exists), and within a few seconds a warning row appears below the list: an amber warning icon plus "Couldn't reach `<peer id>`" (localized).
+- Within a few seconds a warning row appears below the connected peers list: an amber warning icon plus "Couldn't reach `<peer id>`" (localized; the peer itself is not listed as connected).
 - The row is **persistent** — it stays for as long as the peer remains unreachable (it is part of the panel column, not a transient snackbar). When every peer is reachable the section renders nothing (no empty-state text, no stray icon).
 - Start a real CXP peer on that host/port (or fix the manifest to a live port): once the connector's handshake succeeds, the peer is pruned from the failure set and its warning row disappears (presence-driven refresh).
 - Delete the manifest: the peer leaves both the discovered list and the unreachable set.
-- Disable the CXP server (Settings → Remote Control) or change the port: the unreachable set resets to empty on the lifecycle rebuild — no stale warning rows survive a restart.
+- Disable the CXP server (Settings → CXP Cross-Probe) or change the port: the unreachable set resets to empty when the runtime restarts — no stale warning rows survive a restart.
 
 **Edge cases:**
 - Multiple unreachable peers → one warning row each, in snapshot order.
 - A peer that flaps (reachable, then its server dies) reappears in the unreachable set on the next failed dial.
 
-**Coverage:** `[Coverage: UNIT]` `test/features/remote/cxp_dial_failures_provider_test.dart` (`cxpDialFailuresProvider` default-empty, `replace`, unmodifiable snapshot, clear); `[Coverage: INTEGRATION_TEST]` the "surfaces a discovered-but-unreachable peer via cxpDialFailuresProvider" case in `test/features/remote/cxp_server_lifecycle_test.dart` (a manifest pointing at a released loopback port drives a real connection-refused dial and populates the provider); `[Coverage: WIDGET]` `test/features/remote/cross_probe_panel_test.dart` (persistent warning row with "Couldn't reach …" copy; no rows when the set is empty; en / zh_CN / zh / ja / ko locale sweep). Manual sign-off for the live prune-on-reconnect flow.
+**Coverage:** `[Coverage: INTEGRATION_TEST]` the shared runtime's own suite (`crux-shared/packages/crux_cxp_ui/test/cxp_lifecycle_test.dart`: a manifest pointing at a released loopback port drives a real connection-refused dial and populates `cruxCxpUnreachablePeersProvider`; an entry leaves when its peer connects or goes away; a restart clears the set); `[Coverage: WIDGET]` the shared panel's tests (`crux-shared/packages/crux_cxp_ui/test/`: persistent warning row with "Couldn't reach …" copy, no rows when the set is empty) and `test/features/remote/cross_probe_panel_test.dart` (LintCrux's panel in the en / zh_CN / zh / ja / ko locale sweep). Manual sign-off for the live prune-on-reconnect flow.
 
 ### 7.3 RequestHighlight — rule kind
 
@@ -637,7 +636,7 @@ Send (after the standard Hello handshake — see `crux_cxp` README for the wire 
 - Malformed path (missing `@`, missing line/column, non-positive numbers) → ack with `honored: false`, `reason: "Malformed rule element path ..."`.
 - No tab open at all → same `honored: false` no-match ack (empty-workspace fallback reads the empty root store).
 
-**Coverage:** automated via `test/services/remote/cxp/lintcrux_cxp_request_handler_test.dart` (rule-honored, malformed, no-match) and the rule-kind end-to-end case in `cxp_server_lifecycle_test.dart`; and end-to-end on a live macOS build via `integration_test/remote_control/cxp_inbound_highlight_journey_test.dart` — a real `LocalCxpClient` peer connects over a real socket to the auto-started server, a project is opened through the File → Open seam, and an inbound `request_highlight` is proven to resolve against the **active tab's** per-tab store (row selected + visible), then a second highlight for a violation the tab does not hold acks `honored: false` **without disturbing** the prior selection. The active-tab assertion is not vacuous: rewiring the handler's store thunk to the root container turns the journey red with "No matching violation in the active project."
+**Coverage:** automated via `test/services/remote/cxp/lintcrux_cxp_request_handler_test.dart` (rule-honored, malformed, no-match) and the rule-kind end-to-end case in `cxp_runtime_wiring_test.dart` (which also pins that one request is acknowledged exactly once); and end-to-end on a live macOS build via `integration_test/remote_control/cxp_inbound_highlight_journey_test.dart` — a real `LocalCxpClient` peer connects over a real socket to the auto-started server, a project is opened through the File → Open seam, and an inbound `request_highlight` is proven to resolve against the **active tab's** per-tab store (row selected + visible), then a second highlight for a violation the tab does not hold acks `honored: false` **without disturbing** the prior selection. The active-tab assertion is not vacuous: rewiring the handler's store thunk to the root container turns the journey red with "No matching violation in the active project."
 
 ### 7.4 RequestHighlight — source kind
 
@@ -663,7 +662,7 @@ Send (after the standard Hello handshake — see `crux_cxp` README for the wire 
 - Ack: `honored: true`.
 - No violations in the file: `honored: true`, `reason: "No violations in file; filtered table to the file."` (the filter is still useful).
 
-**Coverage:** automated via the source-kind handler tests + the file-narrowing assertion in the lifecycle test.
+**Coverage:** automated via the source-kind handler tests in `lintcrux_cxp_request_handler_test.dart`.
 
 ### 7.5 RequestHighlight — signal / instance kinds
 
@@ -686,19 +685,16 @@ Send (after the standard Hello handshake — see `crux_cxp` README for the wire 
 
 **Coverage:** automated via the per-kind loop in `lintcrux_cxp_request_handler_test.dart`.
 
-### 7.6.1 Non-highlight message kinds — matching-type reply (wire-contract)
+### 7.6.1 Non-highlight message kinds — selection gossip and acknowledgements
 
-**What:** A peer sends, as a *directly addressed* message, a kind LintCrux runs no receive-side handler for — e.g. a `notify_selection` sent as a direct address rather than a broadcast (LintCrux's connector announces only `request_highlight` / `request_open_source`, so it never receives `notify_selection` as a broadcast — only a direct address reaches this path). Every inbound request still needs a reply, or the originator times out.
+**What:** A peer sends a kind LintCrux runs no receive-side handler for: a `notify_selection`, now that LintCrux no longer narrows its subscriptions (the shared runtime announces the full set), so a peer's selection gossip reaches it. The shared runtime sends every acknowledgement itself (`LintCruxCxpWrappedHandler` returns the outcome and never replies on the wire), so a highlight, an open-source request and an open-artifact request are each acknowledged exactly once, and the window's attention is requested once for an honoured request, never twice.
 
-**Expected:** LintCrux replies with an `error_response` carrying `code: "unsupported"`, a human-readable `message` naming the kind (`LintCrux does not handle "<kind>" messages.`), and `in_reply_to` set to the request's `message_id`. Table state and selection are unchanged.
-
-The reply is deliberately an `error_response`, **not** a `request_highlight_ack`. Replying to an arbitrary kind with a `RequestHighlightAck` was a wire-contract violation: the originator correlates the reply on `message_id` but still decodes it by `kind`, so a highlight-ack for a request it never sent is uninterpretable. Only kinds LintCrux actually implements get their matching ack type (`request_highlight` → `request_highlight_ack`, `request_open_source` → `request_open_source_ack`); everything else gets the generic error envelope the v1 protocol defines for exactly this case.
+**Expected:** A `notify_selection` changes nothing (table state and selection are unchanged); it shows in the cross-probe panel's Recent events and draws no reply. A request kind LintCrux does not recognise gets no `error_response` from LintCrux. The handler's own matching-type rule is unit-tested below: `request_highlight` → `request_highlight_ack`, `request_open_source` → `request_open_source_ack`, `request_open_artifact` → `request_open_artifact_ack`, and never a fabricated highlight-ack for another kind.
 
 **Edge cases:**
-- The `message_id` of the offending message is echoed into `in_reply_to`; a peer awaiting a correlated reply resolves it rather than timing out.
-- A malformed *envelope* (undecodable JSON, missing `kind`) is a transport-layer concern handled by `crux_cxp` before dispatch — it yields `error_response` with `code: "malformed_envelope"` / `"unknown_kind"`, not this handler's `"unsupported"`.
+- A malformed *envelope* (undecodable JSON, missing `kind`) is a transport-layer concern handled by `crux_cxp` before dispatch — it yields `error_response` with `code: "malformed_envelope"` / `"unknown_kind"`.
 
-**Coverage:** automated via the "NotifySelection … returns an unsupported ErrorResponse, not a fabricated highlight ack" case in `test/services/remote/cxp/lintcrux_cxp_request_handler_test.dart`, which asserts the reply is an `ErrorResponse` (and explicitly `isNot` a `RequestHighlightAck`), carries `CxpErrorCode.unsupported`, echoes a non-empty `in_reply_to`, and leaves table state + selection null.
+**Coverage:** automated via the "NotifySelection … returns an unsupported ErrorResponse, not a fabricated highlight ack" case in `test/services/remote/cxp/lintcrux_cxp_request_handler_test.dart` (the handler's own reply rule, ErrorResponse and not a `RequestHighlightAck`, carrying `CxpErrorCode.unsupported`, leaving table state + selection null); `test/features/remote/cxp_runtime_wiring_test.dart` ("a NotifySelection from a peer is shown in the event log and does not draw an error response", "one RequestHighlight is acknowledged exactly once").
 
 ### 7.7 RequestOpenSource
 
@@ -725,32 +721,46 @@ The reply is deliberately an `error_response`, **not** a `request_highlight_ack`
 - The same rule applies to `request_open_artifact`: the `.lintcrux` project a peer's `design_id` resolves to in the shared workspace is opened only when it lies inside those directories. A project the user has opened before (it is in Recent projects) opens even when its tab is closed; one the user never opened is refused.
 - **Peer auth.** A peer must present, in its `hello`, the token LintCrux published in its discovery manifest; a suite app reads it from the manifest automatically. A hand-rolled peer that omits it is refused `unauthorized` and disconnected before any request is dispatched.
 
-**Coverage:** automated via the open-source unit tests + the end-to-end open-source case in `cxp_server_lifecycle_test.dart` (using a recording launcher). Containment: the "refuses a RequestOpenSource outside the opened projects" and "RequestOpenArtifact opens a recorded project inside the opened projects" cases in `cxp_server_lifecycle_test.dart` (production roots, published through the handle `WorkspaceRoot` fills), the server-level refusal in `lintcrux_cxp_server_test.dart` (refused before `onInbound`), the handler's own check in `lintcrux_cxp_request_handler_test.dart`, and the roots' publication in `workspace_root_test.dart`. Peer auth: `lintcrux_cxp_server_test.dart`. Manual sign-off: from WaveCrux, cross-probe into a design LintCrux has open (opens) and into one it has never opened (refused).
+**Coverage:** automated via the open-source unit tests + the end-to-end open-source case in `cxp_runtime_wiring_test.dart` (using a recording launcher). Containment: the "refuses a RequestOpenSource outside the opened projects" and "RequestOpenArtifact opens a recorded project inside the opened projects" cases in `cxp_runtime_wiring_test.dart` (production roots, published through the handle `WorkspaceRoot` fills), the wire-level screen cases in `cxp_open_artifact_test.dart` (the hint is screened before the handler sees it), the handler's own check in `lintcrux_cxp_request_handler_test.dart`, and the roots' publication in `workspace_root_test.dart`. Peer auth: the shared runtime's suite (`crux-shared/packages/crux_cxp/test/`). Manual sign-off: from WaveCrux, cross-probe into a design LintCrux has open (opens) and into one it has never opened (refused).
 
 ### 7.8 Cross-probe panel — peers + events
 
-**What:** Open Tools → Cross-probe Peers and verify the three live data sources.
+**What:** Open View > Show Cross-Probe Panel and verify the three live data sources.
 
 **Expected:**
-- The status line reflects the current `cxpServerLifecycleProvider` state.
-- "Discovered peers" lists each peer manifest the watcher has seen (product name + version + `peer_id` + host:port).
-- "Recent events" shows the rolling log of the last 50 cross-probe events with per-kind icons (link / link-off / call-received / call-made) and HH:MM:SS timestamps.
+- The panel shows a "The CXP server is off" notice only when the server is off.
+- "Connected peers" lists each peer connected (product name + version + `peer_id`), with a send button per row that sends the active tab's selected violation; "No peers connected" when there are none.
+- "Recent events" shows the rolling log of the last 200 cross-probe events (kept across a server restart) with per-kind icons and HH:MM:SS timestamps.
 - The **Clear events** button empties the log immediately.
-- The dialog re-renders correctly under the locale sweep (en / zh_CN / zh / ja / ko).
+- The panel re-renders correctly under the locale sweep (en / zh_CN / zh / ja / ko).
 
-**Coverage:** automated via `test/features/remote/cross_probe_panel_test.dart` for state rendering, peer presence, event-tile rendering, clear-button flow, and the five-locale sweep.
+**Coverage:** automated via `test/features/remote/cross_probe_panel_test.dart` (LintCrux's panel: the shared bound panel, the selection a row sends, the close wiring, the five-locale sweep) and the shared panel's own suite (`crux-shared/packages/crux_cxp_ui/test/`: peer rows, the event log, the clear button).
 
-### 7.9 Settings → Remote Control
+### 7.9 Settings → CXP Cross-Probe
 
-**What:** Open Settings → Remote Control and verify the toggle + port input.
+**What:** Open Settings → CXP Cross-Probe and verify the four settings and the status line.
 
 **Expected:**
-- The switch reads the current `cxpServerEnabled` and writes back on toggle. The change is reflected immediately in the cross-probe panel's status line.
-- The port field accepts digits only, capped at 5 characters. Submitting the field (Enter or focus-out) writes the value through `setCxpServerPort`.
-- Out-of-range input (0 or > 65535) is silently clamped back to `54324`; the text field updates to reflect the applied value.
+- **Enable CXP server** reads the saved setting and writes back at once on toggle (the preference keys are unchanged from earlier releases: `settings.cxpServerEnabled`, `settings.cxpServerPort`, `settings.requestAttentionOnCrossProbe`, `settings.broadcastSelectionOnCrossProbe`). The change is reflected immediately in the status line under the controls and in the panel.
+- The port field accepts digits only. Submitting the field (Enter or focus-out) saves a valid port and restarts a running server on it at once; an invalid port (0 or > 65535) shows "Enter a port between 1 and 65535." and is not applied.
 - Toggling the switch off disables the port field (prevents typing a port the server cannot bind because it's not running).
+- The status line closes the section: "Running on port N, K peers connected" or "Stopped", with the reason in the error colour when the server cannot start. A "Learn more" link to the cross-probe documentation follows the section.
+- A change to any other Settings page never changes these four (the settings model holds no copy of them).
+- Keyboard: the section is one Tab walk of named stops (switch, port field, switch, switch, Learn more).
 
-**Coverage:** automated via `test/features/settings/widgets/settings_remote_control_section_test.dart` for the switch / port-disabled / locale-sweep behaviors.
+**Coverage:** automated via `test/features/settings/widgets/settings_remote_control_section_test.dart` for the switch / port / save-at-once / port-disabled / locale-sweep behaviors and the focus walk (`test/accessibility/goldens/settings_cxp_section.txt`), and `test/features/settings/providers/app_settings_provider_test.dart` ("a settings change leaves the saved CXP keys alone").
+
+### 7.9.1 Cross-probe to, and the Cross-probe Selection command
+
+**What:** Sending the selected violation to a running peer product without opening the panel.
+
+**Expected:**
+- Right-click a violation row: the menu offers **Cross-probe to** (free in every tier, no badge). Choosing it opens a second menu where the first opened, with one item per running product (a product running in several windows nests "WaveCrux 1", "WaveCrux 2"). Choosing a product sends the violation and a toast confirms it. With no peer running the entry reads "Cross-probe to (no peers running)" and choosing it says what to start.
+- View > **Cross-probe Selection…** (also in the command palette; Cmd/Ctrl+Shift+Enter) sends the selected violation at once when exactly one peer runs, and opens the same target list as a menu (never a dialog) when several do. With nothing selected it says "Select something to cross-probe first."; with the server off it says where to turn it on; with no peer it says none is running.
+- While a text field has focus (the search box, a note), Cmd/Ctrl+Shift+Enter belongs to the field and the command does not run.
+- The target receives the kind it shows: WaveCrux the `source` citation, NetCrux the `scope` module, LintCrux the `rule`.
+
+**Coverage:** `test/features/remote/cross_probe_violation_menu_entry_test.dart` (the entry), `test/core/shortcuts/shortcut_manager_widget_test.dart` ("Cross-probe Selection chord": fires with nothing typing, ignored in a text field), `test/app_action_dispatch_test.dart` (the command reports nothing selected), `test/core/shortcuts/lintcrux_action_test.dart` and the menu/palette conformance tests (the action's surfaces and tier). The shared command's several-targets and one-target cases are in `crux-shared/packages/crux_cxp_ui/test/cross_probe_surfaces_test.dart`.
 
 ### 7.10 Notes on out-of-scope items
 
@@ -804,7 +814,7 @@ The custom-regex-rule *evaluator implementation* (regex compile cache, per-rule 
 2. Click a row's outline bookmark icon. The **Add bookmark** dialog opens with the rule, file:line and message; type a note, pick a color, **Save**. The icon fills, the color dot shows, the chip reads `1`, and `.lintcrux-bookmarks.json` appears beside the project. — `[Coverage: WIDGET]` (`test/features/bookmarks/widgets/bookmark_column_icon_test.dart`, `test/features/bookmarks/widgets/bookmark_dialog_test.dart`)
 3. Select another violation and run `Tools > Toggle Bookmark`. The same dialog opens for it; with nothing selected the action says "Select a violation to bookmark." — `[Coverage: WIDGET]` (`test/features/bookmarks/providers/bookmark_openers_test.dart`)
 4. Click the chip (or `Tools > Show Bookmarked Violations…`). The **Bookmarks** panel lists both, grouped by file, with All / Active / Stale chips and search; **Jump to violation** selects the row, **Edit note** reopens the dialog in edit mode, **Remove bookmark** asks first. — `[Coverage: WIDGET]` (`test/features/bookmarks/screens/bookmark_panel_test.dart`)
-5. Click a filled icon: the bookmark is removed at once and a snackbar offers **Undo**, which restores it with its note and color. — `[Coverage: WIDGET]` (`test/features/bookmarks/widgets/bookmark_column_icon_test.dart`)
+5. Click a filled icon: the bookmark is removed at once and a toast offers **Undo** (a Tab stop; it restores the bookmark with its note and color and closes the toast). — `[Coverage: WIDGET]` (`test/features/bookmarks/widgets/bookmark_column_icon_test.dart`)
 6. Fix (or waive) one bookmarked violation and re-run. Its icon dims with a clock glyph and it appears under **Stale**; the other stays active. — `[Coverage: UNIT]` (`test/services/bookmarks/bookmark_freshness_test.dart`) + `[Coverage: MANUAL]`
 7. Close and reopen the project: the bookmarks, notes and colors are back. Copy in a `.lintcrux-bookmarks.json` written by an earlier release (version 1 or 2): it loads unchanged. — `[Coverage: UNIT]` (`test/services/bookmarks/json_file_violation_bookmark_store_test.dart`, `test/services/bookmarks/violation_bookmark_store_provider_test.dart`)
 

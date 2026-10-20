@@ -144,7 +144,7 @@ class ViolationTableNotifier extends Notifier<ViolationTableState> {
 
   /// Copy every filter dimension from [next] in one shot.
   /// Used by the CXP receive-side dispatcher
-  /// (`cxpServerLifecycleProvider`) to apply the filter computed by
+  /// (`LintCruxCxpWrappedHandler`) to apply the filter computed by
   /// [LintCruxCxpRequestHandler]. Sort and selection are intentionally
   /// not touched — sort is a table-level UI concern, and selection is
   /// managed by [selectedViolationProvider].

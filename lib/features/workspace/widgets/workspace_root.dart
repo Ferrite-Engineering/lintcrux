@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:lintcrux/features/project/services/open_project_service.dart';
-import 'package:lintcrux/features/workspace/providers/recent_projects_provider.dart';
+import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/tab_overrides_factory.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/open_project_in_workspace.dart';
@@ -213,7 +213,7 @@ class _WorkspaceRootState extends WorkspaceRootState {
             in root.read(workspaceProvider).value?.tabs ??
                 const <WorkspaceTab>[])
           tab.payload.projectPath,
-        ...root.read(recentProjectsProvider),
+        ...root.read(recentProjects.provider),
       ];
     _projectOpenHandle = openHandle;
   }

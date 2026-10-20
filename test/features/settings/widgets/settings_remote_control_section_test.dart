@@ -1,33 +1,31 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_a11y/crux_a11y_testing.dart';
+import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lintcrux/domain/models/app_settings.dart';
-import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
 import 'package:lintcrux/features/settings/widgets/settings_remote_control_section.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
+import 'package:lintcrux/services/remote/cxp/lintcrux_cxp_binding.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class _SeedNotifier extends AppSettingsNotifier {
-  _SeedNotifier(this._seed);
-
-  final AppSettings _seed;
-
-  @override
-  AppSettings build() => _seed;
-}
-
+/// The page under test, with the shared CXP settings bound the way
+/// `bootstrap()` binds them. The transport is off, so no server binds.
 Widget _wrap({
-  required AppSettings seed,
+  CruxCxpSettings launch = const CruxCxpSettings(enabled: true, port: 54324),
   Locale locale = const Locale('en'),
   List<Override> extra = const [],
+  void Function(ProviderContainer container)? onContainer,
 }) {
   return ProviderScope(
     overrides: [
-      appSettingsProvider.overrideWith(() => _SeedNotifier(seed)),
+      cruxCxpProductBindingProvider.overrideWithValue(kLintcruxCxpBinding),
+      cruxCxpLaunchSettingsProvider.overrideWithValue(launch),
+      cruxCxpTransportAvailableProvider.overrideWithValue(false),
       ...extra,
     ],
     child: MaterialApp(
@@ -39,15 +37,24 @@ Widget _wrap({
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: L10N.supportedLocales,
-      home: const Scaffold(body: SettingsRemoteControlSection()),
+      home: Consumer(
+        builder: (context, ref, _) {
+          onContainer?.call(ProviderScope.containerOf(context));
+          return const Scaffold(body: SettingsRemoteControlSection());
+        },
+      ),
     ),
   );
 }
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+  });
+
   group('SettingsRemoteControlSection', () {
     testWidgets('renders the enabled switch and port field', (tester) async {
-      await tester.pumpWidget(_wrap(seed: const AppSettings()));
+      await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
       // Three switches: the CXP-enabled toggle, the request-attention
       // toggle, and the broadcast-selection toggle.
@@ -57,136 +64,76 @@ void main() {
       expect(find.text('54324'), findsOneWidget);
     });
 
-    testWidgets('toggling the switch updates appSettingsProvider', (
+    testWidgets('toggling the switch saves the enabled setting at once', (
       tester,
     ) async {
       late ProviderContainer container;
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            appSettingsProvider.overrideWith(
-              () => _SeedNotifier(const AppSettings()),
-            ),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: const [
-              L10N.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: L10N.supportedLocales,
-            home: Consumer(
-              builder: (context, ref, _) {
-                container = ProviderScope.containerOf(context);
-                return const Scaffold(body: SettingsRemoteControlSection());
-              },
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(_wrap(onContainer: (c) => container = c));
       await tester.pumpAndSettle();
       // Toggle the CXP-enabled switch (the first one) off.
       await tester.tap(find.byType(Switch).first);
       await tester.pumpAndSettle();
-      expect(
-        container.read(appSettingsProvider).cxpServerEnabled,
-        isFalse,
-      );
+      expect(container.read(cruxCxpSettingsProvider).enabled, isFalse);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getBool('settings.cxpServerEnabled'), isFalse);
     });
 
-    testWidgets('toggling the attention switch updates appSettingsProvider', (
+    testWidgets('toggling the attention switch saves it at once', (
       tester,
     ) async {
       late ProviderContainer container;
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            appSettingsProvider.overrideWith(
-              () => _SeedNotifier(const AppSettings()),
-            ),
-          ],
-          child: MaterialApp(
-            localizationsDelegates: const [
-              L10N.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: L10N.supportedLocales,
-            home: Consumer(
-              builder: (context, ref, _) {
-                container = ProviderScope.containerOf(context);
-                return const Scaffold(body: SettingsRemoteControlSection());
-              },
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(_wrap(onContainer: (c) => container = c));
       await tester.pumpAndSettle();
       // The request-attention switch is the second (defaults on).
-      expect(
-        container.read(appSettingsProvider).requestAttentionOnCrossProbe,
-        isTrue,
-      );
+      expect(container.read(cruxCxpSettingsProvider).requestAttention, isTrue);
       await tester.tap(find.byType(Switch).at(1));
       await tester.pumpAndSettle();
+      expect(container.read(cruxCxpSettingsProvider).requestAttention, isFalse);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getBool('settings.requestAttentionOnCrossProbe'), isFalse);
+    });
+
+    testWidgets('toggling the broadcast-selection switch saves it at once', (
+      tester,
+    ) async {
+      late ProviderContainer container;
+      await tester.pumpWidget(_wrap(onContainer: (c) => container = c));
+      await tester.pumpAndSettle();
+      // The broadcast-selection switch is the third (defaults on).
       expect(
-        container.read(appSettingsProvider).requestAttentionOnCrossProbe,
+        container.read(cruxCxpSettingsProvider).broadcastSelection,
+        isTrue,
+      );
+      await tester.tap(find.byType(Switch).last);
+      await tester.pumpAndSettle();
+      expect(
+        container.read(cruxCxpSettingsProvider).broadcastSelection,
+        isFalse,
+      );
+      final prefs = await SharedPreferences.getInstance();
+      expect(
+        prefs.getBool('settings.broadcastSelectionOnCrossProbe'),
         isFalse,
       );
     });
 
-    testWidgets(
-      'toggling the broadcast-selection switch updates appSettingsProvider',
-      (tester) async {
-        late ProviderContainer container;
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              appSettingsProvider.overrideWith(
-                () => _SeedNotifier(const AppSettings()),
-              ),
-            ],
-            child: MaterialApp(
-              localizationsDelegates: const [
-                L10N.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: L10N.supportedLocales,
-              home: Consumer(
-                builder: (context, ref, _) {
-                  container = ProviderScope.containerOf(context);
-                  return const Scaffold(body: SettingsRemoteControlSection());
-                },
-              ),
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
-        // The broadcast-selection switch is the third (defaults on).
-        expect(
-          container.read(appSettingsProvider).broadcastSelectionOnCrossProbe,
-          isTrue,
-        );
-        await tester.tap(find.byType(Switch).last);
-        await tester.pumpAndSettle();
-        expect(
-          container.read(appSettingsProvider).broadcastSelectionOnCrossProbe,
-          isFalse,
-        );
-      },
-    );
+    testWidgets('a new port is saved under the LintCrux key', (tester) async {
+      late ProviderContainer container;
+      await tester.pumpWidget(_wrap(onContainer: (c) => container = c));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '60000');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+      expect(container.read(cruxCxpSettingsProvider).port, 60000);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getInt('settings.cxpServerPort'), 60000);
+    });
 
     testWidgets('disables the port field when the switch is off', (
       tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(
-          seed: const AppSettings(cxpServerEnabled: false),
-        ),
+        _wrap(launch: const CruxCxpSettings(enabled: false, port: 54324)),
       );
       await tester.pumpAndSettle();
       final field = tester.widget<TextField>(find.byType(TextField));
@@ -201,12 +148,7 @@ void main() {
       Locale('ko'),
     ]) {
       testWidgets('renders without exception in $locale', (tester) async {
-        await tester.pumpWidget(
-          _wrap(
-            seed: const AppSettings(),
-            locale: locale,
-          ),
-        );
+        await tester.pumpWidget(_wrap(locale: locale));
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
       });
@@ -216,7 +158,7 @@ void main() {
       'lays out Enable → Port → Request-attention → Broadcast-selection → '
       'CXP Status top-to-bottom (WaveCrux canonical order)',
       (tester) async {
-        await tester.pumpWidget(_wrap(seed: const AppSettings()));
+        await tester.pumpWidget(_wrap());
         await tester.pumpAndSettle();
 
         final enableDy = tester.getTopLeft(find.text('Enable CXP server')).dy;
@@ -228,7 +170,7 @@ void main() {
             .getTopLeft(find.text('Broadcast selection automatically'))
             .dy;
         // The CXP Status line closes the section.
-        final statusDy = tester.getTopLeft(find.text('CXP Status')).dy;
+        final statusDy = tester.getTopLeft(find.text('CXP status')).dy;
 
         expect(enableDy, lessThan(portDy));
         expect(portDy, lessThan(attentionDy));
@@ -240,10 +182,39 @@ void main() {
     testWidgets('CXP Status shows "Stopped" when the server is not running', (
       tester,
     ) async {
-      await tester.pumpWidget(_wrap(seed: const AppSettings()));
+      await tester.pumpWidget(_wrap());
       await tester.pumpAndSettle();
-      expect(find.text('CXP Status'), findsOneWidget);
+      expect(find.text('CXP status'), findsOneWidget);
       expect(find.text('Stopped'), findsOneWidget);
+    });
+
+    testWidgets('keeps the documentation link beside the section', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+      expect(find.byType(CruxCxpSettingsSection), findsOneWidget);
+      expect(find.byTooltip('Learn more'), findsOneWidget);
+    });
+
+    testWidgets('the keyboard walk names every stop in the section', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      tester.view
+        ..physicalSize = const Size(1200, 900)
+        ..devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(_wrap());
+      await tester.pumpAndSettle();
+
+      final walk = await walkFocus(tester);
+      expectCleanFocusWalk(walk, context: 'Settings CXP Cross-Probe section');
+      expectFocusWalkGolden(
+        walk,
+        'test/accessibility/goldens/settings_cxp_section.txt',
+      );
+      handle.dispose();
     });
   });
 }
