@@ -1,10 +1,13 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_theme/crux_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:lintcrux/core/theme/lintcrux_colors.dart';
 
-/// Builders for the LintCrux Material 3 themes.
+/// Builders for the LintCrux themes: the brand seed and canvas colours over
+/// `cruxThemeForDevice` (Crux Desktop on macOS, Windows, Linux and web; plain
+/// Material 3 on iOS and Android).
 ///
 /// Both light and dark themes are derived from a single brand seed
 /// ([LintcruxColors.brandSeed], "lint blue" — matching the LintCrux
@@ -39,14 +42,21 @@ abstract final class LintcruxTheme {
       // toggle. Keeps the brand hue rather than swapping to a fixed palette.
       contrastLevel: highContrast ? 1.0 : 0.0,
     );
-    return ThemeData(
-      useMaterial3: true,
-      brightness: brightness,
+    final canvas = brightness == Brightness.dark
+        ? LintcruxColors.darkCanvasBackground
+        : LintcruxColors.lightCanvasBackground;
+    // Desktop hosts get the Crux Desktop component themes over the brand
+    // scheme; iOS and Android keep the plain Material 3 theme below.
+    final base = cruxThemeForDevice(
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: brightness == Brightness.dark
-          ? LintcruxColors.darkCanvasBackground
-          : LintcruxColors.lightCanvasBackground,
-      visualDensity: VisualDensity.adaptivePlatformDensity,
+      highContrast: highContrast,
+      mobile: () => ThemeData(
+        useMaterial3: true,
+        brightness: brightness,
+        colorScheme: colorScheme,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
     );
+    return base.copyWith(scaffoldBackgroundColor: canvas);
   }
 }

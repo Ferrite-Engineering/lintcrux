@@ -1,6 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_ide_layout/crux_ide_layout.dart' show CruxDialog;
 import 'package:crux_workspace/crux_workspace.dart' as crux;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -436,7 +437,7 @@ void main() {
       // empty state instead of the tab's preset.
       expect(
         find.descendant(
-          of: find.byType(AlertDialog),
+          of: find.byType(CruxDialog),
           matching: find.text('TabOnly'),
         ),
         findsOneWidget,

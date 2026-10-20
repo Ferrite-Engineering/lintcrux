@@ -77,14 +77,17 @@ abstract final class LintcruxIssueReporter {
     final screenshot = await _captureScreenshot(rootContainer);
     if (!context.mounted) return;
 
-    await showDialog<void>(
+    // It holds a typed title, so a stray scrim click must not discard it.
+    await showCruxDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (_) => UncontrolledProviderScope(
         container: container,
-        child: Dialog(
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
-            width: _dialogWidth,
+        child: CruxDialog(
+          width: _dialogWidth,
+          scrollable: false,
+          contentPadding: EdgeInsets.zero,
+          content: SizedBox(
             height: _dialogHeight,
             child: CruxIssueReporterDialog(screenshotPng: screenshot),
           ),

@@ -815,33 +815,23 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
     final cruxColorTheme = ref.watch(cruxColorThemeProvider);
     final chromeExt = CruxThemeExtension(theme: cruxColorTheme);
     final themeMode = themeModeFromBrightness(cruxColorTheme);
-    final lightTheme = applyChromeTokens(
-      LintcruxTheme.light().copyWith(
-        extensions: <ThemeExtension<dynamic>>[chromeExt],
-      ),
-      chromeExt,
-    );
-    final darkTheme = applyChromeTokens(
-      LintcruxTheme.dark().copyWith(
-        extensions: <ThemeExtension<dynamic>>[chromeExt],
-      ),
-      chromeExt,
-    );
+    // The base theme's extensions stay: on a desktop host it carries
+    // `CruxDesktopTokens`, the marker the Crux Desktop widgets read.
+    ThemeData withChrome(ThemeData base) {
+      final kept = base.extensions.values.toList();
+      return applyChromeTokens(
+        base.copyWith(extensions: [...kept, chromeExt]),
+        chromeExt,
+      );
+    }
+
+    final lightTheme = withChrome(LintcruxTheme.light());
+    final darkTheme = withChrome(LintcruxTheme.dark());
     // High-contrast variants, applied by MaterialApp when the OS
     // "increase contrast" accessibility setting is on. Mirrors WaveCrux's
     // app.dart wiring so LintCrux has accessibility parity.
-    final hcLightTheme = applyChromeTokens(
-      LintcruxTheme.highContrastLight().copyWith(
-        extensions: <ThemeExtension<dynamic>>[chromeExt],
-      ),
-      chromeExt,
-    );
-    final hcDarkTheme = applyChromeTokens(
-      LintcruxTheme.highContrastDark().copyWith(
-        extensions: <ThemeExtension<dynamic>>[chromeExt],
-      ),
-      chromeExt,
-    );
+    final hcLightTheme = withChrome(LintcruxTheme.highContrastLight());
+    final hcDarkTheme = withChrome(LintcruxTheme.highContrastDark());
     // Pro overlay contributes its own localization delegates (e.g.
     // `L10NPro.delegate`) through `extraLocalizationsDelegatesProvider`.
     // The open-core default is an empty list so the open-core build

@@ -40,7 +40,7 @@ class BookmarkPanel extends ConsumerStatefulWidget {
   static Future<void> showAsDialog(BuildContext context) {
     return ModalGuard.run(
       'bookmarkPanel',
-      () => showDialog<void>(
+      () => showCruxDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (_) => wrapInActiveTabScope(
@@ -185,7 +185,6 @@ class _BookmarkPanelState extends ConsumerState<BookmarkPanel> {
                           hintText: l10n.bookmarkPanelSearchHint,
                           prefixIcon: const Icon(Icons.search, size: 18),
                           isDense: true,
-                          border: const OutlineInputBorder(),
                         ),
                         onChanged: (v) => setState(() => _search = v),
                       ),
@@ -269,7 +268,22 @@ class _BookmarkRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10N.of(context);
     final scheme = Theme.of(context).colorScheme;
-    return ListTile(
+    // The same commands on the "⋯" button and on right-click.
+    final entries = <CruxMenuEntry>[
+      CruxMenuItem(
+        label: l10n.bookmarkPanelRowJumpAction,
+        onSelected: () => unawaited(_onAction(context, ref, l10n, 'jump')),
+      ),
+      CruxMenuItem(
+        label: l10n.bookmarkPanelRowEditAction,
+        onSelected: () => unawaited(_onAction(context, ref, l10n, 'edit')),
+      ),
+      CruxMenuItem(
+        label: l10n.bookmarkPanelRowRemoveAction,
+        onSelected: () => unawaited(_onAction(context, ref, l10n, 'remove')),
+      ),
+    ];
+    final row = ListTile(
       key: ValueKey('bookmarkPanelRow-${bookmark.id}'),
       dense: true,
       leading: Icon(
@@ -326,26 +340,14 @@ class _BookmarkRow extends ConsumerWidget {
             ),
         ],
       ),
-      trailing: PopupMenuButton<String>(
+      trailing: CruxOverflowMenu(
         key: ValueKey('bookmarkPanelRowMenu-${bookmark.id}'),
-        icon: const Icon(Icons.more_vert, size: 18),
-        onSelected: (action) => _onAction(context, ref, l10n, action),
-        itemBuilder: (_) => [
-          PopupMenuItem<String>(
-            value: 'jump',
-            child: Text(l10n.bookmarkPanelRowJumpAction),
-          ),
-          PopupMenuItem<String>(
-            value: 'edit',
-            child: Text(l10n.bookmarkPanelRowEditAction),
-          ),
-          PopupMenuItem<String>(
-            value: 'remove',
-            child: Text(l10n.bookmarkPanelRowRemoveAction),
-          ),
-        ],
+        tooltip: MaterialLocalizations.of(context).showMenuTooltip,
+        iconSize: 18,
+        entries: entries,
       ),
     );
+    return CruxContextMenuRegion(entries: entries, child: row);
   }
 
   String _firstLine(String s) {
@@ -396,7 +398,7 @@ class _BookmarkRow extends ConsumerWidget {
       // mounts on the root navigator, so re-wrap in the active tab scope
       // (the panel itself is already wrapped, but that wrap does not
       // extend to routes pushed from inside it).
-      await showDialog<void>(
+      await showCruxDialog<void>(
         context: context,
         // A note + color-tag editor holding in-progress user input:
         // closing must be a deliberate act, never a stray scrim click.

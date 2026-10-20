@@ -1,6 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_settings_ui/crux_settings_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,7 +46,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(_toggleKey), findsOneWidget);
-      final tile = tester.widget<SwitchListTile>(find.byKey(_toggleKey));
+      final tile = tester.widget<CruxFormRow>(find.byKey(_toggleKey));
       expect(tile.value, isTrue);
 
       final l10n = lookupL10N(const Locale('en'));
@@ -72,7 +73,7 @@ void main() {
         isFalse,
       );
       expect(
-        tester.widget<SwitchListTile>(find.byKey(_toggleKey)).value,
+        tester.widget<CruxFormRow>(find.byKey(_toggleKey)).value,
         isFalse,
       );
     });
@@ -128,7 +129,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(_restoreTabsKey), findsOneWidget);
-      final tile = tester.widget<SwitchListTile>(find.byKey(_restoreTabsKey));
+      final tile = tester.widget<CruxFormRow>(find.byKey(_restoreTabsKey));
       expect(tile.value, isTrue);
 
       final l10n = lookupL10N(const Locale('en'));
@@ -154,7 +155,7 @@ void main() {
         isFalse,
       );
       expect(
-        tester.widget<SwitchListTile>(find.byKey(_restoreTabsKey)).value,
+        tester.widget<CruxFormRow>(find.byKey(_restoreTabsKey)).value,
         isFalse,
       );
     });
@@ -212,7 +213,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.byKey(_diagnosticsKey));
       expect(
-        tester.widget<SwitchListTile>(find.byKey(_diagnosticsKey)).value,
+        tester.widget<CruxFormRow>(find.byKey(_diagnosticsKey)).value,
         isFalse,
       );
       final l10n = lookupL10N(const Locale('en'));

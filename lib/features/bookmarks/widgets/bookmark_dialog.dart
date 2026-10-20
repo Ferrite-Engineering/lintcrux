@@ -116,70 +116,64 @@ class _BookmarkDialogState extends ConsumerState<BookmarkDialog> {
             message: widget.violation!.message,
           );
 
-    return AlertDialog(
-      title: Text(
-        _isEditMode
-            ? l10n.bookmarkDialogTitleEdit
-            : l10n.bookmarkDialogTitleCreate,
-      ),
-      content: SizedBox(
-        width: 520,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _ContextPreview(data: violationOrExisting, l10n: l10n),
-              const SizedBox(height: 16),
-              Text(
-                l10n.bookmarkDialogNoteLabel,
-                style: theme.textTheme.labelMedium,
-              ),
-              const SizedBox(height: 4),
-              TextField(
-                key: const ValueKey('bookmarkDialogNoteField'),
-                controller: _noteController,
-                maxLines: 4,
-                minLines: 3,
-                decoration: InputDecoration(
-                  hintText: l10n.bookmarkDialogNoteHint,
-                  border: const OutlineInputBorder(),
-                  isDense: true,
-                ),
-                onChanged: (_) => setState(() {}),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                l10n.bookmarkDialogNotePreviewLabel,
-                style: theme.textTheme.labelMedium,
-              ),
-              const SizedBox(height: 4),
-              _NotePreview(text: _noteController.text),
-              const SizedBox(height: 16),
-              Text(
-                l10n.bookmarkDialogColorLabel,
-                style: theme.textTheme.labelMedium,
-              ),
-              const SizedBox(height: 6),
-              _ColorPickerRow(
-                selectedHex: _colorHex,
-                onSelect: (next) => setState(() => _colorHex = next),
-                noneLabel: l10n.bookmarkDialogColorNoneLabel,
-              ),
-            ],
+    return CruxDialog(
+      title: _isEditMode
+          ? l10n.bookmarkDialogTitleEdit
+          : l10n.bookmarkDialogTitleCreate,
+      width: 520,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _ContextPreview(data: violationOrExisting, l10n: l10n),
+          const SizedBox(height: 16),
+          Text(
+            l10n.bookmarkDialogNoteLabel,
+            style: theme.textTheme.labelMedium,
           ),
-        ),
+          const SizedBox(height: 4),
+          TextField(
+            key: const ValueKey('bookmarkDialogNoteField'),
+            controller: _noteController,
+            maxLines: 4,
+            minLines: 3,
+            decoration: InputDecoration(
+              hintText: l10n.bookmarkDialogNoteHint,
+              isDense: true,
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.bookmarkDialogNotePreviewLabel,
+            style: theme.textTheme.labelMedium,
+          ),
+          const SizedBox(height: 4),
+          _NotePreview(text: _noteController.text),
+          const SizedBox(height: 16),
+          Text(
+            l10n.bookmarkDialogColorLabel,
+            style: theme.textTheme.labelMedium,
+          ),
+          const SizedBox(height: 6),
+          _ColorPickerRow(
+            selectedHex: _colorHex,
+            onSelect: (next) => setState(() => _colorHex = next),
+            noneLabel: l10n.bookmarkDialogColorNoneLabel,
+          ),
+        ],
       ),
       actions: [
-        TextButton(
+        CruxDialogAction(
           key: const ValueKey('bookmarkDialogCancel'),
+          label: l10n.bookmarkDialogCancelAction,
           onPressed: () => _onCancel(context, l10n),
-          child: Text(l10n.bookmarkDialogCancelAction),
         ),
-        FilledButton(
+        CruxDialogAction(
           key: const ValueKey('bookmarkDialogSave'),
+          label: l10n.bookmarkDialogSaveAction,
+          role: CruxDialogActionRole.primary,
           onPressed: () => _onSave(context),
-          child: Text(l10n.bookmarkDialogSaveAction),
         ),
       ],
     );

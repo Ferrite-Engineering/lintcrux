@@ -1,6 +1,8 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_ide_layout/crux_ide_layout.dart' show CruxDesktopTokens;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/core/theme/lintcrux_colors.dart';
@@ -68,6 +70,31 @@ void main() {
         LintcruxColors.lightCanvasBackground,
       );
     });
+
+    test(
+      'a desktop host carries the Crux Desktop marker, a phone does not',
+      () {
+        debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+        try {
+          expect(
+            LintcruxTheme.dark().extension<CruxDesktopTokens>(),
+            isNotNull,
+          );
+          expect(
+            LintcruxTheme.highContrastLight().extension<CruxDesktopTokens>(),
+            isNotNull,
+          );
+          expect(
+            LintcruxTheme.light().scaffoldBackgroundColor,
+            LintcruxColors.lightCanvasBackground,
+          );
+          debugDefaultTargetPlatformOverride = TargetPlatform.android;
+          expect(LintcruxTheme.dark().extension<CruxDesktopTokens>(), isNull);
+        } finally {
+          debugDefaultTargetPlatformOverride = null;
+        }
+      },
+    );
 
     test('high-contrast schemes differ from the standard schemes', () {
       // contrastLevel: 1.0 must actually shift the palette — otherwise the

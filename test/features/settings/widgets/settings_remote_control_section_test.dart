@@ -51,7 +51,7 @@ void main() {
       await tester.pumpAndSettle();
       // Three switches: the CXP-enabled toggle, the request-attention
       // toggle, and the broadcast-selection toggle.
-      expect(find.byType(SwitchListTile), findsNWidgets(3));
+      expect(find.byType(Switch), findsNWidgets(3));
       expect(find.byType(TextField), findsOneWidget);
       // Port defaults to 54324.
       expect(find.text('54324'), findsOneWidget);
@@ -87,7 +87,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       // Toggle the CXP-enabled switch (the first one) off.
-      await tester.tap(find.byType(SwitchListTile).first);
+      await tester.tap(find.byType(Switch).first);
       await tester.pumpAndSettle();
       expect(
         container.read(appSettingsProvider).cxpServerEnabled,
@@ -129,7 +129,7 @@ void main() {
         container.read(appSettingsProvider).requestAttentionOnCrossProbe,
         isTrue,
       );
-      await tester.tap(find.byType(SwitchListTile).at(1));
+      await tester.tap(find.byType(Switch).at(1));
       await tester.pumpAndSettle();
       expect(
         container.read(appSettingsProvider).requestAttentionOnCrossProbe,
@@ -171,7 +171,7 @@ void main() {
           container.read(appSettingsProvider).broadcastSelectionOnCrossProbe,
           isTrue,
         );
-        await tester.tap(find.byType(SwitchListTile).last);
+        await tester.tap(find.byType(Switch).last);
         await tester.pumpAndSettle();
         expect(
           container.read(appSettingsProvider).broadcastSelectionOnCrossProbe,

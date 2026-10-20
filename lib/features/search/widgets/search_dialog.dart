@@ -36,7 +36,7 @@ Future<void> showViolationSearchDialog(
   // launcher so every caller is covered.
   return ModalGuard.run(
     'search',
-    () => showDialog<void>(
+    () => showCruxDialog<void>(
       context: context,
       builder: (_) => activeTab
           ? wrapInActiveTabScope(context, const SearchDialog())

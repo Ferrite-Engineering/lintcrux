@@ -145,7 +145,7 @@ LintCrux's fixture corpus is the **engine-output → golden-SARIF** model (the a
 
 ## 9. Design System
 
-Mirror WaveCrux's design tokens (Material 3, dark default, JetBrains Mono / Fira Code for monospace fields, 4dp/8dp grids, minimal motion). Update this section once the first design surface is built.
+The design system is Crux Desktop: `cruxThemeForDevice` (from `crux_theme`) supplies the component themes on macOS, Windows, Linux and web, and `lib/core/theme/lintcrux_theme.dart` adds only the brand seed and canvas colours. iOS and Android keep a plain Material 3 theme. Dark is the default, with JetBrains Mono / Fira Code for monospace fields. Dialogs open through `showCruxDialog`, forms use `CruxFormRow`, switches are `CruxSwitch`, and row actions are right-click plus a "⋯" `CruxOverflowMenu`; `test/static/crux_desktop_guard_test.dart` enforces this.
 
 ---
 

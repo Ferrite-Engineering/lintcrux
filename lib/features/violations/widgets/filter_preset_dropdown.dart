@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:crux_ide_layout/crux_ide_layout.dart';
+import 'package:crux_settings_ui/crux_settings_ui.dart';
 import 'package:crux_telemetry/crux_telemetry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -131,7 +132,7 @@ class FilterPresetDropdown extends ConsumerWidget {
   }
 
   Future<void> _showSaveDialog(BuildContext context, WidgetRef ref) async {
-    final name = await showDialog<String>(
+    final name = await showCruxDialog<String>(
       context: context,
       builder: (_) => const _FilterPresetSaveDialog(),
     );
@@ -164,7 +165,7 @@ Future<void> showProjectFilterPresetManageDialog(BuildContext context) async {
   // notifier so nothing disappeared. The save dialog needs no wrapper
   // because it reads nothing: it returns a name by `pop` and the caller
   // above (still inside the tab scope) does the per-tab write.
-  await showDialog<void>(
+  await showCruxDialog<void>(
     context: context,
     builder: (_) => wrapInActiveTabScope(
       context,
@@ -193,25 +194,26 @@ class _FilterPresetSaveDialogState extends State<_FilterPresetSaveDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = L10N.of(context);
-    return AlertDialog(
-      title: Text(l10n.filterPresetSaveDialogTitle),
-      content: TextField(
-        controller: _controller,
-        decoration: InputDecoration(
-          labelText: l10n.filterPresetNameLabel,
-          border: const OutlineInputBorder(),
+    return CruxDialog(
+      title: l10n.filterPresetSaveDialogTitle,
+      width: 400,
+      content: CruxFormRow(
+        label: l10n.filterPresetNameLabel,
+        child: TextField(
+          controller: _controller,
+          autofocus: true,
+          onSubmitted: (v) => Navigator.of(context).pop(v.trim()),
         ),
-        autofocus: true,
-        onSubmitted: (v) => Navigator.of(context).pop(v.trim()),
       ),
       actions: [
-        TextButton(
+        CruxDialogAction(
+          label: l10n.filterPresetCancelButton,
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.filterPresetCancelButton),
         ),
-        FilledButton(
+        CruxDialogAction(
+          label: l10n.filterPresetSaveButton,
+          role: CruxDialogActionRole.primary,
           onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
-          child: Text(l10n.filterPresetSaveButton),
         ),
       ],
     );
@@ -225,23 +227,23 @@ class _FilterPresetManageDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10N.of(context);
     final state = ref.watch(savedFilterPresetsProvider);
-    return AlertDialog(
-      title: Text(l10n.filterPresetManageDialogTitle),
-      content: SizedBox(
-        width: 360,
-        child: state.presets.isEmpty
-            ? Text(l10n.filterPresetEmptyState)
-            : ListView(
-                shrinkWrap: true,
-                children: [
-                  for (final p in state.presets) _PresetRow(preset: p),
-                ],
-              ),
-      ),
+    return CruxDialog(
+      title: l10n.filterPresetManageDialogTitle,
+      width: 400,
+      scrollable: false,
+      content: state.presets.isEmpty
+          ? Text(l10n.filterPresetEmptyState)
+          : ListView(
+              shrinkWrap: true,
+              children: [
+                for (final p in state.presets) _PresetRow(preset: p),
+              ],
+            ),
       actions: [
-        TextButton(
+        CruxDialogAction(
+          label: l10n.filterPresetDoneButton,
+          role: CruxDialogActionRole.primary,
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.filterPresetDoneButton),
         ),
       ],
     );

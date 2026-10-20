@@ -37,7 +37,7 @@ Future<void> showBookmarkDialogFor(
   final existing = await store.lookupByFingerprint(fingerprint);
   if (!context.mounted) return;
   await ModalGuard.run('bookmarkDialog', () async {
-    await showDialog<void>(
+    await showCruxDialog<void>(
       context: context,
       // A note + color-tag editor holding in-progress user input: closing
       // must be a deliberate act, never a stray scrim click.

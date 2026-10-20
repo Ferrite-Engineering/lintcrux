@@ -31,7 +31,7 @@ class AppDiagnosticsDialog extends ConsumerStatefulWidget {
     // inside the opener so every caller is covered.
     return ModalGuard.run(
       'appDiagnostics',
-      () => showDialog<void>(
+      () => showCruxDialog<void>(
         context: context,
         builder: (_) => wrapInActiveTabScope(
           context,
@@ -74,50 +74,43 @@ class _AppDiagnosticsDialogState extends ConsumerState<AppDiagnosticsDialog> {
     if (tabReport != null) {
       fullReport.writeln(tabReport.toPlainText());
     }
-    return Dialog(
-      child: SizedBox(
-        width: 640,
-        height: 480,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.diagnosticsAppDialogTitle,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.copy),
-                    tooltip: l10n.diagnosticsCopyFullReport,
-                    onPressed: () => Clipboard.setData(
-                      ClipboardData(text: fullReport.toString()),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    tooltip: l10n.diagnosticsCloseTooltip,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
+    return CruxDialog(
+      title: l10n.diagnosticsAppDialogTitle,
+      width: 640,
+      scrollable: false,
+      contentPadding: EdgeInsets.zero,
+      titleTrailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.copy),
+            tooltip: l10n.diagnosticsCopyFullReport,
+            onPressed: () =>
+                Clipboard.setData(ClipboardData(text: fullReport.toString())),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close),
+            tooltip: l10n.diagnosticsCloseTooltip,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Divider(height: 1),
+          SizedBox(
+            height: 400,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: SelectableText(
+                fullReport.toString(),
+                style: const TextStyle(fontFamily: 'monospace'),
               ),
             ),
-            const Divider(height: 1),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: SelectableText(
-                  fullReport.toString(),
-                  style: const TextStyle(fontFamily: 'monospace'),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

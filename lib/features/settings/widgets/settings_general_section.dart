@@ -57,59 +57,71 @@ class SettingsGeneralSection extends ConsumerWidget {
               offLabel: l10n.settingsAutoReloadOff,
             ),
             const SizedBox(height: 24),
-            Text(
-              l10n.settingsGeneralDefaultSortLabel,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            DropdownButton<ViolationTableColumn>(
-              value: tableState.sortColumn,
-              onChanged: (next) {
-                if (next != null) {
-                  tableNotifier.setSortColumn(next);
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: ViolationTableColumn.severity,
-                  child: Text(l10n.settingsGeneralDefaultSortSeverity),
+            CruxFormRow(
+              label: l10n.settingsGeneralDefaultSortLabel,
+              child: InputDecorator(
+                decoration: const InputDecoration(isDense: true),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<ViolationTableColumn>(
+                    value: tableState.sortColumn,
+                    isDense: true,
+                    isExpanded: true,
+                    onChanged: (next) {
+                      if (next != null) {
+                        tableNotifier.setSortColumn(next);
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        value: ViolationTableColumn.severity,
+                        child: Text(l10n.settingsGeneralDefaultSortSeverity),
+                      ),
+                      DropdownMenuItem(
+                        value: ViolationTableColumn.engine,
+                        child: Text(l10n.settingsGeneralDefaultSortEngine),
+                      ),
+                      DropdownMenuItem(
+                        value: ViolationTableColumn.rule,
+                        child: Text(l10n.settingsGeneralDefaultSortRule),
+                      ),
+                      DropdownMenuItem(
+                        value: ViolationTableColumn.file,
+                        child: Text(l10n.settingsGeneralDefaultSortFile),
+                      ),
+                    ],
+                  ),
                 ),
-                DropdownMenuItem(
-                  value: ViolationTableColumn.engine,
-                  child: Text(l10n.settingsGeneralDefaultSortEngine),
-                ),
-                DropdownMenuItem(
-                  value: ViolationTableColumn.rule,
-                  child: Text(l10n.settingsGeneralDefaultSortRule),
-                ),
-                DropdownMenuItem(
-                  value: ViolationTableColumn.file,
-                  child: Text(l10n.settingsGeneralDefaultSortFile),
-                ),
-              ],
+              ),
             ),
             const SizedBox(height: 24),
-            Text(
-              l10n.settingsGeneralDefaultFilterLabel,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            DropdownButton<String?>(
-              value: presets.activePresetName,
-              onChanged: (next) {
-                // null sentinel = "None"
-                ref.read(savedFilterPresetsProvider.notifier).activate(next);
-              },
-              items: [
-                DropdownMenuItem<String?>(
-                  child: Text(l10n.settingsGeneralDefaultFilterNone),
-                ),
-                for (final p in presets.presets)
-                  DropdownMenuItem<String?>(
-                    value: p.name,
-                    child: Text(p.name),
+            CruxFormRow(
+              label: l10n.settingsGeneralDefaultFilterLabel,
+              child: InputDecorator(
+                decoration: const InputDecoration(isDense: true),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String?>(
+                    value: presets.activePresetName,
+                    isDense: true,
+                    isExpanded: true,
+                    onChanged: (next) {
+                      // null sentinel = "None"
+                      ref
+                          .read(savedFilterPresetsProvider.notifier)
+                          .activate(next);
+                    },
+                    items: [
+                      DropdownMenuItem<String?>(
+                        child: Text(l10n.settingsGeneralDefaultFilterNone),
+                      ),
+                      for (final p in presets.presets)
+                        DropdownMenuItem<String?>(
+                          value: p.name,
+                          child: Text(p.name),
+                        ),
+                    ],
                   ),
-              ],
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             // Gates whether the persisted workspace document is rehydrated at
@@ -118,31 +130,24 @@ class SettingsGeneralSection extends ConsumerWidget {
             // here takes effect on the *next* launch. Turning it off leaves
             // the document on disk, so turning it back on restores the
             // session that was there.
-            SwitchListTile(
-              key: const Key('settings.restoreTabsOnLaunch'),
-              contentPadding: EdgeInsets.zero,
-              title: Row(
-                children: [
-                  // Flexible so the label shrinks (and ellipsises) before
-                  // the help icon trailing the row gets pushed off-screen on
-                  // narrow viewports (the WaveCrux settings pattern).
-                  Flexible(
-                    child: Text(
-                      l10n.settingsRestoreTabsOnLaunchLabel,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+            Row(
+              children: [
+                Expanded(
+                  child: CruxFormRow.toggle(
+                    key: const Key('settings.restoreTabsOnLaunch'),
+                    label: l10n.settingsRestoreTabsOnLaunchLabel,
+                    help: l10n.settingsRestoreTabsOnLaunchDescription,
+                    value: settings.restoreTabsOnLaunch,
+                    onChanged: (enabled) =>
+                        notifier.setRestoreTabsOnLaunch(enabled: enabled),
                   ),
-                  const SizedBox(width: 4),
-                  CruxHelpLink(
-                    url: HelpUrls.workspaces,
-                    tooltip: l10n.helpLinkLearnMore,
-                  ),
-                ],
-              ),
-              subtitle: Text(l10n.settingsRestoreTabsOnLaunchDescription),
-              value: settings.restoreTabsOnLaunch,
-              onChanged: (enabled) =>
-                  notifier.setRestoreTabsOnLaunch(enabled: enabled),
+                ),
+                const SizedBox(width: 4),
+                CruxHelpLink(
+                  url: HelpUrls.workspaces,
+                  tooltip: l10n.helpLinkLearnMore,
+                ),
+              ],
             ),
             const SizedBox(height: 24),
             // Gates the automatic (launch / periodic / on-resume)
@@ -150,11 +155,10 @@ class SettingsGeneralSection extends ConsumerWidget {
             // so turning this off never makes the check unreachable. Persisted
             // through `autoUpdateCheckSettingsServiceProvider`; read back by
             // `crux_updates`' `autoUpdateCheckEnabledProvider`.
-            SwitchListTile(
+            CruxFormRow.toggle(
               key: const Key('settings.autoCheckForUpdates'),
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.settingsAutoCheckUpdatesLabel),
-              subtitle: Text(l10n.settingsAutoCheckUpdatesDescription),
+              label: l10n.settingsAutoCheckUpdatesLabel,
+              help: l10n.settingsAutoCheckUpdatesDescription,
               value: settings.autoCheckForUpdates,
               onChanged: (enabled) =>
                   notifier.setAutoCheckForUpdates(enabled: enabled),
@@ -165,11 +169,10 @@ class SettingsGeneralSection extends ConsumerWidget {
             // there and is shown only in release builds.
             if (!ref.watch(diagnosticsForcedByBuildModeProvider)) ...[
               const SizedBox(height: 24),
-              SwitchListTile(
+              CruxFormRow.toggle(
                 key: const Key('settings.diagnosticsEnabled'),
-                contentPadding: EdgeInsets.zero,
-                title: Text(l10n.settingsDiagnosticsEnabledLabel),
-                subtitle: Text(l10n.settingsDiagnosticsEnabledDescription),
+                label: l10n.settingsDiagnosticsEnabledLabel,
+                help: l10n.settingsDiagnosticsEnabledDescription,
                 value: settings.diagnosticsEnabled,
                 onChanged: (enabled) =>
                     notifier.setDiagnosticsEnabled(enabled: enabled),
