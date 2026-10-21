@@ -1,8 +1,6 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
-import 'dart:io';
-
 import 'package:crux_io/crux_io.dart';
 import 'package:crux_yosys/crux_yosys.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +9,8 @@ import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_engine_support.dart';
+
+import '../../../support/posix_keyed_paths.dart';
 
 /// Records what it was asked to spawn and answers with a clean exit.
 class _RecordingProcessRunner implements ProcessRunner {
@@ -51,10 +51,7 @@ void main() {
     test('Custom with no path falls back to the PATH default', () {
       expect(
         yosysExecutableFor(
-          const EngineBinaryConfig(
-            source: EngineBinarySource.custom,
-            path: '',
-          ),
+          const EngineBinaryConfig(source: EngineBinarySource.custom, path: ''),
         ),
         isNull,
       );
@@ -302,8 +299,10 @@ void main() {
 
     test('the workingDirectory option, relative to the root', () {
       expect(
-        yosysWorkingDirectoryFor(
-          request(root: '/p', options: const {'workingDirectory': 'sw'}),
+        posixKey(
+          yosysWorkingDirectoryFor(
+            request(root: '/p', options: const {'workingDirectory': 'sw'}),
+          )!,
         ),
         '/p/sw',
       );
@@ -311,11 +310,13 @@ void main() {
 
     test('an absolute workingDirectory option stands alone', () {
       expect(
-        yosysWorkingDirectoryFor(
-          request(
-            root: '/p',
-            options: const {'workingDirectory': '/images/'},
-          ),
+        posixKey(
+          yosysWorkingDirectoryFor(
+            request(
+              root: '/p',
+              options: const {'workingDirectory': '/images/'},
+            ),
+          )!,
         ),
         '/images',
       );
@@ -338,11 +339,16 @@ void main() {
         final inner = _RecordingProcessRunner();
         // The PATH launchd hands a GUI app: none of the package-manager
         // directories a terminal session would have.
-        const launchdPath = '/usr/bin:/bin:/usr/sbin:/sbin';
+        final launchdPath = joinSearchPath(const [
+          '/usr/bin',
+          '/bin',
+          '/usr/sbin',
+          '/sbin',
+        ]);
         await EngineYosysProcessRunner(inner, workingDirectory: '/p').run(
           'yosys',
           const ['-V'],
-          environment: const {'FOO': 'bar', 'PATH': launchdPath},
+          environment: {'FOO': 'bar', 'PATH': launchdPath},
         );
 
         expect(inner.workingDirectory, '/p');
@@ -355,7 +361,7 @@ void main() {
           // Linux: nothing to append, the PATH is passed through.
           expect(env['PATH'], launchdPath);
         } else {
-          final path = env['PATH']!.split(Platform.isWindows ? ';' : ':');
+          final path = splitSearchPath(env['PATH']!);
           expect(path, containsAll(dirs));
           expect(path.first, '/usr/bin', reason: 'appended, never prepended');
         }

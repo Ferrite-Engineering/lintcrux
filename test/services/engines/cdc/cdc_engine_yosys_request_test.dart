@@ -12,6 +12,8 @@ import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_engine.dart';
 
+import '../../../support/posix_keyed_paths.dart';
+
 // What the CDC engine asks Yosys to do, and how it is spawned.
 //
 // The engine used to hand every source to Yosys as Verilog-2005 with no
@@ -134,7 +136,7 @@ void main() {
           processRunner: runner,
           tempDirectory: temp,
         ).run(_request(options: const {'workingDirectory': 'sw'})).toList();
-        expect(runner.workingDirectory, '/p/sw');
+        expect(posixKey(runner.workingDirectory!), '/p/sw');
       },
     );
 
@@ -151,7 +153,7 @@ void main() {
       // when it had to change it; otherwise the child inherits this
       // process's, which then already has them.
       final effective = env['PATH'] ?? Platform.environment['PATH'] ?? '';
-      final path = effective.split(Platform.isWindows ? ';' : ':');
+      final path = splitSearchPath(effective);
       for (final dir in engineSearchDirs()) {
         expect(path, contains(dir));
       }
