@@ -112,6 +112,14 @@ class ProjectConfigOverlay {
         ).map((f) => _abs(base, f)).toList(growable: false),
       );
     }
+    if (overlay.containsKey('constraintFiles')) {
+      out = out.copyWith(
+        constraintFiles: _stringList(
+          overlay['constraintFiles'],
+          'constraintFiles',
+        ).map((f) => _abs(base, f)).toList(growable: false),
+      );
+    }
     if (overlay.containsKey('includePaths')) {
       out = out.copyWith(
         includePaths: _stringList(
@@ -176,6 +184,7 @@ class ProjectConfigOverlay {
   /// state with no CI use.
   static const Set<String> _overlayableKeys = <String>{
     'sourceFiles',
+    'constraintFiles',
     'includePaths',
     'defines',
     'topModule',

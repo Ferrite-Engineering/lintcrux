@@ -1,0 +1,3 @@
+$ nextpnr-ice40 -q --up5k --package sg48 --pcf pins.pcf --json netlist.json
+
+exit status: 0

@@ -3,6 +3,7 @@
 
 import 'package:args/args.dart';
 import 'package:lintcrux/core/cli/cli_args.dart';
+import 'package:lintcrux/domain/enums/constraint_format.dart';
 
 /// Parses LintCrux CLI arguments into a [CliArgs] snapshot.
 ///
@@ -94,7 +95,25 @@ class CliArgsParser {
       engineTimeout = Duration(seconds: seconds);
     }
 
+    // The format of a constraint file is its extension. An extension that is
+    // not one of the three is a usage error, not a guess: a file read under
+    // the wrong grammar would report every line as unrecognised, or none.
+    final constraintFiles = <String>[
+      ...(results[kConstraintsOption] as List<String>? ?? const <String>[]),
+    ];
+    for (final file in constraintFiles) {
+      if (ConstraintFormat.fromPath(file) == null) {
+        return CliArgsParseResult(
+          error:
+              'Option "--$kConstraintsOption" cannot tell the format of '
+              '"$file": expected one of ${ConstraintFormat.extensionList}.',
+          usage: usage,
+        );
+      }
+    }
+
     final parsed = CliArgs(
+      constraintFiles: List<String>.unmodifiable(constraintFiles),
       paths: List<String>.unmodifiable(results.rest),
       configPath: results['config'] as String?,
       sarifOutputPath: exportFormat == kSarifExportFormat ? exportOut : null,
@@ -133,6 +152,9 @@ class CliArgsParser {
 
   /// The option naming the directory SARIF paths are written relative to.
   static const String kSarifRootOption = 'sarif-root';
+
+  /// The repeatable option naming a pin-constraint file to check.
+  static const String kConstraintsOption = 'constraints';
 
   /// The budget the headless runner applies when [kEngineTimeoutOption] is
   /// absent. One definition, quoted in the usage text and used as the
@@ -205,6 +227,7 @@ Examples:
   lintcrux project.lintcrux --export sarif --out lint.sarif --exit-code
   lintcrux project.lintcrux --fail-on-new-violations
   lintcrux project.lintcrux --config ci-overrides.lintcrux --exit-code
+  lintcrux top.v --top top --constraints pins.pcf
 ''';
 
   static ArgParser _buildParser() {
@@ -245,9 +268,19 @@ Examples:
         valueHelp: 'id',
         help:
             'Run only this engine (repeatable). One of verilator, '
-            'verible, slang, yosys, ghdl, svlint, cdc. Overrides the '
+            'verible, slang, yosys, ghdl, svlint, cdc, constraints. Overrides the '
             "project's enabledEngineIds for this invocation — the "
             'usual shape for a CI image that only installs one engine.',
+      )
+      ..addMultiOption(
+        kConstraintsOption,
+        valueHelp: 'file',
+        help:
+            'Check this FPGA pin-constraint file (.pcf, .lpf or .cst) against '
+            "the top module's ports (repeatable). Added to the project's own "
+            'constraintFiles. Needs a top module: pass --top, or set it in the '
+            'project. A run with no top module did not run (exit 3), it is '
+            'never clean.',
       )
       ..addOption(
         'export',

@@ -1,0 +1,40 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "lintcrux-constraints"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "constraints/port-reassigned",
+          "level": "warning",
+          "message": {
+            "text": "led[0] 23 28"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pins.pcf"
+                },
+                "region": {
+                  "startLine": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "mentions": [
+              "led[0]",
+              "23",
+              "28"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

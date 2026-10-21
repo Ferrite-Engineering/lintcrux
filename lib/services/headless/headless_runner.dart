@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'dart:async';
+import 'dart:io' show File;
 
 import 'package:lintcrux/core/cli/cli_args.dart';
 import 'package:lintcrux/core/cli/cli_args_parser.dart';
@@ -25,6 +26,7 @@ import 'package:lintcrux/services/transformers/pragma_waiver_transformer.dart';
 import 'package:lintcrux/services/transformers/severity_override_transformer.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
 import 'package:lintcrux/services/waivers/pragma_waiver_reader.dart';
+import 'package:path/path.dart' as p;
 
 /// The headless lint pipeline: project in, exit code out.
 ///
@@ -180,6 +182,35 @@ class HeadlessRunner {
           problems: <String>[e.message],
         );
       }
+    }
+
+    // ── 2b. Add --constraints ──────────────────────────────────────
+    // Each file is named relative to the working directory, like every other
+    // path on the command line. One that does not exist is a mis-wired
+    // command line, not a clean run.
+    if (args.constraintFiles.isNotEmpty) {
+      final absolute = <String>[
+        for (final f in args.constraintFiles) p.normalize(p.absolute(f)),
+      ];
+      final missing = <String>[
+        for (final f in absolute)
+          if (!File(f).existsSync()) f,
+      ];
+      if (missing.isNotEmpty) {
+        return HeadlessRunResult.failed(
+          code: CliExitCode.usage,
+          problems: <String>[
+            for (final f in missing) 'Constraint file not found: $f',
+          ],
+        );
+      }
+      project = project.copyWith(
+        constraintFiles: <String>[
+          ...project.constraintFiles,
+          for (final f in absolute)
+            if (!project.constraintFiles.contains(f)) f,
+        ],
+      );
     }
 
     // ── 3. Plan the run ────────────────────────────────────────────

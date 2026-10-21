@@ -332,7 +332,7 @@ const List<TelemetryCatalogEvent> kLintcruxEventCatalog =
 /// The closed `engine` vocabulary, shared by `engine.run` and
 /// `rule_doc.viewed`.
 ///
-/// The six ids `defaultEngineRegistry()` ships, plus `custom` for the
+/// The ids `defaultEngineRegistry()` ships, plus `custom` for the
 /// synthetic custom-regex-rule slice (`kCustomRuleEngineId`) and `other` for
 /// anything a future registry or a Pro engine pack adds. The token is
 /// `custom`, not `custom_rules`, because the catalog follows the constant —
@@ -351,6 +351,7 @@ const List<String> kLintcruxEngineTokens = <String>[
   'ghdl',
   'svlint',
   'cdc',
+  'constraints',
   'custom',
   'other',
 ];
@@ -379,6 +380,7 @@ String telemetryEngineToken(String engineId) => switch (engineId) {
   'ghdl' => 'ghdl',
   'svlint' => 'svlint',
   'cdc' => 'cdc',
+  'constraints' => 'constraints',
   'custom' => 'custom',
   _ => 'other',
 };

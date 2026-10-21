@@ -1,0 +1,3 @@
+$ nextpnr-ecp5 -q --25k --package CABGA256 --lpf pins.lpf --json netlist.json
+
+exit status: 0

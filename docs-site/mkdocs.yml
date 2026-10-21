@@ -78,6 +78,7 @@ nav:
       - Baselines & deltas: baselines.md
       - Trends & regressions: trends.md
       - Clock-domain crossings: cdc.md
+      - Pin constraints: pin-constraints.md
   - Ship & integrate:
       - Exports & CI: exports-and-ci.md
       - Team trend database: team-database.md

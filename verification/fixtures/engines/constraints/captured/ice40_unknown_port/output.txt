@@ -1,0 +1,6 @@
+$ nextpnr-ice40 -q --up5k --package sg48 --pcf pins.pcf --json netlist.json
+Warning: unmatched constraint 'rst_m' (on line 3)
+ERROR: IO 'rst_n' is unconstrained in PCF (override this error with --pcf-allow-unconstrained)
+ERROR: Loading PCF failed.
+1 warning, 2 errors
+exit status: 125

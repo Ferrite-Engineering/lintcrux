@@ -1,0 +1,63 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "lintcrux-constraints"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "constraints/unknown-port",
+          "level": "error",
+          "message": {
+            "text": "rst_m rst_n"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pins.pcf"
+                },
+                "region": {
+                  "startLine": 3
+                }
+              }
+            }
+          ],
+          "properties": {
+            "mentions": [
+              "rst_m",
+              "rst_n"
+            ]
+          }
+        },
+        {
+          "ruleId": "constraints/unconstrained-port",
+          "level": "warning",
+          "message": {
+            "text": "rst_n"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "top.v"
+                },
+                "region": {
+                  "startLine": 4
+                }
+              }
+            }
+          ],
+          "properties": {
+            "mentions": [
+              "rst_n"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

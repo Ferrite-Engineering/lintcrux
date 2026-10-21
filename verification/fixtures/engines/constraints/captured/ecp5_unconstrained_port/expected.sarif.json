@@ -1,0 +1,38 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "lintcrux-constraints"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "constraints/unconstrained-port",
+          "level": "warning",
+          "message": {
+            "text": "btn"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "top.v"
+                },
+                "region": {
+                  "startLine": 5
+                }
+              }
+            }
+          ],
+          "properties": {
+            "mentions": [
+              "btn"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

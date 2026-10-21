@@ -39,6 +39,7 @@ class LintProject {
     this.sourceFileLanguages = const <String, ProjectSourceFileLanguage>{},
     this.customRegexRules = const <CustomRegexRule>[],
     this.sourceFileProvenance = const <String, String>{},
+    this.constraintFiles = const <String>[],
   });
 
   /// Human-readable project name. Surfaced in the title bar and the
@@ -117,6 +118,14 @@ class LintProject {
   /// this project" — consumers must not treat absence as an error.
   final Map<String, String> sourceFileProvenance;
 
+  /// FPGA pin-constraint files (`.pcf`, `.lpf`, `.cst`), beside
+  /// [sourceFiles] and never part of it.
+  ///
+  /// The `constraints` engine checks them against the top module's ports.
+  /// The format follows the file extension. Older `.lintcrux` files load with
+  /// the empty default unchanged.
+  final List<String> constraintFiles;
+
   /// Returns each entry of [sourceFiles] as a typed
   /// [ProjectSourceFile], applying the override in [sourceFileLanguages]
   /// when present. Used by the engine-routing layer.
@@ -146,6 +155,7 @@ class LintProject {
     Map<String, ProjectSourceFileLanguage>? sourceFileLanguages,
     List<CustomRegexRule>? customRegexRules,
     Map<String, String>? sourceFileProvenance,
+    List<String>? constraintFiles,
   }) {
     return LintProject(
       name: name ?? this.name,
@@ -162,6 +172,7 @@ class LintProject {
       sourceFileLanguages: sourceFileLanguages ?? this.sourceFileLanguages,
       customRegexRules: customRegexRules ?? this.customRegexRules,
       sourceFileProvenance: sourceFileProvenance ?? this.sourceFileProvenance,
+      constraintFiles: constraintFiles ?? this.constraintFiles,
     );
   }
 
@@ -182,7 +193,8 @@ class LintProject {
         _listEq(other.filterPresets, filterPresets) &&
         _mapEq(other.sourceFileLanguages, sourceFileLanguages) &&
         _listEq(other.customRegexRules, customRegexRules) &&
-        _mapEq(other.sourceFileProvenance, sourceFileProvenance);
+        _mapEq(other.sourceFileProvenance, sourceFileProvenance) &&
+        _listEq(other.constraintFiles, constraintFiles);
   }
 
   @override
@@ -216,6 +228,7 @@ class LintProject {
       hashMap(sourceFileLanguages),
       Object.hashAll(customRegexRules),
       hashMap(sourceFileProvenance),
+      Object.hashAll(constraintFiles),
     );
   }
 

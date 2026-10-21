@@ -115,6 +115,51 @@ void main() {
       expect(u, contains('lintcrux project.lintcrux'));
     });
 
+    group('--constraints', () {
+      test('is empty by default', () {
+        expect(parser.parse(const []).args!.constraintFiles, isEmpty);
+      });
+
+      test(
+        'is repeatable and order-preserving, with any case of extension',
+        () {
+          final r = parser.parse(const [
+            '--constraints',
+            'a.pcf',
+            '--constraints=B.LPF',
+            '--constraints',
+            'c.cst',
+            'top.v',
+          ]);
+          expect(r.args!.constraintFiles, ['a.pcf', 'B.LPF', 'c.cst']);
+          expect(r.args!.paths, ['top.v']);
+        },
+      );
+
+      test('an extension that is none of the three is a usage error', () {
+        final r = parser.parse(const ['--constraints', 'timing.sdc']);
+        expect(r.isSuccess, isFalse);
+        expect(r.error, contains('timing.sdc'));
+        expect(r.error, contains('.pcf, .lpf, .cst'));
+      });
+
+      test('no extension at all is a usage error, not a guess', () {
+        expect(
+          parser.parse(const ['--constraints', 'pins']).isSuccess,
+          isFalse,
+        );
+      });
+
+      test('a missing value is a usage error', () {
+        expect(parser.parse(const ['--constraints']).isSuccess, isFalse);
+      });
+
+      test('is documented', () {
+        expect(parser.usage, contains('--constraints'));
+        expect(parser.usage, contains('lintcrux top.v --top top'));
+      });
+    });
+
     group('--sarif-root', () {
       test('is absent by default, leaving the writer its own detection', () {
         expect(parser.parse(const []).args!.sarifRoot, isNull);

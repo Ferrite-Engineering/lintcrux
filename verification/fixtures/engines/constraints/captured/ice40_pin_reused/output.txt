@@ -1,0 +1,4 @@
+$ nextpnr-ice40 -q --up5k --package sg48 --pcf pins.pcf --json netlist.json
+ERROR: Cell 'led[1]$sb_io' cannot be bound to bel 'X19/Y31/io1' since it is already bound to cell 'led[2]$sb_io'
+0 warnings, 1 error
+exit status: 125

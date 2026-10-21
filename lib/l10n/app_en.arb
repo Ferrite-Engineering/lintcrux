@@ -2062,6 +2062,28 @@
       }
     }
   },
+  "constraintsCount": "{count, plural, =1{1 constraint file} other{{count} constraint files}}",
+  "@constraintsCount": {
+    "description": "Section header count of pin-constraint files in the sources panel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "constraintsRemoveConfirmTitle": "Remove constraint file?",
+  "@constraintsRemoveConfirmTitle": {
+    "description": "Title of the confirmation dialog for removing a pin-constraint file from a project."
+  },
+  "constraintsRemoveConfirmBody": "{file} will be removed from this project. The file itself is not deleted.",
+  "@constraintsRemoveConfirmBody": {
+    "description": "Body of the remove-constraint-file confirmation. Says the file on disk is untouched.",
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
   "rulesPanelSearchHint": "Search rules…",
   "@rulesPanelSearchHint": {
     "description": "Placeholder in the rule browser's search field."

@@ -33,6 +33,9 @@ Uri? bundledRuleHelpUri(String engineId, String localRuleId) {
     ),
     // First-party rules: the user documentation's rule table.
     'cdc' => Uri.parse('https://docs.lintcrux.app/cdc/#rules'),
+    'constraints' => Uri.parse(
+      'https://docs.lintcrux.app/pin-constraints/#$id',
+    ),
     _ => null,
   };
 }

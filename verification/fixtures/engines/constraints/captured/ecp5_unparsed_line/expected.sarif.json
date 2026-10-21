@@ -1,0 +1,38 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "lintcrux-constraints"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "constraints/unparsed-line",
+          "level": "note",
+          "message": {
+            "text": "BOGUS"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pins.lpf"
+                },
+                "region": {
+                  "startLine": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "mentions": [
+              "BOGUS"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

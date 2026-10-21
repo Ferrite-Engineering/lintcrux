@@ -88,6 +88,7 @@ class EdamImportService {
       },
       sourceFileLanguages: imported.sourceFileLanguages,
       sourceFileProvenance: imported.sourceFileProvenance,
+      constraintFiles: imported.constraintFiles,
     );
     final json = codec.encode(project);
     try {

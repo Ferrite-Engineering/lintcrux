@@ -15,6 +15,7 @@ fixtures/
 │   ├── ghdl/generated/<case>/
 │   ├── svlint/generated/<case>/
 │   ├── yosys/generated/<case>/
+│   ├── constraints/captured/<family>_<case>/  # top.v + pins.<ext> + output.txt + expected.sarif.json + PROVENANCE.md
 │   └── helpers/README.md             # engine-corpus regeneration commands
 └── stress/                           # large-scale pins (not the corpus itself)
     ├── violations_50k.expected.meta.json   # distribution-meta pin for the in-memory 50K set
@@ -22,7 +23,7 @@ fixtures/
     └── helpers/README.md
 ```
 
-**No `captured/` fixtures are committed today.** The corpus is entirely `generated/`. A `<engine>/captured/<case>/` slot is reserved for real-world engine output rebuilt from public OSS RTL (with a `PROVENANCE.md` + a license drawn from the MIT/BSD/Apache/ISC/CC0 allow-list), but none exist yet — so the `captured_fixture_licenses_test.dart` static guard is **vacuous-by-design** until the first capture lands.
+**`captured/` fixtures** are real-world engine output rebuilt from RTL written for the fixture (each with a `PROVENANCE.md` + a license drawn from the MIT/BSD/Apache/ISC/CC0 allow-list, checked by `captured_fixture_licenses_test.dart`). They exist for `svlint` and for `constraints`. The `constraints` cases are the pin-constraint corpus: one RTL top and one constraint file per mistake, for iCE40 (`.pcf`), ECP5 (`.lpf`) and Gowin (`.cst`). Their `expected.sarif.json` is written by hand from the constraint file, never from LintCrux's output or nextpnr's; their `output.txt` is what nextpnr printed, captured by `python3 tool/capture_constraint_fixtures.py --suite <oss-cad-suite dir>`, which writes `output.txt` and nothing else. The nextpnr outcome for each case (error, warning or silence) is in its `PROVENANCE.md`. LintCrux has no engine canary and its CI installs no nextpnr, so nothing in CI re-runs nextpnr; the live assertion runs LintCrux's own engine over real Yosys.
 
 **The 50K/100K stress corpora are not committed as binaries.** They are regenerated deterministically in memory from `test/support/stress_corpus.dart` (byte-stable per seed); only the small distribution-meta pin and the malformed-rejection cases are committed. See `stress/helpers/README.md` for the rationale and the `dart run tool/generate_stress_fixtures.dart` command.
 

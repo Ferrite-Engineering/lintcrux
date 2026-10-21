@@ -1,0 +1,5 @@
+$ nextpnr-ice40 -q --up5k --package sg48 --pcf pins.pcf --json netlist.json
+ERROR: unsupported PCF command 'bogus_command' (on line 9)
+ERROR: Loading PCF failed.
+0 warnings, 2 errors
+exit status: 125

@@ -14,6 +14,7 @@ import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_domain_analysis.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_source_span.dart';
+import 'package:lintcrux/services/engines/yosys/yosys_elaboration.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_engine_support.dart';
 import 'package:meta/meta.dart';
 
@@ -170,51 +171,35 @@ class CdcEngine implements LintEngine {
       return;
     }
 
-    final executable = yosysExecutableFor(
-      request.binary,
-      resolver: bundledBinaryResolver,
-    );
-    final runner = YosysRunner(
-      processRunner: EngineYosysProcessRunner(
-        processRunner,
-        workingDirectory: yosysWorkingDirectoryFor(request),
-      ),
-      executable: executable,
-      tempDirectory: tempDirectory,
-    );
-    final result = await runner.run(
-      YosysRunRequest(
-        // Each file under its own language, with the project's include paths
-        // and defines: what the Yosys check engine passes, so a design that
-        // elaborates there elaborates here.
-        sources: yosysSourcesFor(request),
-        defines: yosysDefinesFor(request),
-        includePaths: request.includePaths,
-        topModule: request.topModule,
-        // `flatten` is required rather than cosmetic: without it every module
-        // is its own scope and a crossing *between* two instances is invisible,
-        // which is most of the crossings that matter.
-        //
-        // `opt` is deliberately absent. It folds and rewrites exactly the
-        // structure this analysis reads — a two-flop synchronizer can be
-        // retimed or merged, at which point a correct design starts reporting
-        // as unsafe. A CDC-safe pass list is a real constraint, not a
-        // preference.
-        extraCommands: const <String>['flatten'],
-      ),
-    );
-
     // A Yosys that could not be started, timed out, could not be handed the
     // request, or ended without its JSON output is a tool failure, not a
-    // property of the design. Reporting it as a finding would let a machine
-    // without `yosys` produce a run that "completed" — one that a gate passes
-    // and a baseline can freeze, turning CDC off for good. Only a genuine
-    // non-zero Yosys exit on real RTL is a finding about the design.
-    final YosysRunSuccess elaborated;
-    switch (result) {
-      case YosysRunSuccess():
-        elaborated = result;
-      case YosysRunFailure(:final stderr) when isYosysDesignFailure(result):
+    // property of the design: the helper throws for those. Reporting one as a
+    // finding would let a machine without `yosys` produce a run that
+    // "completed" — one that a gate passes and a baseline can freeze, turning
+    // CDC off for good. Only a genuine non-zero Yosys exit on real RTL is a
+    // finding about the design.
+    final elaborated = await elaborateDesign(
+      request,
+      engineId: id,
+      processRunner: processRunner,
+      tempDirectory: tempDirectory,
+      bundledBinaryResolver: bundledBinaryResolver,
+      // `flatten` is required rather than cosmetic: without it every module
+      // is its own scope and a crossing *between* two instances is invisible,
+      // which is most of the crossings that matter.
+      //
+      // `opt` is deliberately absent. It folds and rewrites exactly the
+      // structure this analysis reads — a two-flop synchronizer can be
+      // retimed or merged, at which point a correct design starts reporting
+      // as unsafe. A CDC-safe pass list is a real constraint, not a
+      // preference.
+      extraCommands: const <String>['flatten'],
+    );
+    final String rawJson;
+    switch (elaborated) {
+      case DesignElaborated(rawJson: final json):
+        rawJson = json;
+      case DesignElaborationFailed(:final stderr):
         yield Violation(
           engineId: id,
           ruleId: 'cdc/elaboration-failed',
@@ -231,17 +216,11 @@ class CdcEngine implements LintEngine {
           raw: const <String, dynamic>{Violation.analysisFailedKey: true},
         );
         return;
-      case YosysRunFailure() || YosysRunTimeout() || YosysRunCancelled():
-        throw yosysRunException(
-          engineId: id,
-          result: result,
-          executable: executable,
-        );
     }
 
     final NetlistModel model;
     try {
-      model = parser.parse(elaborated.rawJson);
+      model = parser.parse(rawJson);
     } on Object catch (e) {
       yield Violation(
         engineId: id,

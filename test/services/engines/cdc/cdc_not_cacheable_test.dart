@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_engine.dart';
+import 'package:lintcrux/services/engines/constraints/constraints_engine.dart';
 import 'package:lintcrux/services/engines/default_engine_registry.dart';
 
 /// CDC must never be served from the lint cache.
@@ -35,6 +36,12 @@ void main() {
     );
   });
 
+  test('the constraints engine declares itself non-cacheable', () {
+    // Its input is the constraint files, and they are not source files: the
+    // key is blind to them, so an edited pin would come back from the cache.
+    expect(ConstraintsEngine().capabilities.cacheable, isFalse);
+  });
+
   test('the engines that ARE cacheable are the binary-backed ones', () {
     // The complement, so the flag does not quietly spread. Every other engine
     // is a versioned external binary reading only the files it is handed,
@@ -44,7 +51,7 @@ void main() {
       final cacheable = registry.get(id)!.capabilities.cacheable;
       expect(
         cacheable,
-        id == 'cdc' ? isFalse : isTrue,
+        const {'cdc', 'constraints'}.contains(id) ? isFalse : isTrue,
         reason:
             '`$id` cacheable=$cacheable — if this engine grew an input outside '
             'sourceFiles, or moved its analysis in-process, the cache key no '

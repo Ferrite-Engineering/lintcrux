@@ -187,6 +187,9 @@ class HeadlessInputResolver {
       includePaths: <String>[
         for (final d in loaded.includePaths) _absoluteAgainst(base, d),
       ],
+      constraintFiles: <String>[
+        for (final f in loaded.constraintFiles) _absoluteAgainst(base, f),
+      ],
       sourceFileLanguages: <String, ProjectSourceFileLanguage>{
         for (final entry in loaded.sourceFileLanguages.entries)
           _absoluteAgainst(base, entry.key): entry.value,
@@ -206,11 +209,17 @@ class HeadlessInputResolver {
         kind: HeadlessInputFailureKind.loadFailed,
       );
     }
-    if (missing.isNotEmpty) {
+    final missingConstraints = <String>[
+      for (final f in project.constraintFiles)
+        if (!File(f).existsSync()) f,
+    ];
+    if (missing.isNotEmpty || missingConstraints.isNotEmpty) {
       return HeadlessInputResolution.failed(
         <String>[
           for (final f in missing)
             'Source file listed in the project is missing: $f',
+          for (final f in missingConstraints)
+            'Constraint file listed in the project is missing: $f',
         ],
         kind: HeadlessInputFailureKind.loadFailed,
       );

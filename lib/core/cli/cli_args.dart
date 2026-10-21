@@ -12,6 +12,7 @@ import 'package:meta/meta.dart';
 ///          [--config <overlay.lintcrux>]
 ///          [--export <format> --out <path>] [--sarif <out.sarif>]
 ///          [--baseline <file>] [--exit-code] [--fail-on-new-violations]
+///          [--constraints <file>]...
 ///          [--allow-missing-engines] [--quiet] [--help] [--version]
 /// ```
 ///
@@ -60,6 +61,7 @@ class CliArgs {
     this.quiet = false,
     this.engineTimeout,
     this.sarifRoot,
+    this.constraintFiles = const <String>[],
   });
 
   /// Empty/default args — equivalent to `lintcrux` with no flags.
@@ -246,6 +248,13 @@ class CliArgs {
   /// a CI layout whose checkout root is not the git root.
   final String? sarifRoot;
 
+  /// Pin-constraint files supplied by repeating `--constraints <file>`, added
+  /// to the project's own `constraintFiles` for this run.
+  ///
+  /// The format of each follows its extension (`.pcf`, `.lpf`, `.cst`); the
+  /// parser refuses any other extension rather than guessing.
+  final List<String> constraintFiles;
+
   /// Returns a copy with overridden fields.
   CliArgs copyWith({
     List<String>? paths,
@@ -271,8 +280,10 @@ class CliArgs {
     bool? quiet,
     Duration? engineTimeout,
     String? sarifRoot,
+    List<String>? constraintFiles,
   }) {
     return CliArgs(
+      constraintFiles: constraintFiles ?? this.constraintFiles,
       paths: paths ?? this.paths,
       configPath: configPath ?? this.configPath,
       sarifOutputPath: sarifOutputPath ?? this.sarifOutputPath,
@@ -331,6 +342,10 @@ class CliArgs {
     if (other.quiet != quiet) return false;
     if (other.engineTimeout != engineTimeout) return false;
     if (other.sarifRoot != sarifRoot) return false;
+    if (other.constraintFiles.length != constraintFiles.length) return false;
+    for (var i = 0; i < constraintFiles.length; i++) {
+      if (other.constraintFiles[i] != constraintFiles[i]) return false;
+    }
     if (other.engineIds.length != engineIds.length) return false;
     for (var i = 0; i < engineIds.length; i++) {
       if (other.engineIds[i] != engineIds[i]) return false;
@@ -370,7 +385,12 @@ class CliArgs {
       allowMissingEngines,
       quiet,
       // Object.hash takes at most twenty arguments.
-      Object.hash(engineTimeout, sarifRoot, Object.hashAll(mandatoryEngineIds)),
+      Object.hash(
+        engineTimeout,
+        sarifRoot,
+        Object.hashAll(mandatoryEngineIds),
+        Object.hashAll(constraintFiles),
+      ),
       Object.hashAll(engineIds),
     );
   }
@@ -387,5 +407,6 @@ class CliArgs {
       'baseline: $baselinePath, failOnNew: $failOnNewViolations, '
       'allowMissingEngines: $allowMissingEngines, engines: $engineIds, '
       'mandatoryEngines: $mandatoryEngineIds, '
-      'quiet: $quiet, engineTimeout: $engineTimeout, sarifRoot: $sarifRoot)';
+      'quiet: $quiet, engineTimeout: $engineTimeout, sarifRoot: $sarifRoot, '
+      'constraints: $constraintFiles)';
 }

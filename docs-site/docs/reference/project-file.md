@@ -48,6 +48,22 @@ Projects created by `--import-edam` also carry a
 informational; missing keys simply mean "origin unknown / this
 project".
 
+## `constraintFiles` {#constraint-files}
+
+From LintCrux 1.2, a project can list FPGA pin-constraint files:
+
+```json
+"constraintFiles": ["constraints/board.pcf"]
+```
+
+| Key | Type | Meaning |
+|---|---|---|
+| `constraintFiles` | string list | `.pcf`, `.lpf` or `.cst` files for the `constraints` engine to check against the top module's ports. Relative paths resolve against the project file's directory, like `sourceFiles`. The extension picks the format. Omitted when empty, so a project without constraint files is saved exactly as before; a project file from an earlier release loads unchanged. |
+
+The files are not sources: no other engine reads them. A project whose
+`enabledEngineIds` is not empty runs the check only when that list
+includes `constraints`. See [Pin constraints](../pin-constraints.md).
+
 ## `perEngineOptions.verilator`
 
 | Key | Type | Meaning |

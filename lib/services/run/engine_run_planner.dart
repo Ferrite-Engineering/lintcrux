@@ -137,6 +137,7 @@ class EngineRunPlanner {
             language: selection.requestLanguage,
             options: project.perEngineOptions[engine.id] ?? const {},
             projectRoot: project.rootPath,
+            constraintFiles: project.constraintFiles,
           ),
           sourcesUsed: selection.sourcesUsed.length,
           sourcesTotal: selection.sourcesTotal,

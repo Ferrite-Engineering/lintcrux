@@ -4,6 +4,7 @@
 import 'package:crux_yosys/crux_yosys.dart' show YosysDiagnostic;
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_engine.dart';
+import 'package:lintcrux/services/engines/constraints/constraints_engine.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/ghdl/ghdl_engine.dart';
 import 'package:lintcrux/services/engines/slang/slang_engine.dart';
@@ -56,5 +57,8 @@ EngineRegistry defaultEngineRegistry({
     // its findings are ordinary Violations, so waivers, trends, SARIF and
     // cross-probe need no CDC-specific code.
     cdcEngine ?? CdcEngine(),
+    // Pin-constraint files against the top module's ports. Runs only when the
+    // project lists constraint files.
+    ConstraintsEngine(),
   ]);
 }

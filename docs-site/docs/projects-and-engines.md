@@ -125,10 +125,12 @@ A `.rules.verible_lint` in the project root turns on Verible's config search by 
 
 The `cdc` engine has no binary of its own and no row in `Settings → Engines`: it runs the `yosys` that the **Yosys check** row (or `--yosys-path`) selects.
 
+From LintCrux 1.2 there is an eighth engine, `constraints`, which checks FPGA pin-constraint files (`.pcf`, `.lpf`, `.cst`) against the top module's ports. It is also LintCrux's own, takes its ports from a Yosys elaboration, has no row in `Settings → Engines`, and has nothing to check unless the project lists constraint files. See [Pin constraints](pin-constraints.md).
+
 The desktop app lists each engine's run status — Pending, Running, Completed, Failed, Binary not available, Cancelled — in the **Details** pane while no violation is selected; one engine being unavailable does not stop the others. The headless binary is stricter: a missing engine fails the run unless you pass `--allow-missing-engines` — see [Missing engines](cli/invocation.md#missing-engines).
 
 !!! note "Every engine ships rule metadata"
-    All seven engines have entries in the bundled rule database — 645 rules with default severity, tags and documentation links, browsable from the **Rules** tab in the left dock. Where that metadata came from differs per engine: the Verilator, Verible, Slang and GHDL ids are checked against real releases; Svlint's 159 rules are enumerated from the binary itself; CDC's are LintCrux's own; and Yosys' come from LintCrux's message-pattern table, because Yosys does not name its checks. See the [rule database reference](reference/rule-database.md).
+    All seven engines have entries in the bundled rule database — 646 rules with default severity, tags and documentation links, browsable from the **Rules** tab in the left dock. Where that metadata came from differs per engine: the Verilator, Verible, Slang and GHDL ids are checked against real releases; Svlint's 159 rules are enumerated from the binary itself; CDC's are LintCrux's own; and Yosys' come from LintCrux's message-pattern table, because Yosys does not name its checks. See the [rule database reference](reference/rule-database.md). From 1.2 an eighth engine, `constraints`, adds ten first-party rules, 656 in all (see below).
 
 ### Version drift
 

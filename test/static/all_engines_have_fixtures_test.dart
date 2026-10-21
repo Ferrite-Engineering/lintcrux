@@ -14,6 +14,11 @@ const Map<String, String> _exempt = <String, String>{
       'consumes a Yosys-elaborated netlist rather than engine text output, '
       'so there is no output.txt to capture; the analysis is covered by '
       'test/services/engines/cdc/',
+  'constraints':
+      'reads a Yosys netlist and constraint files, not engine text output, '
+      'so there is no engine output.txt to feed an engine parser; the checks '
+      'are covered by test/services/engines/constraints/ against '
+      'verification/fixtures/engines/constraints/',
 };
 
 /// Static guardrail: every engine in the shipped

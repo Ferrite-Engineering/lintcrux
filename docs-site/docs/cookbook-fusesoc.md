@@ -34,6 +34,7 @@ Or in the desktop app, `File → Import FuseSoC EDAM…` and pick the `.eda.yml`
 | `vlogparam` parameters with a default | Verilator `-G` overrides. |
 | `tool_options.verilator` | `-W*` flags as warning options; the rest as extra options. |
 | `file_type: vlt` | Verilator waiver files, placed ahead of the sources — Edalize's own ordering. |
+| `file_type: PCF`, `LPF` or `CST` (from 1.2) | Pin-constraint files, in the project's `constraintFiles`, checked against the top module's ports by the `constraints` engine. See [Pin constraints](pin-constraints.md). |
 | The core each file came from | `sourceFileProvenance` in the project: which FuseSoC core contributed each file. |
 
 !!! tip "Nothing is dropped silently"

@@ -19,6 +19,7 @@ import 'package:lintcrux/domain/models/lint_baseline.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_engine.dart';
+import 'package:lintcrux/services/engines/constraints/constraints_engine.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_check_engine.dart';
 import 'package:lintcrux/services/headless/headless_runner.dart';
@@ -69,6 +70,19 @@ class _FakeEngine implements LintEngine {
 
   @override
   void cancel() {}
+}
+
+/// An engine that records the constraint files it was handed.
+class _RequestRecordingEngine extends _FakeEngine {
+  _RequestRecordingEngine(this.seen) : super('recorder');
+
+  final List<List<String>> seen;
+
+  @override
+  Stream<Violation> run(LintRunRequest request) {
+    seen.add(request.constraintFiles);
+    return super.run(request);
+  }
 }
 
 /// A Yosys process runner on a machine with no Yosys.
@@ -420,6 +434,28 @@ void main() {
         );
       });
 
+      test(
+        'constraints → runFailed (3), and the hint names --yosys-path',
+        () async {
+          final pins = File(p.join(tmp.path, 'pins.pcf'))
+            ..writeAsStringSync('set_io clk 1\n');
+          final r =
+              await runnerWith([
+                ConstraintsEngine(processRunner: _MissingBinaryProcessRunner()),
+              ]).run(
+                CliArgs(
+                  paths: <String>[projectPath],
+                  topModule: 'top',
+                  constraintFiles: <String>[pins.path],
+                ),
+              );
+          expect(r.exitCode, CliExitCode.runFailed);
+          expect(r.violations, isEmpty);
+          expect(r.problems.single, contains('"constraints" is unavailable'));
+          expect(r.problems.single, contains('--yosys-path'));
+        },
+      );
+
       test('--allow-missing-engines tolerates both', () async {
         final r = await runnerWith([
           YosysCheckEngine(processRunner: _MissingBinaryProcessRunner()),
@@ -457,6 +493,89 @@ void main() {
           expect(spawned, everyElement('/opt/y/bin/yosys'));
         }
       });
+    });
+
+    group('pin-constraint files', () {
+      late String pins;
+
+      setUp(() {
+        pins = p.join(tmp.path, 'pins.pcf');
+        File(pins).writeAsStringSync('set_io clk 1\n');
+      });
+
+      test(
+        'constraint files and no top module → runFailed (3), never 0',
+        () async {
+          // The real engine: it refuses before it asks for Yosys, so no binary
+          // is needed to see the exit code.
+          final r = await runnerWith([ConstraintsEngine()]).run(
+            CliArgs(
+              paths: <String>[projectPath],
+              constraintFiles: <String>[pins],
+            ),
+          );
+          expect(r.exitCode, CliExitCode.runFailed);
+          expect(r.violations.single.ruleId, 'constraints/no-top-module');
+          expect(r.violations.single.isAnalysisFailure, isTrue);
+        },
+      );
+
+      test(
+        '--constraints reaches the engine, added to the project list',
+        () async {
+          final seen = <List<String>>[];
+          final engine = _RequestRecordingEngine(seen);
+          File(projectPath).writeAsStringSync(
+            jsonEncode(<String, Object?>{
+              'version': 1,
+              'name': 'design',
+              'rootPath': '.',
+              'sourceFiles': <String>['top.sv'],
+              'constraintFiles': <String>['pins.pcf'],
+              'language': 'systemverilog',
+            }),
+          );
+          final extra = File(p.join(tmp.path, 'extra.lpf'))
+            ..writeAsStringSync('LOCATE COMP "a" SITE "A1";\n');
+          final r = await runnerWith([engine]).run(
+            CliArgs(
+              paths: <String>[projectPath],
+              constraintFiles: <String>[extra.path, pins],
+            ),
+          );
+          expect(r.exitCode, CliExitCode.clean);
+          expect(seen.single, [pins, extra.path]);
+        },
+      );
+
+      test('a --constraints file that does not exist → usage (64)', () async {
+        final r = await runnerWith([ConstraintsEngine()]).run(
+          CliArgs(
+            paths: <String>[projectPath],
+            constraintFiles: <String>[p.join(tmp.path, 'gone.pcf')],
+          ),
+        );
+        expect(r.exitCode, CliExitCode.usage);
+        expect(r.problems.single, contains('Constraint file not found'));
+      });
+
+      test(
+        'a project listing a missing constraint file → runFailed (3)',
+        () async {
+          File(projectPath).writeAsStringSync(
+            jsonEncode(<String, Object?>{
+              'version': 1,
+              'name': 'design',
+              'rootPath': '.',
+              'sourceFiles': <String>['top.sv'],
+              'constraintFiles': <String>['gone.pcf'],
+            }),
+          );
+          final r = await runnerWith([ConstraintsEngine()]).run(args());
+          expect(r.exitCode, CliExitCode.runFailed);
+          expect(r.problems.single, contains('Constraint file listed'));
+        },
+      );
     });
 
     test('an unknown --engine id → usage (64), not a narrower run', () async {

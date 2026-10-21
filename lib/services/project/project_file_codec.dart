@@ -43,6 +43,10 @@ class ProjectFileCodec {
       'name': project.name,
       'rootPath': project.rootPath,
       'sourceFiles': List<String>.from(project.sourceFiles),
+      // Written only when there are some, so a project without constraint
+      // files encodes byte-for-byte as it did before the key existed.
+      if (project.constraintFiles.isNotEmpty)
+        'constraintFiles': List<String>.from(project.constraintFiles),
       'includePaths': List<String>.from(project.includePaths),
       'defines': Map<String, String>.from(project.defines),
       if (project.topModule != null) 'topModule': project.topModule,
@@ -145,6 +149,7 @@ class ProjectFileCodec {
       sourceFileLanguages: _sourceFileLanguageMap(raw, 'sourceFileLanguages'),
       customRegexRules: _customRegexRuleList(raw, 'customRegexRules'),
       sourceFileProvenance: _stringMap(raw, 'sourceFileProvenance'),
+      constraintFiles: _stringList(raw, 'constraintFiles'),
     );
   }
 

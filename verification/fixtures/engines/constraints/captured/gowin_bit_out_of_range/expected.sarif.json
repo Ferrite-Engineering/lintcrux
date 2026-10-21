@@ -1,0 +1,39 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "lintcrux-constraints"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "constraints/bit-out-of-range",
+          "level": "error",
+          "message": {
+            "text": "led[4] [3:0]"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pins.cst"
+                },
+                "region": {
+                  "startLine": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "mentions": [
+              "led[4]",
+              "[3:0]"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

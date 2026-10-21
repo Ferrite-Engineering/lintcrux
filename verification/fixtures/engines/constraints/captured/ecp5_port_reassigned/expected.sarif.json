@@ -1,0 +1,40 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "lintcrux-constraints"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "constraints/port-reassigned",
+          "level": "warning",
+          "message": {
+            "text": "led[0] A2 E3"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pins.lpf"
+                },
+                "region": {
+                  "startLine": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "mentions": [
+              "led[0]",
+              "A2",
+              "E3"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

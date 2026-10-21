@@ -148,6 +148,49 @@ files:
       ]);
     });
 
+    test('PCF, LPF and CST files are constraint files, not sources', () {
+      final edam = writeEdam('''
+version: 0.2.1
+toplevel: top
+files:
+- {file_type: systemVerilogSource, name: top.sv}
+- {file_type: PCF, name: board/pins.pcf}
+- {file_type: LPF, name: board/pins.lpf}
+- {file_type: CST, name: board/pins.cst}
+- {file_type: PCF, name: board/pins.pcf}
+''');
+      final imported = const EdamReader().read(edam.path);
+      expect(imported.sourceFiles, [_resolved(tmp.path, 'top.sv')]);
+      expect(imported.constraintFiles, [
+        _resolved(tmp.path, 'board/pins.pcf'),
+        _resolved(tmp.path, 'board/pins.lpf'),
+        _resolved(tmp.path, 'board/pins.cst'),
+      ]);
+      expect(imported.sourceFileLanguages.keys, [
+        _resolved(tmp.path, 'top.sv'),
+      ]);
+      expect(
+        imported.warnings,
+        isNot(contains(contains('unsupported file_type'))),
+      );
+    });
+
+    test('file types are compared exactly, as Edalize does', () {
+      final edam = writeEdam('''
+version: 0.2.1
+files:
+- {file_type: verilogSource, name: top.v}
+- {file_type: pcf, name: pins.pcf}
+- {file_type: SDC, name: timing.sdc}
+''');
+      final imported = const EdamReader().read(edam.path);
+      expect(imported.constraintFiles, isEmpty);
+      expect(
+        imported.warnings,
+        contains(contains('unsupported file_type "pcf"')),
+      );
+    });
+
     test('unsupported file_type warns and skips', () {
       final edam = writeEdam('''
 version: 0.2.1

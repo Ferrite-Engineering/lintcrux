@@ -464,6 +464,20 @@ See `VERIFICATION_GUIDE.md` §21. Needs a real `verible-verilog-lint`
 
 ---
 
+## Pin-constraint rules, `constraints` engine (guide §24)
+
+- [ ] The `.pcf`, `.lpf` and `.cst` readers accept what nextpnr's readers accept (commands, flags, quoting, comments, `led[3]`) and report any other line as `constraints/unparsed-line` — `[Coverage: UNIT]` (`constraint_parsers_test.dart`)
+- [ ] The six rules fire on the cases under `verification/fixtures/engines/constraints/captured/` for all three families, and the clean case reports nothing — `[Coverage: UNIT]` (`constraints_fixture_test.dart`, real Yosys)
+- [ ] Ranges `[7:0]`, `[0:7]` and `[8:1]` resolve from Yosys's `offset` and `upto`; a one-bit port accepts `x[0]`; a bus named with no bit is `unknown-port` — `[Coverage: UNIT]` (`constraint_checks_test.dart`, `yosys_elaboration_test.dart`)
+- [ ] No constraint files means no finding and no Yosys run; no top module, a design with VHDL, an unreadable file and a design Yosys rejects each report a run that did not happen and exit `3` from the headless binary — `[Coverage: UNIT]` (`constraints_engine_test.dart`, `headless_runner_test.dart`)
+- [ ] `--constraints` takes a path per flag, refuses an unknown extension or a missing file with exit `64`, and adds to the project's list — `[Coverage: UNIT]` (`cli_args_parser_test.dart`, `headless_runner_test.dart`)
+- [ ] `constraintFiles` round-trips through `.lintcrux`, an old project loads unchanged, and an EDAM `file_type` of `PCF`, `LPF` or `CST` fills it — `[Coverage: UNIT]` (`project_file_codec_test.dart`, `edam_reader_test.dart`)
+- [ ] The Sources panel lists **Constraint files** beneath the sources and removes one after confirmation, keeping paths relative — `[Coverage: WIDGET]` (`sources_panel_test.dart`) + `[Coverage: MANUAL]`
+- [ ] Each case's `PROVENANCE.md` states what nextpnr does with that file; re-run `tool/capture_constraint_fixtures.py --suite <oss-cad-suite>` when the suite moves — `[Coverage: MANUAL]`
+- [ ] **Tier:** Open Core, identical under both `kBetaPeriod` values — `[Coverage: MANUAL]`
+
+---
+
 ## Telemetry — cross-platform end-to-end pass (staging)
 
 > **Run 2026-08-05/06** against the **staging** dataset `crux_telemetry_dev`, from

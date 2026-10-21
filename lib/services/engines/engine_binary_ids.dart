@@ -7,9 +7,11 @@
 /// process it starts is `yosys`. Its binary therefore comes from the Yosys
 /// binary settings — Settings > Engines > Yosys check, and `--yosys-path` —
 /// rather than from a CDC setting that would have to be kept in step with
-/// Yosys by hand.
+/// Yosys by hand. The constraints engine reads its top module's ports from the
+/// same Yosys elaboration and shares the binary the same way.
 const Map<String, String> _kSharedBinaryEngineIds = <String, String>{
   'cdc': 'yosys',
+  'constraints': 'yosys',
 };
 
 /// The engine id whose binary configuration [engineId] runs with.

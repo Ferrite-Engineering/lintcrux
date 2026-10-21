@@ -16,6 +16,7 @@ void main() {
       'ghdl',
       'svlint',
       'cdc',
+      'constraints',
     ]);
   });
 

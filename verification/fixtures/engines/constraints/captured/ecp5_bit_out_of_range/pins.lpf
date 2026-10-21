@@ -1,0 +1,9 @@
+# Pin constraints for top on ECP5 25F, CABGA256.
+LOCATE COMP "clk" SITE "R4";
+LOCATE COMP "rst_n" SITE "T2";
+LOCATE COMP "btn" SITE "R3";
+LOCATE COMP "led[0]" SITE "A2";
+LOCATE COMP "led[1]" SITE "B2";
+LOCATE COMP "led[2]" SITE "C2";
+LOCATE COMP "led[3]" SITE "E2";
+LOCATE COMP "led[4]" SITE "E3";

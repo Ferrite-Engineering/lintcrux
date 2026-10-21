@@ -1,0 +1,40 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "lintcrux-constraints"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "constraints/pin-reused",
+          "level": "error",
+          "message": {
+            "text": "B2 led[1] led[2]"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pins.lpf"
+                },
+                "region": {
+                  "startLine": 7
+                }
+              }
+            }
+          ],
+          "properties": {
+            "mentions": [
+              "B2",
+              "led[1]",
+              "led[2]"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

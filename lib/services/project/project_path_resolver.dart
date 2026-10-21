@@ -23,7 +23,7 @@ import 'package:path/path.dart' as p;
 ///    without knowing the author's checkout layout. This mirrors the
 ///    headless `HeadlessInputResolver`, so a design lints identically in
 ///    the desktop app and in CI.
-///  - `sourceFiles`, `includePaths`, and the keys of
+///  - `sourceFiles`, `includePaths`, `constraintFiles`, and the keys of
 ///    `sourceFileLanguages`: made absolute against that base so engines
 ///    resolve them regardless of the process working directory (a
 ///    Finder/Dock launch inherits CWD `/`, where every relative path is
@@ -44,6 +44,7 @@ LintProject resolveProjectPaths(LintProject project, String projectFileDir) {
     rootPath: base,
     sourceFiles: <String>[for (final f in project.sourceFiles) abs(f)],
     includePaths: <String>[for (final d in project.includePaths) abs(d)],
+    constraintFiles: <String>[for (final f in project.constraintFiles) abs(f)],
     sourceFileLanguages: <String, ProjectSourceFileLanguage>{
       for (final e in project.sourceFileLanguages.entries) abs(e.key): e.value,
     },

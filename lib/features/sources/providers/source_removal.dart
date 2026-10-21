@@ -15,6 +15,15 @@ import 'package:lintcrux/services/project/project_file_service.dart';
 import 'package:lintcrux/services/project/project_path_resolver.dart';
 import 'package:path/path.dart' as p;
 
+/// Which of a project's file lists an entry belongs to.
+enum ProjectFileKind {
+  /// HDL sources (`LintProject.sourceFiles`).
+  source,
+
+  /// FPGA pin-constraint files (`LintProject.constraintFiles`).
+  constraint,
+}
+
 /// Removes [absolutePath] from the open project, after confirming.
 ///
 /// **Mirrors the add path deliberately, including the awkward part.** Adding
@@ -29,20 +38,29 @@ import 'package:path/path.dart' as p;
 /// The confirmation says the file on disk is untouched, because "Remove" next
 /// to a filename reads as "delete" to a reasonable person, and the cost of
 /// being wrong about that is somebody's RTL.
+///
+/// [kind] picks which of the project's file lists the entry leaves: its
+/// sources, or its pin-constraint files. Everything else is the same path.
 Future<void> removeSourceFromProject(
   BuildContext context,
   WidgetRef ref, {
   required String absolutePath,
   required String projectName,
+  ProjectFileKind kind = ProjectFileKind.source,
 }) async {
   final l10n = L10N.of(context);
   final project = ref.read(currentProjectProvider);
   if (project == null) return;
 
+  final isConstraint = kind == ProjectFileKind.constraint;
   final confirmed = await confirmCruxDestructiveAction(
     context,
-    title: l10n.sourcesRemoveConfirmTitle,
-    body: l10n.sourcesRemoveConfirmBody(p.basename(absolutePath)),
+    title: isConstraint
+        ? l10n.constraintsRemoveConfirmTitle
+        : l10n.sourcesRemoveConfirmTitle,
+    body: isConstraint
+        ? l10n.constraintsRemoveConfirmBody(p.basename(absolutePath))
+        : l10n.sourcesRemoveConfirmBody(p.basename(absolutePath)),
     confirmLabel: l10n.sourcesRemoveConfirmAction,
     cancelLabel: l10n.dialogCancel,
   );
@@ -68,13 +86,19 @@ Future<void> removeSourceFromProject(
   // Match on the RESOLVED path, not the authored string. The panel shows what
   // the running tab holds (absolute), the file stores what the author wrote
   // (usually relative), and comparing those directly removes nothing.
+  final authoredList = isConstraint
+      ? authored.constraintFiles
+      : authored.sourceFiles;
   final remaining = <String>[
-    for (final authoredPath in authored.sourceFiles)
+    for (final authoredPath in authoredList)
       if (p.canonicalize(p.join(projectDir, authoredPath)) !=
           p.canonicalize(absolutePath))
         authoredPath,
   ];
-  if (remaining.length == authored.sourceFiles.length) {
+  LintProject without(LintProject from) => isConstraint
+      ? from.copyWith(constraintFiles: remaining)
+      : from.copyWith(sourceFiles: remaining);
+  if (remaining.length == authoredList.length) {
     // Nothing matched. Better to say so than to report a success that changed
     // no file and leave the user wondering why the entry is still listed.
     if (!context.mounted) return;
@@ -86,17 +110,14 @@ Future<void> removeSourceFromProject(
   }
 
   try {
-    await service.write(projectPath, authored.copyWith(sourceFiles: remaining));
+    await service.write(projectPath, without(authored));
   } on ProjectFileException catch (e) {
     if (!context.mounted) return;
     showCruxErrorSnack(context, e.message);
     return;
   }
 
-  final resolved = resolveProjectPaths(
-    authored.copyWith(sourceFiles: remaining),
-    projectDir,
-  );
+  final resolved = resolveProjectPaths(without(authored), projectDir);
   ref
       .read(currentProjectProvider.notifier)
       .load(resolved, projectFilePath: projectPath);

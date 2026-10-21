@@ -124,6 +124,48 @@ void main() {
     });
 
     test(
+      'resolves constraintFiles against the project file directory',
+      () async {
+        writeFile('proj/rtl/top.sv', 'module top; endmodule');
+        writeFile('proj/board/pins.pcf', 'set_io clk 1\n');
+        final projectFile = writeFile('proj/design.lintcrux', '''
+{
+  "version": 1,
+  "name": "design",
+  "rootPath": ".",
+  "sourceFiles": ["rtl/top.sv"],
+  "constraintFiles": ["board/pins.pcf"]
+}
+''');
+        final r = await resolver.resolve(<String>[projectFile.path]);
+        expect(r.isSuccess, isTrue, reason: r.problems.join('\n'));
+        expect(r.project!.constraintFiles, [
+          p.join(tmp.path, 'proj', 'board', 'pins.pcf'),
+        ]);
+      },
+    );
+
+    test('a constraint file listed but absent fails the run', () async {
+      writeFile('proj/rtl/top.sv', 'module top; endmodule');
+      final projectFile = writeFile('proj/design.lintcrux', '''
+{
+  "version": 1,
+  "name": "design",
+  "rootPath": ".",
+  "sourceFiles": ["rtl/top.sv"],
+  "constraintFiles": ["board/gone.pcf"]
+}
+''');
+      final r = await resolver.resolve(<String>[projectFile.path]);
+      expect(r.isSuccess, isFalse);
+      expect(r.kind, HeadlessInputFailureKind.loadFailed);
+      expect(
+        r.problems.single,
+        contains('Constraint file listed in the project is missing'),
+      );
+    });
+
+    test(
       'a RELATIVE rootPath is replaced by the project file directory',
       () async {
         // Committed `.lintcrux` files in this repo carry a rootPath that

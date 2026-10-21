@@ -7,10 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
+import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/sources/widgets/sources_panel.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/project/project_file_service.dart';
+import 'package:lintcrux/services/project/project_path_resolver.dart';
+import 'package:lintcrux/services/telemetry/telemetry_event_catalog.dart';
 import 'package:path/path.dart' as p;
 
 /// The sources panel, and the round trip that makes removal safe.
@@ -26,6 +29,23 @@ Widget _host(ProviderContainer container) => UncontrolledProviderScope(
     home: Scaffold(body: SourcesPanel()),
   ),
 );
+
+/// Records the runs a removal asks for instead of starting engines.
+class _RecordingRun extends LintRunNotifier {
+  final List<LintProject> runs = <LintProject>[];
+
+  @override
+  LintRunState build() => LintRunState.idle;
+
+  @override
+  Future<void> runAll(
+    LintProject project, {
+    bool forceBypassCache = false,
+    LintRunTrigger trigger = LintRunTrigger.manual,
+  }) async {
+    runs.add(project);
+  }
+}
 
 void main() {
   testWidgets('with no project open it says so rather than looking empty', (
@@ -62,6 +82,117 @@ void main() {
     expect(find.text('2 source files'), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNWidgets(2));
   });
+
+  testWidgets('lists pin-constraint files in their own section', (
+    tester,
+  ) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    container
+        .read(currentProjectProvider.notifier)
+        .load(
+          const LintProject(
+            name: 'board',
+            rootPath: '/w/board',
+            sourceFiles: <String>['/w/board/rtl/top.v'],
+            constraintFiles: <String>[
+              '/w/board/pins.pcf',
+              '/w/board/alt/pins.cst',
+            ],
+          ),
+        );
+    await tester.pumpWidget(_host(container));
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 source file'), findsOneWidget);
+    expect(find.text('2 constraint files'), findsOneWidget);
+    expect(find.text('top.v'), findsOneWidget);
+    expect(find.text('pins.pcf'), findsOneWidget);
+    expect(find.text('pins.cst'), findsOneWidget);
+    // One remove button per row, constraint files included.
+    expect(find.byIcon(Icons.close), findsNWidgets(3));
+  });
+
+  testWidgets('a project with only constraint files is not shown as empty', (
+    tester,
+  ) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    container
+        .read(currentProjectProvider.notifier)
+        .load(
+          const LintProject(
+            name: 'board',
+            rootPath: '/w/board',
+            constraintFiles: <String>['/w/board/pins.lpf'],
+          ),
+        );
+    await tester.pumpWidget(_host(container));
+    await tester.pumpAndSettle();
+    expect(find.text('pins.lpf'), findsOneWidget);
+    expect(find.textContaining('No source files'), findsNothing);
+  });
+
+  testWidgets(
+    'removing a constraint file rewrites the project file, keeps paths '
+    'relative, and leaves the sources alone',
+    (tester) async {
+      final dir = Directory.systemTemp.createTempSync('sources_panel_c');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final projectPath = p.join(dir.path, 'board.lintcrux');
+      const service = ProjectFileService();
+      const authored = LintProject(
+        name: 'board',
+        rootPath: '.',
+        sourceFiles: <String>['rtl/top.v'],
+        constraintFiles: <String>['pins.pcf', 'alt/pins.cst'],
+      );
+      await tester.runAsync(() => service.write(projectPath, authored));
+
+      final run = _RecordingRun();
+      final container = ProviderContainer(
+        overrides: [lintRunProvider.overrideWith(() => run)],
+      );
+      addTearDown(container.dispose);
+      container
+          .read(currentProjectProvider.notifier)
+          .load(
+            resolveProjectPaths(authored, dir.path),
+            projectFilePath: projectPath,
+          );
+      await tester.pumpWidget(_host(container));
+      await tester.pumpAndSettle();
+
+      // Rows: top.v first, then pins.pcf, pins.cst.
+      await tester.tap(find.byIcon(Icons.close).at(1));
+      await tester.pumpAndSettle();
+      expect(find.text('Remove constraint file?'), findsOneWidget);
+      await tester.tap(find.text('Remove'));
+      await tester.pumpAndSettle();
+      // The removal reads and writes the project file: real I/O, which the
+      // test clock does not advance.
+      for (var i = 0; i < 100 && run.runs.isEmpty; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump();
+      }
+
+      final reread = await tester.runAsync(() => service.read(projectPath));
+      expect(reread!.constraintFiles, <String>['alt/pins.cst']);
+      expect(reread.sourceFiles, <String>['rtl/top.v']);
+      expect(
+        reread.constraintFiles.every(p.isRelative),
+        isTrue,
+        reason: 'a committed .lintcrux must stay portable',
+      );
+      expect(
+        container.read(currentProjectProvider)!.constraintFiles,
+        <String>[p.join(dir.path, 'alt', 'pins.cst')],
+      );
+      expect(run.runs, hasLength(1), reason: 'the findings are re-derived');
+    },
+  );
 
   test('removal rewrites the project file and keeps paths RELATIVE', () async {
     // The property that matters most and is easiest to get wrong. Adding

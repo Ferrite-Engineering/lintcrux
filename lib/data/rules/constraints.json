@@ -1,0 +1,89 @@
+{
+  "engineId": "constraints",
+  "displayName": "Constraints",
+  "helpBaseUrl": "https://docs.lintcrux.app/pin-constraints/",
+  "note": "First-party rules. LintCrux emits these itself from its own check of FPGA pin-constraint files (.pcf, .lpf, .cst) against the top module's ports, so unlike the external engines this list is exhaustive by construction.",
+  "rules": [
+    {
+      "id": "unknown-port",
+      "defaultSeverity": "error",
+      "tags": [
+        "constraints",
+        "pins"
+      ]
+    },
+    {
+      "id": "unconstrained-port",
+      "defaultSeverity": "warning",
+      "tags": [
+        "constraints",
+        "pins"
+      ]
+    },
+    {
+      "id": "bit-out-of-range",
+      "defaultSeverity": "error",
+      "tags": [
+        "constraints",
+        "pins",
+        "bus"
+      ]
+    },
+    {
+      "id": "pin-reused",
+      "defaultSeverity": "error",
+      "tags": [
+        "constraints",
+        "pins"
+      ]
+    },
+    {
+      "id": "port-reassigned",
+      "defaultSeverity": "warning",
+      "tags": [
+        "constraints",
+        "pins"
+      ]
+    },
+    {
+      "id": "unparsed-line",
+      "defaultSeverity": "note",
+      "tags": [
+        "constraints",
+        "info"
+      ]
+    },
+    {
+      "id": "no-top-module",
+      "defaultSeverity": "error",
+      "tags": [
+        "constraints",
+        "tooling"
+      ]
+    },
+    {
+      "id": "unsupported-sources",
+      "defaultSeverity": "error",
+      "tags": [
+        "constraints",
+        "tooling"
+      ]
+    },
+    {
+      "id": "elaboration-failed",
+      "defaultSeverity": "error",
+      "tags": [
+        "constraints",
+        "tooling"
+      ]
+    },
+    {
+      "id": "constraint-file-unreadable",
+      "defaultSeverity": "error",
+      "tags": [
+        "constraints",
+        "tooling"
+      ]
+    }
+  ]
+}

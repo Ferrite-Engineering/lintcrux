@@ -9,7 +9,8 @@ import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:path/path.dart' as p;
 
-/// The project's source files, and the only way to take one back out.
+/// The project's source files and pin-constraint files, and the only way to
+/// take one back out.
 ///
 /// Adding a source was a one-way door: the file picker appended to the
 /// project and nothing anywhere listed what a project contained. A user who
@@ -20,6 +21,10 @@ import 'package:path/path.dart' as p;
 /// Paths are shown basename-first with the directory beneath, because the
 /// basename is what distinguishes two entries and a column of long absolute
 /// paths distinguishes nothing at the point the eye lands.
+///
+/// Constraint files (`.pcf`, `.lpf`, `.cst`) are listed in their own section
+/// beneath the sources, filled from `.lintcrux`, an EDAM import and the CLI,
+/// with the same per-row remove. There is no add action here.
 class SourcesPanel extends ConsumerWidget {
   /// Creates the panel.
   const SourcesPanel({super.key});
@@ -32,38 +37,59 @@ class SourcesPanel extends ConsumerWidget {
       return CruxPanelEmptyState(message: l10n.sourcesPanelNoProject);
     }
     final sources = project.sourceFiles;
-    if (sources.isEmpty) {
+    final constraints = project.constraintFiles;
+    if (sources.isEmpty && constraints.isEmpty) {
       return CruxPanelEmptyState(message: l10n.sourcesPanelEmpty);
     }
     final scheme = Theme.of(context).colorScheme;
+
+    Widget header(String text) => Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: scheme.onSurfaceVariant,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    // Built lazily: a design pulled in through FuseSoC can list thousands of
+    // sources. Each non-empty section is a header row and then its files.
+    final sourceRows = sources.isEmpty ? 0 : sources.length + 1;
+    final constraintRows = constraints.isEmpty ? 0 : constraints.length + 1;
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: sources.length + 1,
+      itemCount: sourceRows + constraintRows,
       itemBuilder: (context, index) {
-        if (index == 0) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-            child: Text(
-              l10n.sourcesCount(sources.length),
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: scheme.onSurfaceVariant,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          );
+        if (index < sourceRows) {
+          return index == 0
+              ? header(l10n.sourcesCount(sources.length))
+              : _SourceRow(path: sources[index - 1], projectName: project.name);
         }
-        final path = sources[index - 1];
-        return _SourceRow(path: path, projectName: project.name);
+        final i = index - sourceRows;
+        return i == 0
+            ? header(l10n.constraintsCount(constraints.length))
+            : _SourceRow(
+                path: constraints[i - 1],
+                projectName: project.name,
+                kind: ProjectFileKind.constraint,
+              );
       },
     );
   }
 }
 
 class _SourceRow extends ConsumerWidget {
-  const _SourceRow({required this.path, required this.projectName});
+  const _SourceRow({
+    required this.path,
+    required this.projectName,
+    this.kind = ProjectFileKind.source,
+  });
 
   final String path;
   final String projectName;
+  final ProjectFileKind kind;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -97,6 +123,7 @@ class _SourceRow extends ConsumerWidget {
           ref,
           absolutePath: path,
           projectName: projectName,
+          kind: kind,
         ),
       ),
     );

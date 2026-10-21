@@ -3,6 +3,7 @@
 
 import 'dart:io';
 
+import 'package:lintcrux/domain/enums/constraint_format.dart';
 import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/models/project_source_file.dart';
 import 'package:meta/meta.dart';
@@ -46,6 +47,9 @@ const String kSupportedEdamVersion = '0.2.1';
 ///   VHDL. `file_type: vlt` is a Verilator waiver/config file and is
 ///   routed to the Verilator engine's `waiverFiles` option — **not**
 ///   into the source list, where every other engine would choke on it.
+/// * `files[].file_type` of `PCF`, `LPF` or `CST` is an FPGA pin-constraint
+///   file and joins [ImportedEdam.constraintFiles] for the constraints
+///   engine, not the source list.
 /// * `files[].is_include_file` → the file's directory (or its explicit
 ///   `include_path`) joins [ImportedEdam.includePaths]; the file itself
 ///   is not passed as a source. Mirrors Edalize's `_add_include_dir`.
@@ -127,6 +131,7 @@ class EdamReader {
     final languages = <String, ProjectSourceFileLanguage>{};
     final provenance = <String, String>{};
     final waiverFiles = <String>[];
+    final constraintFiles = <String>[];
 
     final files = doc['files'];
     if (files is List) {
@@ -143,6 +148,7 @@ class EdamReader {
           languages: languages,
           provenance: provenance,
           waiverFiles: waiverFiles,
+          constraintFiles: constraintFiles,
           warnings: warnings,
         );
       }
@@ -213,6 +219,7 @@ class EdamReader {
           : List<String>.unmodifiable(warnFlags),
       verilatorExtraOptions: List<String>.unmodifiable(verilatorExtraOptions),
       verilatorWaiverFiles: List<String>.unmodifiable(waiverFiles),
+      constraintFiles: List<String>.unmodifiable(constraintFiles),
       warnings: List<String>.unmodifiable(warnings),
     );
   }
@@ -245,6 +252,7 @@ class EdamReader {
     required Map<String, ProjectSourceFileLanguage> languages,
     required Map<String, String> provenance,
     required List<String> waiverFiles,
+    required List<String> constraintFiles,
     required List<String> warnings,
   }) {
     final rawName = entry['name'];
@@ -272,6 +280,14 @@ class EdamReader {
       // A Verilator waiver/config file. It belongs on Verilator's
       // command line and nowhere near the other engines' source lists.
       waiverFiles.add(abs);
+      return;
+    }
+
+    // A pin-constraint file. Edalize names the type by the format it hands
+    // nextpnr (`PCF`, `LPF`, `CST`) and compares it exactly. It is the
+    // constraints engine's input, not a source.
+    if (ConstraintFormat.fromEdamFileType(fileType) != null) {
+      if (!constraintFiles.contains(abs)) constraintFiles.add(abs);
       return;
     }
 
@@ -451,6 +467,7 @@ class ImportedEdam {
     this.version,
     this.toplevel,
     this.verilatorWarnFlags,
+    this.constraintFiles = const <String>[],
   });
 
   /// The EDAM `name:` (e.g. `award-winning_serv_serv_1.4.0`), or
@@ -499,6 +516,10 @@ class ImportedEdam {
 
   /// Absolute paths of `file_type: vlt` Verilator waiver/config files.
   final List<String> verilatorWaiverFiles;
+
+  /// Absolute paths of the pin-constraint files: `file_type` `PCF`, `LPF` or
+  /// `CST`. They feed the project's `constraintFiles`.
+  final List<String> constraintFiles;
 
   /// Human-readable reports of everything skipped or approximated.
   /// Never fatal — fatal problems throw [EdamImportException] instead.

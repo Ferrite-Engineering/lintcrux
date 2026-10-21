@@ -118,6 +118,30 @@ files:
       expect(result.project.enabledEngineIds, ['verilator']);
     });
 
+    test('constraint files land in the project and survive the written '
+        'file', () {
+      final edam = writeEdam('''
+version: 0.2.1
+name: board
+toplevel: top
+files:
+- {file_type: verilogSource, name: top.v}
+- {file_type: PCF, name: pins.pcf}
+''');
+      const service = EdamImportService();
+      final result = service.importEdam(edamPath: edam.path);
+      final expected = p.normalize(p.join(tmp.path, 'pins.pcf'));
+      expect(result.project.constraintFiles, [expected]);
+      expect(result.project.sourceFiles, [
+        p.normalize(p.join(tmp.path, 'top.v')),
+      ]);
+      final reread = const ProjectFileCodec().decode(
+        File(result.projectFilePath).readAsStringSync(),
+      );
+      expect(reread.constraintFiles, [expected]);
+      expect(result.warnings, isEmpty);
+    });
+
     test('omits the verilator options bag entirely when the EDAM carries '
         'nothing for it', () {
       final edam = writeEdam('''

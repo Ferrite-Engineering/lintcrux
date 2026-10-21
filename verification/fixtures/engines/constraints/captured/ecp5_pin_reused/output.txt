@@ -1,0 +1,4 @@
+$ nextpnr-ecp5 -q --25k --package CABGA256 --lpf pins.lpf --json netlist.json
+ERROR: Cell 'led[2]$tr_io' cannot be bound to bel 'X0/Y2/PIOB' since it is already bound to cell 'led[1]$tr_io'
+0 warnings, 1 error
+exit status: 125

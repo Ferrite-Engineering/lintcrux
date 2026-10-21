@@ -86,6 +86,15 @@ void main() {
       expect(out.sourceFiles.single, p.join(base, 'other', 'a.sv'));
       expect(out.includePaths.single, p.join(base, 'inc'));
     });
+
+    test('constraintFiles are replaced wholesale and resolve like sources', () {
+      final out = apply(const <String, dynamic>{
+        'constraintFiles': <String>['board/pins.pcf'],
+      });
+      expect(out.constraintFiles, [p.join(base, 'board', 'pins.pcf')]);
+      expect(out.sourceFiles, project.sourceFiles);
+      expect(apply(const <String, dynamic>{}).constraintFiles, isEmpty);
+    });
   });
 
   group('malformed overlays fail loudly', () {

@@ -84,6 +84,52 @@ void main() {
     }
   });
 
+  test(
+    'every request carries the project constraint files, and only those',
+    () {
+      const withPins = LintProject(
+        name: 'board',
+        rootPath: '/repo',
+        sourceFiles: <String>['/repo/top.sv'],
+        constraintFiles: <String>['/repo/pins.pcf'],
+      );
+      final plan = planner.plan(
+        project: withPins,
+        registry: registry,
+        binaryConfigFor: binaryFor,
+      );
+      expect(plan.pairs, isNotEmpty);
+      for (final pair in plan.pairs) {
+        expect(
+          pair.request.constraintFiles,
+          <String>['/repo/pins.pcf'],
+          reason: pair.engine.id,
+        );
+        expect(
+          pair.request.sourceFiles,
+          isNot(contains('/repo/pins.pcf')),
+          reason: 'a constraint file is not a source',
+        );
+      }
+    },
+  );
+
+  test('the constraints engine is handed the Yosys binary configuration', () {
+    final yosysBacked = EngineRegistry(<LintEngine>[
+      _Engine('constraints', const {HdlLanguage.systemVerilog}),
+    ]);
+    final asked = <String>[];
+    planner.plan(
+      project: project,
+      registry: yosysBacked,
+      binaryConfigFor: (id) {
+        asked.add(id);
+        return bundled;
+      },
+    );
+    expect(asked, <String>['yosys']);
+  });
+
   test('the CDC engine is handed the Yosys binary configuration', () {
     final yosysBacked = EngineRegistry(<LintEngine>[
       _Engine('yosys', const {HdlLanguage.systemVerilog}),

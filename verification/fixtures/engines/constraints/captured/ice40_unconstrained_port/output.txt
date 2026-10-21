@@ -1,0 +1,5 @@
+$ nextpnr-ice40 -q --up5k --package sg48 --pcf pins.pcf --json netlist.json
+ERROR: IO 'btn' is unconstrained in PCF (override this error with --pcf-allow-unconstrained)
+ERROR: Loading PCF failed.
+0 warnings, 2 errors
+exit status: 125

@@ -1,0 +1,4 @@
+$ nextpnr-ecp5 -q --25k --package CABGA256 --lpf pins.lpf --json netlist.json
+ERROR: IO 'btn' is unconstrained in LPF (override this error with --lpf-allow-unconstrained)
+0 warnings, 1 error
+exit status: 125

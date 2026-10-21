@@ -1,0 +1,4 @@
+$ nextpnr-himbaechel -q --device GW1NR-LV9QN88PC6/I5 --vopt family=GW1N-9 --vopt cst=pins.cst --json netlist.json
+Warning: Invalid constraint: BOGUS "x" 1;
+1 warning, 0 errors
+exit status: 0

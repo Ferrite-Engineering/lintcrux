@@ -307,6 +307,57 @@ void main() {
       expect(decoded.sourceFileProvenance, project.sourceFileProvenance);
     });
 
+    test('round-trips constraintFiles unchanged', () {
+      const project = LintProject(
+        name: 'board',
+        rootPath: '/r',
+        sourceFiles: ['/r/top.v'],
+        constraintFiles: ['/r/pins.pcf', '/r/board.cst'],
+      );
+      final decoded = codec.decode(codec.encode(project));
+      expect(decoded.constraintFiles, ['/r/pins.pcf', '/r/board.cst']);
+      expect(decoded, project);
+    });
+
+    test('a project without constraint files encodes without the key', () {
+      const project = LintProject(name: 'p', rootPath: '/r');
+      expect(codec.encode(project), isNot(contains('constraintFiles')));
+    });
+
+    test(
+      'decode of an older file without constraintFiles defaults to empty',
+      () {
+        const jsonStr = '''
+{"version": 1, "name": "x", "rootPath": "/y",
+ "sourceFiles": ["/y/a.sv"]}
+''';
+        final decoded = codec.decode(jsonStr);
+        expect(decoded.constraintFiles, isEmpty);
+        expect(
+          codec.decode(codec.encode(decoded)),
+          decoded,
+          reason: 'an old project round-trips to itself',
+        );
+      },
+    );
+
+    test('decode rejects a constraintFiles that is not a list of strings', () {
+      expect(
+        () => codec.decode(
+          '{"version": 1, "name": "x", "rootPath": "/y", '
+          '"constraintFiles": "pins.pcf"}',
+        ),
+        throwsA(isA<ProjectFileException>()),
+      );
+      expect(
+        () => codec.decode(
+          '{"version": 1, "name": "x", "rootPath": "/y", '
+          '"constraintFiles": [3]}',
+        ),
+        throwsA(isA<ProjectFileException>()),
+      );
+    });
+
     test(
       'decode of an older file without sourceFileProvenance defaults to '
       'empty',

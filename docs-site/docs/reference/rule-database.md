@@ -20,7 +20,8 @@ shows the engine's own message; it just has no tags or link.
 | `svlint.json` | 159 | `svlint --example` on 0.9.5 |
 | `ghdl.json` | 38 | `ghdl help-warnings` on 6.0.0 and 5.1.1 |
 | `yosys.json` | 10 | LintCrux's own ids — Yosys does not name its checks |
-| `cdc.json` | 8 | First-party CDC rules — every id the CDC engine emits |
+| `cdc.json` | 9 | First-party CDC rules — every id the CDC engine emits |
+| `constraints.json` | 10 | From 1.2: first-party pin-constraint rules, every id the `constraints` engine emits. See [Pin constraints](../pin-constraints.md) |
 
 The database is community-extensible — pull requests adding or
 correcting rule metadata are welcome. `lib/data/rule_aliases.json`

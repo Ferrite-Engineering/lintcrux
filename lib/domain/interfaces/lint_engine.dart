@@ -86,7 +86,15 @@ class LintRunRequest {
     this.topModule,
     this.options = const <String, Object?>{},
     this.projectRoot = '',
+    this.constraintFiles = const <String>[],
   });
+
+  /// Pin-constraint files (`.pcf`, `.lpf`, `.cst`) the project lists, as
+  /// absolute paths.
+  ///
+  /// Only the `constraints` engine reads them. They are not sources: no
+  /// language router and no other engine sees them.
+  final List<String> constraintFiles;
 
   /// Source files passed to the engine.
   final List<String> sourceFiles;
@@ -160,8 +168,10 @@ class LintRunRequest {
     EngineBinaryConfig? binary,
     Map<String, Object?>? options,
     String? projectRoot,
+    List<String>? constraintFiles,
   }) {
     return LintRunRequest(
+      constraintFiles: constraintFiles ?? this.constraintFiles,
       sourceFiles: sourceFiles ?? this.sourceFiles,
       // Must be carried: the incremental re-run path calls
       // `copyWith(sourceFiles: changed)`, and losing the dropped set here

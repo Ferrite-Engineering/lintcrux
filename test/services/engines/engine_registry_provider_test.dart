@@ -3,6 +3,8 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lintcrux/services/engines/cdc/cdc_engine.dart';
+import 'package:lintcrux/services/engines/constraints/constraints_engine.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
 import 'package:lintcrux/services/engines/ghdl/ghdl_engine.dart';
 import 'package:lintcrux/services/engines/slang/slang_engine.dart';
@@ -14,7 +16,7 @@ import 'package:lintcrux/services/engines/yosys/yosys_check_engine.dart';
 void main() {
   group('engineRegistryProvider', () {
     test('default binding registers Verilator, Verible, Slang, '
-        'Yosys, GHDL, and Svlint', () {
+        'Yosys, GHDL, Svlint, CDC and Constraints', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final registry = container.read(engineRegistryProvider);
@@ -26,6 +28,7 @@ void main() {
         'ghdl',
         'svlint',
         'cdc',
+        'constraints',
       ]);
       expect(registry.get('verilator'), isA<VerilatorEngine>());
       expect(registry.get('verible'), isA<VeribleEngine>());
@@ -33,6 +36,8 @@ void main() {
       expect(registry.get('yosys'), isA<YosysCheckEngine>());
       expect(registry.get('ghdl'), isA<GhdlEngine>());
       expect(registry.get('svlint'), isA<SvlintEngine>());
+      expect(registry.get('cdc'), isA<CdcEngine>());
+      expect(registry.get('constraints'), isA<ConstraintsEngine>());
     });
   });
 }

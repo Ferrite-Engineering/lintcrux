@@ -50,6 +50,22 @@ void main() {
       expect(c.read(currentProjectProvider), b);
     });
   });
+  group('resolveProjectPaths', () {
+    test('makes constraint files absolute against the project directory', () {
+      final dir = p.normalize('/w/proj');
+      const authored = LintProject(
+        name: 'board',
+        rootPath: '.',
+        sourceFiles: <String>['rtl/top.v'],
+        constraintFiles: <String>['board/pins.pcf'],
+      );
+      final resolved = resolveProjectPaths(authored, dir);
+      expect(resolved.constraintFiles, [p.join(dir, 'board', 'pins.pcf')]);
+      expect(resolved.sourceFiles, [p.join(dir, 'rtl', 'top.v')]);
+      // The authored form is untouched: what belongs on disk stays relative.
+      expect(authored.constraintFiles, ['board/pins.pcf']);
+    });
+  });
   group('saveSeverityOverride', () {
     late Directory tmp;
     late String projectFile;

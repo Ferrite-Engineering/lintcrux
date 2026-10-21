@@ -1,0 +1,4 @@
+$ nextpnr-ice40 -q --up5k --package sg48 --pcf pins.pcf --json netlist.json
+Warning: unmatched constraint 'led[4]' (on line 9)
+1 warning, 0 errors
+exit status: 0

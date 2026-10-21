@@ -22,6 +22,7 @@ const List<String> kShippedRuleDatabaseEngineIds = <String>[
   'ghdl',
   'svlint',
   'cdc',
+  'constraints',
 ];
 
 /// Riverpod provider exposing the app-wide [RuleDatabase].
