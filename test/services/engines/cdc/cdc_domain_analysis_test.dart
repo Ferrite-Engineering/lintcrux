@@ -1,6 +1,8 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'dart:convert';
+
 import 'package:crux_netlist/crux_netlist.dart';
 import 'package:crux_yosys/crux_yosys.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -367,6 +369,151 @@ void main() {
       expect(reviewed.reviewReason, 'accepted');
       expect(reviewed.netName, 'data');
       expect(reviewed.width, 8);
+    });
+  });
+
+  group('the netlist shape the yosys-slang frontend writes', () {
+    // The capstone's structure as yosys-slang writes it after `flatten`: an
+    // asynchronous reset makes every flop an `$aldff` (async load of a
+    // constant) rather than an `$adff`, and every value that passes through
+    // an instance port goes through a `$buf`. Built by hand so the expected
+    // answer is the RTL's meaning, not the output of the code under test:
+    // `req` crosses clk_a -> clk_b through a private two-flop chain, a 4-bit
+    // `data` bus crosses with nothing in between.
+    Map<String, Object?> cell(
+      String type,
+      Map<String, List<Object>> connections,
+    ) => <String, Object?>{
+      'hide_name': 0,
+      'type': type,
+      'parameters': <String, Object?>{},
+      'attributes': <String, Object?>{},
+      'port_directions': <String, Object?>{
+        for (final port in connections.keys)
+          port: port == 'Q' || port == 'Y' ? 'output' : 'input',
+      },
+      'connections': connections,
+    };
+    Map<String, Object?> aldff(int clk, List<Object> d, List<Object> q) =>
+        cell(r'$aldff', <String, List<Object>>{
+          'CLK': <Object>[clk],
+          'ALOAD': <Object>[4],
+          'AD': <Object>[for (final _ in q) '0'],
+          'D': d,
+          'Q': q,
+        });
+    Map<String, Object?> buf(List<Object> a, List<Object> y) =>
+        cell(r'$buf', <String, List<Object>>{'A': a, 'Y': y});
+    Map<String, Object?> port(String direction, List<Object> bits) =>
+        <String, Object?>{'direction': direction, 'bits': bits};
+    Map<String, Object?> net(List<Object> bits) => <String, Object?>{
+      'hide_name': 0,
+      'bits': bits,
+      'attributes': <String, Object?>{},
+    };
+
+    NetlistModel slangShaped() => const YosysJsonParser().parse(
+      jsonEncode(<String, Object?>{
+        'creator': 'hand-written',
+        'modules': <String, Object?>{
+          'soc_top': <String, Object?>{
+            'attributes': <String, Object?>{'top': '1'},
+            'ports': <String, Object?>{
+              'clk_a': port('input', <Object>[2]),
+              'clk_b': port('input', <Object>[3]),
+              'rst_n': port('input', <Object>[4]),
+              'req_in': port('input', <Object>[5]),
+              'd_in': port('input', <Object>[40, 41, 42, 43]),
+              'req_out': port('output', <Object>[15]),
+              'captured': port('output', <Object>[50, 51, 52, 53]),
+            },
+            'cells': <String, Object?>{
+              'u_prod.req': aldff(2, <Object>[5], <Object>[10]),
+              'u_prod.data': aldff(
+                2,
+                <Object>[40, 41, 42, 43],
+                <Object>[20, 21, 22, 23],
+              ),
+              r'$buf$req': buf(<Object>[10], <Object>[11]),
+              'u_sync.s1': aldff(3, <Object>[11], <Object>[12]),
+              r'$buf$s1': buf(<Object>[12], <Object>[13]),
+              'u_sync.s2': aldff(3, <Object>[13], <Object>[14]),
+              r'$buf$s2': buf(<Object>[14], <Object>[15]),
+              r'$buf$data': buf(
+                <Object>[20, 21, 22, 23],
+                <Object>[30, 31, 32, 33],
+              ),
+              'u_cons.captured': aldff(
+                3,
+                <Object>[30, 31, 32, 33],
+                <Object>[50, 51, 52, 53],
+              ),
+            },
+            'netnames': <String, Object?>{
+              'clk_a': net(<Object>[2]),
+              'clk_b': net(<Object>[3]),
+              'req': net(<Object>[10]),
+              'u_sync.d': net(<Object>[11]),
+              'data': net(<Object>[20, 21, 22, 23]),
+              'u_cons.data_bus': net(<Object>[30, 31, 32, 33]),
+            },
+          },
+        },
+      }),
+    );
+
+    test('async-load flops are registers in their clock domains', () {
+      final result = analysis.analyze(slangShaped(), topModuleName: 'soc_top');
+      expect(
+        result.domains.map((d) => d.clockName).toSet(),
+        <String>{'clk_a', 'clk_b'},
+        reason: 'an \$aldff is a flop on CLK; got ${result.diagnostics}',
+      );
+    });
+
+    test('the bus is an unsynchronized 4-bit crossing, named data', () {
+      final result = analysis.analyze(slangShaped(), topModuleName: 'soc_top');
+      final bus = result.crossings.singleWhere(
+        (c) => c.destRegisterPath == 'u_cons.captured',
+      );
+      expect(bus.width, 4);
+      expect(bus.syncKind, CdcSyncKind.none);
+      expect(bus.isUnsafe, isTrue);
+      expect(bus.netName, 'data');
+    });
+
+    test('req through buffered synchronizer stages is a two-flop chain', () {
+      // The buffers are wires. Kept, they are the only reader of the first
+      // stage, and a correct synchronizer reports as unprotected.
+      final result = analysis.analyze(slangShaped(), topModuleName: 'soc_top');
+      final req = result.crossings.singleWhere(
+        (c) => c.destRegisterPath == 'u_sync.s1',
+      );
+      expect(req.width, 1);
+      expect(req.syncKind, CdcSyncKind.twoFlop);
+      expect(req.isUnsafe, isFalse);
+    });
+
+    test('a module with no buffer is returned unchanged', () {
+      final model = slangShaped();
+      final module = model.modules['soc_top']!;
+      final once = CdcDomainAnalysis.withoutBuffers(module);
+      expect(once.cells.values.where((c) => c.type == r'$buf'), isEmpty);
+      expect(identical(CdcDomainAnalysis.withoutBuffers(once), once), isTrue);
+    });
+
+    test('a loop of buffers ends instead of spinning', () {
+      final looped = Module(
+        name: 'loop',
+        attributes: const <String, String>{},
+        ports: const <String, Port>{},
+        cells: <String, Cell>{
+          'b1': Cell.fromJson('b1', buf(<Object>[7], <Object>[8])),
+          'b2': Cell.fromJson('b2', buf(<Object>[8], <Object>[7])),
+        },
+        nets: const <String, Net>{},
+      );
+      expect(CdcDomainAnalysis.withoutBuffers(looped).cells, isEmpty);
     });
   });
 

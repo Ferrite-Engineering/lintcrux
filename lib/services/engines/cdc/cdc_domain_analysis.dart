@@ -456,24 +456,94 @@ class CdcDomainAnalysis {
   final CdcReviewedCrossingLookup? reviewedCrossing;
 
   /// Yosys register primitives. `$dff` family plus the async-reset variants;
-  /// the sync-reset `$sdff*` family carries the same `CLK` port.
+  /// the sync-reset `$sdff*` family carries the same `CLK` port, and so does
+  /// the async-load `$aldff*` family, which is how the yosys-slang frontend
+  /// writes a flop with an asynchronous reset.
   static bool isRegister(String cellType) =>
       cellType.startsWith(r'$dff') ||
       cellType.startsWith(r'$adff') ||
+      cellType.startsWith(r'$aldff') ||
       cellType.startsWith(r'$sdff');
+
+  /// [module] with every `$buf` cell removed and the nets on either side of
+  /// it merged.
+  ///
+  /// A buffer is a wire. The yosys-slang frontend writes one wherever a value
+  /// passes through a port of an instance, so after `flatten` a two-flop
+  /// synchronizer instantiated as its own module reads `Q -> $buf -> D`.
+  /// Left in, the buffer is the only reader of the first stage, the stage no
+  /// longer feeds the second one directly, and a correct synchronizer reports
+  /// as an unprotected crossing. Every reference to a buffer's output bit is
+  /// rewritten to the bit that drives its input, through chains of buffers,
+  /// in cell connections, ports and net names alike, so the analysis sees
+  /// the netlist the built-in frontend writes for the same RTL.
+  ///
+  /// Returns [module] itself when it has no buffer.
+  static Module withoutBuffers(Module module) {
+    final aliasOf = <int, BitRef>{};
+    for (final cell in module.cells.values) {
+      if (cell.type != r'$buf') continue;
+      final a = cell.connections['A'] ?? const <BitRef>[];
+      final y = cell.connections['Y'] ?? const <BitRef>[];
+      for (var i = 0; i < y.length && i < a.length; i++) {
+        final out = y[i];
+        if (out is NetBit) aliasOf[out.netId] = a[i];
+      }
+    }
+    if (aliasOf.isEmpty) return module;
+
+    BitRef resolve(BitRef bit) {
+      var current = bit;
+      // A buffer loop has no driver to land on; stop where it closes rather
+      // than spin.
+      final seen = <int>{};
+      while (current is NetBit && seen.add(current.netId)) {
+        final next = aliasOf[current.netId];
+        if (next == null) break;
+        current = next;
+      }
+      return current;
+    }
+
+    List<BitRef> rewrite(List<BitRef> bits) => <BitRef>[
+      for (final bit in bits) resolve(bit),
+    ];
+
+    return module.copyWith(
+      cells: <String, Cell>{
+        for (final entry in module.cells.entries)
+          if (entry.value.type != r'$buf')
+            entry.key: entry.value.copyWith(
+              connections: <String, List<BitRef>>{
+                for (final c in entry.value.connections.entries)
+                  c.key: rewrite(c.value),
+              },
+            ),
+      },
+      ports: <String, Port>{
+        for (final entry in module.ports.entries)
+          entry.key: entry.value.copyWith(bits: rewrite(entry.value.bits)),
+      },
+      nets: <String, Net>{
+        for (final entry in module.nets.entries)
+          entry.key: entry.value.copyWith(bits: rewrite(entry.value.bits)),
+      },
+    );
+  }
 
   /// Analyses [topModuleName] within [netlist].
   CdcAnalysisResult analyze(NetlistModel netlist, {String? topModuleName}) {
-    final module = topModuleName != null
+    final elaborated = topModuleName != null
         ? netlist.modules[topModuleName]
         : netlist.topModule;
-    if (module == null) {
+    if (elaborated == null) {
       return const CdcAnalysisResult(
         domains: <CdcClockDomain>[],
         crossings: <CdcCrossing>[],
         diagnostics: <String>['no top module to analyse'],
       );
     }
+    final module = withoutBuffers(elaborated);
 
     final diagnostics = <String>[];
     final netNames = _netNamesByBit(module);
@@ -573,6 +643,9 @@ class CdcDomainAnalysis {
       'PRE',
       'SET',
       'EN',
+      // The async-load flop's reset: the load enable and the value loaded.
+      'ALOAD',
+      'AD',
     };
     final readersOf = <int, Set<String>>{};
     for (final entry in module.cells.entries) {
