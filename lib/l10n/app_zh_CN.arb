@@ -506,15 +506,15 @@
   "@settingsAutoReloadLabel": {
     "description": "Settings → General label for the AutoReloadMode toggle."
   },
-  "settingsAutoReloadAuto": "自动重新运行",
+  "settingsAutoReloadAuto": "自动",
   "@settingsAutoReloadAuto": {
     "description": "Settings → General option for AutoReloadMode.auto."
   },
-  "settingsAutoReloadPrompt": "先询问我",
+  "settingsAutoReloadPrompt": "提示",
   "@settingsAutoReloadPrompt": {
     "description": "Settings → General option for AutoReloadMode.prompt."
   },
-  "settingsAutoReloadOff": "不做任何操作",
+  "settingsAutoReloadOff": "关闭",
   "@settingsAutoReloadOff": {
     "description": "Settings → General option for AutoReloadMode.off."
   },
@@ -1512,7 +1512,7 @@
   "settingsLanguageLabel": "语言",
   "settingsLanguageDescription": "应用界面使用的语言",
   "settingsCxpSectionTitle": "CXP 交叉探测",
-  "settingsAutoReloadDescription": "已加载项目在磁盘上更改时 LintCrux 的响应方式",
+  "settingsAutoReloadDescription": "已加载项目在磁盘上更改时：提示会先询问再重新运行，自动会重新运行引擎，关闭则不做任何操作",
   "tabContextMenuRevealInFinder": "在 Finder 中显示",
   "tabContextMenuRevealInExplorer": "在 Explorer 中显示",
   "tabContextMenuRevealInFiles": "在文件管理器中显示",

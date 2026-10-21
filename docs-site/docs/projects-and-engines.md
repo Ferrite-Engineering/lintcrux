@@ -142,6 +142,8 @@ Engines rename and retire rules between releases. LintCrux carries a rule-alias 
 - **Re-run automatically** — the engines re-run shortly after the save, re-linting only the changed files where an engine supports it.
 - **Do nothing** — no files are watched; re-run with ++f5++ or the toolbar run button.
 
+From LintCrux 1.2 the three options are labelled **Prompt**, **Auto** and **Off** so they fit the settings row; they do what **Prompt me first**, **Re-run automatically** and **Do nothing** do above.
+
 Each tab watches its own project's source files, so a save re-runs only that project. The choice applies to the current session; it is not saved across restarts.
 
 ## Sessions & workspaces {#sessions}

@@ -506,15 +506,15 @@
   "@settingsAutoReloadLabel": {
     "description": "Settings → General label for the AutoReloadMode toggle."
   },
-  "settingsAutoReloadAuto": "自動的に再実行する",
+  "settingsAutoReloadAuto": "自動",
   "@settingsAutoReloadAuto": {
     "description": "Settings → General option for AutoReloadMode.auto."
   },
-  "settingsAutoReloadPrompt": "確認する",
+  "settingsAutoReloadPrompt": "確認",
   "@settingsAutoReloadPrompt": {
     "description": "Settings → General option for AutoReloadMode.prompt."
   },
-  "settingsAutoReloadOff": "何もしない",
+  "settingsAutoReloadOff": "オフ",
   "@settingsAutoReloadOff": {
     "description": "Settings → General option for AutoReloadMode.off."
   },
@@ -1512,7 +1512,7 @@
   "settingsLanguageLabel": "言語",
   "settingsLanguageDescription": "アプリケーションインターフェースに使用する言語",
   "settingsCxpSectionTitle": "CXP クロスプローブ",
-  "settingsAutoReloadDescription": "読み込んだプロジェクトがディスク上で変更されたときの LintCrux の動作",
+  "settingsAutoReloadDescription": "読み込んだプロジェクトがディスク上で変更されたとき：確認は再実行の前に尋ね、自動はエンジンを再実行し、オフは何もしません",
   "tabContextMenuRevealInFinder": "Finder で表示",
   "tabContextMenuRevealInExplorer": "エクスプローラーで表示",
   "tabContextMenuRevealInFiles": "ファイルマネージャーで表示",

@@ -545,21 +545,21 @@
   "@settingsAutoReloadLabel": {
     "description": "Settings → General label for the AutoReloadMode toggle."
   },
-  "settingsAutoReloadAuto": "Re-run automatically",
+  "settingsAutoReloadAuto": "Auto",
   "@settingsAutoReloadAuto": {
     "description": "Settings → General option for AutoReloadMode.auto."
   },
-  "settingsAutoReloadPrompt": "Prompt me first",
+  "settingsAutoReloadPrompt": "Prompt",
   "@settingsAutoReloadPrompt": {
     "description": "Settings → General option for AutoReloadMode.prompt."
   },
-  "settingsAutoReloadOff": "Do nothing",
+  "settingsAutoReloadOff": "Off",
   "@settingsAutoReloadOff": {
     "description": "Settings → General option for AutoReloadMode.off."
   },
   "autoReloadPromptMessage": "Source files changed. Re-run the engines to pick up the changes?",
   "@autoReloadPromptMessage": {
-    "description": "Snackbar shown in a project tab when a watched source file changed and Settings > General > Auto-reload on source change is set to Prompt me first."
+    "description": "Snackbar shown in a project tab when a watched source file changed and Settings > General > Auto-reload on source change is set to Prompt."
   },
   "autoReloadActionRerun": "Re-run now",
   "@autoReloadActionRerun": {
@@ -1905,7 +1905,7 @@
   "@settingsCxpSectionTitle": {
     "description": "Settings category title for CXP cross-probe configuration."
   },
-  "settingsAutoReloadDescription": "How LintCrux responds when a loaded project changes on disk",
+  "settingsAutoReloadDescription": "When a loaded project changes on disk: Prompt asks before re-running, Auto re-runs the engines, Off does nothing",
   "@settingsAutoReloadDescription": {
     "description": "Description for the auto-reload segmented control."
   },

@@ -53,7 +53,7 @@ Open Settings with ++cmd+comma++ / ++ctrl+comma++. On desktop it opens as a dial
 
 | Section | What it controls |
 |---|---|
-| General | **Auto-reload on source change** (Prompt me first / Re-run automatically / Do nothing — see [Auto-reload](projects-and-engines.md#auto-reload)), **Default sort column**, **Default filter set on launch**, **Restore tabs on launch**, **Automatically check for updates**, and in release builds **Enable diagnostics** (see [Diagnostics](#diagnostics)). |
+| General | **Auto-reload on source change** (Prompt me first / Re-run automatically / Do nothing — see [Auto-reload](projects-and-engines.md#auto-reload); from LintCrux 1.2 the options read Prompt / Auto / Off), **Default sort column**, **Default filter set on launch**, **Restore tabs on launch**, **Automatically check for updates**, and in release builds **Enable diagnostics** (see [Diagnostics](#diagnostics)). |
 | Appearance | The **Language** picker (English, 中文, 日本語, 한국어), color theme presets, per-token color overrides (including the severity colors), and theme packs — see [Appearance & themes](appearance-and-themes.md). |
 | Privacy | The **Send anonymous usage statistics** toggle. See [Usage statistics](getting-started.md#usage-statistics). |
 | Engines | **Engine binary paths** — Auto-detect / Bundled / Custom per engine, with a **Probe** button — and **Per-rule severity overrides**. |

@@ -506,15 +506,15 @@
   "@settingsAutoReloadLabel": {
     "description": "Settings → General label for the AutoReloadMode toggle."
   },
-  "settingsAutoReloadAuto": "자동으로 다시 실행",
+  "settingsAutoReloadAuto": "자동",
   "@settingsAutoReloadAuto": {
     "description": "Settings → General option for AutoReloadMode.auto."
   },
-  "settingsAutoReloadPrompt": "먼저 확인",
+  "settingsAutoReloadPrompt": "확인",
   "@settingsAutoReloadPrompt": {
     "description": "Settings → General option for AutoReloadMode.prompt."
   },
-  "settingsAutoReloadOff": "아무 작업 안 함",
+  "settingsAutoReloadOff": "끄기",
   "@settingsAutoReloadOff": {
     "description": "Settings → General option for AutoReloadMode.off."
   },
@@ -1512,7 +1512,7 @@
   "settingsLanguageLabel": "언어",
   "settingsLanguageDescription": "애플리케이션 인터페이스에 사용할 언어",
   "settingsCxpSectionTitle": "CXP 교차 프로브",
-  "settingsAutoReloadDescription": "불러온 프로젝트가 디스크에서 변경될 때 LintCrux의 응답 방식",
+  "settingsAutoReloadDescription": "불러온 프로젝트가 디스크에서 변경될 때: 확인은 다시 실행하기 전에 묻고, 자동은 엔진을 다시 실행하며, 끄기는 아무 작업도 하지 않습니다",
   "tabContextMenuRevealInFinder": "Finder에서 표시",
   "tabContextMenuRevealInExplorer": "Explorer에서 표시",
   "tabContextMenuRevealInFiles": "파일 관리자에서 표시",
