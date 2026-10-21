@@ -1535,6 +1535,10 @@
   "@engineConfigSeverityOff": {
     "description": "Dropdown option in the per-rule severity-override control meaning the rule is disabled (no severity emitted). Distinct from severityNone ('Unclassified')."
   },
+  "engineConfigSeverityOverrideLabel": "Severity override",
+  "@engineConfigSeverityOverrideLabel": {
+    "description": "Accessible name of the per-rule severity-override pop-up button in Settings > Engines. Spoken by screen readers only; the rule id beside it is the visible label."
+  },
   "diagnosticsNoProjectLoaded": "No project loaded.",
   "@diagnosticsNoProjectLoaded": {
     "description": "Empty-state message in the Tab Diagnostics drawer when no project is active."

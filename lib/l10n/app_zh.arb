@@ -1409,6 +1409,7 @@
   "snackFeatureRequiresPro": "{feature} 需要 LintCrux Pro。",
   "snackFeatureNotAvailableYet": "{feature} 尚不可用。",
   "engineConfigSeverityOff": "关闭",
+  "engineConfigSeverityOverrideLabel": "严重级别覆盖",
   "diagnosticsNoProjectLoaded": "未加载项目。",
   "filePickerTypeProjectLabel": "LintCrux 项目",
   "filePickerTypeSourcesLabel": "HDL 源文件",

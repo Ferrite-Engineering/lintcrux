@@ -12,7 +12,7 @@
 11. cdc button
 12. verilator/ALWCOMBORDER always-comb · ordering button
 13. [verilator/ALWCOMBORDER always-comb · ordering button] Documentation button
-14. Filter preset None button collapsed
+14. Filter preset button collapsed None
 15. Fatal button
 16. Error button
 17. Warning button

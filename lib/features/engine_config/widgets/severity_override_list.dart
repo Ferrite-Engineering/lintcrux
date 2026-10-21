@@ -158,33 +158,35 @@ class _Row extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             flex: 2,
-            child: DropdownButton<Severity>(
+            child: CruxPopUpButton<Severity>(
               key: ValueKey('severityOverride-${rule.id}'),
               value: currentOverride ?? rule.defaultSeverity,
-              isExpanded: true,
+              expand: true,
+              dense: true,
+              semanticLabel: l10n.engineConfigSeverityOverrideLabel,
               onChanged: (sev) {
-                if (sev == null || sev == rule.defaultSeverity) {
+                if (sev == rule.defaultSeverity) {
                   onChanged(null);
                 } else {
                   onChanged(sev);
                 }
               },
               items: [
-                DropdownMenuItem(
+                CruxPopUpItem(
                   value: Severity.error,
-                  child: Text(l10n.severityError),
+                  label: l10n.severityError,
                 ),
-                DropdownMenuItem(
+                CruxPopUpItem(
                   value: Severity.warning,
-                  child: Text(l10n.severityWarning),
+                  label: l10n.severityWarning,
                 ),
-                DropdownMenuItem(
+                CruxPopUpItem(
                   value: Severity.note,
-                  child: Text(l10n.severityNote),
+                  label: l10n.severityNote,
                 ),
-                DropdownMenuItem(
+                CruxPopUpItem(
                   value: Severity.none,
-                  child: Text(l10n.engineConfigSeverityOff),
+                  label: l10n.engineConfigSeverityOff,
                 ),
               ],
             ),

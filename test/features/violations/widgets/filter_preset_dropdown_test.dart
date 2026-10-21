@@ -149,6 +149,60 @@ void main() {
     );
 
     testWidgets(
+      'choosing None from an active preset deactivates it: the null-valued '
+      'row reports null, it is not an action row',
+      (tester) async {
+        const presets = [NamedFilterPreset(name: 'Errors only')];
+        final container = ProviderContainer(
+          overrides: [
+            ...telemetryDeclinedOverrides(),
+            savedFilterPresetsProvider.overrideWith(() {
+              return _SeededNotifier()
+                ..seed = const SavedFilterPresetsState(
+                  presets: presets,
+                  activePresetName: 'Errors only',
+                );
+            }),
+          ],
+        );
+        addTearDown(container.dispose);
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const MaterialApp(
+              localizationsDelegates: [
+                L10N.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: L10N.supportedLocales,
+              home: Scaffold(body: FilterPresetDropdown()),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          container.read(savedFilterPresetsProvider).activePresetName,
+          'Errors only',
+        );
+
+        await tester.tap(find.byKey(const ValueKey('filterPresetDropdown')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('None').last);
+        await tester.pumpAndSettle();
+
+        expect(
+          container.read(savedFilterPresetsProvider).activePresetName,
+          isNull,
+        );
+        // The closed button shows the chosen row, not an action row's label.
+        expect(find.text('Save current filters as preset…'), findsNothing);
+        expect(find.text('None'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
       'selecting "Save current filters as preset…" opens a dialog; '
       'submitting a name saves and activates a new preset from the '
       'current table state',

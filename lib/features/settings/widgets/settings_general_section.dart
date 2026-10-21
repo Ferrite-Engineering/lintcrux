@@ -59,68 +59,49 @@ class SettingsGeneralSection extends ConsumerWidget {
             const SizedBox(height: 24),
             CruxFormRow(
               label: l10n.settingsGeneralDefaultSortLabel,
-              child: InputDecorator(
-                decoration: const InputDecoration(isDense: true),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<ViolationTableColumn>(
-                    value: tableState.sortColumn,
-                    isDense: true,
-                    isExpanded: true,
-                    onChanged: (next) {
-                      if (next != null) {
-                        tableNotifier.setSortColumn(next);
-                      }
-                    },
-                    items: [
-                      DropdownMenuItem(
-                        value: ViolationTableColumn.severity,
-                        child: Text(l10n.settingsGeneralDefaultSortSeverity),
-                      ),
-                      DropdownMenuItem(
-                        value: ViolationTableColumn.engine,
-                        child: Text(l10n.settingsGeneralDefaultSortEngine),
-                      ),
-                      DropdownMenuItem(
-                        value: ViolationTableColumn.rule,
-                        child: Text(l10n.settingsGeneralDefaultSortRule),
-                      ),
-                      DropdownMenuItem(
-                        value: ViolationTableColumn.file,
-                        child: Text(l10n.settingsGeneralDefaultSortFile),
-                      ),
-                    ],
+              child: CruxPopUpButton<ViolationTableColumn>(
+                value: tableState.sortColumn,
+                expand: true,
+                onChanged: tableNotifier.setSortColumn,
+                items: [
+                  CruxPopUpItem(
+                    value: ViolationTableColumn.severity,
+                    label: l10n.settingsGeneralDefaultSortSeverity,
                   ),
-                ),
+                  CruxPopUpItem(
+                    value: ViolationTableColumn.engine,
+                    label: l10n.settingsGeneralDefaultSortEngine,
+                  ),
+                  CruxPopUpItem(
+                    value: ViolationTableColumn.rule,
+                    label: l10n.settingsGeneralDefaultSortRule,
+                  ),
+                  CruxPopUpItem(
+                    value: ViolationTableColumn.file,
+                    label: l10n.settingsGeneralDefaultSortFile,
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 24),
             CruxFormRow(
               label: l10n.settingsGeneralDefaultFilterLabel,
-              child: InputDecorator(
-                decoration: const InputDecoration(isDense: true),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String?>(
-                    value: presets.activePresetName,
-                    isDense: true,
-                    isExpanded: true,
-                    onChanged: (next) {
-                      // null sentinel = "None"
-                      ref
-                          .read(savedFilterPresetsProvider.notifier)
-                          .activate(next);
-                    },
-                    items: [
-                      DropdownMenuItem<String?>(
-                        child: Text(l10n.settingsGeneralDefaultFilterNone),
-                      ),
-                      for (final p in presets.presets)
-                        DropdownMenuItem<String?>(
-                          value: p.name,
-                          child: Text(p.name),
-                        ),
-                    ],
+              child: CruxPopUpButton<String?>(
+                value: presets.activePresetName,
+                expand: true,
+                placeholder: l10n.settingsGeneralDefaultFilterNone,
+                // A null value is "None".
+                onChanged: (next) => ref
+                    .read(savedFilterPresetsProvider.notifier)
+                    .activate(next),
+                items: [
+                  CruxPopUpItem<String?>(
+                    value: null,
+                    label: l10n.settingsGeneralDefaultFilterNone,
                   ),
-                ),
+                  for (final p in presets.presets)
+                    CruxPopUpItem<String?>(value: p.name, label: p.name),
+                ],
               ),
             ),
             const SizedBox(height: 24),

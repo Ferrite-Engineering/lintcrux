@@ -1409,6 +1409,7 @@
   "snackFeatureRequiresPro": "{feature}에는 LintCrux Pro가 필요합니다.",
   "snackFeatureNotAvailableYet": "{feature}은(는) 아직 사용할 수 없습니다.",
   "engineConfigSeverityOff": "끄기",
+  "engineConfigSeverityOverrideLabel": "심각도 재정의",
   "diagnosticsNoProjectLoaded": "로드된 프로젝트가 없습니다.",
   "filePickerTypeProjectLabel": "LintCrux 프로젝트",
   "filePickerTypeSourcesLabel": "HDL 소스",

@@ -16,11 +16,13 @@ import 'package:lintcrux/domain/models/editor/editor_command.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/lintcrux_tab_payload.dart';
+import 'package:lintcrux/domain/models/named_filter_preset.dart';
 import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/search/widgets/search_dialog.dart';
+import 'package:lintcrux/features/violations/providers/saved_filter_presets_provider.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_view_mode_provider.dart';
@@ -535,12 +537,19 @@ void main() {
     });
 
     testWidgets('the preset dropdown reports kind: preset', (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          telemetryServiceProvider.overrideWithValue(telemetry),
+          telemetryStorageProvider.overrideWithValue(TelemetryTestStore()),
+        ],
+      );
+      addTearDown(container.dispose);
+      container
+          .read(savedFilterPresetsProvider.notifier)
+          .save(const NamedFilterPreset(name: 'Latches only'));
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            telemetryServiceProvider.overrideWithValue(telemetry),
-            telemetryStorageProvider.overrideWithValue(TelemetryTestStore()),
-          ],
+        UncontrolledProviderScope(
+          container: container,
           child: const MaterialApp(
             localizationsDelegates: [L10N.delegate],
             supportedLocales: L10N.supportedLocales,
@@ -550,11 +559,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Selecting "none" is still a preset gesture: the user reached for the
-      // preset control, which is what the counter is counting.
+      // Choosing a preset is the gesture the counter counts. (Choosing the
+      // row that is already chosen, "None" here, changes nothing and so
+      // reports nothing.)
       await tester.tap(find.byKey(const ValueKey('filterPresetDropdown')));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('None').last);
+      await tester.tap(find.text('Latches only').last);
       await tester.pumpAndSettle();
 
       expect(propsOf('filter.used'), <String, Object?>{'kind': 'preset'});

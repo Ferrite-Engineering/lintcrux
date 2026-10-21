@@ -1,0 +1,6 @@
+# Tab walk: 5 stops, cycles
+1. Substring button selected
+2. Glob button
+3. Regex button
+4. Learn more text
+5. Search rule or message edit

@@ -1,0 +1,33 @@
+# Tab walk: 32 stops, cycles
+1. [Browser dock grouping — No source files in this project.] Sources button selected
+2. Rules button
+3. Hide Panel button
+4. Filter preset button collapsed None
+5. No bookmarks — open manager button
+6. Fatal button
+7. Error button
+8. Warning button
+9. Note button
+10. Unclassified button
+11. Filter by rule or message… edit
+12. Filter by file glob (e.g. **/top.sv)… edit
+13. Severity button
+14. Engine button
+15. Rule button
+16. File button
+17. Line button
+18. Message button
+19. [Panel dock Source grouping — Select a violation to preview source.] Hide Panel button
+20. [Details dock Details grouping — Select a violation to inspect.] Hide Panel button
+21. [Toolbar grouping] Open Project… (Ctrl+O) button
+22. Save Session… button
+23. Close Active Project button
+24. Find in Violations… (Ctrl+F) button
+25. Cross-Probe Panel (Ctrl+Shift+X) button
+26. Settings… (Ctrl+,) button
+27. Open Source Files… (Ctrl+Shift+O) button
+28. Open Workspace… button
+29. Import SARIF report… button
+30. Run All Engines button
+31. [Active pane grouping] demo button selected — <project file>
+32. [demo button — <project file>] Close demo button

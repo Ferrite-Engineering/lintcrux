@@ -282,7 +282,7 @@ void main() {
     expect(
       lines,
       containsAllInOrder(<String>[
-        'Filter preset None button collapsed',
+        'Filter preset button collapsed None',
         'Warning button',
         'Severity button',
         rowLines.single,

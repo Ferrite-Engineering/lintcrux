@@ -1,6 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:crux_settings/crux_settings.dart';
 import 'package:crux_settings_ui/crux_settings_ui.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +67,7 @@ void main() {
       // active color preset, so [ColorThemeSection] is the stable marker that
       // survives ARB-string churn from the embedded `ThemeAppearanceSection`.
       expect(find.byType(ColorThemeSection), findsOneWidget);
-      expect(find.byType(SegmentedButton<AppThemeMode>), findsNothing);
+      expect(find.byType(CruxSegmentedControl<AppThemeMode>), findsNothing);
     });
 
     testWidgets('switches to Editors when its rail item is tapped', (

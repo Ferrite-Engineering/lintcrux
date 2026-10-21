@@ -34,7 +34,7 @@ import '../../support/telemetry_test_store.dart';
 
 /// The delegate set `LintcruxApp` itself installs. The Material / Widgets /
 /// Cupertino ones are not optional here: the Settings shell draws an `AppBar`
-/// and two `DropdownButton`s, all of which assert on a missing
+/// and the shared locale and auto-reload tiles, all of which assert on a missing
 /// `MaterialLocalizations` in a non-English locale.
 const List<LocalizationsDelegate<Object?>> _delegates =
     <LocalizationsDelegate<Object?>>[

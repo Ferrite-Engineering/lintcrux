@@ -1409,6 +1409,7 @@
   "snackFeatureRequiresPro": "{feature} には LintCrux Pro が必要です。",
   "snackFeatureNotAvailableYet": "{feature} はまだ利用できません。",
   "engineConfigSeverityOff": "オフ",
+  "engineConfigSeverityOverrideLabel": "重大度の上書き",
   "diagnosticsNoProjectLoaded": "プロジェクトが読み込まれていません。",
   "filePickerTypeProjectLabel": "LintCrux プロジェクト",
   "filePickerTypeSourcesLabel": "HDL ソース",

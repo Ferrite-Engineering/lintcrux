@@ -1,6 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +25,7 @@ class _TextAwareShortcutManager extends ShortcutManager {
     if (_isTextInputFocused() && _isBareLetter()) {
       return KeyEventResult.ignored;
     }
-    if (_isBareEscape(event) && _isPopupFocused()) {
+    if (_isBareKey() && cruxFocusIsInPushedRoute()) {
       return KeyEventResult.ignored;
     }
     // Cross-probe Selection's chord ends in Enter, which a text field owns (a
@@ -49,28 +50,21 @@ class _TextAwareShortcutManager extends ShortcutManager {
     return false;
   }
 
-  /// Escape with no modifier at all.
-  static bool _isBareEscape(KeyEvent event) =>
-      event.logicalKey == LogicalKeyboardKey.escape &&
+  /// A key pressed with no modifier at all (Escape, an arrow, a letter).
+  ///
+  /// This manager sits above the app's Navigator, so a key reaches it before
+  /// the framework's own Escape-dismisses-the-popup handling, which lives in
+  /// `WidgetsApp`'s default shortcuts further up. While focus is in a dialog,
+  /// sheet or menu (`cruxFocusIsInPushedRoute`, which also sees a tab-modal
+  /// dialog on a tab's own navigator), a bare key belongs to that route:
+  /// binding a bare Escape here (cancel run) otherwise swallowed the Escape
+  /// that closes an open row menu or tab dialog. Modifier chords still fire
+  /// from inside a dialog, so the command palette stays reachable.
+  static bool _isBareKey() =>
       !HardwareKeyboard.instance.isControlPressed &&
       !HardwareKeyboard.instance.isMetaPressed &&
       !HardwareKeyboard.instance.isAltPressed &&
       !HardwareKeyboard.instance.isShiftPressed;
-
-  /// True when focus is inside a popup route: a context menu, a dropdown, a
-  /// dialog.
-  ///
-  /// This manager sits above the app's Navigator, so a key reaches it before
-  /// the framework's own Escape-dismisses-the-popup handling, which lives in
-  /// `WidgetsApp`'s default shortcuts further up. Binding a bare Escape here
-  /// (cancel run) therefore used to swallow it: Escape on an open row menu
-  /// cancelled nothing, said so in a snackbar, and left the menu open.
-  /// Inside a popup, Escape belongs to the popup.
-  static bool _isPopupFocused() {
-    final focusContext = FocusManager.instance.primaryFocus?.context;
-    if (focusContext == null || !focusContext.mounted) return false;
-    return ModalRoute.of(focusContext) is PopupRoute;
-  }
 
   /// True when the current key event has no primary modifier keys
   /// (Ctrl, Cmd/Meta, Alt). Shift is not a primary modifier — a

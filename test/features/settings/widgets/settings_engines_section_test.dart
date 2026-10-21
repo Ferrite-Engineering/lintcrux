@@ -1,6 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,7 +20,7 @@ import 'package:lintcrux/services/engines/engine_registry_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Widget coverage for [SettingsEnginesSection] — the Settings → Engines
-/// section: per-engine binary-source segmented buttons, the custom-path
+/// section: per-engine binary-source segmented controls, the custom-path
 /// field + live probe (success / not-detected / thrown error), settings
 /// persistence, and the standard locale sweep.
 /// (`settings_screen_test.dart` only exercises the General / Appearance /
@@ -99,8 +100,8 @@ void main() {
         // No Bundled choice: no engine binaries ship, so it would resolve
         // exactly as Auto-detect does.
         for (final button
-            in tester.widgetList<SegmentedButton<EngineBinarySource>>(
-              find.byType(SegmentedButton<EngineBinarySource>),
+            in tester.widgetList<CruxSegmentedControl<EngineBinarySource>>(
+              find.byType(CruxSegmentedControl<EngineBinarySource>),
             )) {
           expect(
             button.segments.map((s) => s.value),
@@ -143,10 +144,10 @@ void main() {
             );
         await tester.pump();
 
-        final button = tester.widget<SegmentedButton<EngineBinarySource>>(
-          find.byType(SegmentedButton<EngineBinarySource>),
+        final button = tester.widget<CruxSegmentedControl<EngineBinarySource>>(
+          find.byType(CruxSegmentedControl<EngineBinarySource>),
         );
-        expect(button.selected, {EngineBinarySource.system});
+        expect(button.selected, EngineBinarySource.system);
         // Only the display maps it; the saved value is untouched.
         expect(
           containerOf(

@@ -56,9 +56,9 @@ class FilterPresetDropdown extends ConsumerWidget {
           // keeping its isExpanded share of the row unchanged.
           //
           // The visible label is excluded from semantics and given to the
-          // dropdown instead: on its own the dropdown was announced only by
-          // its current value ("None button collapsed"), with the name it
-          // controls sitting on a separate node focus never reaches.
+          // pop-up button as its semantic label instead: on its own the
+          // button would be announced only by its current value, with the
+          // name it controls sitting on a separate node focus never reaches.
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 160),
             child: ExcludeSemantics(
@@ -71,59 +71,56 @@ class FilterPresetDropdown extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           Flexible(
-            child: Semantics(
-              label: l10n.filterPresetDropdownLabel,
-              child: DropdownButton<String?>(
-                key: const ValueKey('filterPresetDropdown'),
-                value: state.activePresetName,
-                isExpanded: true,
-                hint: Text(l10n.filterPresetNoneLabel),
-                onChanged: (next) async {
-                  if (next == _saveSentinel) {
-                    await _showSaveDialog(context, ref);
-                    return;
-                  }
-                  if (next == _manageSentinel) {
-                    await _showManageDialog(context, ref);
-                    return;
-                  }
-                  ref.read(savedFilterPresetsProvider.notifier).activate(next);
-                  // The fifth `filter.used` kind. Recorded at the dropdown
-                  // rather than on `SavedFilterPresetsNotifier.activate`, which
-                  // session restore also drives — see the note on
-                  // `ViolationFilterChips._recordFilterUsed`.
-                  ref
-                      .read(telemetryServiceProvider)
-                      .record(
-                        TelemetryEvent(
-                          'filter.used',
-                          properties: <String, Object?>{
-                            'kind': telemetryEnumToken(
-                              LintcruxFilterKind.preset,
-                            ),
-                          },
-                        ),
-                      );
-                },
-                items: [
-                  DropdownMenuItem<String?>(
-                    child: Text(l10n.filterPresetNoneLabel),
-                  ),
-                  for (final p in state.presets)
-                    DropdownMenuItem<String?>(
-                      value: p.name,
-                      child: Text(p.name),
-                    ),
-                  DropdownMenuItem<String?>(
-                    value: _saveSentinel,
-                    child: Text(l10n.filterPresetSaveAction),
-                  ),
-                  DropdownMenuItem<String?>(
-                    value: _manageSentinel,
-                    child: Text(l10n.filterPresetManageAction),
-                  ),
-                ],
-              ),
+            child: CruxPopUpButton<String?>(
+              key: const ValueKey('filterPresetDropdown'),
+              value: state.activePresetName,
+              expand: true,
+              dense: true,
+              semanticLabel: l10n.filterPresetDropdownLabel,
+              placeholder: l10n.filterPresetNoneLabel,
+              onChanged: (next) async {
+                if (next == _saveSentinel) {
+                  await _showSaveDialog(context, ref);
+                  return;
+                }
+                if (next == _manageSentinel) {
+                  await _showManageDialog(context, ref);
+                  return;
+                }
+                ref.read(savedFilterPresetsProvider.notifier).activate(next);
+                // The fifth `filter.used` kind. Recorded at the dropdown
+                // rather than on `SavedFilterPresetsNotifier.activate`, which
+                // session restore also drives — see the note on
+                // `ViolationFilterChips._recordFilterUsed`.
+                ref
+                    .read(telemetryServiceProvider)
+                    .record(
+                      TelemetryEvent(
+                        'filter.used',
+                        properties: <String, Object?>{
+                          'kind': telemetryEnumToken(
+                            LintcruxFilterKind.preset,
+                          ),
+                        },
+                      ),
+                    );
+              },
+              items: [
+                CruxPopUpItem<String?>(
+                  value: null,
+                  label: l10n.filterPresetNoneLabel,
+                ),
+                for (final p in state.presets)
+                  CruxPopUpItem<String?>(value: p.name, label: p.name),
+                CruxPopUpItem<String?>(
+                  value: _saveSentinel,
+                  label: l10n.filterPresetSaveAction,
+                ),
+                CruxPopUpItem<String?>(
+                  value: _manageSentinel,
+                  label: l10n.filterPresetManageAction,
+                ),
+              ],
             ),
           ),
         ],
