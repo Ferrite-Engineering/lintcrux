@@ -125,7 +125,7 @@ void main() {
       await c.read(telemetryConsentReadyProvider.future);
 
       expect(c.read(telemetryConsentPromptVisibleProvider), isFalse);
-      expect(c.read(telemetryEnabledProvider), isFalse);
+      expect(c.read(telemetryGateProvider), isNot(TelemetryGate.open));
     });
 
     test('an answered yes is still yes on the next visit', () async {
@@ -137,7 +137,7 @@ void main() {
       await c.read(telemetryConsentReadyProvider.future);
 
       expect(c.read(telemetryConsentPromptVisibleProvider), isFalse);
-      expect(c.read(telemetryEnabledProvider), isTrue);
+      expect(c.read(telemetryGateProvider), TelemetryGate.open);
     });
   });
 }

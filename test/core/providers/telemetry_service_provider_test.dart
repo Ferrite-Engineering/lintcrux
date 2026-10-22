@@ -79,7 +79,10 @@ void main() {
           isA<PendingTelemetryService>(),
         );
         await container.read(telemetryConsentReadyProvider.future);
-        expect(container.read(telemetryEnabledProvider), isFalse);
+        expect(
+          container.read(telemetryGateProvider),
+          isNot(TelemetryGate.open),
+        );
         expect(
           container.read(telemetryServiceProvider),
           isA<PendingTelemetryService>(),
@@ -99,7 +102,7 @@ void main() {
           TelemetryConsentState.enabled;
       await container.read(telemetryConsentReadyProvider.future);
 
-      expect(container.read(telemetryEnabledProvider), isFalse);
+      expect(container.read(telemetryGateProvider), isNot(TelemetryGate.open));
       expect(
         container.read(telemetryServiceProvider),
         isA<NoopTelemetryService>(),
@@ -122,7 +125,7 @@ void main() {
           TelemetryConsentState.enabled;
       await container.read(telemetryConsentReadyProvider.future);
 
-      expect(container.read(telemetryEnabledProvider), isTrue);
+      expect(container.read(telemetryGateProvider), TelemetryGate.open);
       expect(
         container.read(telemetryServiceProvider),
         isA<LiveTelemetryService>(),
@@ -258,39 +261,39 @@ void main() {
           !cell.beta &&
           !cell.dev &&
           cell.consent == TelemetryConsentState.unset;
-      test(
-        'beta=${cell.beta} dev=${cell.dev} consent=${cell.consent.name} '
-        '→ ${cell.on
-            ? "live"
-            : waits
-            ? "pending"
-            : "no-op"}',
-        () async {
-          final container = lintcruxContainer(
-            extra: [
-              telemetryBetaPeriodProvider.overrideWithValue(cell.beta),
-              telemetryDevModeProvider.overrideWithValue(cell.dev),
-            ],
-          );
-          container.read(telemetryConsentStoreProvider.notifier).state =
-              cell.consent;
-          // These cells state the SETTLED behaviour. Under the dev flag
-          // `unset` counts as consent only once the store has read its
-          // persisted value back — before that a stored refusal wears the same
-          // value, which is how a `disabled` installation once transmitted.
-          await container.read(telemetryConsentReadyProvider.future);
+      test('beta=${cell.beta} dev=${cell.dev} consent=${cell.consent.name} '
+          '→ ${cell.on
+              ? "live"
+              : waits
+              ? "pending"
+              : "no-op"}', () async {
+        final container = lintcruxContainer(
+          extra: [
+            telemetryBetaPeriodProvider.overrideWithValue(cell.beta),
+            telemetryDevModeProvider.overrideWithValue(cell.dev),
+          ],
+        );
+        container.read(telemetryConsentStoreProvider.notifier).state =
+            cell.consent;
+        // These cells state the SETTLED behaviour. Under the dev flag
+        // `unset` counts as consent only once the store has read its
+        // persisted value back — before that a stored refusal wears the same
+        // value, which is how a `disabled` installation once transmitted.
+        await container.read(telemetryConsentReadyProvider.future);
 
-          expect(container.read(telemetryEnabledProvider), cell.on);
-          expect(
-            container.read(telemetryServiceProvider),
-            cell.on
-                ? isA<LiveTelemetryService>()
-                : waits
-                ? isA<PendingTelemetryService>()
-                : isA<NoopTelemetryService>(),
-          );
-        },
-      );
+        expect(
+          container.read(telemetryGateProvider) == TelemetryGate.open,
+          cell.on,
+        );
+        expect(
+          container.read(telemetryServiceProvider),
+          cell.on
+              ? isA<LiveTelemetryService>()
+              : waits
+              ? isA<PendingTelemetryService>()
+              : isA<NoopTelemetryService>(),
+        );
+      });
     }
   });
 
