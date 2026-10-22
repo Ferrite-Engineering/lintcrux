@@ -81,6 +81,7 @@ nav:
       - Pin constraints: pin-constraints.md
   - Ship & integrate:
       - Exports & CI: exports-and-ci.md
+      - Opening Flow SARIF: opening-flow-sarif.md
       - Team trend database: team-database.md
       - Cross-probe & the suite: integrations.md
       - Use in VS Code: vscode.md

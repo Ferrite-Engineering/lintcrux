@@ -19,4 +19,4 @@ The rest of these docs explain what each feature *is*. The Cookbook shows you ho
 Every recipe opens with a short summary — the goal, a rough time, the tier you need, and the features it exercises — followed by numbered steps. Keyboard shortcuts are written macOS first (++cmd++), with the ++ctrl++ equivalent for Linux and Windows. Where a step leans on a feature covered in depth elsewhere, it links straight to that page so you can go deeper without leaving the workflow.
 
 !!! note "More on the way"
-    This is the opening set of recipes. If there is a workflow you keep repeating and would like written up — a migration from a commercial lint tool, a tape-out sign-off pass, a new-repo onboarding checklist — [tell us](mailto:support@ferriteengineering.com).
+    This is the opening set of recipes. If there is a workflow you keep repeating and would like written up — a migration from a commercial lint tool, a pre-release lint pass, a new-repo onboarding checklist — [tell us](mailto:support@ferriteengineering.com).
