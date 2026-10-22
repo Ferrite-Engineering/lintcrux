@@ -62,6 +62,20 @@ The *epoch* is the escape hatch that keeps that promise honest. Additive-only is
 
 Submitter attribution is nullable, so an anonymous CI writer can push. **An unattributed run is honest; a fabricated attribution is a name in a dashboard next to a failure that person never saw.**
 
+## Project identity {#project-id}
+
+From 1.2, runs are pooled under the project's own **`projectId`**, declared in its `.lintcrux` file and committed with it:
+
+```json
+"projectId": "soc-top"
+```
+
+It is 1 to 64 letters, digits, `.`, `_` or `-`, and it is the same string on every engineer's checkout and in the CI job, which is what lets one project's history be read from every machine. Pick a short name once and keep it: changing it starts a new history.
+
+**The checkout path is never the identity.** Before 1.2 the pooled history was keyed on the absolute path of the project, so two engineers who checked the same repository out to different paths (`/Users/alice/soc` and `/home/bob/src/soc`) never saw each other's runs. A project that declares no `projectId` is not pooled: `Settings → Team Database` says so for the open project, and `push-trends` exits `6` with a message that names the line to add, rather than quietly filing the run under a path.
+
+**History written by an earlier release follows the project.** The first time a 1.2 client opens or pushes a project that declares a `projectId`, runs the earlier release filed under that project's own location (the path of its `.lintcrux` file, from the desktop app, and the project directory, from CI) are moved to the `projectId`, rows and violations intact. Runs filed under any other path are not touched: they stay readable from the machine that wrote them, and nothing is deleted on a guess. A role that may insert and read but not update or delete keeps pooling under the `projectId`; its earlier rows stay where they were until an administrator runs the move with a wider role.
+
 ## Pushing from CI {#ci}
 
 ```bash
@@ -110,7 +124,7 @@ When the lint itself is clean, a problem with the shared database sets the exit 
 | Code | Meaning | Retry? |
 |---|---|---|
 | `5` | The server could not be reached, refused the connection, or refused the credential. | Reasonable. |
-| `6` | The database is reachable, but this run cannot be recorded in it — a different epoch, an older schema, none at all, an unparseable `LINTCRUX_TEAM_DB_URL`, or no `LINTCRUX_ORIGIN_ID`. | Never — it needs an administrator or a fixed job definition. |
+| `6` | The database is reachable, but this run cannot be recorded in it — a different epoch, an older schema, none at all, an unparseable `LINTCRUX_TEAM_DB_URL`, no `LINTCRUX_ORIGIN_ID`, or a project file with no [`projectId`](#project-id) (from 1.2). | Never — it needs an administrator or a fixed job definition. |
 
 A run already present in the database is a success. A lint result of `1`, `2`, `3` or `4` takes precedence over either code, and neither code is reused by the lint itself, so a pipeline can branch on the number alone. `5` means the same thing as it does for `simcrux-pro push-results`, so one retry rule covers both products.
 
@@ -133,7 +147,7 @@ Highest first:
 
 ## What a push records {#pushed}
 
-Each pushed run becomes a row in `lint_runs` — the project path the pushing client recorded, the run time, the submitter (or none), and the violation count — plus one row per violation in `violation_data_points` with its rule, severity, file, line and message. The run key is built from the [required `LINTCRUX_ORIGIN_ID`](#ci), which is what keeps two agents starting a run in the same millisecond from colliding on it. A push is not an audit event; the events LintCrux records are listed on [Administration](administration.md#audit).
+Each pushed run becomes a row in `lint_runs` — the project's [`projectId`](#project-id) (the project path, in releases before 1.2), the run time, the submitter (or none), and the violation count — plus one row per violation in `violation_data_points` with its rule, severity, file, line and message. The run key is built from the [required `LINTCRUX_ORIGIN_ID`](#ci), which is what keeps two agents starting a run in the same millisecond from colliding on it. A push is not an audit event; the events LintCrux records are listed on [Administration](administration.md#audit).
 
 !!! note "Education institutions"
     The shared trend database is an Enterprise feature and is not part of the <span class="tier tier-edu">EDU</span> tier — see [Tiers & licensing](https://edacrux.app/licensing).
