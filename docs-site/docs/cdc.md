@@ -18,6 +18,7 @@ LintCrux analyses crossings **structurally**, from the elaborated netlist, and r
 | `cdc/reviewed-crossing` | Note | <span class="tier tier-pro">Pro</span> | An unprotected crossing that a `cdc.yaml` `waive:` rule covers. Reported as a note carrying the rule's `reason`, in place of the error or warning, so an accepted crossing stays visible rather than vanishing. See [below](#cdc-yaml). |
 | `cdc/elaboration-failed` | Error | Open core | Yosys could not elaborate the design, so nothing was analysed. The headless binary exits `3` on it. |
 | `cdc/unsupported-sources` | Error | Open core | The design includes VHDL; CDC refuses to analyse a partial design. The headless binary exits `3` on it. |
+| `cdc/needs-slang-frontend` | Error | Open core | From LintCrux 1.2. The design uses SystemVerilog packages, the Yosys in use has no yosys-slang frontend, and its built-in reader refused the design, so nothing was analysed. Names the package and how to get yosys-slang. The headless binary exits `3` on it. See [below](#systemverilog). |
 | `cdc/summary`, `cdc/analysis-note` | Note | Open core | What was analysed, and anything the analysis could not do — reported even on a clean design. See [below](#summary-note). |
 
 ## The fix that looks careful and is not {#per-bit}
@@ -103,10 +104,29 @@ CDC is registered like any other engine: it runs when `enabledEngineIds` is empt
 
 Each source is read under the language the project resolved for it (its declared language, else its extension), so a SystemVerilog file gets `read_verilog -sv` and a Verilog file does not, and the project's include paths and defines are passed, the same as for the Yosys check engine. Yosys runs from the project root, so a relative path in `$readmemh` or `$readmemb` resolves against it wherever LintCrux was started from. A design whose memory images live in another directory names it with `workingDirectory` under `perEngineOptions.cdc` (see the [project file reference](reference/project-file.md)).
 
-!!! warning "SystemVerilog designs that use packages"
+!!! warning "SystemVerilog designs that use packages (LintCrux 1.1)"
     The CDC path reads SystemVerilog with Yosys's built-in `read_verilog -sv`, which covers the synthesizable subset but not the whole language. Package scoping (`pkg::Name`), `void` functions and some other constructs stop it with a syntax error, so a design built on packages, among them OpenTitan, Ibex and CVA6, does not elaborate under `cdc` today and returns `cdc/elaboration-failed` with no crossings. The Verilator, Verible and Slang engines are not affected. A SystemVerilog front end for the CDC path is planned; until it lands, CDC analysis is limited to designs that stock Yosys can read.
+
+From LintCrux 1.2, SystemVerilog that uses packages elaborates when the Yosys in use includes yosys-slang: see [below](#systemverilog).
 
 Without a runnable `yosys`, CDC is reported like any other missing engine — **Binary not available** on the desktop, and exit `3` from the headless binary unless you pass `--allow-missing-engines`. A Yosys run that times out, that could not be started with your source list (a path containing a double quote, for instance), or that exits without writing its netlist marks the engine **Failed** instead — also exit `3`, and not something `--allow-missing-engines` tolerates. `cdc/elaboration-failed` is reserved for a design Yosys ran on and rejected with a non-zero exit. It still means nothing was analysed, so the headless binary exits `3` for it as well: a CI job never reads an unelaborated design as clean.
 
 !!! note "Whole-design analysis"
     A crossing is a relationship between two places, so CDC has no incremental mode: re-analysing one changed file in isolation would answer a different question. It runs over the whole design every time, and is never served from the Pro lint cache — the cache keys on the engine binary's version, which for CDC is Yosys', so a cached result could not be invalidated by a LintCrux update *or* by you editing `cdc.yaml`. One extra Yosys invocation is the right price for constraint edits that actually take effect.
+
+## SystemVerilog through yosys-slang, from LintCrux 1.2 {#systemverilog}
+
+From LintCrux 1.2, when the Yosys that CDC runs includes the yosys-slang frontend, CDC reads the design's SystemVerilog with `read_slang` instead of `read_verilog -sv`. yosys-slang reads the language, packages included. The [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build)'s Yosys has it built in; Homebrew's Yosys does not. Point **Settings > Engines > Yosys check** (or `--yosys-path`) at the suite's `bin/yosys`. A design with no SystemVerilog file is read with the built-in reader, as before, and the `cdc/summary` note says when yosys-slang read the design.
+
+CDC reads with `--single-unit` (macros cross files, as they do in one `read_verilog`), `--top` with the project's `topModule`, `--ignore-initial` (initial blocks and declaration initializers describe simulation start-up, not structure) and `--ignore-assertions` (CDC reads no assertion). Set `topModule`: without it, yosys-slang elaborates every module in the file list, including ones the top never instantiates. yosys-slang names each file relative to the directory Yosys ran in; CDC turns every position back into the project's own path, so waivers and baselines written against a finding keep matching it.
+
+Measured with the OSS CAD Suite of 2026-10-21 on the three designs named in the LintCrux 1.1 note above:
+
+| Design | Top | Result |
+|---|---|---|
+| CVA6 v5.3.0 core (`core/Flist.cva6`, `cv64a6_imafdc_sv39`) | `cva6` | Elaborates (about 69,000 cells) |
+| Ibex | `ibex_core` | Elaborates (about 11,000 cells) |
+| Ibex | `ibex_top` | Refused by yosys-slang: a declaration initializer that reads a net (`ibex_top.sv` lines 659 and 660, "reading net state during design initialization unsupported"). `--ignore-initial` does not remove it. Analyse from `ibex_core` |
+| OpenTitan `earlgrey_1.0.0` | `chip_earlgrey_asic` | Elaborates with `rglts_pdm_3p3v`, an analog regulator's behavioural model, read as a black box (`blackboxedModules` under `perEngineOptions.cdc`, see the [project file reference](reference/project-file.md)). The flattened netlist is about 754,000 cells and 864 MB of JSON, which CDC reads whole: a design this large may exceed the memory available until CDC reads the netlist in bounded memory |
+
+When the Yosys in use has no yosys-slang and its built-in reader refuses a design that declares or imports a package, CDC reports one `cdc/needs-slang-frontend` error, at the first package declaration or import, naming the package and how to get yosys-slang, in place of `cdc/elaboration-failed`. A design that yosys-slang itself refuses is `cdc/elaboration-failed`, and the message says yosys-slang read it.

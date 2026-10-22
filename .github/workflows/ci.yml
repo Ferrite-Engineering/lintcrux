@@ -278,8 +278,10 @@ jobs:
           # opt-in; the Linux leg is the one that runs on every push.
           LINTCRUX_CHECK_ENGINE_URLS: ${{ runner.os == 'Linux' && '1' || '0' }}
         # The JSON file reporter feeds the count check below; the console
-        # keeps the GitHub reporter.
-        run: flutter test --reporter github --file-reporter json:build/test-results.json
+        # keeps the GitHub reporter. `oss-cad-live` tests need the OSS CAD
+        # Suite's Yosys (with yosys-slang), which this job does not install;
+        # excluded so they do not count against the skip ceiling.
+        run: flutter test -x oss-cad-live --reporter github --file-reporter json:build/test-results.json
 
       # A narrowed glob, a lost test directory or a mass skip leaves every
       # remaining test green, so only the count notices. Parsed from the JSON

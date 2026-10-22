@@ -105,6 +105,7 @@ Svlint has no structured output mode; LintCrux parses its default report, which 
 | Key | Type | Meaning |
 |---|---|---|
 | `workingDirectory` | string | As for `yosys`: CDC drives Yosys and resolves memory images the same way. |
+| `blackboxedModules` | list of strings | From LintCrux 1.2. Modules yosys-slang reads as black boxes (ports kept, contents not elaborated), for a behavioural model it cannot lower, such as an analog macro's. Each entry is a bare module name; anything else fails the run before Yosys starts. Applies only when CDC reads SystemVerilog with yosys-slang (see [CDC](../cdc.md#systemverilog)). |
 
 Both Yosys-backed engines read each source under the language the project resolved for it (a declared language, else the extension), and pass the project's `includePaths` and `defines`.
 

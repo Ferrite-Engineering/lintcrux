@@ -57,6 +57,14 @@
       ]
     },
     {
+      "id": "needs-slang-frontend",
+      "defaultSeverity": "error",
+      "tags": [
+        "cdc",
+        "tooling"
+      ]
+    },
+    {
       "id": "elaboration-failed",
       "defaultSeverity": "error",
       "tags": [

@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'dart:convert';
-import 'dart:io' show Directory;
+import 'dart:io'
+    show
+        Directory,
+        File,
+        FileSystemEntity,
+        FileSystemEntityType,
+        FileSystemException,
+        Platform;
 
 import 'package:crux_yosys/crux_yosys.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
@@ -10,6 +17,7 @@ import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_source_span.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_engine_support.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as p;
 
 // The one place a LintCrux engine that analyses a Yosys-elaborated design
 // asks Yosys to elaborate it. The `cdc` and `constraints` engines both call
@@ -56,6 +64,11 @@ final class DesignElaborationFailed extends DesignElaboration {
 /// not be among them for an analysis that reads structure (the CDC engine's
 /// reason for passing only `flatten`).
 ///
+/// [frontend] picks the reader; [YosysFrontend.slang] needs a Yosys that
+/// `YosysAvailabilityService.probeSlang` says has it, and takes
+/// [slangOptions]. A slang netlist names each `src` file relative to the
+/// directory Yosys ran in: read spans through [YosysSpanPathResolver].
+///
 /// Throws the engine exception [yosysRunException] builds for every outcome
 /// that says nothing about the design.
 Future<DesignElaboration> elaborateDesign(
@@ -65,6 +78,8 @@ Future<DesignElaboration> elaborateDesign(
   Directory? tempDirectory,
   BundledBinaryResolver bundledBinaryResolver = const BundledBinaryResolver(),
   List<String> extraCommands = const <String>[],
+  YosysFrontend frontend = YosysFrontend.verilog,
+  List<String> slangOptions = const <String>[],
 }) async {
   final executable = yosysExecutableFor(
     request.binary,
@@ -85,6 +100,8 @@ Future<DesignElaboration> elaborateDesign(
       includePaths: request.includePaths,
       topModule: request.topModule,
       extraCommands: extraCommands,
+      frontend: frontend,
+      slangOptions: slangOptions,
     ),
   );
   switch (result) {
@@ -99,6 +116,96 @@ Future<DesignElaboration> elaborateDesign(
         executable: executable,
       );
   }
+}
+
+/// Turns the file of a Yosys `src` attribute into the path the user's project
+/// names, so findings, waivers and baselines key on the user's own path.
+///
+/// The built-in reader writes the path it was given, which is already the
+/// project's (absolute) source path, and is returned unchanged. yosys-slang
+/// writes the file relative to the directory Yosys ran in
+/// ([yosysWorkingDirectoryFor]), with or without `--diag-abs-paths`, so
+/// `rtl/top.sv` from a run in the project root would otherwise be a second
+/// name for `/project/rtl/top.sv`: a waiver written against one would not
+/// match the other.
+///
+/// A relative file is joined to that directory. When the result names one of
+/// the request's sources, directly or once symbolic links are resolved
+/// (Yosys's own directory is the canonical one, `/private/var` where the
+/// project says `/var`), the source's own spelling is returned. Anything else,
+/// an included header for instance, is returned as the joined absolute path.
+/// Answers are cached per resolver, which serves one run.
+class YosysSpanPathResolver {
+  /// A resolver for the spans of one elaboration of [request].
+  YosysSpanPathResolver(LintRunRequest request)
+    : _workingDirectory = yosysWorkingDirectoryFor(request),
+      _sources = request.sourceFiles;
+
+  final String? _workingDirectory;
+  final List<String> _sources;
+  final Map<String, String> _resolved = <String, String>{};
+  Map<String, String>? _byNormalized;
+  Map<String, String>? _byCanonical;
+  String? _canonicalWorkingDirectory;
+
+  /// The project's name for [file], as described on the class.
+  String resolve(String file) {
+    final workingDirectory = _workingDirectory;
+    if (file.isEmpty || p.isAbsolute(file) || workingDirectory == null) {
+      return file;
+    }
+    return _resolved.putIfAbsent(
+      file,
+      () => _resolveRelative(workingDirectory, file),
+    );
+  }
+
+  String _resolveRelative(String workingDirectory, String file) {
+    final joined = p.normalize(p.join(workingDirectory, file));
+    final byNormalized = _byNormalized ??= <String, String>{
+      for (final source in _sources) _key(p.normalize(source)): source,
+    };
+    if (byNormalized[_key(joined)] case final String source) return source;
+
+    // Yosys's own working directory is the canonical one, so the relative
+    // name may have been computed from it rather than from the spelling the
+    // project uses: try both, each with its links resolved.
+    final canonicalDirectory = _canonicalWorkingDirectory ??= _canonical(
+      workingDirectory,
+    );
+    final fromCanonical = p.normalize(p.join(canonicalDirectory, file));
+    final byCanonical = _byCanonical ??= <String, String>{
+      for (final source in _sources) _key(_canonical(source)): source,
+    };
+    for (final candidate in <String>[joined, fromCanonical]) {
+      if (byCanonical[_key(_canonical(candidate))] case final String source) {
+        return source;
+      }
+    }
+    if (!_exists(joined) && _exists(fromCanonical)) return fromCanonical;
+    return joined;
+  }
+
+  static bool _exists(String path) =>
+      FileSystemEntity.typeSync(path) != FileSystemEntityType.notFound;
+
+  /// [path] with its symbolic links resolved, or [path] normalized when it
+  /// cannot be (it does not exist, or is not readable).
+  static String _canonical(String path) {
+    try {
+      final type = FileSystemEntity.typeSync(path);
+      final resolved = type == FileSystemEntityType.directory
+          ? Directory(path).resolveSymbolicLinksSync()
+          : File(path).resolveSymbolicLinksSync();
+      return p.normalize(resolved);
+    } on FileSystemException {
+      return p.normalize(path);
+    }
+  }
+
+  /// Comparison key: case-insensitive where the platform's paths are.
+  static String _key(String path) =>
+      Platform.isWindows ? path.toLowerCase() : path;
 }
 
 /// A top-level port as the Yosys JSON declares it.

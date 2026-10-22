@@ -14,9 +14,11 @@ import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_domain_analysis.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_source_span.dart';
+import 'package:lintcrux/services/engines/cdc/sv_package_use.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_elaboration.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_engine_support.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart' as p;
 
 /// Clock-domain-crossing analysis as a LintCrux engine.
 ///
@@ -171,6 +173,15 @@ class CdcEngine implements LintEngine {
       return;
     }
 
+    // SystemVerilog goes through yosys-slang when this Yosys has it. The
+    // built-in `read_verilog -sv` stops on package scoping, `void` functions
+    // and other constructs every package-based design uses; slang reads the
+    // language. Verilog-only designs keep the built-in reader.
+    final hasSystemVerilog = yosysSourcesFor(
+      request,
+    ).any((s) => s.language == YosysSourceLanguage.systemVerilog);
+    final slang = hasSystemVerilog && await _hasSlang(request);
+
     // A Yosys that could not be started, timed out, could not be handed the
     // request, or ended without its JSON output is a tool failure, not a
     // property of the design: the helper throws for those. Reporting one as a
@@ -194,18 +205,35 @@ class CdcEngine implements LintEngine {
       // as unsafe. A CDC-safe pass list is a real constraint, not a
       // preference.
       extraCommands: const <String>['flatten'],
+      frontend: slang ? YosysFrontend.slang : YosysFrontend.verilog,
+      slangOptions: slang ? slangOptionsFor(request) : const <String>[],
     );
     final String rawJson;
     switch (elaborated) {
       case DesignElaborated(rawJson: final json):
         rawJson = json;
       case DesignElaborationFailed(:final stderr):
+        // The built-in reader refused a design built on packages: say what
+        // would read it instead of handing over a parser error that reads
+        // like a bug in the user's RTL.
+        if (hasSystemVerilog && !slang) {
+          final use = await findSvPackageUse(<String>[
+            for (final s in yosysSourcesFor(request))
+              if (s.language == YosysSourceLanguage.systemVerilog) s.path,
+          ]);
+          if (use != null) {
+            yield _needsSlangFor(use, stderr);
+            return;
+          }
+        }
         yield Violation(
           engineId: id,
           ruleId: 'cdc/elaboration-failed',
           severity: Severity.error,
           message:
-              'CDC analysis could not elaborate the design: ${stderr.trim()}',
+              'CDC analysis could not elaborate the design'
+              '${slang ? ' (SystemVerilog read with yosys-slang)' : ''}: '
+              '${stderr.trim()}',
           location: SourceLocation(
             file: request.sourceFiles.isEmpty ? '' : request.sourceFiles.first,
             line: 1,
@@ -244,6 +272,9 @@ class CdcEngine implements LintEngine {
       line: 1,
       column: 1,
     );
+    // Every span goes through this before it becomes a location: yosys-slang
+    // names files relative to the directory Yosys ran in.
+    final paths = YosysSpanPathResolver(request);
 
     var unsafe = 0;
     var reviewed = 0;
@@ -254,12 +285,12 @@ class CdcEngine implements LintEngine {
       // indistinguishable from one the analysis never saw.
       if (crossing.syncKind == CdcSyncKind.reviewed) {
         reviewed++;
-        yield _reviewedNoteFor(crossing, fallback);
+        yield _reviewedNoteFor(crossing, fallback, paths);
         continue;
       }
       if (!crossing.isUnsafe) continue;
       unsafe++;
-      yield _violationFor(crossing, fallback);
+      yield _violationFor(crossing, fallback, paths);
     }
 
     // ── Say what was analysed, even when nothing was wrong ────────────────
@@ -290,7 +321,8 @@ class CdcEngine implements LintEngine {
           '(${cdc.domains.map((d) => humanCdcClockName(d.clockName)).join(', ')}) '
           'and found '
           '${cdc.crossings.length} crossing(s), $unsafe unsafe'
-          '${reviewed > 0 ? ', $reviewed reviewed' : ''}.',
+          '${reviewed > 0 ? ', $reviewed reviewed' : ''}.'
+          '${slang ? ' SystemVerilog was read with yosys-slang.' : ''}',
       location: fallback,
       raw: <String, dynamic>{
         'domains': cdc.domains.length,
@@ -309,10 +341,15 @@ class CdcEngine implements LintEngine {
   /// The reason the user gave is in the message, because that is what a
   /// reviewer six months later needs to see without opening the constraints
   /// file.
-  Violation _reviewedNoteFor(CdcCrossing crossing, SourceLocation fallback) {
-    final location = _toLocation(crossing.destSpan) ?? fallback;
+  Violation _reviewedNoteFor(
+    CdcCrossing crossing,
+    SourceLocation fallback,
+    YosysSpanPathResolver paths,
+  ) {
+    final location = _toLocation(crossing.destSpan, paths) ?? fallback;
     final related = <SourceLocation>[
-      if (_toLocation(crossing.sourceSpan) case final SourceLocation s) s,
+      if (_toLocation(crossing.sourceSpan, paths) case final SourceLocation s)
+        s,
     ];
     final src = humanCdcClockName(crossing.sourceClock);
     final dst = humanCdcClockName(crossing.destClock);
@@ -377,10 +414,15 @@ class CdcEngine implements LintEngine {
   /// what it costs — every fallback finding lands on the same (file, line 1),
   /// so a waiver written against one waives all of them. That is the reason
   /// real spans matter here and not merely for navigation.
-  Violation _violationFor(CdcCrossing crossing, SourceLocation fallback) {
-    final location = _toLocation(crossing.destSpan) ?? fallback;
+  Violation _violationFor(
+    CdcCrossing crossing,
+    SourceLocation fallback,
+    YosysSpanPathResolver paths,
+  ) {
+    final location = _toLocation(crossing.destSpan, paths) ?? fallback;
     final related = <SourceLocation>[
-      if (_toLocation(crossing.sourceSpan) case final SourceLocation s) s,
+      if (_toLocation(crossing.sourceSpan, paths) case final SourceLocation s)
+        s,
     ];
     // The per-bit and multi-bit rules below fire only for width > 1, and the
     // single-bit rule only for width 1, so one subject serves all four arms.
@@ -443,10 +485,94 @@ class CdcEngine implements LintEngine {
     );
   }
 
-  /// Converts a Yosys-recovered span into the engine's location type.
-  static SourceLocation? _toLocation(CdcSourceSpan? span) => span == null
+  /// Converts a Yosys-recovered span into the engine's location type, its
+  /// file named the way the project names it (see [YosysSpanPathResolver]).
+  static SourceLocation? _toLocation(
+    CdcSourceSpan? span,
+    YosysSpanPathResolver paths,
+  ) => span == null
       ? null
-      : SourceLocation(file: span.file, line: span.line, column: span.column);
+      : SourceLocation(
+          file: paths.resolve(span.file),
+          line: span.line,
+          column: span.column,
+        );
+
+  /// The `read_slang` options CDC elaborates with.
+  ///
+  /// CDC reads no assertion, so `--ignore-assertions` removes the one way an
+  /// SVA construct yosys-slang cannot lower could stop the read. And
+  /// `--ignore-initial` drops initial blocks and declaration initializers,
+  /// which describe simulation start-up rather than structure; without it a
+  /// `$readmemh` in an `initial` block or a `$value$plusargs` call stops the
+  /// read (OpenTitan's memory primitives do both).
+  static const List<String> slangOptions = <String>[
+    '--ignore-initial',
+    '--ignore-assertions',
+  ];
+
+  /// The per-engine option (`perEngineOptions.cdc.blackboxedModules`)
+  /// listing modules yosys-slang reads as black boxes: their ports are kept,
+  /// their contents are not elaborated. For a behavioural model slang cannot
+  /// lower, such as an analog macro's (OpenTitan's `rglts_pdm_3p3v`). Each
+  /// entry must be a bare module name; anything else fails the run before
+  /// Yosys starts. Ignored when the built-in reader is used.
+  static const String blackboxedModulesOption = 'blackboxedModules';
+
+  /// [slangOptions] plus one `--blackboxed-module` per entry of
+  /// [blackboxedModulesOption].
+  @visibleForTesting
+  static List<String> slangOptionsFor(LintRunRequest request) => <String>[
+    ...slangOptions,
+    if (request.options[blackboxedModulesOption] case final List<Object?> names)
+      for (final name in names.whereType<String>()) '--blackboxed-module $name',
+  ];
+
+  /// Whether the Yosys this run starts has the yosys-slang frontend. Cached
+  /// per executable by `crux_yosys`, so asking on every run costs one probe
+  /// per binary per process.
+  Future<bool> _hasSlang(LintRunRequest request) => YosysAvailabilityService(
+    runner: EngineYosysProcessRunner(processRunner),
+    executableNameOverride: yosysExecutableFor(
+      request.binary,
+      resolver: bundledBinaryResolver,
+    ),
+  ).probeSlang();
+
+  /// The finding for a package-based design the built-in reader refused
+  /// because this Yosys has no yosys-slang.
+  ///
+  /// One finding, at the package [use] that makes the design need slang,
+  /// marked as an analysis failure so the headless binary exits `3`: nothing
+  /// was analysed. The Yosys error is kept, first line only, so a reader can
+  /// still see what stopped the built-in reader.
+  Violation _needsSlangFor(SvPackageUse use, String stderr) {
+    final lines = stderr
+        .split('\n')
+        .map((l) => l.trim())
+        .where((l) => l.isNotEmpty)
+        .toList(growable: false);
+    final error = lines.firstWhere(
+      (l) => l.contains('ERROR'),
+      orElse: () => lines.isEmpty ? '' : lines.first,
+    );
+    return Violation(
+      engineId: id,
+      ruleId: 'cdc/needs-slang-frontend',
+      severity: Severity.error,
+      message:
+          'CDC analysis did not run: this design uses SystemVerilog packages '
+          '(`${use.construct}` in ${p.basename(use.file)}, line ${use.line}), '
+          'and the Yosys in use has no yosys-slang frontend, so its built-in '
+          'reader stopped${error.isEmpty ? '' : ' ($error)'}. CDC reads '
+          'SystemVerilog with yosys-slang when the Yosys it runs has it. '
+          'Install a Yosys that includes yosys-slang, such as the OSS CAD '
+          'Suite (github.com/YosysHQ/oss-cad-suite-build), and select it in '
+          'Settings > Engines > Yosys check, or pass --yosys-path.',
+      location: SourceLocation(file: use.file, line: use.line, column: 1),
+      raw: const <String, dynamic>{Violation.analysisFailedKey: true},
+    );
+  }
 
   @override
   void cancel() {
