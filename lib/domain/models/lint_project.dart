@@ -40,6 +40,7 @@ class LintProject {
     this.customRegexRules = const <CustomRegexRule>[],
     this.sourceFileProvenance = const <String, String>{},
     this.constraintFiles = const <String>[],
+    this.projectId,
   });
 
   /// Human-readable project name. Surfaced in the title bar and the
@@ -126,6 +127,16 @@ class LintProject {
   /// the empty default unchanged.
   final List<String> constraintFiles;
 
+  /// The project's identity across machines: the `projectId` key of the
+  /// `.lintcrux` file, or `null` when the file declares none.
+  ///
+  /// It travels with the project (committed beside the sources), so every
+  /// checkout and every CI job sees the same string, which an absolute path
+  /// never is. Anything keyed per project across machines uses it; a project
+  /// without one has no cross-machine identity. Must match
+  /// `kProjectIdPattern` (`project_identity.dart`).
+  final String? projectId;
+
   /// Returns each entry of [sourceFiles] as a typed
   /// [ProjectSourceFile], applying the override in [sourceFileLanguages]
   /// when present. Used by the engine-routing layer.
@@ -156,6 +167,7 @@ class LintProject {
     List<CustomRegexRule>? customRegexRules,
     Map<String, String>? sourceFileProvenance,
     List<String>? constraintFiles,
+    String? projectId,
   }) {
     return LintProject(
       name: name ?? this.name,
@@ -173,6 +185,7 @@ class LintProject {
       customRegexRules: customRegexRules ?? this.customRegexRules,
       sourceFileProvenance: sourceFileProvenance ?? this.sourceFileProvenance,
       constraintFiles: constraintFiles ?? this.constraintFiles,
+      projectId: projectId ?? this.projectId,
     );
   }
 
@@ -194,7 +207,8 @@ class LintProject {
         _mapEq(other.sourceFileLanguages, sourceFileLanguages) &&
         _listEq(other.customRegexRules, customRegexRules) &&
         _mapEq(other.sourceFileProvenance, sourceFileProvenance) &&
-        _listEq(other.constraintFiles, constraintFiles);
+        _listEq(other.constraintFiles, constraintFiles) &&
+        other.projectId == projectId;
   }
 
   @override
@@ -229,6 +243,7 @@ class LintProject {
       Object.hashAll(customRegexRules),
       hashMap(sourceFileProvenance),
       Object.hashAll(constraintFiles),
+      projectId,
     );
   }
 

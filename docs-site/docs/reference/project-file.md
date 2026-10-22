@@ -48,6 +48,20 @@ Projects created by `--import-edam` also carry a
 informational; missing keys simply mean "origin unknown / this
 project".
 
+## `projectId` {#project-id}
+
+From LintCrux 1.2, a project can declare an identity that is the same on every machine:
+
+```json
+"projectId": "soc-top"
+```
+
+| Key | Type | Meaning |
+|---|---|---|
+| `projectId` | string | 1 to 64 letters, digits, `.`, `_` or `-`. Commit it with the project file. Anything that keys a project across machines uses it, because an absolute checkout path differs on every machine and in CI. A value outside that set is rejected on load with a message that names the rule. Omitted when the project declares none, so a project file from an earlier release loads and saves unchanged. |
+
+LintCrux never adds the key for you. Pick a short name once and keep it: changing it later starts a new history. The Enterprise [team database](../team-database.md) pools runs under it.
+
 ## `constraintFiles` {#constraint-files}
 
 From LintCrux 1.2, a project can list FPGA pin-constraint files:

@@ -507,9 +507,98 @@ void main() {
     });
   });
 
+  group('projectId', () {
+    const codec = ProjectFileCodec();
+    const base = LintProject(name: 'soc', rootPath: '.');
+
+    test('round-trips through encode and decode', () {
+      final project = base.copyWith(projectId: 'soc-top');
+      final decoded = codec.decode(codec.encode(project));
+      expect(decoded.projectId, 'soc-top');
+      expect(decoded, project);
+    });
+
+    test('is absent from the file when the project has none', () {
+      expect(codec.encode(base), isNot(contains('projectId')));
+      expect(codec.decode(codec.encode(base)).projectId, isNull);
+    });
+
+    test('a file written before the key existed decodes to no id', () {
+      final decoded = codec.decode(
+        '{"version": 1, "name": "soc", "rootPath": "."}',
+      );
+      expect(decoded.projectId, isNull);
+    });
+
+    test('an id outside the pattern is rejected with the rule', () {
+      for (final bad in <String>['has space', 'a/b', 'x' * 65, r'a$b']) {
+        expect(
+          () => codec.decode(
+            '{"version": 1, "name": "soc", "rootPath": ".", '
+            '"projectId": ${_quote(bad)}}',
+          ),
+          throwsA(
+            isA<ProjectFileException>().having(
+              (e) => e.message,
+              'message',
+              contains('not a valid project id'),
+            ),
+          ),
+          reason: bad,
+        );
+      }
+    });
+
+    test('a non-string id is rejected', () {
+      expect(
+        () => codec.decode(
+          '{"version": 1, "name": "soc", "rootPath": ".", "projectId": 7}',
+        ),
+        throwsA(isA<ProjectFileException>()),
+      );
+    });
+
+    test('is compared by value', () {
+      expect(
+        base.copyWith(projectId: 'a') == base.copyWith(projectId: 'b'),
+        isFalse,
+      );
+      expect(
+        base.copyWith(projectId: 'a').hashCode,
+        base.copyWith(projectId: 'a').hashCode,
+      );
+    });
+
+    group('readProjectId', () {
+      test('reads the declared id without loading the project', () {
+        expect(
+          ProjectFileCodec.readProjectId('{"projectId": "soc-top"}'),
+          'soc-top',
+        );
+      });
+
+      test('reads no id from anything unusable', () {
+        for (final text in <String>[
+          '',
+          'not json',
+          '[]',
+          '{}',
+          '{"projectId": 3}',
+          '{"projectId": "has space"}',
+          '{"projectId": ""}',
+        ]) {
+          expect(ProjectFileCodec.readProjectId(text), isNull, reason: text);
+        }
+      });
+    });
+  });
+
   group('kProjectFileSchemaVersion', () {
     test('is 1 for the original schema', () {
       expect(kProjectFileSchemaVersion, 1);
     });
   });
 }
+
+String _quote(String s) =>
+    '"${s.replaceAll(r'\', r'\\').replaceAll('"', r'\"')}"';

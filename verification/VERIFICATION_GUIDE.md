@@ -243,10 +243,12 @@ Desktop: open a mixed Verilog+VHDL project with GHDL/Svlint enabled; import a `.
 3. Custom binary path: set a per-engine Custom path in Settings → Engines, Probe runs `<binary> --version` and shows the result inline; a CLI `--verilator-path` shadows it for one run. Quit and relaunch with a project tab restored: the Custom path is still selected, and the restored tab's first run already uses it (Tab Diagnostics shows the Custom binary).
 4. Incremental re-run: edit one source in an auto-reload project — only the changed engine/files re-lint; other engines' results and the four indices stay correct.
 5. Web viewer: load a 100K-violation SARIF by URL — the table renders, filters/sorts responsively, the source-preview pane shows the unreadable-file placeholder (no disk on web), and nothing is uploaded to a server.
+6. Project identity: add `"projectId": "soc-top"` to a `.lintcrux`, open it, make an unrelated edit and save — the key is still in the file with the same value. Open the same file from a second checkout at a different absolute path: the loaded project reports the same `projectId`. A project file with no `projectId` opens exactly as before and saving it does not add one.
 
 ### 6.4 Edge cases
 
 - A truncated/malformed SARIF on web is rejected with a typed error, leaving any prior contents intact (see §11).
+- A `projectId` outside 1 to 64 letters, digits, `.`, `_` and `-` (spaces, slashes, 65 characters, a non-string) fails to open with a message that names the rule; nothing is rewritten.
 - A `.f` with a cyclic `-f` include is rejected rather than looping.
 
 ### 6.5 Tier-gate scenarios
@@ -265,6 +267,8 @@ Open Core — no gating. The web viewer is the free viewing surface; it has no P
 | Custom binary override model + codec + CLI | `[Coverage: UNIT]` | `test/services/settings/**` + `test/core/cli/**` |
 | Per-file incremental re-run + partial-replace index sync | `[Coverage: UNIT]` | `test/services/violations/partial_replace_index_sync_test.dart` |
 | Streaming SARIF reader (bounded memory / cancel / malformed) | `[Coverage: UNIT/HYBRID]` | `test/services/sarif/streaming_sarif_reader_*.dart` |
+| Project identity: `projectId` round trip, absent-when-unset, pattern rejection, id-only reader, value equality | `[Coverage: UNIT]` | `test/services/project/project_file_codec_test.dart` (group `projectId`) |
+| Completion event carries the project id and compares by it | `[Coverage: UNIT]` | `test/domain/models/lint_run_completion_event_test.dart` |
 | Web read-only mode (SARIF loader / source-notifier / landing screen + locale sweep) | `[Coverage: WIDGET]` | `test/features/web_viewer/**` |
 | Web build smoke | `[Coverage: CI]` | `.github/workflows/ci.yml` (manual-trigger `build-web`) |
 | Live GHDL/Svlint binaries + real browser CORS fetch | `[Coverage: MANUAL]` | requires binaries / a served host |

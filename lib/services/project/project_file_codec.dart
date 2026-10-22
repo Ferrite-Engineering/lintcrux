@@ -8,6 +8,7 @@ import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/models/custom_regex_rule.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/named_filter_preset.dart';
+import 'package:lintcrux/domain/models/project_identity.dart';
 import 'package:lintcrux/domain/models/project_source_file.dart';
 
 /// The current `.lintcrux` schema version. Bump whenever a
@@ -41,6 +42,7 @@ class ProjectFileCodec {
     final map = <String, Object?>{
       'version': kProjectFileSchemaVersion,
       'name': project.name,
+      if (project.projectId != null) 'projectId': project.projectId,
       'rootPath': project.rootPath,
       'sourceFiles': List<String>.from(project.sourceFiles),
       // Written only when there are some, so a project without constraint
@@ -120,22 +122,23 @@ class ProjectFileCodec {
 
     final name = raw['name'];
     if (name is! String || name.isEmpty) {
-      throw const ProjectFileException(
-        'missing or empty "name" field',
-      );
+      throw const ProjectFileException('missing or empty "name" field');
     }
     final rootPath = raw['rootPath'];
     if (rootPath is! String || rootPath.isEmpty) {
-      throw const ProjectFileException(
-        'missing or empty "rootPath" field',
-      );
+      throw const ProjectFileException('missing or empty "rootPath" field');
     }
 
-    final language = _languageFromString(
-      _expectStringOrNull(raw, 'language'),
-    );
+    final language = _languageFromString(_expectStringOrNull(raw, 'language'));
+    final projectId = _expectStringOrNull(raw, 'projectId');
+    if (projectId != null && !kProjectIdPattern.hasMatch(projectId)) {
+      throw ProjectFileException(
+        '"projectId" "$projectId" is not a valid project id. $kProjectIdRule',
+      );
+    }
     return LintProject(
       name: name,
+      projectId: projectId,
       rootPath: rootPath,
       sourceFiles: _stringList(raw, 'sourceFiles'),
       includePaths: _stringList(raw, 'includePaths'),
@@ -151,6 +154,27 @@ class ProjectFileCodec {
       sourceFileProvenance: _stringMap(raw, 'sourceFileProvenance'),
       constraintFiles: _stringList(raw, 'constraintFiles'),
     );
+  }
+
+  /// The `projectId` declared by the `.lintcrux` JSON in [jsonString], or
+  /// `null` when it declares none.
+  ///
+  /// For readers that want the identity without loading the project (the
+  /// shared team database resolves it from the active project's file). Text
+  /// that does not parse, a non-object, a non-string and a value outside
+  /// [kProjectIdPattern] all read as "no id": each means the project has no
+  /// usable cross-machine identity, and [decode] reports the file's own
+  /// problems where the user edits it.
+  static String? readProjectId(String jsonString) {
+    try {
+      final raw = json.decode(jsonString);
+      if (raw is! Map<String, dynamic>) return null;
+      final value = raw['projectId'];
+      if (value is! String || !kProjectIdPattern.hasMatch(value)) return null;
+      return value;
+    } on FormatException {
+      return null;
+    }
   }
 
   static String _patternKindToString(CustomRulePatternKind kind) {
@@ -192,16 +216,12 @@ class ProjectFileCodec {
     final out = <CustomRegexRule>[];
     for (final entry in v) {
       if (entry is! Map) {
-        throw ProjectFileException(
-          '"$key" must contain only JSON objects',
-        );
+        throw ProjectFileException('"$key" must contain only JSON objects');
       }
       final raw = Map<String, Object?>.from(entry);
       final id = raw['id'];
       if (id is! String || id.isEmpty) {
-        throw ProjectFileException(
-          '"$key" entry missing or empty "id"',
-        );
+        throw ProjectFileException('"$key" entry missing or empty "id"');
       }
       final pattern = raw['pattern'];
       if (pattern is! String || pattern.isEmpty) {
@@ -217,9 +237,7 @@ class ProjectFileCodec {
       }
       final severityRaw = raw['severity'];
       if (severityRaw is! String) {
-        throw ProjectFileException(
-          '"$key" entry "$id" missing "severity"',
-        );
+        throw ProjectFileException('"$key" entry "$id" missing "severity"');
       }
       final patternKindRaw = raw['patternKind'];
       if (patternKindRaw != null && patternKindRaw is! String) {
@@ -267,9 +285,7 @@ class ProjectFileCodec {
     }
   }
 
-  static ProjectSourceFileLanguage? _sourceFileLanguageFromString(
-    String s,
-  ) {
+  static ProjectSourceFileLanguage? _sourceFileLanguageFromString(String s) {
     switch (s) {
       case 'auto':
         return ProjectSourceFileLanguage.auto;
@@ -296,9 +312,7 @@ class ProjectFileCodec {
     final out = <String, ProjectSourceFileLanguage>{};
     v.forEach((k, val) {
       if (k is! String || val is! String) {
-        throw ProjectFileException(
-          '"$key" entries must be string -> string',
-        );
+        throw ProjectFileException('"$key" entries must be string -> string');
       }
       final lang = _sourceFileLanguageFromString(val);
       if (lang == null) {
@@ -323,9 +337,7 @@ class ProjectFileCodec {
     final out = <NamedFilterPreset>[];
     for (final entry in v) {
       if (entry is! Map) {
-        throw ProjectFileException(
-          '"$key" must contain only JSON objects',
-        );
+        throw ProjectFileException('"$key" must contain only JSON objects');
       }
       final preset = NamedFilterPreset.fromJson(
         Map<String, Object?>.from(entry),
@@ -365,9 +377,7 @@ class ProjectFileCodec {
     final out = <String, String>{};
     v.forEach((k, val) {
       if (k is! String || val is! String) {
-        throw ProjectFileException(
-          '"$key" entries must be string -> string',
-        );
+        throw ProjectFileException('"$key" entries must be string -> string');
       }
       out[k] = val;
     });
@@ -386,9 +396,7 @@ class ProjectFileCodec {
     final out = <String, Severity>{};
     v.forEach((k, val) {
       if (k is! String || val is! String) {
-        throw ProjectFileException(
-          '"$key" entries must be string -> string',
-        );
+        throw ProjectFileException('"$key" entries must be string -> string');
       }
       out[k] = _severityFromString(val);
     });
@@ -407,21 +415,15 @@ class ProjectFileCodec {
     final out = <String, Map<String, Object?>>{};
     v.forEach((engineId, options) {
       if (engineId is! String) {
-        throw ProjectFileException(
-          '"$key" engine keys must be strings',
-        );
+        throw ProjectFileException('"$key" engine keys must be strings');
       }
       if (options is! Map) {
-        throw ProjectFileException(
-          '"$key.$engineId" must be a JSON object',
-        );
+        throw ProjectFileException('"$key.$engineId" must be a JSON object');
       }
       final bag = <String, Object?>{};
       options.forEach((k, val) {
         if (k is! String) {
-          throw ProjectFileException(
-            '"$key.$engineId" keys must be strings',
-          );
+          throw ProjectFileException('"$key.$engineId" keys must be strings');
         }
         bag[k] = val;
       });

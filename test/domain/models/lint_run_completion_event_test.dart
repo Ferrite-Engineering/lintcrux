@@ -70,5 +70,34 @@ void main() {
       expect(base, isNot(withProject));
       expect(withProject.toString(), contains('/work/demo'));
     });
+
+    test('equality includes projectId; default is null', () {
+      final t = DateTime.utc(2026, 5, 25);
+      final base = LintRunCompletionEvent(
+        runId: 'r1',
+        runTimestamp: t,
+        dataPoints: const [],
+        projectPath: '/work/demo',
+      );
+      final withId = LintRunCompletionEvent(
+        runId: 'r1',
+        runTimestamp: t,
+        dataPoints: const [],
+        projectPath: '/work/demo',
+        projectId: 'soc-top',
+      );
+      final withIdAgain = LintRunCompletionEvent(
+        runId: 'r1',
+        runTimestamp: t,
+        dataPoints: const [],
+        projectPath: '/work/demo',
+        projectId: 'soc-top',
+      );
+      expect(base.projectId, isNull);
+      expect(withId, withIdAgain);
+      expect(withId.hashCode, withIdAgain.hashCode);
+      expect(base, isNot(withId));
+      expect(withId.toString(), contains('soc-top'));
+    });
   });
 }

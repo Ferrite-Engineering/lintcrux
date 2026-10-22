@@ -23,6 +23,7 @@ class LintRunCompletionEvent {
     required this.runTimestamp,
     required this.dataPoints,
     this.projectPath,
+    this.projectId,
   });
 
   /// Stable identifier for the run — typically `run-<millis>` for
@@ -46,6 +47,13 @@ class LintRunCompletionEvent {
   /// completions that belong to a different tab's project.
   final String? projectPath;
 
+  /// The `projectId` the project file declares, or `null` when the producer
+  /// had no project loaded or the project declares none.
+  ///
+  /// Unlike [projectPath] it is the same on every machine and in CI, which is
+  /// what a consumer pooling runs across machines must key on.
+  final String? projectId;
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -53,6 +61,7 @@ class LintRunCompletionEvent {
     if (runId != other.runId) return false;
     if (runTimestamp != other.runTimestamp) return false;
     if (projectPath != other.projectPath) return false;
+    if (projectId != other.projectId) return false;
     if (dataPoints.length != other.dataPoints.length) return false;
     for (var i = 0; i < dataPoints.length; i++) {
       if (dataPoints[i] != other.dataPoints[i]) return false;
@@ -65,6 +74,7 @@ class LintRunCompletionEvent {
     runId,
     runTimestamp,
     projectPath,
+    projectId,
     Object.hashAll(dataPoints),
   );
 
@@ -72,5 +82,5 @@ class LintRunCompletionEvent {
   String toString() =>
       'LintRunCompletionEvent('
       'runId: $runId, runTimestamp: $runTimestamp, '
-      'projectPath: $projectPath, dataPoints: ${dataPoints.length})';
+      'projectPath: $projectPath, projectId: $projectId, dataPoints: ${dataPoints.length})';
 }
