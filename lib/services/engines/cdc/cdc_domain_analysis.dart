@@ -292,6 +292,8 @@ class CdcClassificationContext {
   final Map<int, String> driverOf;
 
   /// Net bit -> the net bits feeding the combinational cell that drives it.
+  ///
+  /// Read-only: the output bits of one cell share a single set.
   final Map<int, Set<int>> combSources;
 
   /// The register sampling the crossing.
@@ -389,11 +391,14 @@ class BasicCdcSyncClassifier extends CdcSyncClassifier {
   @override
   CdcSyncKind classify(CdcClassificationContext context) {
     final dest = context.destination;
+    // A set, because every register's D bits are tested against it: a list
+    // made this scan quadratic in the register widths.
+    final destQ = dest.qBits.toSet();
     for (final r in context.registers.values) {
       if (r.path == dest.path) continue;
       if (r.domainKey != dest.domainKey) continue;
       // Direct wire from dest.Q into r.D → a candidate two-flop chain.
-      if (r.dBits.any(dest.qBits.contains)) {
+      if (r.dBits.any(destQ.contains)) {
         if (!context.isDedicatedStage(dest, r)) continue;
         return CdcSyncKind.twoFlop;
       }
@@ -402,7 +407,7 @@ class BasicCdcSyncClassifier extends CdcSyncClassifier {
       // value feeding a datapath and the crossing itself is the finding.
       for (final bit in r.dBits) {
         final via = context.combSources[bit];
-        if (via != null && via.any(dest.qBits.contains)) {
+        if (via != null && via.any(destQ.contains)) {
           if (!context.isDedicatedStage(dest, r)) continue;
           return CdcSyncKind.comboInSync;
         }
@@ -609,6 +614,12 @@ class CdcDomainAnalysis {
     // to whatever registers feed that cell. One level of indirection covers the
     // muxes and inverters `proc` leaves behind without turning this into a
     // general cone walk, which belongs to NetCrux.
+    //
+    // Every output bit of a cell shares ONE set of that cell's inputs, and a
+    // bit driven by more than one cell gets a merged copy, so the sets are
+    // read-only once built. A set per output bit cost outputs x inputs
+    // entries per cell: a 3200-bit `$mux` in OpenTitan earlgrey alone made
+    // twenty million, and the design as a whole half a billion (13 GB).
     final combSources = <int, Set<int>>{};
     for (final entry in module.cells.entries) {
       final cell = entry.value;
@@ -624,8 +635,13 @@ class CdcDomainAnalysis {
           inputs.addAll(bits);
         }
       }
+      if (outputs.isEmpty) continue;
+      final shared = inputs.toSet();
       for (final o in outputs) {
-        combSources.putIfAbsent(o, () => <int>{}).addAll(inputs);
+        final existing = combSources[o];
+        combSources[o] = existing == null
+            ? shared
+            : <int>{...existing, ...shared};
       }
     }
 

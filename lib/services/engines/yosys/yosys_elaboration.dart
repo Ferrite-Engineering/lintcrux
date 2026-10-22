@@ -37,10 +37,20 @@ sealed class DesignElaboration {
 /// Yosys elaborated the design and wrote its `write_json` document.
 final class DesignElaborated extends DesignElaboration {
   /// Creates the result.
-  const DesignElaborated(this.rawJson);
+  const DesignElaborated(this.rawJson, {this.netlistFile});
 
-  /// The `write_json` document, exactly as Yosys wrote it.
+  /// The `write_json` document `crux_yosys` read back, exactly as Yosys
+  /// wrote it.
+  ///
+  /// When [netlistFile] is set the design was cleared after it was written
+  /// there, and this is the document of the empty design: read the netlist
+  /// from the file.
   final String rawJson;
+
+  /// The file holding the netlist, when the caller asked [elaborateDesign]
+  /// for one (`netlistPath`) and Yosys wrote it; `null` otherwise. The caller
+  /// that named the path removes it.
+  final File? netlistFile;
 }
 
 /// Yosys ran over the RTL and exited non-zero: its stderr describes the
@@ -69,6 +79,18 @@ final class DesignElaborationFailed extends DesignElaboration {
 /// [slangOptions]. A slang netlist names each `src` file relative to the
 /// directory Yosys ran in: read spans through [YosysSpanPathResolver].
 ///
+/// [netlistPath] asks for the netlist on disk rather than in memory, for an
+/// analysis that reads it as a stream (see `CdcNetlistReader`). `crux_yosys`
+/// reads its `write_json` output back whole, as one string: 864 MB of text
+/// for a flattened OpenTitan earlgrey. So after [extraCommands] Yosys writes
+/// the netlist to [netlistPath] itself and then clears the design, and the
+/// document the runner reads back is the empty one. The result's
+/// [DesignElaborated.netlistFile] is the file when Yosys wrote it; it stays
+/// `null` (the netlist is then in [DesignElaborated.rawJson], as without
+/// [netlistPath]) when the path cannot be written into a Yosys script bare,
+/// because it contains whitespace, a quote, `;` or a line break, or when the
+/// process that ran wrote no such file.
+///
 /// Throws the engine exception [yosysRunException] builds for every outcome
 /// that says nothing about the design.
 Future<DesignElaboration> elaborateDesign(
@@ -80,11 +102,15 @@ Future<DesignElaboration> elaborateDesign(
   List<String> extraCommands = const <String>[],
   YosysFrontend frontend = YosysFrontend.verilog,
   List<String> slangOptions = const <String>[],
+  String? netlistPath,
 }) async {
   final executable = yosysExecutableFor(
     request.binary,
     resolver: bundledBinaryResolver,
   );
+  // `extraCommands` entries cannot carry double quotes, so the path is
+  // written bare and must be one token.
+  final toDisk = netlistPath != null && !_unsafeBare.hasMatch(netlistPath);
   final runner = YosysRunner(
     processRunner: EngineYosysProcessRunner(
       processRunner,
@@ -99,14 +125,23 @@ Future<DesignElaboration> elaborateDesign(
       defines: yosysDefinesFor(request),
       includePaths: request.includePaths,
       topModule: request.topModule,
-      extraCommands: extraCommands,
+      extraCommands: <String>[
+        ...extraCommands,
+        if (toDisk) ...<String>['write_json $netlistPath', 'design -reset'],
+      ],
       frontend: frontend,
       slangOptions: slangOptions,
     ),
   );
   switch (result) {
     case YosysRunSuccess(:final rawJson):
-      return DesignElaborated(rawJson);
+      final file = toDisk ? File(netlistPath) : null;
+      return DesignElaborated(
+        rawJson,
+        netlistFile: file != null && file.existsSync() && file.lengthSync() > 0
+            ? file
+            : null,
+      );
     case YosysRunFailure(:final stderr) when isYosysDesignFailure(result):
       return DesignElaborationFailed(stderr);
     case YosysRunFailure() || YosysRunTimeout() || YosysRunCancelled():
@@ -117,6 +152,11 @@ Future<DesignElaboration> elaborateDesign(
       );
   }
 }
+
+/// What a path written bare into a Yosys script must not contain: whitespace
+/// ends the token, and a quote, `;` or line break is refused in an extra
+/// command.
+final RegExp _unsafeBare = RegExp(r'[\s";]');
 
 /// Turns the file of a Yosys `src` attribute into the path the user's project
 /// names, so findings, waivers and baselines key on the user's own path.

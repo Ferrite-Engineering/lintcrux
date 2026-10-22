@@ -1,7 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
-import 'dart:io' show Directory;
+import 'dart:io' show Directory, FileSystemException;
 
 import 'package:crux_netlist/crux_netlist.dart';
 import 'package:crux_yosys/crux_yosys.dart';
@@ -13,6 +13,7 @@ import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_domain_analysis.dart';
+import 'package:lintcrux/services/engines/cdc/cdc_netlist_reader.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_source_span.dart';
 import 'package:lintcrux/services/engines/cdc/sv_package_use.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_elaboration.dart';
@@ -48,6 +49,7 @@ class CdcEngine implements LintEngine {
     this.tempDirectory,
     this.analysis = const CdcDomainAnalysis(),
     this.parser = const YosysJsonParser(),
+    this.netlistReader = const CdcNetlistReader(),
     this.bundledBinaryResolver = const BundledBinaryResolver(),
   });
 
@@ -81,8 +83,13 @@ class CdcEngine implements LintEngine {
   @visibleForOverriding
   CdcDomainAnalysis analysisFor(LintRunRequest request) => analysis;
 
-  /// The Yosys JSON parser.
+  /// No longer consulted: the netlist is read by [netlistReader], which
+  /// streams the document instead of decoding it whole. Kept so a subclass
+  /// that forwards it still compiles.
   final YosysJsonParser parser;
+
+  /// Reads the elaborated netlist, keeping only what the analysis uses.
+  final CdcNetlistReader netlistReader;
 
   @override
   String get id => 'cdc';
@@ -182,36 +189,55 @@ class CdcEngine implements LintEngine {
     ).any((s) => s.language == YosysSourceLanguage.systemVerilog);
     final slang = hasSystemVerilog && await _hasSlang(request);
 
-    // A Yosys that could not be started, timed out, could not be handed the
-    // request, or ended without its JSON output is a tool failure, not a
-    // property of the design: the helper throws for those. Reporting one as a
-    // finding would let a machine without `yosys` produce a run that
-    // "completed" — one that a gate passes and a baseline can freeze, turning
-    // CDC off for good. Only a genuine non-zero Yosys exit on real RTL is a
-    // finding about the design.
-    final elaborated = await elaborateDesign(
-      request,
-      engineId: id,
-      processRunner: processRunner,
-      tempDirectory: tempDirectory,
-      bundledBinaryResolver: bundledBinaryResolver,
-      // `flatten` is required rather than cosmetic: without it every module
-      // is its own scope and a crossing *between* two instances is invisible,
-      // which is most of the crossings that matter.
-      //
-      // `opt` is deliberately absent. It folds and rewrites exactly the
-      // structure this analysis reads — a two-flop synchronizer can be
-      // retimed or merged, at which point a correct design starts reporting
-      // as unsafe. A CDC-safe pass list is a real constraint, not a
-      // preference.
-      extraCommands: const <String>['flatten'],
-      frontend: slang ? YosysFrontend.slang : YosysFrontend.verilog,
-      slangOptions: slang ? slangOptionsFor(request) : const <String>[],
-    );
-    final String rawJson;
+    // The netlist stays on disk and is read as a stream: a flattened SoC
+    // writes hundreds of megabytes of JSON (OpenTitan earlgrey: 864 MB), and
+    // holding that as a string and decoding it whole needed more memory than
+    // the analysis itself. The directory is removed once the netlist is read.
+    final scratch = _netlistScratchDirectory();
+    final DesignElaboration elaborated;
+    final NetlistModel? model;
+    final Object? readError;
+    try {
+      // A Yosys that could not be started, timed out, could not be handed
+      // the request, or ended without its JSON output is a tool failure, not
+      // a property of the design: the helper throws for those. Reporting one
+      // as a finding would let a machine without `yosys` produce a run that
+      // "completed" — one that a gate passes and a baseline can freeze,
+      // turning CDC off for good. Only a genuine non-zero Yosys exit on real
+      // RTL is a finding about the design.
+      elaborated = await elaborateDesign(
+        request,
+        engineId: id,
+        processRunner: processRunner,
+        tempDirectory: tempDirectory,
+        bundledBinaryResolver: bundledBinaryResolver,
+        // `flatten` is required rather than cosmetic: without it every module
+        // is its own scope and a crossing *between* two instances is
+        // invisible, which is most of the crossings that matter.
+        //
+        // `opt` is deliberately absent. It folds and rewrites exactly the
+        // structure this analysis reads — a two-flop synchronizer can be
+        // retimed or merged, at which point a correct design starts reporting
+        // as unsafe. A CDC-safe pass list is a real constraint, not a
+        // preference.
+        extraCommands: const <String>['flatten'],
+        frontend: slang ? YosysFrontend.slang : YosysFrontend.verilog,
+        slangOptions: slang ? slangOptionsFor(request) : const <String>[],
+        netlistPath: scratch == null
+            ? null
+            : p.join(scratch.path, 'netlist.json'),
+      );
+      (model, readError) = switch (elaborated) {
+        DesignElaborated() => _readNetlist(elaborated, request.topModule),
+        DesignElaborationFailed() => (null, null),
+      };
+    } finally {
+      _removeScratch(scratch);
+    }
+
     switch (elaborated) {
-      case DesignElaborated(rawJson: final json):
-        rawJson = json;
+      case DesignElaborated():
+        break;
       case DesignElaborationFailed(:final stderr):
         // The built-in reader refused a design built on packages: say what
         // would read it instead of handing over a parser error that reads
@@ -246,15 +272,14 @@ class CdcEngine implements LintEngine {
         return;
     }
 
-    final NetlistModel model;
-    try {
-      model = parser.parse(rawJson);
-    } on Object catch (e) {
+    if (model == null) {
       yield Violation(
         engineId: id,
         ruleId: 'cdc/elaboration-failed',
         severity: Severity.error,
-        message: 'CDC analysis could not read the elaborated netlist: $e',
+        message:
+            'CDC analysis could not read the elaborated netlist: '
+            '$readError',
         location: SourceLocation(
           file: request.sourceFiles.isEmpty ? '' : request.sourceFiles.first,
           line: 1,
@@ -528,6 +553,49 @@ class CdcEngine implements LintEngine {
       for (final name in names.whereType<String>()) '--blackboxed-module $name',
   ];
 
+  /// A fresh directory for one run's netlist file, under [tempDirectory] or
+  /// the system temp directory, or `null` when none can be made: the netlist
+  /// then reaches the engine in memory, as it did before it was kept on disk.
+  Directory? _netlistScratchDirectory() {
+    try {
+      return (tempDirectory ?? Directory.systemTemp).createTempSync(
+        'lintcrux_cdc_',
+      );
+    } on FileSystemException {
+      return null;
+    }
+  }
+
+  static void _removeScratch(Directory? scratch) {
+    if (scratch == null) return;
+    try {
+      scratch.deleteSync(recursive: true);
+    } on FileSystemException {
+      // A temp directory left behind is not worth failing the run over.
+    }
+  }
+
+  /// The netlist of [elaborated], or the reason it could not be read.
+  (NetlistModel?, Object?) _readNetlist(
+    DesignElaborated elaborated,
+    String? topModule,
+  ) {
+    try {
+      final file = elaborated.netlistFile;
+      return (
+        file != null
+            ? netlistReader.readFile(file, topModule: topModule)
+            : netlistReader.readString(
+                elaborated.rawJson,
+                topModule: topModule,
+              ),
+        null,
+      );
+    } on Object catch (e) {
+      return (null, e);
+    }
+  }
+
   /// Whether the Yosys this run starts has the yosys-slang frontend. Cached
   /// per executable by `crux_yosys`, so asking on every run costs one probe
   /// per binary per process.
@@ -576,8 +644,9 @@ class CdcEngine implements LintEngine {
 
   @override
   void cancel() {
-    // The Yosys run is a single short subprocess; there is no streaming parse
-    // to interrupt. Left explicit rather than absent so a reader does not
-    // assume cancellation was forgotten.
+    // The Yosys run is a single subprocess and the netlist read that follows
+    // it is synchronous, so there is nothing to interrupt in between. Left
+    // explicit rather than absent so a reader does not assume cancellation
+    // was forgotten.
   }
 }

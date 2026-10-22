@@ -127,6 +127,22 @@ Measured with the OSS CAD Suite of 2026-10-21 on the three designs named in the 
 | CVA6 v5.3.0 core (`core/Flist.cva6`, `cv64a6_imafdc_sv39`) | `cva6` | Elaborates (about 69,000 cells) |
 | Ibex | `ibex_core` | Elaborates (about 11,000 cells) |
 | Ibex | `ibex_top` | Refused by yosys-slang: a declaration initializer that reads a net (`ibex_top.sv` lines 659 and 660, "reading net state during design initialization unsupported"). `--ignore-initial` does not remove it. Analyse from `ibex_core` |
-| OpenTitan `earlgrey_1.0.0` | `chip_earlgrey_asic` | Elaborates with `rglts_pdm_3p3v`, an analog regulator's behavioural model, read as a black box (`blackboxedModules` under `perEngineOptions.cdc`, see the [project file reference](reference/project-file.md)). The flattened netlist is about 754,000 cells and 864 MB of JSON, which CDC reads whole: a design this large may exceed the memory available until CDC reads the netlist in bounded memory |
+| OpenTitan `earlgrey_1.0.0` | `chip_earlgrey_asic` | Elaborates with `rglts_pdm_3p3v`, an analog regulator's behavioural model, read as a black box (`blackboxedModules` under `perEngineOptions.cdc`, see the [project file reference](reference/project-file.md)). The flattened netlist is about 739,000 cells and 840 MB of JSON. See [design size](#design-size) for the memory and time the whole run took |
 
 When the Yosys in use has no yosys-slang and its built-in reader refuses a design that declares or imports a package, CDC reports one `cdc/needs-slang-frontend` error, at the first package declaration or import, naming the package and how to get yosys-slang, in place of `cdc/elaboration-failed`. A design that yosys-slang itself refuses is `cdc/elaboration-failed`, and the message says yosys-slang read it.
+
+## Design size, from LintCrux 1.2 {#design-size}
+
+CDC flattens the whole design, so the netlist it reads grows with the chip. From LintCrux 1.2, Yosys writes that netlist to a temporary file and CDC reads it a piece at a time, keeping only the top module and the parts of it the analysis uses. LintCrux 1.1 held the whole JSON document in memory and decoded it in one go, which on OpenTitan earlgrey took 5 GB before the analysis started.
+
+Measured from LintCrux 1.2 on a Mac mini with an Apple M4 Pro and 64 GB of memory, with the Yosys of the OSS CAD Suite of 2026-10-21 and the open-core analysis:
+
+| Design | Cells after `flatten` | Netlist JSON | Yosys peak memory | CDC peak memory | Whole run |
+|---|---|---|---|---|---|
+| Ibex `ibex_core` | about 11,000 | 10 MB | 0.1 GB | 0.3 GB | under 1 second |
+| CVA6 v5.3.0 core (`cva6`) | about 69,000 | 113 MB | 1.3 GB | 0.6 GB | 5 seconds |
+| OpenTitan earlgrey (`chip_earlgrey_asic`) | about 739,000 | 840 MB | 5.4 GB | 2.3 GB | 85 seconds |
+
+Yosys finishes and exits before CDC reads its output, so the two peaks do not add up: the larger one is what the machine needs. On earlgrey CDC found 57 clock domains and 975 crossings, 156 of them unsafe, with the open-core rule that every distinct clock net is its own domain (see [above](#tiers)).
+
+These are the designs measured, not a limit. A larger design, or one with more or wider registers, needs more. The Pro analysis (clock-tree tracing, `cdc.yaml`, the further synchronizer idioms) has not been measured on a design of earlgrey's size.
