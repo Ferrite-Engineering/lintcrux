@@ -299,10 +299,7 @@ void main() {
         await record('d-padded', trailing);
         final ack = await ask(container, designId: 'd-padded');
         expect(ack.honored, isFalse);
-        expect(
-          ack.reason,
-          'No source artifact recorded for design "d-padded".',
-        );
+        expect(ack.reason, 'No source artifact recorded for that design.');
         expect(openerCalls, isEmpty);
       });
     });
@@ -430,10 +427,7 @@ void main() {
         final client = await connect(boot());
         final ack = await send(client, trailing);
         expect(ack.honored, isFalse);
-        expect(
-          ack.reason,
-          'No source artifact recorded for design "unrecorded".',
-        );
+        expect(ack.reason, 'No source artifact recorded for that design.');
         expect(openerCalls, isEmpty);
       });
     });

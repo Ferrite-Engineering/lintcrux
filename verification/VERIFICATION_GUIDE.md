@@ -693,7 +693,7 @@ Send (after the standard Hello handshake — see `crux_cxp` README for the wire 
 
 **What:** A peer sends `request_highlight` with one of `scope`, `net`, `port`, `marker`, `test`, `breakpoint`. LintCrux cannot represent these.
 
-**Expected:** Ack with `honored: false`, `reason: "LintCrux does not represent <kind> elements."`. Table state and selection unchanged.
+**Expected:** Ack with `honored: false`, `reason: "LintCrux does not represent that kind of element."` (the kind is not repeated). Table state and selection unchanged.
 
 **Unknown wire kinds (open enum):** `ElementKind` is open — a peer on a newer protocol revision can name a kind this build does not model. Such a kind decodes to the enum's unknown (`null`) case and is declined exactly like a known-but-unrepresentable kind: a graceful `honored: false` ack naming the wire string, never a throw. An older LintCrux must not be crashable by a newer peer's vocabulary.
 

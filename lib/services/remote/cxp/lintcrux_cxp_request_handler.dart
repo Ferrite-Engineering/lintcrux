@@ -246,9 +246,9 @@ class LintCruxCxpRequestHandler {
       // `ElementKind` is open: a peer on a newer protocol revision can
       // name a kind this build does not model. Decline it exactly like a
       // known-but-unrepresentable kind — a graceful `honored: false` ack
-      // naming the wire string, never a throw. The originator learns the
-      // request went unserved and moves on; an older LintCrux must not be
-      // crashable by a newer peer's vocabulary.
+      // that does not repeat the wire string, never a throw. The originator
+      // learns the request went unserved and moves on; an older LintCrux must
+      // not be crashable by a newer peer's vocabulary.
       case KnownElementKind.property:
       case KnownElementKind.timingPath:
       case KnownElementKind.cell:
@@ -257,9 +257,7 @@ class LintCruxCxpRequestHandler {
           ack: RequestHighlightAck(
             inReplyTo: requestId,
             honored: false,
-            reason:
-                'LintCrux does not represent '
-                '${element.kind.name} elements.',
+            reason: 'LintCrux does not represent that kind of element.',
           ),
         );
     }
@@ -317,9 +315,7 @@ class LintCruxCxpRequestHandler {
         ack: RequestOpenArtifactAck(
           inReplyTo: requestId,
           honored: false,
-          reason:
-              'LintCrux opens only "source" artifacts, not '
-              '"${req.artifactKind}".',
+          reason: 'LintCrux opens only "source" artifacts.',
         ),
       );
     }
@@ -355,7 +351,7 @@ class LintCruxCxpRequestHandler {
         ack: RequestHighlightAck(
           inReplyTo: requestId,
           honored: false,
-          reason: 'Malformed rule element path "${req.element.path}".',
+          reason: 'Malformed rule element path.',
         ),
       );
     }
@@ -410,7 +406,7 @@ class LintCruxCxpRequestHandler {
         ack: RequestHighlightAck(
           inReplyTo: requestId,
           honored: false,
-          reason: 'Malformed source element path "${req.element.path}".',
+          reason: 'Malformed source element path.',
         ),
       );
     }
@@ -478,13 +474,23 @@ class LintCruxCxpRequestHandler {
         inReplyTo: requestId,
         honored: true,
         reason: matches.isEmpty
-            ? 'No violations mention "$ruleSubstring"; filter applied.'
+            ? 'No violations mention that element; filter applied.'
             : null,
       ),
       tableState: filtered,
       selection: matches.isEmpty ? null : matches.first,
     );
   }
+
+  /// What goes back to the peer when the editor did not open [result].
+  ///
+  /// The service's own message for a failed launch names the executable and
+  /// the operating system's text, which can carry a path, so only its fixed
+  /// refusal sentence travels (CXP §9.11).
+  static String _editorFailureReason(ClickToSourceResult result) =>
+      result.errorMessage == ClickToSourceService.refusedNonAbsolutePathMessage
+      ? ClickToSourceService.refusedNonAbsolutePathMessage
+      : 'The editor could not be launched.';
 
   Future<CxpDispatchResult> _dispatchRequestOpenSource(
     RequestOpenSource req,
@@ -525,7 +531,7 @@ class LintCruxCxpRequestHandler {
       ack: RequestOpenSourceAck(
         inReplyTo: requestId,
         honored: result.success,
-        reason: result.errorMessage,
+        reason: result.success ? null : _editorFailureReason(result),
       ),
       openSourceResult: result,
     );

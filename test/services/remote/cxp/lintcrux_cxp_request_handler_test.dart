@@ -292,7 +292,7 @@ void main() {
         );
         final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isFalse, reason: 'kind: $kind');
-        expect(ack.reason, contains(kind.name), reason: 'kind: $kind');
+        expect(ack.reason, contains('does not represent'), reason: '$kind');
         expect(result.tableState, isNull, reason: 'kind: $kind');
         expect(result.selection, isNull, reason: 'kind: $kind');
       }
@@ -324,9 +324,10 @@ void main() {
 
         final ack = result.ack! as RequestHighlightAck;
         expect(ack.honored, isFalse);
-        // The unrecognised wire string is echoed back verbatim so the
-        // originator can tell which of its requests went unserved.
-        expect(ack.reason, contains('quantum-flux-capacitor'));
+        // The unrecognised wire string is not repeated: the ack says only
+        // that the kind is not represented.
+        expect(ack.reason, contains('does not represent'));
+        expect(ack.reason, isNot(contains('quantum-flux-capacitor')));
         expect(result.tableState, isNull);
         expect(result.selection, isNull);
       },
@@ -368,25 +369,28 @@ void main() {
       expect(editorInvocations.single.column, 1);
     });
 
-    test('forwards the editor failure as ack honored=false + reason', () async {
-      editorResult = const ClickToSourceResult(
-        success: false,
-        command: RenderedEditorCommand(executable: 'code', arguments: []),
-        errorMessage: 'No such file',
-      );
-      final handler = buildHandler();
-      final result = await handler.dispatch(
-        inbound(
-          RequestOpenSource(
-            filePath: hostAbsolute('/x.sv'),
-            line: 1,
+    test(
+      'acks an editor failure as honored=false with a fixed reason',
+      () async {
+        editorResult = const ClickToSourceResult(
+          success: false,
+          command: RenderedEditorCommand(executable: 'code', arguments: []),
+          errorMessage: 'Failed to launch /zqbin/code: No such file',
+        );
+        final handler = buildHandler();
+        final result = await handler.dispatch(
+          inbound(
+            RequestOpenSource(
+              filePath: hostAbsolute('/x.sv'),
+              line: 1,
+            ),
           ),
-        ),
-      );
-      final ack = result.ack! as RequestOpenSourceAck;
-      expect(ack.honored, isFalse);
-      expect(ack.reason, 'No such file');
-    });
+        );
+        final ack = result.ack! as RequestOpenSourceAck;
+        expect(ack.honored, isFalse);
+        expect(ack.reason, 'The editor could not be launched.');
+      },
+    );
 
     test('rejects line < 1', () async {
       final handler = buildHandler();
@@ -593,7 +597,8 @@ void main() {
         expect(called, isFalse);
         final ack = result.ack! as RequestOpenArtifactAck;
         expect(ack.honored, isFalse);
-        expect(ack.reason, contains('waveform'));
+        expect(ack.reason, contains('source'));
+        expect(ack.reason, isNot(contains('waveform')));
       },
     );
 

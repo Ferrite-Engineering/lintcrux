@@ -77,7 +77,7 @@ final Provider<LintCruxCxpRequestHandler> cxpRequestHandlerProvider =
           if (path == null) {
             return (
               honored: false,
-              reason: 'No source artifact recorded for design "$designId".',
+              reason: 'No source artifact recorded for that design.',
             );
           }
           return await openCxpProject(
