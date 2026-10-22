@@ -145,7 +145,9 @@ class _SearchDialogState extends ConsumerState<SearchDialog> {
             return CruxSearchResultTile(
               title: v.ruleId,
               subtitle: v.message,
-              trailingChipLabel: '${v.location.file}:${v.location.line}',
+              trailingChipLabel: v.location.file.isEmpty
+                  ? L10N.of(rowContext).violationNoSourceLocation
+                  : '${v.location.file}:${v.location.line}',
               highlighted: highlighted,
               onTap: onActivate,
             );

@@ -1493,7 +1493,23 @@
       }
     }
   },
-  "accessibilityToolbarRegion": "도구 모음",
+  "accessibilityViolationRowNoLocation": "{severity} 위반, 규칙 {rule}, 소스 위치 없음: {message}",
+  "@accessibilityViolationRowNoLocation": {
+    "description": "Screen-reader label for one violation table row whose finding has no source file.",
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "rule": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "violationNoSourceLocation": "소스 위치 없음",
+  "accessibilityToolbarRegion":"도구 모음",
   "accessibilityStatusBarRegion": "상태 표시줄",
   "accessibilityViolationTableKeyboardHint": "위아래 화살표 키로 위반 사이를 이동합니다. Enter는 위반을 에디터에서 열고, Space는 체크박스를 전환합니다.",
   "toolbarOverflowActions": "동작",

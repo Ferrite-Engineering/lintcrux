@@ -1493,7 +1493,23 @@
       }
     }
   },
-  "accessibilityToolbarRegion": "ツールバー",
+  "accessibilityViolationRowNoLocation": "{severity}の指摘、ルール {rule}、ソースの場所なし: {message}",
+  "@accessibilityViolationRowNoLocation": {
+    "description": "Screen-reader label for one violation table row whose finding has no source file.",
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "rule": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "violationNoSourceLocation": "ソースの場所なし",
+  "accessibilityToolbarRegion":"ツールバー",
   "accessibilityStatusBarRegion": "ステータスバー",
   "accessibilityViolationTableKeyboardHint": "上下キーで違反間を移動します。Enter で違反をエディターで開き、Space でチェックボックスを切り替えます。",
   "toolbarOverflowActions": "アクション",

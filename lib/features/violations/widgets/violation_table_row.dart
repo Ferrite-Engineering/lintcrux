@@ -133,6 +133,8 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
   Future<void> _openInEditor() async {
     final l10n = L10N.of(context);
     ref.read(selectedViolationProvider.notifier).select(widget.violation);
+    // A finding with no source file has nothing to open.
+    if (widget.violation.location.file.isEmpty) return;
     final result = await ref
         .read(clickToSourceServiceProvider)
         .openInEditor(widget.violation.location);
@@ -183,13 +185,24 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
     // node focus never reaches. Severity resolves through `severityLabel`
     // rather than `.name` so the reader hears "Warning", not "warning"
     // spelled from an enum.
-    final spoken = l10n.accessibilityViolationRow(
-      severityLabel(l10n, violation.severity),
-      violation.ruleId,
-      violation.location.file,
-      violation.location.line,
-      violation.message,
-    );
+    //
+    // A finding with no source file (a layout check from an imported
+    // implementation-flow report) is read without a file and a line: the
+    // reader's placeholder line 1 is not a place in any file.
+    final hasFile = violation.location.file.isNotEmpty;
+    final spoken = hasFile
+        ? l10n.accessibilityViolationRow(
+            severityLabel(l10n, violation.severity),
+            violation.ruleId,
+            violation.location.file,
+            violation.location.line,
+            violation.message,
+          )
+        : l10n.accessibilityViolationRowNoLocation(
+            severityLabel(l10n, violation.severity),
+            violation.ruleId,
+            violation.message,
+          );
     final row = SizedBox(
       height: kCruxTableRowHeight,
       child: DecoratedBox(
@@ -279,6 +292,7 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
                     child: GestureDetector(
                       behavior: HitTestBehavior.translucent,
                       onDoubleTap: () async {
+                        if (!hasFile) return;
                         final svc = ref.read(clickToSourceServiceProvider);
                         await svc.openInEditor(violation.location);
                       },
@@ -310,15 +324,19 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
                             flex: layout.flexOf(ViolationTableColumn.rule),
                           ),
                           CruxTableCell(
-                            text: displayPath(
-                              violation.location.file,
-                              projectRoot,
-                            ),
+                            text: hasFile
+                                ? displayPath(
+                                    violation.location.file,
+                                    projectRoot,
+                                  )
+                                : l10n.violationNoSourceLocation,
                             flex: layout.flexOf(ViolationTableColumn.file),
-                            tooltip: violation.location.file,
+                            tooltip: hasFile
+                                ? violation.location.file
+                                : l10n.violationNoSourceLocation,
                           ),
                           CruxTableCell(
-                            text: '${violation.location.line}',
+                            text: hasFile ? '${violation.location.line}' : '',
                             flex: layout.flexOf(ViolationTableColumn.line),
                           ),
                           CruxTableCell(

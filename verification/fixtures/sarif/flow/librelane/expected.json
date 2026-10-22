@@ -1,0 +1,78 @@
+{
+  "engine_id": "edacrux flow",
+  "fingerprint_key": "cruxFlowEndpoint/v1",
+  "cases": {
+    "sky130A_drc": {
+      "results": [
+        {
+          "rule_id": "flow/drc",
+          "severity": "note",
+          "metric": "route__drc_errors",
+          "value": 44,
+          "enforced": false,
+          "message": "LibreLane reports routing design rule violations in this run."
+        },
+        {
+          "rule_id": "flow/drc",
+          "severity": "warning",
+          "metric": "magic__drc_error__count",
+          "value": 161,
+          "enforced": true,
+          "message": "LibreLane reports Magic design rule violations in this run."
+        },
+        {
+          "rule_id": "flow/drc",
+          "severity": "warning",
+          "metric": "klayout__drc_error__count",
+          "value": 24,
+          "enforced": true,
+          "message": "LibreLane reports KLayout design rule violations in this run."
+        },
+        {
+          "rule_id": "flow/lvs",
+          "severity": "warning",
+          "metric": "design__lvs_error__count",
+          "value": 10,
+          "enforced": true,
+          "message": "LibreLane reports LVS mismatches between layout and circuit in this run."
+        }
+      ]
+    },
+    "sky130A_antenna": {
+      "results": [
+        {
+          "rule_id": "flow/antenna",
+          "severity": "warning",
+          "metric": "route__antenna_violation__count",
+          "value": 1,
+          "enforced": false,
+          "message": "LibreLane reports routing antenna violations in this run."
+        },
+        {
+          "rule_id": "flow/antenna",
+          "severity": "warning",
+          "metric": "antenna__violating__nets",
+          "value": 1,
+          "enforced": false,
+          "message": "LibreLane reports nets over their antenna ratio in this run."
+        }
+      ]
+    },
+    "gf180mcuD_met": {
+      "results": [
+        {
+          "rule_id": "flow/timing-check",
+          "severity": "note",
+          "metric": "design__max_cap_violation__count",
+          "value": 1,
+          "enforced": false,
+          "message": "LibreLane reports maximum capacitance violations in this run."
+        }
+      ]
+    },
+    "sky130A_met": {
+      "results": []
+    }
+  },
+  "klayout_metric_absent_on_gf180mcuD": "klayout__drc_error__count"
+}

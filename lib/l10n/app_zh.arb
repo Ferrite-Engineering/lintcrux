@@ -1493,7 +1493,23 @@
       }
     }
   },
-  "accessibilityToolbarRegion": "工具栏",
+  "accessibilityViolationRowNoLocation": "{severity} 违规，规则 {rule}，无源码位置：{message}",
+  "@accessibilityViolationRowNoLocation": {
+    "description": "Screen-reader label for one violation table row whose finding has no source file.",
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "rule": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "violationNoSourceLocation": "无源码位置",
+  "accessibilityToolbarRegion":"工具栏",
   "accessibilityStatusBarRegion": "状态栏",
   "accessibilityViolationTableKeyboardHint": "使用上下方向键在违规之间移动。按 Enter 在编辑器中打开违规，按 Space 切换其复选框。",
   "toolbarOverflowActions": "操作",

@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "EDACrux Flow",
+          "version": "1.2.0",
+          "rules": [
+            {
+              "id": "flow/timing-path",
+              "name": "TimingPathMissesConstraint",
+              "shortDescription": {
+                "text": "A timing path misses its clock constraint."
+              },
+              "fullDescription": {
+                "text": "The clock's worst path takes longer than the clock period the run was constrained to. The location is the source of the path's endpoint as far as the synthesized design records it; the start of the path is a related location."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "help": {
+                "text": "Shorten the logic between the two registers, pipeline it, or relax the clock constraint. The result is a finding from this run's report, read by the tool that placed and routed it."
+              }
+            },
+            {
+              "id": "flow/clock-constraint",
+              "name": "ClockMissesConstraint",
+              "shortDescription": {
+                "text": "A clock misses its constraint."
+              },
+              "fullDescription": {
+                "text": "The clock reaches a lower frequency than it was constrained to, and the report names no path for it."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "flow/timing-check",
+              "name": "TimingCheckFails",
+              "shortDescription": {
+                "text": "A timing check of the implementation run fails."
+              },
+              "fullDescription": {
+                "text": "Setup, hold, slew or capacitance violations at one or more corners the run timed. The corners and whether the flow enforces the check are in the properties."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "flow/drc",
+              "name": "DesignRuleViolations",
+              "shortDescription": {
+                "text": "The layout breaks design rules of the PDK."
+              },
+              "fullDescription": {
+                "text": "A design rule check of the run's layout reports violations. The markers are in the run's DRC reports; open the layout in KLayout to see them."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "flow/lvs",
+              "name": "LvsMismatch",
+              "shortDescription": {
+                "text": "The layout does not match the circuit it was built from."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "flow/antenna",
+              "name": "AntennaViolations",
+              "shortDescription": {
+                "text": "Nets exceed their antenna ratio."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "flow/physical",
+              "name": "PhysicalCheckFails",
+              "shortDescription": {
+                "text": "A physical check of the implementation run fails."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "flow/synthesis",
+              "name": "SynthesisCheckFails",
+              "shortDescription": {
+                "text": "A lint or synthesis check of the run fails."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
+        }
+      },
+      "originalUriBaseIds": {
+        "SRCROOT": {
+          "description": {
+            "text": "The design's source root."
+          }
+        }
+      },
+      "results": [
+        {
+          "ruleId": "flow/drc",
+          "level": "note",
+          "message": {
+            "text": "LibreLane reports routing design rule violations in this run."
+          },
+          "partialFingerprints": {
+            "cruxFlowEndpoint/v1": "843bc00850f15061"
+          },
+          "properties": {
+            "metric": "route__drc_errors",
+            "category": "drc",
+            "value": 44,
+            "enforcedByLibreLane": false,
+            "checker": "Checker.TrDRC"
+          }
+        },
+        {
+          "ruleId": "flow/drc",
+          "level": "warning",
+          "message": {
+            "text": "LibreLane reports Magic design rule violations in this run."
+          },
+          "partialFingerprints": {
+            "cruxFlowEndpoint/v1": "259c9cf9c0748983"
+          },
+          "properties": {
+            "metric": "magic__drc_error__count",
+            "category": "drc",
+            "value": 161,
+            "enforcedByLibreLane": true,
+            "checker": "Checker.MagicDRC"
+          }
+        },
+        {
+          "ruleId": "flow/drc",
+          "level": "warning",
+          "message": {
+            "text": "LibreLane reports KLayout design rule violations in this run."
+          },
+          "partialFingerprints": {
+            "cruxFlowEndpoint/v1": "e9de5960fdf1ce3b"
+          },
+          "properties": {
+            "metric": "klayout__drc_error__count",
+            "category": "drc",
+            "value": 24,
+            "enforcedByLibreLane": true,
+            "checker": "Checker.KLayoutDRC"
+          }
+        },
+        {
+          "ruleId": "flow/lvs",
+          "level": "warning",
+          "message": {
+            "text": "LibreLane reports LVS mismatches between layout and circuit in this run."
+          },
+          "partialFingerprints": {
+            "cruxFlowEndpoint/v1": "6786e12b80dec478"
+          },
+          "properties": {
+            "metric": "design__lvs_error__count",
+            "category": "lvs",
+            "value": 10,
+            "enforcedByLibreLane": true,
+            "checker": "Checker.LVS"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1824,6 +1824,25 @@
       }
     }
   },
+  "accessibilityViolationRowNoLocation": "{severity} violation, rule {rule}, no source location: {message}",
+  "@accessibilityViolationRowNoLocation": {
+    "description": "Screen-reader label for one violation table row whose finding has no source file, such as a layout check from an imported implementation-flow report. Same as accessibilityViolationRow without a file and line, which would be invented.",
+    "placeholders": {
+      "severity": {
+        "type": "String"
+      },
+      "rule": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "violationNoSourceLocation": "No source location",
+  "@violationNoSourceLocation": {
+    "description": "Shown in the File column of the violation table and in the inspector's Location section for a finding that names no source file (a layout check from an imported report points at the layout, not at a line of source). The Line column is left blank for it."
+  },
   "accessibilityToolbarRegion": "Toolbar",
   "@accessibilityToolbarRegion": {
     "description": "Screen-reader label for the application toolbar region"

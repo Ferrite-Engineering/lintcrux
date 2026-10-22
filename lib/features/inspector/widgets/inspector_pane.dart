@@ -283,6 +283,15 @@ class _LocationSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10N.of(context);
     final location = violation.location;
+    if (location.file.isEmpty) {
+      return _Section(
+        title: l10n.inspectorLocationHeader,
+        child: Text(
+          l10n.violationNoSourceLocation,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      );
+    }
     // A Wrap, not a Row: the Details dock can be dragged narrower than the
     // path and the button together, and a Row then overflowed — the button
     // alone is wider than a narrow dock in some locales. The button moves
