@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
+import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_engine.dart';
 
 // CDC's only process is Yosys. A machine without Yosys must report the CDC
@@ -129,23 +130,26 @@ void main() {
     expect(runner.executables, isEmpty);
   });
 
-  test('a Yosys JSON output that cannot be read fails the engine', () async {
-    await expectLater(
-      CdcEngine(
+  // The runner leaves the netlist on disk unread, so a file that cannot be
+  // decoded is found by CDC's own reader, and reported the way it reports any
+  // netlist it cannot read: a failed analysis, which fails a headless run.
+  test(
+    'a Yosys JSON output that cannot be read is a failed analysis',
+    () async {
+      final violations = await CdcEngine(
         processRunner: _ScriptedProcessRunner.exits(
           const ProcessRunResult(exitCode: 0, stdout: '', stderr: ''),
           jsonBytes: const <int>[0xFF, 0xFE, 0xFD],
         ),
-      ).run(_request()),
-      emitsError(
-        isA<EngineRunFailedException>().having(
-          (e) => e.reason,
-          'reason',
-          contains('could not be read back'),
-        ),
-      ),
-    );
-  });
+      ).run(_request()).toList();
+      expect(violations.single.ruleId, 'cdc/elaboration-failed');
+      expect(violations.single.raw[Violation.analysisFailedKey], isTrue);
+      expect(
+        violations.single.message,
+        contains('could not read the elaborated netlist'),
+      );
+    },
+  );
 
   test('a clean Yosys exit with no JSON output fails the engine', () async {
     // Not an elaboration error on the RTL: as cdc/elaboration-failed it would

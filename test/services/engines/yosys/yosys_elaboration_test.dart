@@ -194,6 +194,63 @@ endmodule
       },
       skip: yosys ? false : 'yosys not on PATH',
     );
+
+    test('keepNetlist leaves the netlist in a file, in a temp directory with '
+        'spaces, and no string', () async {
+      final temp = Directory(p.join(dir.path, 'my temp dir'))..createSync();
+      final src = File(p.join(dir.path, 'top.v'))
+        ..writeAsStringSync(
+          'module top(input a, output y);\n  assign y = a;\nendmodule\n',
+        );
+      final result = await elaborateDesign(
+        LintRunRequest(
+          sourceFiles: [src.path],
+          binary: const EngineBinaryConfig.system(),
+          language: HdlLanguage.verilog,
+          topModule: 'top',
+          projectRoot: dir.path,
+        ),
+        engineId: 'cdc',
+        processRunner: const DefaultProcessRunner(),
+        tempDirectory: temp,
+        keepNetlist: true,
+      );
+      final file = (result as DesignElaborated).netlistFile!;
+      expect(result.rawJson, isEmpty);
+      expect(p.isWithin(temp.path, file.path), isTrue);
+      final doc = jsonDecode(file.readAsStringSync()) as Map<String, Object?>;
+      expect(
+        (doc['modules']! as Map<String, Object?>).containsKey('top'),
+        true,
+      );
+      file.deleteSync();
+      expect(temp.listSync(), isEmpty);
+    }, skip: yosys ? false : 'yosys not on PATH');
+
+    test(
+      'keepNetlist on a design Yosys rejects leaves no file behind',
+      () async {
+        final temp = Directory(p.join(dir.path, 'tmp'))..createSync();
+        final src = File(p.join(dir.path, 'bad.v'))
+          ..writeAsStringSync('module top(;\n');
+        final result = await elaborateDesign(
+          LintRunRequest(
+            sourceFiles: [src.path],
+            binary: const EngineBinaryConfig.system(),
+            language: HdlLanguage.verilog,
+            topModule: 'top',
+            projectRoot: dir.path,
+          ),
+          engineId: 'cdc',
+          processRunner: const DefaultProcessRunner(),
+          tempDirectory: temp,
+          keepNetlist: true,
+        );
+        expect(result, isA<DesignElaborationFailed>());
+        expect(temp.listSync(), isEmpty);
+      },
+      skip: yosys ? false : 'yosys not on PATH',
+    );
   });
 }
 

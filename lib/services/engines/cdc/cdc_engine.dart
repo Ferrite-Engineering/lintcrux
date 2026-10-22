@@ -1,7 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
-import 'dart:io' show Directory, FileSystemException;
+import 'dart:io' show Directory, File, FileSystemException;
 
 import 'package:crux_netlist/crux_netlist.dart';
 import 'package:crux_yosys/crux_yosys.dart';
@@ -192,48 +192,39 @@ class CdcEngine implements LintEngine {
     // The netlist stays on disk and is read as a stream: a flattened SoC
     // writes hundreds of megabytes of JSON (OpenTitan earlgrey: 864 MB), and
     // holding that as a string and decoding it whole needed more memory than
-    // the analysis itself. The directory is removed once the netlist is read.
-    final scratch = _netlistScratchDirectory();
-    final DesignElaboration elaborated;
-    final NetlistModel? model;
-    final Object? readError;
-    try {
-      // A Yosys that could not be started, timed out, could not be handed
-      // the request, or ended without its JSON output is a tool failure, not
-      // a property of the design: the helper throws for those. Reporting one
-      // as a finding would let a machine without `yosys` produce a run that
-      // "completed" — one that a gate passes and a baseline can freeze,
-      // turning CDC off for good. Only a genuine non-zero Yosys exit on real
-      // RTL is a finding about the design.
-      elaborated = await elaborateDesign(
-        request,
-        engineId: id,
-        processRunner: processRunner,
-        tempDirectory: tempDirectory,
-        bundledBinaryResolver: bundledBinaryResolver,
-        // `flatten` is required rather than cosmetic: without it every module
-        // is its own scope and a crossing *between* two instances is
-        // invisible, which is most of the crossings that matter.
-        //
-        // `opt` is deliberately absent. It folds and rewrites exactly the
-        // structure this analysis reads — a two-flop synchronizer can be
-        // retimed or merged, at which point a correct design starts reporting
-        // as unsafe. A CDC-safe pass list is a real constraint, not a
-        // preference.
-        extraCommands: const <String>['flatten'],
-        frontend: slang ? YosysFrontend.slang : YosysFrontend.verilog,
-        slangOptions: slang ? slangOptionsFor(request) : const <String>[],
-        netlistPath: scratch == null
-            ? null
-            : p.join(scratch.path, 'netlist.json'),
-      );
-      (model, readError) = switch (elaborated) {
-        DesignElaborated() => _readNetlist(elaborated, request.topModule),
-        DesignElaborationFailed() => (null, null),
-      };
-    } finally {
-      _removeScratch(scratch);
-    }
+    // the analysis itself. [_readNetlist] removes the file once it is read.
+    //
+    // A Yosys that could not be started, timed out, could not be handed
+    // the request, or ended without its JSON output is a tool failure, not
+    // a property of the design: the helper throws for those. Reporting one
+    // as a finding would let a machine without `yosys` produce a run that
+    // "completed" — one that a gate passes and a baseline can freeze,
+    // turning CDC off for good. Only a genuine non-zero Yosys exit on real
+    // RTL is a finding about the design.
+    final elaborated = await elaborateDesign(
+      request,
+      engineId: id,
+      processRunner: processRunner,
+      tempDirectory: tempDirectory,
+      bundledBinaryResolver: bundledBinaryResolver,
+      // `flatten` is required rather than cosmetic: without it every module
+      // is its own scope and a crossing *between* two instances is
+      // invisible, which is most of the crossings that matter.
+      //
+      // `opt` is deliberately absent. It folds and rewrites exactly the
+      // structure this analysis reads — a two-flop synchronizer can be
+      // retimed or merged, at which point a correct design starts reporting
+      // as unsafe. A CDC-safe pass list is a real constraint, not a
+      // preference.
+      extraCommands: const <String>['flatten'],
+      frontend: slang ? YosysFrontend.slang : YosysFrontend.verilog,
+      slangOptions: slang ? slangOptionsFor(request) : const <String>[],
+      keepNetlist: true,
+    );
+    final (NetlistModel? model, Object? readError) = switch (elaborated) {
+      DesignElaborated() => _readNetlist(elaborated, request.topModule),
+      DesignElaborationFailed() => (null, null),
+    };
 
     switch (elaborated) {
       case DesignElaborated():
@@ -553,35 +544,14 @@ class CdcEngine implements LintEngine {
       for (final name in names.whereType<String>()) '--blackboxed-module $name',
   ];
 
-  /// A fresh directory for one run's netlist file, under [tempDirectory] or
-  /// the system temp directory, or `null` when none can be made: the netlist
-  /// then reaches the engine in memory, as it did before it was kept on disk.
-  Directory? _netlistScratchDirectory() {
-    try {
-      return (tempDirectory ?? Directory.systemTemp).createTempSync(
-        'lintcrux_cdc_',
-      );
-    } on FileSystemException {
-      return null;
-    }
-  }
-
-  static void _removeScratch(Directory? scratch) {
-    if (scratch == null) return;
-    try {
-      scratch.deleteSync(recursive: true);
-    } on FileSystemException {
-      // A temp directory left behind is not worth failing the run over.
-    }
-  }
-
-  /// The netlist of [elaborated], or the reason it could not be read.
+  /// The netlist of [elaborated], or the reason it could not be read. Removes
+  /// the netlist file, which this run owns, whether or not it was read.
   (NetlistModel?, Object?) _readNetlist(
     DesignElaborated elaborated,
     String? topModule,
   ) {
+    final file = elaborated.netlistFile;
     try {
-      final file = elaborated.netlistFile;
       return (
         file != null
             ? netlistReader.readFile(file, topModule: topModule)
@@ -593,6 +563,16 @@ class CdcEngine implements LintEngine {
       );
     } on Object catch (e) {
       return (null, e);
+    } finally {
+      if (file != null) _removeNetlist(file);
+    }
+  }
+
+  static void _removeNetlist(File file) {
+    try {
+      file.deleteSync();
+    } on FileSystemException {
+      // A temp file left behind is not worth failing the run over.
     }
   }
 

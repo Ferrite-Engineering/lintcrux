@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
+import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_engine.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_netlist_reader.dart';
 import 'package:path/path.dart' as p;
@@ -342,39 +343,43 @@ void main() {
   });
 
   group('CdcEngine reads the netlist from disk', () {
-    // A Yosys stand-in that honours the engine's bare `write_json <path>`
-    // (the netlist) and `design -reset`: the runner's own quoted
-    // `write_json` then gets the empty design.
-    Future<List<String>> runWith({required bool honourBarePath}) async {
-      final netlist = jsonEncode(_twoDomainNetlist());
-      final runner = _DiskYosys(netlist, honourBarePath: honourBarePath);
+    // A Yosys stand-in that writes the netlist at the runner's own quoted
+    // `write_json` path, which the engine asks the runner to keep.
+    List<FileSystemEntity> runnerFiles() => temp
+        .listSync()
+        .where((e) => p.basename(e.path).startsWith('crux_yosys_'))
+        .toList();
+
+    test('the netlist is read from the file the runner kept, and the file '
+        'is removed', () async {
+      final runner = _DiskYosys(jsonEncode(_twoDomainNetlist()));
       final violations = await CdcEngine(
         processRunner: runner,
         tempDirectory: temp,
       ).run(_request(temp.path)).toList();
-      if (honourBarePath) {
-        expect(runner.barePath, isNotNull, reason: 'no bare write_json');
-        expect(
-          File(runner.barePath!).existsSync(),
-          isFalse,
-          reason: 'the netlist file outlived the run',
-        );
-      }
-      return <String>[
-        for (final v in violations)
-          '${v.ruleId}|${v.severity.name}|${v.message}|${v.location}',
-      ];
-    }
-
-    test('the findings are those of the netlist read in memory', () async {
-      final fromDisk = await runWith(honourBarePath: true);
-      final inMemory = await runWith(honourBarePath: false);
-      expect(fromDisk, inMemory);
+      expect(runner.written, isNotNull, reason: 'no write_json');
       expect(
-        fromDisk.where((f) => f.startsWith('cdc/unsync-single-bit')),
+        File(runner.written!).existsSync(),
+        isFalse,
+        reason: 'the netlist file outlived the run',
+      );
+      expect(runnerFiles(), isEmpty);
+      expect(
+        violations.where((v) => v.ruleId == 'cdc/unsync-single-bit'),
         hasLength(1),
         reason: 'flag_a in clk_a feeds flag_b in clk_b directly',
       );
+    });
+
+    test('a netlist that cannot be read is an analysis failure and its file '
+        'is still removed', () async {
+      final violations = await CdcEngine(
+        processRunner: _DiskYosys('{"modules": '),
+        tempDirectory: temp,
+      ).run(_request(temp.path)).toList();
+      expect(violations.single.ruleId, 'cdc/elaboration-failed');
+      expect(violations.single.raw[Violation.analysisFailedKey], isTrue);
+      expect(runnerFiles(), isEmpty);
     });
   });
 }
@@ -445,11 +450,12 @@ Map<String, Object?> _twoDomainNetlist() {
 }
 
 class _DiskYosys implements ProcessRunner {
-  _DiskYosys(this.netlist, {required this.honourBarePath});
+  _DiskYosys(this.netlist);
 
   final String netlist;
-  final bool honourBarePath;
-  String? barePath;
+
+  /// The path of the `write_json` statement, where the netlist was written.
+  String? written;
 
   @override
   Future<ProcessRunResult> run(
@@ -469,19 +475,10 @@ class _DiskYosys implements ProcessRunner {
         stderr: '',
       );
     }
-    final script = arguments.last;
-    final bare = RegExp(r'write_json ([^\s";]+)').firstMatch(script);
-    final quoted = RegExp('write_json "([^"]+)"').firstMatch(script);
-    if (honourBarePath && bare != null) {
-      expect(script, contains('design -reset'));
-      barePath = bare.group(1);
-      File(barePath!).writeAsStringSync(netlist);
-      File(quoted!.group(1)!).writeAsStringSync(
-        '{"creator": "Yosys 0.70", "modules": {}}',
-      );
-    } else {
-      File(quoted!.group(1)!).writeAsStringSync(netlist);
-    }
+    final quoted = RegExp('write_json "([^"]+)"').firstMatch(arguments.last);
+    expect(arguments.last, isNot(contains('design -reset')));
+    written = quoted!.group(1);
+    File(written!).writeAsStringSync(netlist);
     return const ProcessRunResult(exitCode: 0, stdout: '', stderr: '');
   }
 }

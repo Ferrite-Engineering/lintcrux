@@ -42,14 +42,12 @@ final class DesignElaborated extends DesignElaboration {
   /// The `write_json` document `crux_yosys` read back, exactly as Yosys
   /// wrote it.
   ///
-  /// When [netlistFile] is set the design was cleared after it was written
-  /// there, and this is the document of the empty design: read the netlist
-  /// from the file.
+  /// Empty when [netlistFile] is set: the runner then left the document on
+  /// disk unread.
   final String rawJson;
 
   /// The file holding the netlist, when the caller asked [elaborateDesign]
-  /// for one (`netlistPath`) and Yosys wrote it; `null` otherwise. The caller
-  /// that named the path removes it.
+  /// to keep it (`keepNetlist`); `null` otherwise. The caller removes it.
   final File? netlistFile;
 }
 
@@ -79,17 +77,13 @@ final class DesignElaborationFailed extends DesignElaboration {
 /// [slangOptions]. A slang netlist names each `src` file relative to the
 /// directory Yosys ran in: read spans through [YosysSpanPathResolver].
 ///
-/// [netlistPath] asks for the netlist on disk rather than in memory, for an
-/// analysis that reads it as a stream (see `CdcNetlistReader`). `crux_yosys`
-/// reads its `write_json` output back whole, as one string: 864 MB of text
-/// for a flattened OpenTitan earlgrey. So after [extraCommands] Yosys writes
-/// the netlist to [netlistPath] itself and then clears the design, and the
-/// document the runner reads back is the empty one. The result's
-/// [DesignElaborated.netlistFile] is the file when Yosys wrote it; it stays
-/// `null` (the netlist is then in [DesignElaborated.rawJson], as without
-/// [netlistPath]) when the path cannot be written into a Yosys script bare,
-/// because it contains whitespace, a quote, `;` or a line break, or when the
-/// process that ran wrote no such file.
+/// [keepNetlist] asks for the netlist on disk rather than in memory, for an
+/// analysis that reads it as a stream (see `CdcNetlistReader`): 864 MB of
+/// text for a flattened OpenTitan earlgrey. The runner is run with
+/// `runKeepingJson`, so it leaves the `write_json` document in a file of its own
+/// under [tempDirectory] and does not read it back; the result's
+/// [DesignElaborated.netlistFile] is that file and [DesignElaborated.rawJson]
+/// is empty. The caller removes the file. A run that fails leaves none.
 ///
 /// Throws the engine exception [yosysRunException] builds for every outcome
 /// that says nothing about the design.
@@ -102,15 +96,12 @@ Future<DesignElaboration> elaborateDesign(
   List<String> extraCommands = const <String>[],
   YosysFrontend frontend = YosysFrontend.verilog,
   List<String> slangOptions = const <String>[],
-  String? netlistPath,
+  bool keepNetlist = false,
 }) async {
   final executable = yosysExecutableFor(
     request.binary,
     resolver: bundledBinaryResolver,
   );
-  // `extraCommands` entries cannot carry double quotes, so the path is
-  // written bare and must be one token.
-  final toDisk = netlistPath != null && !_unsafeBare.hasMatch(netlistPath);
   final runner = YosysRunner(
     processRunner: EngineYosysProcessRunner(
       processRunner,
@@ -119,28 +110,23 @@ Future<DesignElaboration> elaborateDesign(
     executable: executable,
     tempDirectory: tempDirectory,
   );
-  final result = await runner.run(
-    YosysRunRequest(
-      sources: yosysSourcesFor(request),
-      defines: yosysDefinesFor(request),
-      includePaths: request.includePaths,
-      topModule: request.topModule,
-      extraCommands: <String>[
-        ...extraCommands,
-        if (toDisk) ...<String>['write_json $netlistPath', 'design -reset'],
-      ],
-      frontend: frontend,
-      slangOptions: slangOptions,
-    ),
+  final yosysRequest = YosysRunRequest(
+    sources: yosysSourcesFor(request),
+    defines: yosysDefinesFor(request),
+    includePaths: request.includePaths,
+    topModule: request.topModule,
+    extraCommands: extraCommands,
+    frontend: frontend,
+    slangOptions: slangOptions,
   );
+  final result = keepNetlist
+      ? await runner.runKeepingJson(yosysRequest)
+      : await runner.run(yosysRequest);
   switch (result) {
-    case YosysRunSuccess(:final rawJson):
-      final file = toDisk ? File(netlistPath) : null;
+    case YosysRunSuccess(:final rawJson, :final jsonPath):
       return DesignElaborated(
         rawJson,
-        netlistFile: file != null && file.existsSync() && file.lengthSync() > 0
-            ? file
-            : null,
+        netlistFile: jsonPath == null ? null : File(jsonPath),
       );
     case YosysRunFailure(:final stderr) when isYosysDesignFailure(result):
       return DesignElaborationFailed(stderr);
@@ -152,11 +138,6 @@ Future<DesignElaboration> elaborateDesign(
       );
   }
 }
-
-/// What a path written bare into a Yosys script must not contain: whitespace
-/// ends the token, and a quote, `;` or line break is refused in an extra
-/// command.
-final RegExp _unsafeBare = RegExp(r'[\s";]');
 
 /// Turns the file of a Yosys `src` attribute into the path the user's project
 /// names, so findings, waivers and baselines key on the user's own path.
