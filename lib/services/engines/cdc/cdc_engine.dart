@@ -48,7 +48,6 @@ class CdcEngine implements LintEngine {
     this.processRunner = const DefaultProcessRunner(),
     this.tempDirectory,
     this.analysis = const CdcDomainAnalysis(),
-    this.parser = const YosysJsonParser(),
     this.netlistReader = const CdcNetlistReader(),
     this.bundledBinaryResolver = const BundledBinaryResolver(),
   });
@@ -82,11 +81,6 @@ class CdcEngine implements LintEngine {
   @protected
   @visibleForOverriding
   CdcDomainAnalysis analysisFor(LintRunRequest request) => analysis;
-
-  /// No longer consulted: the netlist is read by [netlistReader], which
-  /// streams the document instead of decoding it whole. Kept so a subclass
-  /// that forwards it still compiles.
-  final YosysJsonParser parser;
 
   /// Reads the elaborated netlist, keeping only what the analysis uses.
   final CdcNetlistReader netlistReader;
