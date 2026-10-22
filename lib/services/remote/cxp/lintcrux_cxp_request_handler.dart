@@ -249,6 +249,9 @@ class LintCruxCxpRequestHandler {
       // naming the wire string, never a throw. The originator learns the
       // request went unserved and moves on; an older LintCrux must not be
       // crashable by a newer peer's vocabulary.
+      case KnownElementKind.property:
+      case KnownElementKind.timingPath:
+      case KnownElementKind.cell:
       case null:
         return CxpDispatchResult(
           ack: RequestHighlightAck(

@@ -81,6 +81,9 @@ class LintCruxNameResolver implements NameResolver {
       // than this build. LintCrux cannot represent it locally, which is
       // exactly the answer `null` already gives for the known kinds it
       // does not own — so an unrecognised kind is declined, not fatal.
+      case KnownElementKind.property:
+      case KnownElementKind.timingPath:
+      case KnownElementKind.cell:
       case null:
         return null;
     }
@@ -102,6 +105,9 @@ class LintCruxNameResolver implements NameResolver {
       case KnownElementKind.test:
       case KnownElementKind.breakpoint:
       // Unrecognised kind — see [toCanonical]. Declined, not fatal.
+      case KnownElementKind.property:
+      case KnownElementKind.timingPath:
+      case KnownElementKind.cell:
       case null:
         return null;
     }

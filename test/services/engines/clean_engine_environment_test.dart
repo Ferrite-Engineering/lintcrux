@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/services/engines/clean_engine_environment.dart';
 
+const String _nixDefaultProfileBin = '/nix/var/nix/profiles/default/bin';
+
 /// The NO_COLOR contract: every engine subprocess is
 /// spawned with color suppression injected so TTY-detecting engines emit
 /// plain diagnostics the parsers can read.
@@ -48,15 +50,25 @@ void main() {
         // Finder/Dock-launched GUI apps miss the shell PATH; the augmented
         // PATH must expose Homebrew engines like verilator, appended after
         // the caller's own entries.
-        expect(env['PATH'], '/usr/bin:/opt/homebrew/bin:/usr/local/bin');
+        // The Nix profiles follow the Homebrew dirs.
+        expect(
+          env['PATH'],
+          allOf(
+            startsWith('/usr/bin:/opt/homebrew/bin:/usr/local/bin:'),
+            endsWith(_nixDefaultProfileBin),
+          ),
+        );
       } else if (Platform.isWindows) {
         // Windows appends the persistent registry PATH (machine-specific),
         // so the caller's entry is preserved as the leading segment.
         expect(env['PATH'], anyOf(equals('/usr/bin'), startsWith('/usr/bin;')));
       } else {
-        // No augmentation on Linux — the caller's PATH passes through
-        // untouched.
-        expect(env['PATH'], '/usr/bin');
+        // Linux appends only the Nix profiles, after the caller's own
+        // entries.
+        expect(
+          env['PATH'],
+          allOf(startsWith('/usr/bin:'), endsWith(_nixDefaultProfileBin)),
+        );
       }
     });
 
@@ -87,7 +99,13 @@ void main() {
           ),
         );
       } else {
-        expect(env['PATH'], '/usr/bin:/bin:/usr/sbin:/sbin');
+        expect(
+          env['PATH'],
+          allOf(
+            startsWith('/usr/bin:/bin:/usr/sbin:/sbin:'),
+            endsWith(_nixDefaultProfileBin),
+          ),
+        );
       }
     });
 
@@ -96,9 +114,15 @@ void main() {
         'PATH': '/opt/homebrew/bin:/usr/bin',
       });
       if (Platform.isMacOS) {
-        // /opt/homebrew/bin is already present, so only /usr/local/bin is
-        // appended.
-        expect(env['PATH'], '/opt/homebrew/bin:/usr/bin:/usr/local/bin');
+        // /opt/homebrew/bin is already present, so /usr/local/bin is the
+        // first dir appended.
+        expect(
+          env['PATH'],
+          allOf(
+            startsWith('/opt/homebrew/bin:/usr/bin:/usr/local/bin:'),
+            endsWith(_nixDefaultProfileBin),
+          ),
+        );
       } else if (Platform.isWindows) {
         expect(
           env['PATH'],
@@ -108,7 +132,13 @@ void main() {
           ),
         );
       } else {
-        expect(env['PATH'], '/opt/homebrew/bin:/usr/bin');
+        expect(
+          env['PATH'],
+          allOf(
+            startsWith('/opt/homebrew/bin:/usr/bin:'),
+            endsWith(_nixDefaultProfileBin),
+          ),
+        );
       }
     });
   });
