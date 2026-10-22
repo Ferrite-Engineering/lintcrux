@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "EDACrux Flow",
+          "version": "1.2.0",
+          "rules": [
+            {
+              "id": "flow/timing-path",
+              "name": "TimingPathMissesConstraint",
+              "shortDescription": {
+                "text": "A timing path misses its clock constraint."
+              },
+              "fullDescription": {
+                "text": "The clock's worst path takes longer than the clock period the run was constrained to. The location is the source of the path's endpoint as far as the synthesized design records it; the start of the path is a related location."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "help": {
+                "text": "Shorten the logic between the two registers, pipeline it, or relax the clock constraint. The result is a finding from this run's report, read by the tool that placed and routed it."
+              }
+            },
+            {
+              "id": "flow/clock-constraint",
+              "name": "ClockMissesConstraint",
+              "shortDescription": {
+                "text": "A clock misses its constraint."
+              },
+              "fullDescription": {
+                "text": "The clock reaches a lower frequency than it was constrained to, and the report names no path for it."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
+        }
+      },
+      "originalUriBaseIds": {
+        "SRCROOT": {
+          "description": {
+            "text": "The design's source root."
+          }
+        }
+      },
+      "results": [
+        {
+          "ruleId": "flow/clock-constraint",
+          "level": "warning",
+          "message": {
+            "text": "Clock clk misses its constraint."
+          },
+          "partialFingerprints": {
+            "cruxFlowEndpoint/v1": "807c3b5c33247554"
+          },
+          "properties": {
+            "clock": "clk",
+            "achievedMhz": 10.0,
+            "constraintMhz": 20.0
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -479,6 +479,16 @@ See `VERIFICATION_GUIDE.md` §21. Needs a real `verible-verilog-lint`
 
 ---
 
+## Flow timing findings imported as SARIF (guide §25)
+
+- [ ] Real flow SARIF imports with the finding on the right file, line and column, the path start as a related location, rule `flow/timing-path` or `flow/clock-constraint`, warning severity — `[Coverage: UNIT]` (`flow_sarif_fixture_test.dart`)
+- [ ] `partialFingerprints` are not read (they survive in the raw SARIF); re-importing a file replaces rather than duplicates, and a baseline matches a rerun whose numbers differ — `[Coverage: UNIT]` (`flow_sarif_fixture_test.dart`)
+- [ ] A run that meets timing imports with no findings, and no fixture text claims signoff — `[Coverage: UNIT]` (`flow_sarif_fixture_test.dart`)
+- [ ] The fixtures name no machine path and carry a `PROVENANCE.md` — `[Coverage: UNIT]` (`fixture_host_path_test.dart`) + `[Coverage: MANUAL]`
+- [ ] **Tier:** Open Core, identical under both `kBetaPeriod` values — `[Coverage: MANUAL]`
+
+---
+
 ## Telemetry — cross-platform end-to-end pass (staging)
 
 > **Run 2026-08-05/06** against the **staging** dataset `crux_telemetry_dev`, from

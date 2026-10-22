@@ -1,0 +1,56 @@
+{
+  "engine_id": "edacrux flow",
+  "design": "path_adder.v",
+  "end_register": "sum_q",
+  "end_register_declaration": "  reg [24:0] sum_q;",
+  "end_statement_expression": "src_a + src_b",
+  "fingerprint_key": "cruxFlowEndpoint/v1",
+  "cases": {
+    "path_ice40_violated": {
+      "rule_id": "flow/timing-path",
+      "severity": "warning",
+      "anchor": "declaration",
+      "start_register": "src_a",
+      "start_declaration": "  reg [23:0] src_a;",
+      "clock": "clk$SB_IO_IN_$glb_clk",
+      "message": "The worst path from src_a to sum_q misses the constraint of clock clk$SB_IO_IN_$glb_clk.",
+      "fingerprint": "21b580c880b78cde"
+    },
+    "path_ecp5_violated": {
+      "rule_id": "flow/timing-path",
+      "severity": "warning",
+      "anchor": "declaration",
+      "start_register": "src_b",
+      "start_declaration": "  reg [23:0] src_b;",
+      "clock": "$glbnet$clk$TRELLIS_IO_IN",
+      "message": "The worst path from src_b to sum_q misses the constraint of clock $glbnet$clk$TRELLIS_IO_IN.",
+      "fingerprint": "359a95f27b63f967"
+    },
+    "path_gowin_violated": {
+      "rule_id": "flow/timing-path",
+      "severity": "warning",
+      "anchor": "declaration",
+      "start_register": "src_a",
+      "start_declaration": "  reg [23:0] src_a;",
+      "clock": "clk_IBUF_I_O",
+      "message": "The worst path from src_a to sum_q misses the constraint of clock clk_IBUF_I_O.",
+      "fingerprint": "1e36dd72bb38c8a2"
+    },
+    "path_gatemate_violated": {
+      "rule_id": "flow/timing-path",
+      "severity": "warning",
+      "anchor": "statement",
+      "start_register": "src_a",
+      "start_declaration": "  reg [23:0] src_a;",
+      "clock": "$iopadmap$clk",
+      "message": "The worst path from src_a to sum_q misses the constraint of clock $iopadmap$clk.",
+      "fingerprint": "3ff1bad762c13612"
+    }
+  },
+  "clock_no_path": {
+    "rule_id": "flow/clock-constraint",
+    "severity": "warning",
+    "message": "Clock clk misses its constraint.",
+    "fingerprint": "807c3b5c33247554"
+  }
+}
