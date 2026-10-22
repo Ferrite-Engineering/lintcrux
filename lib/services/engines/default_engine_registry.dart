@@ -47,7 +47,7 @@ EngineRegistry defaultEngineRegistry({
   LintEngine? cdcEngine,
 }) {
   return EngineRegistry(<LintEngine>[
-    VerilatorEngine(),
+    VerilatorEngine(outputMode: VerilatorOutputMode.auto),
     VeribleEngine(),
     SlangEngine(),
     YosysCheckEngine(onDiagnostics: onYosysDiagnostics),

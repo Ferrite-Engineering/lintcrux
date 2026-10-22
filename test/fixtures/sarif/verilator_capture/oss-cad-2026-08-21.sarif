@@ -1,0 +1,283 @@
+{
+    "$schema": "https://json.schemastore.org/sarif-2.1.0-rtm.5.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "Verilator",
+                    "version": "5.051 devel rev v5.050-226-gf7c087468 (mod)",
+                    "informationUri": "https://verilator.org",
+                    "rules": [
+                        {
+                            "id": "MULTIDRIVEN",
+                            "helpUri": "https://verilator.org/warn/MULTIDRIVEN?v=5.051"
+                        },
+                        {
+                            "id": "UNDRIVEN",
+                            "helpUri": "https://verilator.org/warn/UNDRIVEN?v=5.051"
+                        },
+                        {
+                            "id": "UNUSEDSIGNAL",
+                            "helpUri": "https://verilator.org/warn/UNUSEDSIGNAL?v=5.051"
+                        },
+                        {
+                            "id": "WIDTHTRUNC",
+                            "helpUri": "https://verilator.org/warn/WIDTHTRUNC?v=5.051"
+                        }
+                    ]
+                }
+            },
+            "invocations": [
+                {
+                    "commandLine": "--lint-only -Wall --diagnostics-sarif-output out/oss-cad-2026-08-21.sarif sarif_design.sv",
+                    "executionSuccessful": false
+                }
+            ],
+            "results": [
+                {
+                    "level": "warning",
+                    "message": {
+                        "text": "Operator ASSIGNW expects 2 bits on the Assign RHS, but Assign RHS's VARREF 'a' generates 4 bits.\n... note: In instance 'sarif_design'\n... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.051\n... Use \"/* verilator lint_off WIDTHTRUNC */\" and lint_on around source to disable this message.",
+                        "markdown": "```\n%Warning-WIDTHTRUNC: sarif_design.sv:21:12: Operator ASSIGNW expects 2 bits on the Assign RHS, but Assign RHS's VARREF 'a' generates 4 bits.\n                                          : ... note: In instance 'sarif_design'\n   21 |   assign y = a;\n      |            ^\n                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.051\n                     ... Use \"/* verilator lint_off WIDTHTRUNC */\" and lint_on around source to disable this message.\n\n```\n"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 21,
+                                    "startColumn": 12,
+                                    "endColumn": 13,
+                                    "snippit": {
+                                        "text": "  assign y = a;",
+                                        "markdown": "```\n   21 |   assign y = a;\n      |            ^\n\n```\n"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "ruleId": "WIDTHTRUNC",
+                    "ruleIndex": 3
+                },
+                {
+                    "level": "warning",
+                    "message": {
+                        "text": "Variable written to in always_ff also written by other process (IEEE 1800-2023 9.2.2.4): 'md'\n... note: In instance 'sarif_design'\n... Location of other write\n... For warning description see https://verilator.org/warn/MULTIDRIVEN?v=5.051\n... Use \"/* verilator lint_off MULTIDRIVEN */\" and lint_on around source to disable this message.",
+                        "markdown": "```\n%Warning-MULTIDRIVEN: sarif_design.sv:24:29: Variable written to in always_ff also written by other process (IEEE 1800-2023 9.2.2.4): 'md'\n                                           : ... note: In instance 'sarif_design'\n                      sarif_design.sv:24:29: \n   24 |   always_ff @(posedge clk2) md <= 1'b0;\n      |                             ^~\n                      sarif_design.sv:23:28: ... Location of other write\n   23 |   always_ff @(posedge clk) md <= 1'b1;\n      |                            ^~\n                      ... For warning description see https://verilator.org/warn/MULTIDRIVEN?v=5.051\n                      ... Use \"/* verilator lint_off MULTIDRIVEN */\" and lint_on around source to disable this message.\n\n```\n"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 24,
+                                    "startColumn": 29,
+                                    "endColumn": 31,
+                                    "snippit": {
+                                        "text": "  always_ff @(posedge clk2) md <= 1'b0;",
+                                        "markdown": "```\n   24 |   always_ff @(posedge clk2) md <= 1'b0;\n      |                             ^~\n\n```\n"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "relatedLocations": [
+                        {
+                            "message": {
+                                "text": "",
+                                "markdown": "```\n                      sarif_design.sv:24:29: \n   24 |   always_ff @(posedge clk2) md <= 1'b0;\n      |                             ^~\n\n```\n"
+                            },
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 24,
+                                    "startColumn": 29,
+                                    "endColumn": 31,
+                                    "snippit": {
+                                        "text": "  always_ff @(posedge clk2) md <= 1'b0;",
+                                        "markdown": "```\n   24 |   always_ff @(posedge clk2) md <= 1'b0;\n      |                             ^~\n\n```\n"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "ruleId": "MULTIDRIVEN",
+                    "ruleIndex": 0
+                },
+                {
+                    "level": "warning",
+                    "message": {
+                        "text": "Bits of signal are not used: 'a'[3:2]\n... note: In instance 'sarif_design'\n... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.051\n... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.",
+                        "markdown": "```\n%Warning-UNUSEDSIGNAL: sarif_design.sv:13:22: Bits of signal are not used: 'a'[3:2]\n                                            : ... note: In instance 'sarif_design'\n   13 |   input  logic [3:0] a,\n      |                      ^\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.051\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n\n```\n"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 13,
+                                    "startColumn": 22,
+                                    "endColumn": 23,
+                                    "snippit": {
+                                        "text": "  input  logic [3:0] a,",
+                                        "markdown": "```\n   13 |   input  logic [3:0] a,\n      |                      ^\n\n```\n"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "ruleId": "UNUSEDSIGNAL",
+                    "ruleIndex": 2
+                },
+                {
+                    "level": "warning",
+                    "message": {
+                        "text": "Signal is not used: 'unread_sig'\n... note: In instance 'sarif_design'",
+                        "markdown": "```\n%Warning-UNUSEDSIGNAL: sarif_design.sv:18:9: Signal is not used: 'unread_sig'\n                                           : ... note: In instance 'sarif_design'\n   18 |   logic unread_sig;\n      |         ^~~~~~~~~~\n\n```\n"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 18,
+                                    "startColumn": 9,
+                                    "endColumn": 19,
+                                    "snippit": {
+                                        "text": "  logic unread_sig;",
+                                        "markdown": "```\n   18 |   logic unread_sig;\n      |         ^~~~~~~~~~\n\n```\n"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "ruleId": "UNUSEDSIGNAL",
+                    "ruleIndex": 2
+                },
+                {
+                    "level": "warning",
+                    "message": {
+                        "text": "Signal is not driven: 'undriven_sig'\n... note: In instance 'sarif_design'\n... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.051\n... Use \"/* verilator lint_off UNDRIVEN */\" and lint_on around source to disable this message.",
+                        "markdown": "```\n%Warning-UNDRIVEN: sarif_design.sv:19:9: Signal is not driven: 'undriven_sig'\n                                       : ... note: In instance 'sarif_design'\n   19 |   logic undriven_sig;\n      |         ^~~~~~~~~~~~\n                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.051\n                   ... Use \"/* verilator lint_off UNDRIVEN */\" and lint_on around source to disable this message.\n\n```\n"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 19,
+                                    "startColumn": 9,
+                                    "endColumn": 21,
+                                    "snippit": {
+                                        "text": "  logic undriven_sig;",
+                                        "markdown": "```\n   19 |   logic undriven_sig;\n      |         ^~~~~~~~~~~~\n\n```\n"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "ruleId": "UNDRIVEN",
+                    "ruleIndex": 1
+                },
+                {
+                    "level": "warning",
+                    "message": {
+                        "text": "Signal has multiple driving blocks with different clocking: 'md'\n... Location of first driving block\n... Location of other driving block",
+                        "markdown": "```\n%Warning-MULTIDRIVEN: sarif_design.sv:15:22: Signal has multiple driving blocks with different clocking: 'md'\n                      sarif_design.sv:23:28: ... Location of first driving block\n   23 |   always_ff @(posedge clk) md <= 1'b1;\n      |                            ^~\n                      sarif_design.sv:24:29: ... Location of other driving block\n   24 |   always_ff @(posedge clk2) md <= 1'b0;\n      |                             ^~\n\n```\n"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 15,
+                                    "startColumn": 22,
+                                    "endColumn": 24,
+                                    "snippit": {
+                                        "text": "  output logic       md,",
+                                        "markdown": "```\n   15 |   output logic       md,\n      |                      ^~\n\n```\n"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "relatedLocations": [
+                        {
+                            "message": {
+                                "text": "... Location of first driving block",
+                                "markdown": "```\n                      sarif_design.sv:23:28: ... Location of first driving block\n   23 |   always_ff @(posedge clk) md <= 1'b1;\n      |                            ^~\n\n```\n"
+                            },
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 23,
+                                    "startColumn": 28,
+                                    "endColumn": 30,
+                                    "snippit": {
+                                        "text": "  always_ff @(posedge clk) md <= 1'b1;",
+                                        "markdown": "```\n   23 |   always_ff @(posedge clk) md <= 1'b1;\n      |                            ^~\n\n```\n"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "message": {
+                                "text": "... Location of other driving block",
+                                "markdown": "```\n                      sarif_design.sv:24:29: ... Location of other driving block\n   24 |   always_ff @(posedge clk2) md <= 1'b0;\n      |                             ^~\n\n```\n"
+                            },
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "file://@ROOT@/sarif_design.sv"
+                                },
+                                "region": {
+                                    "sourceLanguage": "systemverilog",
+                                    "startLine": 24,
+                                    "startColumn": 29,
+                                    "endColumn": 31,
+                                    "snippit": {
+                                        "text": "  always_ff @(posedge clk2) md <= 1'b0;",
+                                        "markdown": "```\n   24 |   always_ff @(posedge clk2) md <= 1'b0;\n      |                             ^~\n\n```\n"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    "ruleId": "MULTIDRIVEN",
+                    "ruleIndex": 0
+                },
+                {
+                    "level": "error",
+                    "message": {
+                        "text": "Exiting due to 6 warning(s)",
+                        "markdown": "```\n%Error: Exiting due to 6 warning(s)\n\n```\n"
+                    }
+                }
+            ]
+        }
+    ]
+}

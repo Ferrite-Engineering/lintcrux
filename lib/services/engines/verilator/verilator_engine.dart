@@ -11,6 +11,19 @@ import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
 import 'package:lintcrux/services/engines/process_runner.dart';
 import 'package:lintcrux/services/engines/verilator/verilator_parser.dart';
+import 'package:lintcrux/services/engines/verilator/verilator_sarif_parser.dart';
+import 'package:path/path.dart' as p;
+
+/// Where [VerilatorEngine] reads its findings from.
+enum VerilatorOutputMode {
+  /// Parse Verilator's stderr transcript. One process per run.
+  text,
+
+  /// Read Verilator's SARIF output when the binary's version writes it
+  /// (5.038 and later), the stderr transcript otherwise or whenever the
+  /// SARIF file cannot be used.
+  auto,
+}
 
 /// How many lines of the captured stderr transcript to attach to an
 /// [EngineRunFailedException] so the diagnostics panel can show *why*
@@ -59,7 +72,39 @@ class VerilatorEngine implements LintEngine {
     this.runner = const SystemProcessRunner(),
     this.projectRoot = '',
     this.bundledBinaryResolver = const BundledBinaryResolver(),
+    this.outputMode = VerilatorOutputMode.text,
   });
+
+  /// Where findings are read from. [VerilatorOutputMode.text] (the default)
+  /// parses stderr and spawns exactly one process per run;
+  /// [VerilatorOutputMode.auto], which the production registry selects,
+  /// reads Verilator's SARIF output when its version is
+  /// [minSarifMajor].[minSarifMinor] or later and falls back to stderr
+  /// otherwise.
+  final VerilatorOutputMode outputMode;
+
+  /// First Verilator release with `--diagnostics-sarif-output`: 5.038.
+  static const int minSarifMajor = 5;
+
+  /// See [minSarifMajor].
+  static const int minSarifMinor = 38;
+
+  /// Whether a `verilator --version` line names a release that writes SARIF
+  /// ([minSarifMajor].[minSarifMinor] or later). `null` and a line that is
+  /// not a Verilator version are `false`, so an unknown binary is read the
+  /// way every Verilator was read before SARIF.
+  static bool versionWritesSarif(String? versionLine) {
+    if (versionLine == null) return false;
+    final m = RegExp(r'Verilator\s+(\d+)\.(\d+)').firstMatch(versionLine);
+    if (m == null) return false;
+    final major = int.parse(m.group(1)!);
+    final minor = int.parse(m.group(2)!);
+    return major > minSarifMajor ||
+        (major == minSarifMajor && minor >= minSarifMinor);
+  }
+
+  /// `--version` result per executable, for this engine's lifetime.
+  final Map<String, bool> _sarifSupport = <String, bool>{};
 
   /// The process runner. Tests inject a fake; production uses
   /// [SystemProcessRunner].
@@ -93,10 +138,7 @@ class VerilatorEngine implements LintEngine {
 
   @override
   EngineCapabilities get capabilities => const EngineCapabilities(
-    supportedLanguages: {
-      HdlLanguage.verilog,
-      HdlLanguage.systemVerilog,
-    },
+    supportedLanguages: {HdlLanguage.verilog, HdlLanguage.systemVerilog},
     // Verilator's `--lint-only <files>` re-runs the parse + check
     // pipeline over a caller-supplied file list. Incremental
     // re-runs scope that list to just the changed file(s); the
@@ -123,8 +165,10 @@ class VerilatorEngine implements LintEngine {
   }
 
   @override
-  Future<String?> detectVersion(EngineBinaryConfig config) async {
-    final exe = _resolveExecutable(config);
+  Future<String?> detectVersion(EngineBinaryConfig config) =>
+      _probeVersion(_resolveExecutable(config));
+
+  Future<String?> _probeVersion(String exe) async {
     try {
       final proc = await runner.start(exe, const ['--version']);
       final output = await collectProcessOutput(
@@ -152,13 +196,57 @@ class VerilatorEngine implements LintEngine {
   @override
   Stream<Violation> run(LintRunRequest request) async* {
     final exe = _resolveExecutable(request.binary);
-    final args = _buildArgs(request);
     final root = projectRoot.isNotEmpty
         ? projectRoot
         : (request.sourceFiles.isNotEmpty
               ? _dirname(request.sourceFiles.first)
               : '');
     final parser = VerilatorParser(rootPath: root);
+
+    // SARIF only on a Verilator that writes it. The stderr transcript is
+    // still collected and parsed on every run: it is the fallback when the
+    // SARIF file is missing or unreadable, and the false-clean guard below
+    // reads its `%Error` lines.
+    Directory? sarifDir;
+    String? sarifPath;
+    if (outputMode == VerilatorOutputMode.auto && await _writesSarif(exe)) {
+      try {
+        sarifDir = await Directory.systemTemp.createTemp('lintcrux-verilator-');
+        sarifPath = p.join(sarifDir.path, 'verilator.sarif');
+      } on FileSystemException {
+        sarifDir = null;
+        sarifPath = null;
+      }
+    }
+    try {
+      yield* _runProcess(request, exe, root, parser, sarifPath);
+    } finally {
+      if (sarifDir != null) {
+        try {
+          await sarifDir.delete(recursive: true);
+        } on FileSystemException {
+          // A temp directory that will not delete is the OS's to reap.
+        }
+      }
+    }
+  }
+
+  Future<bool> _writesSarif(String exe) async {
+    final cached = _sarifSupport[exe];
+    if (cached != null) return cached;
+    final supported = versionWritesSarif(await _probeVersion(exe));
+    _sarifSupport[exe] = supported;
+    return supported;
+  }
+
+  Stream<Violation> _runProcess(
+    LintRunRequest request,
+    String exe,
+    String root,
+    VerilatorParser parser,
+    String? sarifPath,
+  ) async* {
+    final args = _buildArgs(request, sarifPath: sarifPath);
 
     final LintProcess proc;
     try {
@@ -192,17 +280,24 @@ class VerilatorEngine implements LintEngine {
     // run whose every line was dropped has no `%Error` left to fail on.
     final CapturedProcessOutput output;
     try {
-      output = await collectProcessOutput(
-        proc,
-        engineId: id,
-        executable: exe,
-      );
+      output = await collectProcessOutput(proc, engineId: id, executable: exe);
     } finally {
       _process = null;
     }
     final exitCode = output.exitCode;
     final stderrLines = output.stderr;
-    final violations = parser.parse(stderrLines);
+    final textViolations = parser.parse(stderrLines);
+    final sarifViolations = sarifPath == null
+        ? null
+        : await _readSarif(sarifPath, root);
+    // SARIF decides only when it parsed and agrees that there is something to
+    // report or that there is nothing: a document with no results beside a
+    // transcript that has findings is the text path's to settle.
+    final violations =
+        sarifViolations != null &&
+            (sarifViolations.isNotEmpty || textViolations.isEmpty)
+        ? sarifViolations
+        : textViolations;
 
     // False-clean guard (mirrors the Verible engine's contract). Verilator
     // exits non-zero both when it FINDS lint violations and when the
@@ -263,8 +358,37 @@ class VerilatorEngine implements LintEngine {
     }
   }
 
-  List<String> _buildArgs(LintRunRequest request) {
+  /// Reads and parses the SARIF Verilator wrote to [path], or `null` when
+  /// there is no usable document (see [VerilatorSarifParser.parse]).
+  Future<List<Violation>?> _readSarif(String path, String root) async {
+    final String source;
+    try {
+      // A missing file is a FileSystemException too.
+      source = await File(path).readAsString();
+    } on FileSystemException {
+      return null;
+    }
+    String? realRoot;
+    if (root.isNotEmpty) {
+      try {
+        realRoot = await Directory(root).resolveSymbolicLinks();
+      } on FileSystemException {
+        realRoot = null;
+      }
+    }
+    return VerilatorSarifParser(
+      rootPath: root,
+      rootRealPath: realRoot,
+    ).parse(source);
+  }
+
+  List<String> _buildArgs(LintRunRequest request, {String? sarifPath}) {
     final args = <String>['--lint-only'];
+    if (sarifPath != null) {
+      args
+        ..add('--diagnostics-sarif-output')
+        ..add(sarifPath);
+    }
     for (final f in _resolveWarnFlags(request)) {
       args.add('-W$f');
     }

@@ -93,6 +93,8 @@ LintCrux registers seven engines. Six run a real tool as a subprocess and normal
 | `svlint` | Svlint | Verilog, SystemVerilog | `configPath` |
 | `cdc` | Structural clock-domain-crossing lint | Verilog, SystemVerilog | — (no binary of its own; it drives Yosys — see [Clock-domain crossings](cdc.md)) |
 
+From LintCrux 1.2, when the Verilator in use is 5.038 or later, LintCrux reads Verilator's own SARIF output (`--diagnostics-sarif-output`, written to a temporary file) instead of parsing its text. The findings are the same: same rules, severities, messages and locations. An older Verilator, or a SARIF file that is missing or unreadable, falls back to the text. If a Verilator release attaches suggested edits (SARIF `fixes`) to a result, they are kept on the finding and written back out by SARIF export; LintCrux does not apply them.
+
 Defines, include paths and the top module are project-level, so every engine that understands them receives them. The option keys and their defaults are in the [project file reference](reference/project-file.md). Engine options are edited in the `.lintcrux` file; `Settings → Engines` configures binaries and severity overrides, not engine flags.
 
 ### Which engines run {#which-engines}

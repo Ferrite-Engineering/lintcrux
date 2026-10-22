@@ -1,0 +1,40 @@
+%Warning-WIDTHTRUNC: sarif_design.sv:21:12: Operator ASSIGNW expects 2 bits on the Assign RHS, but Assign RHS's VARREF 'a' generates 4 bits.
+                                          : ... note: In instance 'sarif_design'
+   21 |   assign y = a;
+      |            ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.053
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-MULTIDRIVEN: sarif_design.sv:24:29: Variable written to in always_ff also written by other process (IEEE 1800-2023 9.2.2.4): 'md'
+                                           : ... note: In instance 'sarif_design'
+                      sarif_design.sv:24:29: 
+   24 |   always_ff @(posedge clk2) md <= 1'b0;
+      |                             ^~
+                      sarif_design.sv:23:28: ... Location of other write
+   23 |   always_ff @(posedge clk) md <= 1'b1;
+      |                            ^~
+                      ... For warning description see https://verilator.org/warn/MULTIDRIVEN?v=5.053
+                      ... Use "/* verilator lint_off MULTIDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: sarif_design.sv:13:22: Bits of signal are not used: 'a'[3:2]
+                                            : ... note: In instance 'sarif_design'
+   13 |   input  logic [3:0] a,
+      |                      ^
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.053
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: sarif_design.sv:18:9: Signal is not used: 'unread_sig'
+                                           : ... note: In instance 'sarif_design'
+   18 |   logic unread_sig;
+      |         ^~~~~~~~~~
+%Warning-UNDRIVEN: sarif_design.sv:19:9: Signal is not driven: 'undriven_sig'
+                                       : ... note: In instance 'sarif_design'
+   19 |   logic undriven_sig;
+      |         ^~~~~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.053
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-MULTIDRIVEN: sarif_design.sv:15:22: Signal has multiple driving blocks with different clocking: 'md'
+                      sarif_design.sv:23:28: ... Location of first driving block
+   23 |   always_ff @(posedge clk) md <= 1'b1;
+      |                            ^~
+                      sarif_design.sv:24:29: ... Location of other driving block
+   24 |   always_ff @(posedge clk2) md <= 1'b0;
+      |                             ^~
+%Error: Exiting due to 6 warning(s)
