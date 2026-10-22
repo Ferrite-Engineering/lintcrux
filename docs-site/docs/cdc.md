@@ -135,14 +135,16 @@ When the Yosys in use has no yosys-slang and its built-in reader refuses a desig
 
 CDC flattens the whole design, so the netlist it reads grows with the chip. From LintCrux 1.2, Yosys writes that netlist to a temporary file and CDC reads it a piece at a time, keeping only the top module and the parts of it the analysis uses. LintCrux 1.1 held the whole JSON document in memory and decoded it in one go, which on OpenTitan earlgrey took 5 GB before the analysis started.
 
-Measured from LintCrux 1.2 on a Mac mini with an Apple M4 Pro and 64 GB of memory, with the Yosys of the OSS CAD Suite of 2026-10-21 and the open-core analysis:
+Measured from LintCrux 1.2 on a Mac mini with an Apple M4 Pro and 64 GB of memory, with the Yosys of the OSS CAD Suite of 2026-10-21, for the open-core analysis and for the Pro analysis (clock-tree tracing and the further synchronizer idioms):
 
-| Design | Cells after `flatten` | Netlist JSON | Yosys peak memory | CDC peak memory | Whole run |
-|---|---|---|---|---|---|
-| Ibex `ibex_core` | about 11,000 | 10 MB | 0.1 GB | 0.3 GB | under 1 second |
-| CVA6 v5.3.0 core (`cva6`) | about 69,000 | 113 MB | 1.3 GB | 0.6 GB | 5 seconds |
-| OpenTitan earlgrey (`chip_earlgrey_asic`) | about 739,000 | 840 MB | 5.4 GB | 2.3 GB | 85 seconds |
+| Design | Cells after `flatten` | Netlist JSON | Yosys peak memory | CDC peak memory, open core | CDC peak memory, Pro | Whole run, open core | Whole run, Pro |
+|---|---|---|---|---|---|---|---|
+| Ibex `ibex_core` | about 11,000 | 10 MB | 0.1 GB | 0.3 GB | 0.4 GB | under 1 second | under 1 second |
+| CVA6 v5.3.0 core (`cva6`) | about 69,000 | 113 MB | 1.3 GB | 0.6 GB | 0.6 GB | 5 seconds | 5 seconds |
+| OpenTitan earlgrey (`chip_earlgrey_asic`) | about 739,000 | 840 MB | 5.4 GB | 2.3 GB | 2.4 GB | 85 seconds | 43 seconds |
 
-Yosys finishes and exits before CDC reads its output, so the two peaks do not add up: the larger one is what the machine needs. On earlgrey CDC found 57 clock domains and 975 crossings, 156 of them unsafe, with the open-core rule that every distinct clock net is its own domain (see [above](#tiers)).
+Yosys finishes and exits before CDC reads its output, so the two peaks do not add up: the larger one is what the machine needs. On earlgrey the open-core analysis found 57 clock domains and 975 crossings, 156 of them unsafe, with the rule that every distinct clock net is its own domain (see [above](#tiers)). The Pro analysis found the same 57 clock nets and traced most of them to a shared clock, leaving 243 crossings, 107 of them unsafe (22 of those are per-bit synchronized buses). With fewer crossings to classify, the Pro run is the shorter one. Ibex `ibex_core` and the CVA6 core each run on one clock, so neither analysis has a crossing to classify there.
 
-These are the designs measured, not a limit. A larger design, or one with more or wider registers, needs more. The Pro analysis (clock-tree tracing, `cdc.yaml`, the further synchronizer idioms) has not been measured on a design of earlgrey's size.
+The Pro figures are without a `cdc.yaml`. On earlgrey, a `cdc.yaml` declaring two handshakes and a `waive:` rule took the Pro run to 50 seconds and 2.5 GB.
+
+These are the designs measured, not a limit. A larger design, or one with more or wider registers, needs more.
