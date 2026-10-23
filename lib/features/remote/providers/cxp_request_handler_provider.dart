@@ -43,14 +43,14 @@ final Provider<LintCruxCxpRequestHandler> cxpRequestHandlerProvider =
         openInEditor: (location) =>
             ref.read(clickToSourceServiceProvider).openInEditor(location),
         containment: ref.read(cxpPathContainmentProvider),
-        // The `crux.design_id` fallback: resolve the design's `source`
+        // The `crux.design_id` fallback: resolve the design's `project`
         // artifact from the shared workspace and open it as a LintCrux
         // project via the WorkspaceRoot-published opener. Root-scoped: the
         // server socket is one-per-app and the opener acts on the
         // workspace, not a per-tab. It keeps the roots — nobody asked for
         // this design; a peer attached its id to a cross-probe.
         resolveAndOpenArtifact: (designId) async {
-          final path = await resolveLintcruxSourceArtifactPath(ref, designId);
+          final path = await resolveLintcruxProjectArtifactPath(ref, designId);
           if (path == null) return false;
           // CXP §11's MUST: the artifact resolved through our OWN records
           // gets the same rule as a `file_path` on the wire, applied to the
@@ -77,7 +77,7 @@ final Provider<LintCruxCxpRequestHandler> cxpRequestHandlerProvider =
           if (path == null) {
             return (
               honored: false,
-              reason: 'No source artifact recorded for that design.',
+              reason: 'No project artifact recorded for that design.',
             );
           }
           return await openCxpProject(

@@ -228,9 +228,7 @@ void main() {
       'signal kind sets ruleSubstring filter and selects first match',
       () async {
         // A violation whose message mentions the signal.
-        final v = mk(
-          message: 'Signal cpu_clk unused',
-        );
+        final v = mk(message: 'Signal cpu_clk unused');
         store.replaceFromEngine('verilator', [v]);
         final handler = buildHandler();
         final result = await handler.dispatch(
@@ -259,10 +257,7 @@ void main() {
       final result = await handler.dispatch(
         inbound(
           const RequestHighlight(
-            element: ElementId(
-              kind: ElementKind.instance,
-              path: 'top.cpu',
-            ),
+            element: ElementId(kind: ElementKind.instance, path: 'top.cpu'),
           ),
         ),
       );
@@ -339,13 +334,7 @@ void main() {
       final handler = buildHandler();
       final file = hostAbsolute('/proj/rtl/cpu.sv');
       final result = await handler.dispatch(
-        inbound(
-          RequestOpenSource(
-            filePath: file,
-            line: 42,
-            column: 7,
-          ),
-        ),
+        inbound(RequestOpenSource(filePath: file, line: 42, column: 7)),
       );
       expect(editorInvocations, hasLength(1));
       expect(editorInvocations.single.file, file);
@@ -379,12 +368,7 @@ void main() {
         );
         final handler = buildHandler();
         final result = await handler.dispatch(
-          inbound(
-            RequestOpenSource(
-              filePath: hostAbsolute('/x.sv'),
-              line: 1,
-            ),
-          ),
+          inbound(RequestOpenSource(filePath: hostAbsolute('/x.sv'), line: 1)),
         );
         final ack = result.ack! as RequestOpenSourceAck;
         expect(ack.honored, isFalse);
@@ -395,12 +379,7 @@ void main() {
     test('rejects line < 1', () async {
       final handler = buildHandler();
       final result = await handler.dispatch(
-        inbound(
-          const RequestOpenSource(
-            filePath: '/x.sv',
-            line: 0,
-          ),
-        ),
+        inbound(const RequestOpenSource(filePath: '/x.sv', line: 0)),
       );
       expect(editorInvocations, isEmpty);
       final ack = result.ack! as RequestOpenSourceAck;
@@ -482,22 +461,19 @@ void main() {
       });
     }
 
-    test(
-      'a request kind LintCrux does not recognise still gets an unsupported '
-      'ErrorResponse, not a fabricated highlight ack',
-      () async {
-        final handler = buildHandler();
-        final result = await handler.dispatch(inbound(const _UnknownRequest()));
-        expect(result.ack, isA<ErrorResponse>());
-        expect(result.ack, isNot(isA<RequestHighlightAck>()));
-        final ack = result.ack! as ErrorResponse;
-        expect(ack.code, CxpErrorCode.unsupported);
-        expect(ack.message, contains('does not handle'));
-        expect(ack.inReplyTo, isNotEmpty);
-        expect(result.tableState, isNull);
-        expect(result.selection, isNull);
-      },
-    );
+    test('a request kind LintCrux does not recognise still gets an unsupported '
+        'ErrorResponse, not a fabricated highlight ack', () async {
+      final handler = buildHandler();
+      final result = await handler.dispatch(inbound(const _UnknownRequest()));
+      expect(result.ack, isA<ErrorResponse>());
+      expect(result.ack, isNot(isA<RequestHighlightAck>()));
+      final ack = result.ack! as ErrorResponse;
+      expect(ack.code, CxpErrorCode.unsupported);
+      expect(ack.message, contains('does not handle'));
+      expect(ack.inReplyTo, isNotEmpty);
+      expect(result.tableState, isNull);
+      expect(result.selection, isNull);
+    });
   });
 
   // Two routes open a project a peer named, and they keep different rules:
@@ -525,31 +501,34 @@ void main() {
       );
     }
 
-    test(
-      'opens the design project and acks honored for a "source" kind',
-      () async {
-        final asked = <(String, String?)>[];
-        final handler = buildHandlerWith(
-          requested: (designId, hint) async {
-            asked.add((designId, hint));
-            return (honored: true, reason: null);
-          },
-        );
-        final result = await handler.dispatch(
-          inbound(
-            const RequestOpenArtifact(
-              designId: 'design-7',
-              artifactKind: 'source',
+    // CXP §9.10.2: a project is `project`; `source` is read for one release
+    // because a peer may still send a project under it. MUTATION: comparing
+    // the kind with `'project'` only, or with `'source'` only, makes one of
+    // the two cases red.
+    for (final kind in <String>['project', 'source']) {
+      test(
+        'opens the design project and acks honored for a "$kind" kind',
+        () async {
+          final asked = <(String, String?)>[];
+          final handler = buildHandlerWith(
+            requested: (designId, hint) async {
+              asked.add((designId, hint));
+              return (honored: true, reason: null);
+            },
+          );
+          final result = await handler.dispatch(
+            inbound(
+              RequestOpenArtifact(designId: 'design-7', artifactKind: kind),
             ),
-          ),
-        );
-        expect(asked, <(String, String?)>[('design-7', null)]);
-        expect(result.ack, isA<RequestOpenArtifactAck>());
-        final ack = result.ack! as RequestOpenArtifactAck;
-        expect(ack.honored, isTrue);
-        expect(ack.reason, isNull);
-      },
-    );
+          );
+          expect(asked, <(String, String?)>[('design-7', null)]);
+          expect(result.ack, isA<RequestOpenArtifactAck>());
+          final ack = result.ack! as RequestOpenArtifactAck;
+          expect(ack.honored, isTrue);
+          expect(ack.reason, isNull);
+        },
+      );
+    }
 
     // The hint is the fallback when nothing is recorded (CXP §9.10), so it
     // has to reach the opener. MUTATION: passing `null` for the hint in
@@ -577,7 +556,7 @@ void main() {
     });
 
     test(
-      'declines a non-source artifact kind without calling the opener',
+      'declines a non-project artifact kind without calling the opener',
       () async {
         var called = false;
         final handler = buildHandlerWith(
@@ -597,7 +576,7 @@ void main() {
         expect(called, isFalse);
         final ack = result.ack! as RequestOpenArtifactAck;
         expect(ack.honored, isFalse);
-        expect(ack.reason, contains('source'));
+        expect(ack.reason, contains('project'));
         expect(ack.reason, isNot(contains('waveform')));
       },
     );

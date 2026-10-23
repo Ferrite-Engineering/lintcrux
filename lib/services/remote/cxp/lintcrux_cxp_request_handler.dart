@@ -9,6 +9,8 @@ import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/domain/models/violation_table_state.dart';
 import 'package:lintcrux/services/editor/click_to_source_service.dart';
+import 'package:lintcrux/services/remote/cxp/cxp_workspace_link.dart'
+    show kCxpLintcruxLegacySourceKind, kCxpLintcruxProjectKind;
 import 'package:lintcrux/services/remote/cxp/lintcrux_name_resolver.dart';
 
 /// Outcome of dispatching one inbound CXP message.
@@ -299,23 +301,25 @@ class LintCruxCxpRequestHandler {
 
   /// Handles an inbound `request_open_artifact`: a peer names a shared
   /// design and the kind of artifact it wants opened. LintCrux opens only its
-  /// own `source` (`.lintcrux` project) artifacts; [openRequestedArtifact]
-  /// resolves the concrete file through the shared workspace store
-  /// (preferring that over the sender's optional path hint, whose absolute
-  /// path may not exist on this machine), checks it, and opens it. Acks
-  /// honored=false with a reason — rather than silently dropping — when the
-  /// kind isn't a source, nothing names a project, the path is refused, or
-  /// the open fails.
+  /// own `project` (`.lintcrux` project) artifacts, and for one release a
+  /// `source` request too, since a peer may still send a project under that
+  /// kind (CXP §9.10.2); [openRequestedArtifact] resolves the concrete file
+  /// through the shared workspace store (preferring that over the sender's
+  /// optional path hint, whose absolute path may not exist on this machine),
+  /// checks it, and opens it. Acks honored=false with a reason — rather than
+  /// silently dropping — when the kind isn't a project, nothing names a
+  /// project, the path is refused, or the open fails.
   Future<CxpDispatchResult> _dispatchRequestOpenArtifact(
     RequestOpenArtifact req,
     String requestId,
   ) async {
-    if (req.artifactKind != 'source') {
+    if (req.artifactKind != kCxpLintcruxProjectKind &&
+        req.artifactKind != kCxpLintcruxLegacySourceKind) {
       return CxpDispatchResult(
         ack: RequestOpenArtifactAck(
           inReplyTo: requestId,
           honored: false,
-          reason: 'LintCrux opens only "source" artifacts.',
+          reason: 'LintCrux opens only "project" artifacts.',
         ),
       );
     }

@@ -11,14 +11,24 @@ import 'package:lintcrux/services/remote/cxp/cxp_project_open_handle.dart';
 import 'package:lintcrux/services/workspace/active_tab_container_handle.dart';
 import 'package:path/path.dart' as p;
 
-/// The shared-workspace artifact kind LintCrux both produces and consumes.
+/// The shared-workspace artifact kind LintCrux both produces and consumes
+/// (CXP §9.10.2): a design's project definition.
 ///
 /// LintCrux's primary design input is a `.lintcrux` project. It *produces* a
-/// `source` record naming the opened project file (the producer side, see
+/// `project` record naming the opened project file (the producer side, see
 /// [publishLintcruxProjectArtifact]) and *consumes* one when a peer asks it to
 /// open a design it has none of loaded (the consumer side, in
 /// `cxp_request_handler_provider.dart` / `lintcrux_cxp_request_handler.dart`).
-const String kCxpLintcruxSourceKind = 'source';
+/// Never `source`, which names one HDL source file.
+const String kCxpLintcruxProjectKind = 'project';
+
+/// LEGACY: the kind LintCrux published its project under before CXP §9.10.2
+/// reserved `source` for one HDL file, and the kind peers (the VS Code
+/// extensions among them) may still send for a project.
+///
+/// Read as a fallback, after [kCxpLintcruxProjectKind], and never written.
+/// Remove it, and the fallbacks that use it, after 1.2.
+const String kCxpLintcruxLegacySourceKind = 'source';
 
 /// LintCrux's producer short-name stamped into workspace records.
 const String kLintcruxProducer = 'lintcrux';
@@ -179,7 +189,7 @@ Future<void> publishLintcruxProjectArtifact(
         .read(cxpWorkspaceStoreProvider)
         .upsertArtifact(
           designId: cxpDesignIdForPath(projectPath),
-          kind: kCxpLintcruxSourceKind,
+          kind: kCxpLintcruxProjectKind,
           path: projectPath,
           producer: kLintcruxProducer,
           topModule: project.topModule,
@@ -191,45 +201,54 @@ Future<void> publishLintcruxProjectArtifact(
   }
 }
 
-/// Resolves the shared-workspace `source` artifact for the design named by
+/// Resolves the shared-workspace `project` artifact for the design named by
 /// [designId], preferring an exact `design_id`+kind match and falling back to
 /// the descriptive [topModule] / [basename] hints.
 ///
 /// Returns the absolute path to open (a `.lintcrux` project file or a design
-/// manifest), or null when the design has no `source` artifact LintCrux can
+/// manifest), or null when the design has no project artifact LintCrux can
 /// open. The caller opens it through LintCrux's ordinary
 /// `OpenProjectInWorkspace.openProject` path.
+///
+/// Reads `project` records first, then, for one release, the legacy `source`
+/// records ([kCxpLintcruxLegacySourceKind]) that carry a project written
+/// before CXP §9.10.2.
 ///
 /// Reads through [cxpWorkspaceStoreProvider], so a record outside the
 /// directories the user has opened resolves to null: this is the
 /// `crux.design_id` fallback's resolution. `request_open_artifact` uses
 /// [resolveOpenArtifactProjectPath].
 ///
-/// Only records whose path [isOpenableProjectPath] admits are considered:
-/// every product publishes the kind `source`, and without the filter the
-/// newest record won, whichever product wrote it. The read is the store's
+/// Only records whose path [isOpenableProjectPath] admits are considered, in
+/// either kind: another product's record under the same design id is never
+/// handed to LintCrux to open, however new it is. The read is the store's
 /// asynchronous one, so the document read and the per-record existence
 /// checks never block the isolate the server runs on.
-Future<String?> resolveLintcruxSourceArtifactPath(
+Future<String?> resolveLintcruxProjectArtifactPath(
   Ref ref,
   String designId, {
   String? topModule,
   String? basename,
 }) async {
   if (designId.isEmpty) return null;
-  final artifact = await ref
-      .read(cxpWorkspaceStoreProvider)
-      .resolveArtifactAsync(
-        designId,
-        kCxpLintcruxSourceKind,
-        topModule: topModule,
-        basename: basename,
-        accepts: isOpenableProjectPath,
-      );
-  return artifact?.path;
+  final store = ref.read(cxpWorkspaceStoreProvider);
+  for (final kind in const <String>[
+    kCxpLintcruxProjectKind,
+    kCxpLintcruxLegacySourceKind,
+  ]) {
+    final artifact = await store.resolveArtifactAsync(
+      designId,
+      kind,
+      topModule: topModule,
+      basename: basename,
+      accepts: isOpenableProjectPath,
+    );
+    if (artifact != null) return artifact.path;
+  }
+  return null;
 }
 
-/// Resolves the `source` artifact recorded for [designId] the way
+/// Resolves the project artifact recorded for [designId] the way
 /// `request_open_artifact` needs it: the records [cxpWorkspaceStoreProvider]
 /// reads, from the same directory, admitted by [kCxpOpenArtifactContainment]
 /// rather than by the rooted rule that store carries.
@@ -240,23 +259,28 @@ Future<String?> resolveLintcruxSourceArtifactPath(
 /// explains. The store keeps no state between reads, so a second view of the
 /// directory costs nothing.
 ///
-/// Returns the absolute path LintCrux should open, or null when the design
-/// has no `source` artifact LintCrux can open ([isOpenableProjectPath]).
-Future<String?> resolveOpenArtifactProjectPath(
-  Ref ref,
-  String designId,
-) async {
+/// `project` records first, then the legacy `source` records
+/// ([kCxpLintcruxLegacySourceKind]) for one release. Returns the absolute
+/// path LintCrux should open, or null when the design has no project
+/// artifact LintCrux can open ([isOpenableProjectPath]).
+Future<String?> resolveOpenArtifactProjectPath(Ref ref, String designId) async {
   if (designId.isEmpty) return null;
   final store = ref.read(cxpWorkspaceStoreProvider);
-  final artifact =
-      await CxpWorkspaceStore(
-        workspaceDirectory: store.workspaceDirectory,
-        ttl: store.ttl,
-        containment: kCxpOpenArtifactContainment,
-      ).resolveArtifactAsync(
-        designId,
-        kCxpLintcruxSourceKind,
-        accepts: isOpenableProjectPath,
-      );
-  return artifact?.path;
+  final floor = CxpWorkspaceStore(
+    workspaceDirectory: store.workspaceDirectory,
+    ttl: store.ttl,
+    containment: kCxpOpenArtifactContainment,
+  );
+  for (final kind in const <String>[
+    kCxpLintcruxProjectKind,
+    kCxpLintcruxLegacySourceKind,
+  ]) {
+    final artifact = await floor.resolveArtifactAsync(
+      designId,
+      kind,
+      accepts: isOpenableProjectPath,
+    );
+    if (artifact != null) return artifact.path;
+  }
+  return null;
 }

@@ -310,7 +310,7 @@ void main() {
                   _inbound(
                     RequestOpenArtifact(
                       designId: designId,
-                      artifactKind: 'source',
+                      artifactKind: 'project',
                       path: hint,
                     ),
                   ),

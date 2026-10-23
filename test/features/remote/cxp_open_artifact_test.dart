@@ -73,7 +73,7 @@ void main() {
   Future<void> record(String designId, String path) =>
       CxpWorkspaceStore(workspaceDirectory: storeDir.path).upsertArtifact(
         designId: designId,
-        kind: kCxpLintcruxSourceKind,
+        kind: kCxpLintcruxProjectKind,
         path: path,
         producer: 'peer',
       );
@@ -135,7 +135,7 @@ void main() {
           _inbound(
             RequestOpenArtifact(
               designId: designId,
-              artifactKind: kCxpLintcruxSourceKind,
+              artifactKind: kCxpLintcruxProjectKind,
               path: hint,
             ),
           ),
@@ -158,7 +158,7 @@ void main() {
       final container = boot();
       final ack = await ask(container, designId: 'unknown');
       expect(ack.honored, isFalse);
-      expect(ack.reason, contains('No source artifact recorded'));
+      expect(ack.reason, contains('No project artifact recorded'));
       expect(openerCalls, isEmpty);
     });
 
@@ -185,7 +185,7 @@ void main() {
     // path its hand-off normally takes. The store the app provides is rooted
     // and would drop the record; the route reads the same directory under
     // the floor. MUTATION: resolving through
-    // `resolveLintcruxSourceArtifactPath` (the rooted store) in
+    // `resolveLintcruxProjectArtifactPath` (the rooted store) in
     // `openRequestedArtifact` makes this red.
     test('a record for a project never opened is opened, though the rooted '
         'store drops it', () async {
@@ -197,7 +197,7 @@ void main() {
             .read(cxpWorkspaceStoreProvider)
             .resolveArtifact(
               'd-published',
-              kCxpLintcruxSourceKind,
+              kCxpLintcruxProjectKind,
             ),
         isNull,
         reason: 'the premise: the rooted store drops this record',
@@ -299,7 +299,7 @@ void main() {
         await record('d-padded', trailing);
         final ack = await ask(container, designId: 'd-padded');
         expect(ack.honored, isFalse);
-        expect(ack.reason, 'No source artifact recorded for that design.');
+        expect(ack.reason, 'No project artifact recorded for that design.');
         expect(openerCalls, isEmpty);
       });
     });
@@ -389,7 +389,7 @@ void main() {
         client.send(
           RequestOpenArtifact(
             designId: 'unrecorded',
-            artifactKind: kCxpLintcruxSourceKind,
+            artifactKind: kCxpLintcruxProjectKind,
             path: hint,
           ),
         );
@@ -427,7 +427,7 @@ void main() {
         final client = await connect(boot());
         final ack = await send(client, trailing);
         expect(ack.honored, isFalse);
-        expect(ack.reason, 'No source artifact recorded for that design.');
+        expect(ack.reason, 'No project artifact recorded for that design.');
         expect(openerCalls, isEmpty);
       });
     });
@@ -523,11 +523,11 @@ void main() {
         containment: production.containment,
       );
       expect(
-        store.resolveArtifact('d-kept', kCxpLintcruxSourceKind)?.path,
+        store.resolveArtifact('d-kept', kCxpLintcruxProjectKind)?.path,
         inside.path,
       );
       expect(
-        store.resolveArtifact('d-dropped', kCxpLintcruxSourceKind),
+        store.resolveArtifact('d-dropped', kCxpLintcruxProjectKind),
         isNull,
       );
     });

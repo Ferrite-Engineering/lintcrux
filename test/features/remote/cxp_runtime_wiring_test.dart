@@ -195,11 +195,7 @@ void main() {
         ruleId: 'verilator/UNUSEDSIGNAL',
         severity: Severity.warning,
         message: 'unused',
-        location: SourceLocation(
-          file: '/proj/cpu.sv',
-          line: 42,
-          column: 7,
-        ),
+        location: SourceLocation(file: '/proj/cpu.sv', line: 42, column: 7),
       );
       store.replaceFromEngine('verilator', [v]);
 
@@ -360,7 +356,7 @@ void main() {
       for (final project in <File>[insideProject, outsideProject]) {
         await workspace.upsertArtifact(
           designId: cxpDesignIdForPath(project.path),
-          kind: kCxpLintcruxSourceKind,
+          kind: kCxpLintcruxProjectKind,
           path: project.path,
           producer: 'peer',
         );
@@ -383,7 +379,7 @@ void main() {
       client!.send(
         RequestOpenArtifact(
           designId: cxpDesignIdForPath(outsideProject.path),
-          artifactKind: kCxpLintcruxSourceKind,
+          artifactKind: kCxpLintcruxProjectKind,
         ),
       );
       await _pumpUntil(() => acks.isNotEmpty);
@@ -394,12 +390,65 @@ void main() {
       client!.send(
         RequestOpenArtifact(
           designId: cxpDesignIdForPath(insideProject.path),
-          artifactKind: kCxpLintcruxSourceKind,
+          artifactKind: kCxpLintcruxProjectKind,
         ),
       );
       await _pumpUntil(() => acks.length == 2);
       expect((acks.last as RequestOpenArtifactAck).honored, isTrue);
       expect(opened, <String>[outsideProject.path, insideProject.path]);
+    });
+
+    // For one release a project recorded as `source`, and a peer that still
+    // asks for `source`, are served too (CXP §9.10.2).
+    test('RequestOpenArtifact opens a project recorded as legacy source, '
+        'asked for as either kind', () async {
+      final dir = Directory.systemTemp.createTempSync('lintcrux_cxp_legacy_');
+      final records = Directory.systemTemp.createTempSync('lintcrux_cxp_lws_');
+      addTearDown(() {
+        for (final d in <Directory>[dir, records]) {
+          d.deleteSync(recursive: true);
+        }
+      });
+      final project = File('${dir.path}/project.lintcrux')
+        ..writeAsStringSync('{}');
+      final workspace = CxpWorkspaceStore(workspaceDirectory: records.path);
+      await workspace.upsertArtifact(
+        designId: cxpDesignIdForPath(project.path),
+        kind: kCxpLintcruxLegacySourceKind,
+        path: project.path,
+        producer: 'vscode',
+      );
+      final opened = <String>[];
+      container = buildContainer(
+        manifestDir: tempDir.path,
+        store: store,
+        launcher: launcher,
+        openedProjects: <String>[project.path],
+        workspaceStore: workspace,
+        openHandle: CxpProjectOpenHandle()
+          ..opener = (path) async {
+            opened.add(path);
+            return true;
+          },
+      );
+      final acks = await connectPeer('vscode');
+
+      for (final kind in <String>[
+        kCxpLintcruxProjectKind,
+        kCxpLintcruxLegacySourceKind,
+      ]) {
+        client!.send(
+          RequestOpenArtifact(
+            designId: cxpDesignIdForPath(project.path),
+            artifactKind: kind,
+          ),
+        );
+        final expected = opened.length + 1;
+        await _pumpUntil(() => acks.length == expected);
+        final ack = acks.last as RequestOpenArtifactAck;
+        expect(ack.honored, isTrue, reason: ack.reason);
+      }
+      expect(opened, <String>[project.path, project.path]);
     });
 
     // The `crux.design_id` fallback reads records through this store, so it
