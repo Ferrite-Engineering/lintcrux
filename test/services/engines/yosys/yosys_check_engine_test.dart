@@ -9,6 +9,7 @@ import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
+import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_check_engine.dart';
 import 'package:path/path.dart' as p;
 
@@ -513,6 +514,126 @@ void main() {
         );
         expect(violations.any((v) => v.isAnalysisFailure), isFalse);
       });
+
+      // What Yosys 0.69 prints under `-q` for an ordinary design or
+      // configuration error. None names a place in the sources, and none is
+      // a read the reader could not finish: each is a finding plus the
+      // check-not-run note, never a front-end failure that exits 3.
+      const designStops = <(String, String)>[
+        (
+          "ERROR: Module `sub' referenced in module `top2' in cell `u' does "
+              "not have a port named 'yy'.",
+          'yosys/unknown-port',
+        ),
+        (
+          "ERROR: Module `sub' referenced in module `top' in cell `u' does "
+              "not have a parameter named 'NOPE'.",
+          'yosys/unknown-parameter',
+        ),
+        ("ERROR: Module `nosuch' not found!", 'yosys/module-not-found'),
+        ("ERROR: Can't decode value 'foo'!", 'yosys/bad-parameter-value'),
+        (
+          r"/tmp/a.sv:2: ERROR: Re-definition of module `\top'!",
+          'yosys/module-redefinition',
+        ),
+      ];
+      for (final (stderr, ruleId) in designStops) {
+        test(
+          'a design error is a finding, not a failed read: $ruleId',
+          () async {
+            final engine = YosysCheckEngine(
+              processRunner: _StubProcessRunner(
+                exitCode: 1,
+                stderr: '$stderr\n',
+              ),
+            );
+            final violations = await engine.run(_request()).toList();
+            expect(violations.map((v) => v.ruleId), [
+              ruleId,
+              'yosys/check-not-run',
+            ]);
+            expect(violations.first.severity, Severity.error);
+            expect(violations.any((v) => v.isAnalysisFailure), isFalse);
+            expect(
+              violations.map((v) => v.message).join('\n'),
+              isNot(contains('limit of that reader')),
+            );
+          },
+        );
+      }
+
+      test(
+        'an include file that cannot be opened is a failed read with no '
+        'reader hint',
+        () async {
+          final engine = YosysCheckEngine(
+            processRunner: _StubProcessRunner(
+              exitCode: 1,
+              stderr: "ERROR: Can't open include file `defs.svh'!\n",
+            ),
+          );
+          final failure = (await engine.run(_request()).toList()).single;
+          expect(failure.ruleId, 'yosys/frontend-failed');
+          expect(failure.isAnalysisFailure, isTrue);
+          expect(failure.message, contains('defs.svh'));
+          expect(failure.message, isNot(contains('limit of that reader')));
+        },
+      );
+
+      test('the frontEndError split on its own', () {
+        YosysDiagnostic error(String message, {String? file}) =>
+            YosysDiagnostic(
+              severity: YosysDiagnosticSeverity.error,
+              message: message,
+              filePath: file,
+              line: file == null ? null : 3,
+            );
+        // The built-in reader's parser giving up, located.
+        expect(
+          YosysCheckEngine.frontEndError([
+            error('syntax error, unexpected TOK_ID', file: '/tmp/a.sv'),
+          ]),
+          isNotNull,
+        );
+        // A located error that is the design's, not the parser's.
+        expect(
+          YosysCheckEngine.frontEndError([
+            error(
+              r"Identifier `\q' is implicitly declared and `default_nettype "
+              'is set to none.',
+              file: '/tmp/a.v',
+            ),
+          ]),
+          isNull,
+        );
+        // yosys-slang: a design error is the design's; a construct it
+        // cannot lower is a failed read.
+        expect(
+          YosysCheckEngine.frontEndError([
+            error("error: unknown module 'foo'", file: '/tmp/a.sv'),
+            error('Compilation failed'),
+          ], slang: true),
+          isNull,
+        );
+        expect(
+          YosysCheckEngine.frontEndError([
+            error(
+              'error: reading net state during design initialization '
+              'unsupported',
+              file: '/tmp/a.sv',
+            ),
+            error('Compilation failed'),
+          ], slang: true),
+          isNotNull,
+        );
+        // A bare `Compilation failed` with nothing located before it.
+        expect(
+          YosysCheckEngine.frontEndError([
+            error('Compilation failed'),
+          ], slang: true),
+          isNotNull,
+        );
+      });
     });
 
     group('SystemVerilog reader', () {
@@ -606,7 +727,8 @@ void main() {
               hasSlang: true,
               exitCode: 1,
               stderr:
-                  "/tmp/a.sv:4:5: error: unknown module 'foo'\n"
+                  '/tmp/a.sv:4:5: error: reading net state during design '
+                  'initialization unsupported\n'
                   'ERROR: Compilation failed\n',
             ),
           );
@@ -616,6 +738,29 @@ void main() {
           expect(failure.location.line, 4);
           expect(failure.message, contains('read with yosys-slang'));
           expect(failure.message, isNot(contains('read_verilog -sv')));
+        },
+      );
+
+      test(
+        'a design error yosys-slang reports is a finding, not a failed read',
+        () async {
+          final engine = YosysCheckEngine(
+            processRunner: _StubProcessRunner(
+              hasSlang: true,
+              exitCode: 1,
+              stderr:
+                  "/tmp/a.sv:4:5: error: unknown module 'foo'\n"
+                  'ERROR: Compilation failed\n',
+            ),
+          );
+          final violations = await engine.run(_request()).toList();
+          expect(violations.map((v) => v.ruleId), [
+            'yosys/unknown-module',
+            'yosys/check-not-run',
+          ]);
+          expect(violations.first.message, "unknown module 'foo'");
+          expect(violations.first.location.line, 4);
+          expect(violations.any((v) => v.isAnalysisFailure), isFalse);
         },
       );
     });
@@ -699,6 +844,58 @@ void main() {
           isEmpty,
           reason: selected.map((v) => v.message).join('\n'),
         );
+      },
+      skip: _yosysOnPath() ? false : 'yosys not on PATH',
+    );
+
+    test(
+      'integration: a design error is a finding and a parse error a failed '
+      'read',
+      () async {
+        final tmp = Directory.systemTemp.createTempSync('yosys_stop_int_');
+        addTearDown(() {
+          if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+        });
+        Future<List<Violation>> lint(String name, String text) {
+          final src = File(p.join(tmp.path, name))..writeAsStringSync(text);
+          return YosysCheckEngine()
+              .run(
+                LintRunRequest(
+                  sourceFiles: [src.path],
+                  binary: const EngineBinaryConfig.system(),
+                  language: HdlLanguage.verilog,
+                  topModule: 'top',
+                  projectRoot: tmp.path,
+                ),
+              )
+              .toList();
+        }
+
+        // A port the module lacks: an ordinary design error.
+        final port = await lint(
+          'port.v',
+          'module sub(input a, output y); assign y = a; endmodule\n'
+              'module top(input a, output y); sub u(.a(a), .yy(y)); '
+              'endmodule\n',
+        );
+        expect(
+          port.map((v) => v.ruleId),
+          ['yosys/unknown-port', 'yosys/check-not-run'],
+          reason: port.map((v) => v.message).join('\n'),
+        );
+        expect(port.any((v) => v.isAnalysisFailure), isFalse);
+
+        // A syntax error: the read did not finish.
+        final parse = await lint(
+          'syntax.v',
+          'module top(input a, output y); assign y = a +; endmodule\n',
+        );
+        expect(
+          parse.single.ruleId,
+          'yosys/frontend-failed',
+          reason: parse.map((v) => v.message).join('\n'),
+        );
+        expect(parse.single.isAnalysisFailure, isTrue);
       },
       skip: _yosysOnPath() ? false : 'yosys not on PATH',
     );

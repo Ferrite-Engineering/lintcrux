@@ -18,7 +18,8 @@
 /// because the violation count from a broken run cannot be trusted.
 ///
 /// ```text
-///   0  clean          nothing to report, or findings present but no gate requested
+///   0  clean          nothing to report, or findings no gate failed on: no gate
+///                     requested, all in the baseline, or within the ceiling
 ///   1  violations     --exit-code was passed and ≥1 non-suppressed violation remains
 ///   2  newViolations  --fail-on-new-violations was passed and ≥1 violation is
 ///                     absent from the baseline

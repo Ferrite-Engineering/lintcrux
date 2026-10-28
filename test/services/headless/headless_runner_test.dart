@@ -199,6 +199,7 @@ void main() {
       ]).run(args());
       expect(r.exitCode, CliExitCode.clean);
       expect(r.reportableViolations, hasLength(1));
+      expect(r.exitLabel, 'no gate requested');
     });
 
     test('no violations with --exit-code → clean (0)', () async {
@@ -685,6 +686,8 @@ void main() {
       expect(r.newViolations, isEmpty);
       expect(r.persistingViolations, hasLength(1));
       expect(r.baselineApplied, isTrue);
+      // The gate was requested and passed: `no gate requested` was false.
+      expect(r.exitLabel, 'gate passed');
     });
 
     test('a violation absent from the baseline fails with 2', () async {
@@ -863,6 +866,7 @@ void main() {
         CliExitCode.clean,
         reason: 'the threshold is a ceiling, not a target — 2 of 2 is inside',
       );
+      expect(r.exitLabel, 'gate passed');
     });
 
     test('over the ceiling exits 4', () async {

@@ -31,6 +31,7 @@ class HeadlessRunResult {
     this.baselineApplied = false,
     this.exportPath,
     this.projectName,
+    this.gateRequested = false,
   });
 
   /// A failure that never got as far as running engines.
@@ -90,6 +91,11 @@ class HeadlessRunResult {
   /// The project's name, for the summary line.
   final String? projectName;
 
+  /// Whether any gate applied to this run: `--exit-code`,
+  /// `--fail-on-new-violations`, or an organization's violation ceiling.
+  /// Decides how a run that exits `0` with findings is labelled.
+  final bool gateRequested;
+
   /// Violations the gates act on: everything not suppressed by a waiver
   /// or a source pragma.
   List<Violation> get reportableViolations => <Violation>[
@@ -116,15 +122,25 @@ class HeadlessRunResult {
 
   /// The label for [exitCode], printed on the summary line.
   ///
-  /// [CliExitCode.labelFor], except for a run that exits `0` with findings:
-  /// that is a report without a gate, and `clean` beside `1 error` reads as
-  /// a contradiction. It is labelled [noGateRequestedLabel] instead.
-  String get exitLabel =>
-      exitCode == CliExitCode.clean && reportableViolations.isNotEmpty
-      ? noGateRequestedLabel
-      : CliExitCode.labelFor(exitCode);
+  /// [CliExitCode.labelFor], except for a run that exits `0` with findings,
+  /// where `clean` beside `1 error` reads as a contradiction. With no gate
+  /// that run is a report, labelled [noGateRequestedLabel]. With a gate it
+  /// passed: every finding was in the baseline, or the count stayed under
+  /// the organization's ceiling. It is labelled [gatePassedLabel].
+  String get exitLabel {
+    if (exitCode != CliExitCode.clean || reportableViolations.isEmpty) {
+      return CliExitCode.labelFor(exitCode);
+    }
+    return gateRequested ? gatePassedLabel : noGateRequestedLabel;
+  }
 
   /// The summary-line label of a run that exits `0` with findings because
-  /// neither `--exit-code` nor `--fail-on-new-violations` was passed.
+  /// neither `--exit-code` nor `--fail-on-new-violations` was passed and no
+  /// organization ceiling applies.
   static const String noGateRequestedLabel = 'no gate requested';
+
+  /// The summary-line label of a run that exits `0` with findings that its
+  /// gate let through: `--fail-on-new-violations` with every finding already
+  /// in the baseline, or an organization ceiling the run stayed under.
+  static const String gatePassedLabel = 'gate passed';
 }

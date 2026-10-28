@@ -51,6 +51,45 @@
       ]
     },
     {
+      "id": "unknown-port",
+      "defaultSeverity": "error",
+      "tags": [
+        "elaboration",
+        "hierarchy"
+      ]
+    },
+    {
+      "id": "unknown-parameter",
+      "defaultSeverity": "error",
+      "tags": [
+        "elaboration",
+        "hierarchy"
+      ]
+    },
+    {
+      "id": "bad-parameter-value",
+      "defaultSeverity": "error",
+      "tags": [
+        "elaboration",
+        "hierarchy"
+      ]
+    },
+    {
+      "id": "module-redefinition",
+      "defaultSeverity": "error",
+      "tags": [
+        "elaboration"
+      ]
+    },
+    {
+      "id": "module-not-found",
+      "defaultSeverity": "error",
+      "tags": [
+        "elaboration",
+        "hierarchy"
+      ]
+    },
+    {
       "id": "implicit-declaration",
       "defaultSeverity": "warning",
       "tags": [

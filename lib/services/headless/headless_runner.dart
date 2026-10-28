@@ -218,10 +218,7 @@ class HeadlessRunner {
     // per configuration of a parameterised core.
     if (args.parameters.isNotEmpty) {
       project = project.copyWith(
-        parameters: <String, String>{
-          ...project.parameters,
-          ...args.parameters,
-        },
+        parameters: <String, String>{...project.parameters, ...args.parameters},
       );
     }
 
@@ -404,9 +401,7 @@ class HeadlessRunner {
         // BaselineFilter would treat "no baseline" as "everything new",
         // which is strict, but the *user* asked to compare against a
         // file that exists and is broken. Surface it.
-        problems.add(
-          'could not read baseline $baselinePath: ${read.error}',
-        );
+        problems.add('could not read baseline $baselinePath: ${read.error}');
       } else if (!read.hasBaseline) {
         diagnostics.add(
           'no baseline at $baselinePath — every violation counts as new. '
@@ -475,6 +470,10 @@ class HeadlessRunner {
       baselineApplied: baselineApplied,
       exportPath: exportPath,
       projectName: project.name,
+      gateRequested:
+          args.exitCodeOnFindings ||
+          args.failOnNewViolations ||
+          args.ciGateThreshold != null,
     );
   }
 

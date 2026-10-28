@@ -160,6 +160,39 @@ void main() {
       expect(lines.last, isNot(contains('clean')));
     });
 
+    test('exit 0 with findings a gate let through is labelled gate passed', () {
+      // A baseline run whose findings are all pre-existing requested a gate
+      // and passed it; `no gate requested` there was false.
+      const reporter = HeadlessReporter();
+      final v = violation(severity: Severity.error);
+      final lines = reporter.stdoutLines(
+        HeadlessRunResult(
+          exitCode: CliExitCode.clean,
+          statuses: completed,
+          violations: <Violation>[v],
+          persistingViolations: <Violation>[v],
+          baselinePath: '/repo/.lintcrux-baseline.json',
+          baselineApplied: true,
+          gateRequested: true,
+        ),
+      );
+      expect(lines.last, contains('0 new, 1 pre-existing'));
+      expect(lines.last, endsWith('[exit 0: gate passed]'));
+      expect(lines.last, isNot(contains('no gate requested')));
+    });
+
+    test('a gated run with no findings is still clean', () {
+      const reporter = HeadlessReporter();
+      final lines = reporter.stdoutLines(
+        const HeadlessRunResult(
+          exitCode: CliExitCode.clean,
+          statuses: completed,
+          gateRequested: true,
+        ),
+      );
+      expect(lines.last, endsWith('[exit 0: clean]'));
+    });
+
     test('breaks the count down per severity', () {
       const reporter = HeadlessReporter();
       final lines = reporter.stdoutLines(

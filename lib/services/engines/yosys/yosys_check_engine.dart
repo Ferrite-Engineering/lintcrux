@@ -33,10 +33,12 @@ import 'package:path/path.dart' as p;
 ///
 /// SystemVerilog sources are read with `read_slang` instead when the Yosys
 /// in use has the yosys-slang frontend, and with `read_verilog -sv`
-/// otherwise. A run that stops before `check -assert` says so: a read that
-/// failed is one `yosys/frontend-failed` analysis failure (the design was
-/// not checked), and a stop in `hierarchy` keeps its findings and adds a
-/// `yosys/check-not-run` note.
+/// otherwise. A run that stops before `check -assert` says so: a read the
+/// reader could not finish (a file it could not open, a parse it gave up on,
+/// a construct it does not support) is one `yosys/frontend-failed` analysis
+/// failure (the design was not checked), and a stop on an error in the
+/// design, such as a missing module or port in `hierarchy`, keeps its
+/// findings and adds a `yosys/check-not-run` note. See [frontEndError].
 ///
 /// `check -assert` exits non-zero when Yosys identifies a structural
 /// problem; the captured stderr is fed to [YosysDiagnosticParser]
@@ -217,11 +219,12 @@ class YosysCheckEngine implements LintEngine {
       final paths = YosysSpanPathResolver(request);
 
       // A failed run that never reached `check -assert` stopped earlier: in
-      // the front end (the sources could not be read) or in `hierarchy`.
+      // the reader (the sources could not be read) or on an error in the
+      // design (most often in `hierarchy`).
       // Either way the check pass did not run, and the run must say so
       // rather than look like a check that found one problem.
       if (result is YosysRunFailure && !checkPassRan(result.stderr)) {
-        final readError = frontEndError(diagnostics);
+        final readError = frontEndError(diagnostics, slang: slang);
         if (readError != null) {
           // What stopped the read is a fact about the tool, not a finding
           // on the design: one analysis failure replaces the parser's
@@ -241,8 +244,15 @@ class YosysCheckEngine implements LintEngine {
           );
           return;
         }
+        // A stop on the design itself: its errors are findings. yosys-slang
+        // closes its own located errors with a bare `Compilation failed`,
+        // which says nothing the errors above it do not.
+        final hasOwnErrors = diagnostics.any(
+          (d) => d.severity == YosysDiagnosticSeverity.error && !_isSummary(d),
+        );
         for (final d in diagnostics) {
-          controller.add(_toViolation(d, paths));
+          if (hasOwnErrors && _isSummary(d)) continue;
+          controller.add(_toViolation(_withoutSlangSeverity(d), paths));
         }
         controller.add(_checkNotRunNote(request));
         return;
@@ -274,33 +284,89 @@ class YosysCheckEngine implements LintEngine {
   );
 
   /// The error that stopped Yosys reading the sources, or `null` when the
-  /// run stopped in `hierarchy` instead (a module that is not part of the
-  /// design, an unknown cell type): those are findings about the design.
+  /// run stopped on the design itself.
+  ///
+  /// Only a stop the reader is responsible for counts: a source or include
+  /// file it could not open, a parse it could not finish (the built-in
+  /// reader's `syntax error`), or a construct it does not support. Every
+  /// other error is a finding about the design, whether the reader or
+  /// `hierarchy` raised it: a module that is not part of the design, a port
+  /// or parameter the module lacks, a top module that does not exist, a
+  /// `-chparam` value Yosys cannot decode, a module defined twice. Reading
+  /// those as a failed read would exit `3` on an ordinary design error.
+  ///
+  /// The split rests on what each pass prints under `yosys -q`. The
+  /// readers cite `file:line` for what they reject and `hierarchy` cites
+  /// nothing, so an error with no location is never read as a parse
+  /// failure unless it is one of the readers' own file messages.
+  /// [slang] selects yosys-slang's vocabulary: it is a full SystemVerilog
+  /// compiler, so its errors are the design's except where it says it
+  /// cannot lower a construct.
   @visibleForTesting
-  static YosysDiagnostic? frontEndError(List<YosysDiagnostic> diagnostics) {
+  static YosysDiagnostic? frontEndError(
+    List<YosysDiagnostic> diagnostics, {
+    bool slang = false,
+  }) {
     final errors = diagnostics
         .where((d) => d.severity == YosysDiagnosticSeverity.error)
         .toList(growable: false);
     if (errors.isEmpty) return null;
-    final elaboration = errors.any(
-      (d) => _elaborationNeedles.any(d.message.contains),
-    );
-    if (elaboration) return null;
-    // Prefer the error that names a place in the sources: yosys-slang ends
-    // its own located diagnostics with a bare `ERROR: Compilation failed`.
-    return errors.firstWhere(
-      (d) => d.filePath != null && d.filePath!.isNotEmpty,
-      orElse: () => errors.first,
-    );
+    for (final d in errors) {
+      if (_isReaderStop(d, slang: slang)) return d;
+    }
+    // yosys-slang's bare `Compilation failed` with nothing located before
+    // it: the read failed and there is no design error to report instead.
+    if (errors.every(_isSummary)) return errors.first;
+    return null;
   }
+
+  static bool _isReaderStop(YosysDiagnostic d, {required bool slang}) {
+    final message = d.message;
+    if (_readerFileNeedles.any(message.contains)) return true;
+    final located = d.filePath != null && d.filePath!.isNotEmpty;
+    if (!located) return false;
+    final lower = message.toLowerCase();
+    if (_unsupportedNeedles.any(lower.contains)) return true;
+    return !slang && _parseFailureNeedles.any(lower.contains);
+  }
+
+  /// [d] without the `error:` yosys-slang starts its own messages with, so
+  /// the message and its rule id read as the design error they are.
+  static YosysDiagnostic _withoutSlangSeverity(YosysDiagnostic d) {
+    final message = d.message.replaceFirst(_slangSeverityPrefix, '');
+    return message == d.message ? d : d.copyWith(message: message);
+  }
+
+  /// yosys-slang's closing line after its own located errors.
+  static bool _isSummary(YosysDiagnostic d) =>
+      d.severity == YosysDiagnosticSeverity.error &&
+      d.message.trim() == 'Compilation failed';
 
   /// The lower-case severity yosys-slang starts its own diagnostics with,
   /// which the Yosys diagnostic parser leaves in the message.
   static final RegExp _slangSeverityPrefix = RegExp(r'^(?:error|fatal):\s*');
 
-  static const List<String> _elaborationNeedles = <String>[
-    'is not part of the design',
-    'found unknown cell type',
+  /// The readers' own messages for a file they could not open. Yosys gives
+  /// them no location.
+  static const List<String> _readerFileNeedles = <String>[
+    'not found or is a directory',
+    "Can't open include file",
+    "Can't open input file",
+  ];
+
+  /// A construct the reader does not handle (lower case). yosys-slang says
+  /// `unsupported` for what it cannot lower, the built-in reader `not
+  /// supported` or `unsupported`.
+  static const List<String> _unsupportedNeedles = <String>[
+    'unsupported',
+    'not supported',
+  ];
+
+  /// The built-in reader's parser stopping (lower case).
+  static const List<String> _parseFailureNeedles = <String>[
+    'syntax error',
+    'parser error',
+    'unexpected eof',
   ];
 
   Violation _frontEndFailure(
@@ -329,7 +395,9 @@ class YosysCheckEngine implements LintEngine {
     final String reader;
     if (slang) {
       reader = ' SystemVerilog was read with yosys-slang.';
-    } else if (hasSystemVerilog) {
+    } else if (hasSystemVerilog && located) {
+      // A located stop is the parser's; a file that could not be opened is
+      // no limit of the reader.
       reader =
           " SystemVerilog was read with Yosys's built-in reader "
           '(read_verilog -sv), which does not accept every SystemVerilog '
@@ -358,16 +426,17 @@ class YosysCheckEngine implements LintEngine {
     );
   }
 
-  /// The note added when Yosys stopped in `hierarchy`: the findings above it
-  /// are real, but the check pass they would normally come with did not run.
+  /// The note added when Yosys stopped on an error in the design, usually in
+  /// `hierarchy`: the findings above it are real, but the check pass they
+  /// would normally come with did not run.
   Violation _checkNotRunNote(LintRunRequest request) => Violation(
     engineId: id,
     ruleId: 'yosys/check-not-run',
     severity: Severity.note,
     message:
-        'Yosys stopped while elaborating the design hierarchy, so its check '
-        'pass (logic loops, multiple drivers, latches) did not run. Resolve '
-        'the hierarchy errors above to get its results.',
+        'Yosys stopped on the design errors above before its check pass '
+        '(logic loops, multiple drivers, latches) ran. Resolve them to get '
+        'its results.',
     location: SourceLocation(
       file: request.sourceFiles.isEmpty ? '' : request.sourceFiles.first,
       line: 1,
@@ -442,7 +511,14 @@ class YosysCheckEngine implements LintEngine {
     ('found logic loop', 'logic-loop'),
     ('Latch inferred', 'latch-inferred'),
     ('is not part of the design', 'unknown-module'),
+    // yosys-slang's wording for the same error.
+    ('unknown module', 'unknown-module'),
     ('found unknown cell type', 'unknown-cell-type'),
+    ('does not have a port named', 'unknown-port'),
+    ('does not have a parameter named', 'unknown-parameter'),
+    ('decode value', 'bad-parameter-value'),
+    ('Re-definition of module', 'module-redefinition'),
+    ('not found!', 'module-not-found'),
     ('is implicitly declared', 'implicit-declaration'),
     ('Replacing memory', 'memory-replaced'),
     ('Found and reported', 'check-summary'),
