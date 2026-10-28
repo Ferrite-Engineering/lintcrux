@@ -49,7 +49,7 @@ usable:
 
 | Code | Meaning |
 | --- | --- |
-| `0` | Clean — or findings present with no gate requested. |
+| `0` | Clean, or findings present that no gate failed on: no gate requested, every finding in the baseline, or within the organization's ceiling. |
 | `1` | `--exit-code` was passed and findings remain. |
 | `2` | `--fail-on-new-violations` was passed and a finding is absent from the baseline. |
 | `3` | **The run itself failed.** An engine died, timed out, or was not installed, or the project file could not be loaded. |

@@ -82,7 +82,7 @@ The value is a whole count of surviving (non-suppressed) violations; `0` means n
 
 | Code | Label | Meaning | Tier |
 |---|---|---|---|
-| `0` | clean | Nothing to fail on — or findings present with no gate requested. A bare `lintcrux project.lintcrux` is a reporting command, not a gate. | free |
+| `0` | clean | Nothing to fail on, or findings present that no gate failed on: no gate requested, every finding in the baseline, or within the organization's ceiling. A bare `lintcrux project.lintcrux` is a reporting command, not a gate. | free |
 | `1` | violations | `--exit-code` was passed and at least one non-suppressed violation survived. | free |
 | `2` | new-violations | `--fail-on-new-violations` was passed and at least one violation is absent from the baseline. Outranks `1`, so a job can branch on regression versus pre-existing debt. | free |
 | `3` | run-failed | An engine failed, timed out or was unavailable (a [mandated engine](#mandatory-engines), whatever `--allow-missing-engines` says); no engine had a compatible source; the `--config` overlay was malformed; the baseline was corrupt; or the export could not be written. **The violation count printed alongside this is not trustworthy.** Outranks every other code. | free |

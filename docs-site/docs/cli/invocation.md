@@ -108,7 +108,7 @@ This is the part a pipeline depends on, so it is spelled out in full.
 
 | Code | Label | Meaning |
 | --- | --- | --- |
-| `0` | `clean` | Nothing to report, **or** findings present with no gate requested. |
+| `0` | `clean` | Nothing to report, **or** findings present that no gate failed on: no gate was requested, every finding is in the baseline, or the count is within the organization's ceiling. |
 | `1` | `violations` | `--exit-code` was passed and at least one non-suppressed violation remains. |
 | `2` | `new-violations` | `--fail-on-new-violations` was passed and at least one violation is absent from the baseline. |
 | `3` | `run-failed` | An engine failed, timed out, was cancelled, or was unavailable (an engine the organization's policy mandates is unavailable whatever `--allow-missing-engines` says; `lintcrux-pro` only); an engine ran but reported that it could not analyse the design (CDC's `cdc/elaboration-failed` and `cdc/unsupported-sources`, from 1.2 `cdc/needs-slang-frontend` and the Yosys engine's `yosys/frontend-failed`, and from 1.2 the `constraints/no-top-module`, `constraints/unsupported-sources`, `constraints/elaboration-failed` and `constraints/constraint-file-unreadable` of the pin-constraint check); no engine had a compatible source file; the project file named on the command line could not be loaded (unparseable, no source files, or a listed source file missing); the `--config` overlay was malformed; the baseline was corrupt; or the export could not be written. From 1.2, a run that ends with this code writes no export (see [Exports & CI](../exports-and-ci.md#exports)). |
@@ -170,9 +170,15 @@ lintcrux: my_project: 3 violations (1 error, 2 warning), 2 new, 1 pre-existing [
 ```
 
 A run with no findings ends `[exit 0: clean]`. From LintCrux 1.2, a run that
-has findings but exits `0` because no gate was requested ends
-`[exit 0: no gate requested]`, so the label never reads `clean` beside a
-count of errors.
+has findings but exits `0` never reads `clean` beside a count of errors. With
+no gate (no `--exit-code`, no `--fail-on-new-violations` and no organization
+ceiling) it ends `[exit 0: no gate requested]`. With a gate it passed, because
+every finding is already in the baseline or the count is within the
+organization's ceiling, it ends `[exit 0: gate passed]`:
+
+```
+lintcrux: my_project: 3 violations (1 error, 2 warning), 0 new, 3 pre-existing [exit 0: gate passed]
+```
 
 ## Output format
 
