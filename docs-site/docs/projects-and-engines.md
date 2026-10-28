@@ -88,7 +88,7 @@ LintCrux registers seven engines. Six run a real tool as a subprocess and normal
 | `verilator` | Verilator, `--lint-only` with `-Wall` by default | Verilog, SystemVerilog | `warnFlags` (the `-W*` selectors), `extraOptions` (raw flags), `waiverFiles` (`.vlt` files) |
 | `verible` | `verible-verilog-lint` | Verilog, SystemVerilog | `ruleProfile`, `rulesConfigSearch`, `textModeFallback` |
 | `slang` | Slang | Verilog, SystemVerilog | `textModeFallback` |
-| `yosys` | Yosys `hierarchy -check` + `check -assert` | Verilog, SystemVerilog | — |
+| `yosys` | Yosys `hierarchy -check` + `check -assert` | Verilog, SystemVerilog (see [below](#yosys-systemverilog)) | `workingDirectory` |
 | `ghdl` | GHDL `-a` | VHDL | `warnFlags` (the `--warn-*` classes) |
 | `svlint` | Svlint | Verilog, SystemVerilog | `configPath` |
 | `cdc` | Structural clock-domain-crossing lint | Verilog, SystemVerilog | — (no binary of its own; it drives Yosys — see [Clock-domain crossings](cdc.md)) |
@@ -96,6 +96,12 @@ LintCrux registers seven engines. Six run a real tool as a subprocess and normal
 From LintCrux 1.2, when the Verilator in use is 5.038 or later, LintCrux reads Verilator's own SARIF output (`--diagnostics-sarif-output`, written to a temporary file) instead of parsing its text. The findings are the same: same rules, severities, messages and locations. An older Verilator, or a SARIF file that is missing or unreadable, falls back to the text. If a Verilator release attaches suggested edits (SARIF `fixes`) to a result, they are kept on the finding and written back out by SARIF export; LintCrux does not apply them.
 
 Defines, include paths and the top module are project-level, so every engine that understands them receives them. The option keys and their defaults are in the [project file reference](reference/project-file.md). Engine options are edited in the `.lintcrux` file; `Settings → Engines` configures binaries and severity overrides, not engine flags.
+
+### Which SystemVerilog the Yosys engine reads {#yosys-systemverilog}
+
+From LintCrux 1.2, the `yosys` engine reads SystemVerilog sources with yosys-slang (`read_slang`) when the Yosys in use includes it, as the OSS CAD Suite build does, and with Yosys's built-in reader (`read_verilog -sv`) otherwise. Verilog sources always use the built-in reader. The built-in reader accepts a subset of SystemVerilog: it stops on some constructs ordinary designs use, such as `return` inside a function or package-scoped names.
+
+When Yosys cannot read the sources, LintCrux reports one `yosys/frontend-failed` finding instead of the parser error. It names where Yosys stopped, says that the check pass (logic loops, multiple drivers, latches) did not run, and, when the built-in reader was used for SystemVerilog, says how to select a Yosys with yosys-slang. The design was not checked, so the headless binary exits `3`. When Yosys stops in `hierarchy -check` instead (a module that is not part of the design), the hierarchy findings are reported as before, with a `yosys/check-not-run` note saying the check pass did not run.
 
 ### Which engines run {#which-engines}
 
@@ -132,7 +138,7 @@ From LintCrux 1.2 there is an eighth engine, `constraints`, which checks FPGA pi
 The desktop app lists each engine's run status — Pending, Running, Completed, Failed, Binary not available, Cancelled — in the **Details** pane while no violation is selected; one engine being unavailable does not stop the others. The headless binary is stricter: a missing engine fails the run unless you pass `--allow-missing-engines` — see [Missing engines](cli/invocation.md#missing-engines).
 
 !!! note "Every engine ships rule metadata"
-    All seven engines have entries in the bundled rule database — 646 rules with default severity, tags and documentation links, browsable from the **Rules** tab in the left dock. Where that metadata came from differs per engine: the Verilator, Verible, Slang and GHDL ids are checked against real releases; Svlint's 159 rules are enumerated from the binary itself; CDC's are LintCrux's own; and Yosys' come from LintCrux's message-pattern table, because Yosys does not name its checks. See the [rule database reference](reference/rule-database.md). From 1.2 an eighth engine, `constraints`, adds ten first-party rules, 656 in all (see below).
+    All seven engines have entries in the bundled rule database — 646 rules with default severity, tags and documentation links, browsable from the **Rules** tab in the left dock. Where that metadata came from differs per engine: the Verilator, Verible, Slang and GHDL ids are checked against real releases; Svlint's 159 rules are enumerated from the binary itself; CDC's are LintCrux's own; and Yosys' come from LintCrux's message-pattern table, because Yosys does not name its checks. See the [rule database reference](reference/rule-database.md). From 1.2 an eighth engine, `constraints`, adds ten first-party rules and the other engines gain a few, 659 in all (see below).
 
 ### Version drift
 

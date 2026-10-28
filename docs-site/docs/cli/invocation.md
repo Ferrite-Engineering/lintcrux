@@ -167,6 +167,11 @@ self-documenting:
 lintcrux: my_project: 3 violations (1 error, 2 warning), 2 new, 1 pre-existing [exit 2: new-violations]
 ```
 
+A run with no findings ends `[exit 0: clean]`. From LintCrux 1.2, a run that
+has findings but exits `0` because no gate was requested ends
+`[exit 0: no gate requested]`, so the label never reads `clean` beside a
+count of errors.
+
 ## Output format
 
 One line per violation, in the shape every editor and log scraper

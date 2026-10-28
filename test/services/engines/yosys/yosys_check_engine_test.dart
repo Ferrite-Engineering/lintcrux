@@ -18,6 +18,7 @@ class _StubProcessRunner implements ProcessRunner {
     this.stderr = '',
     this.jsonBytes = const <int>[],
     this.writesJson = true,
+    this.hasSlang = false,
   });
 
   final int exitCode;
@@ -30,6 +31,13 @@ class _StubProcessRunner implements ProcessRunner {
 
   /// When false the stub exits without writing the `write_json` file.
   final bool writesJson;
+
+  /// Whether the stub answers the `help read_slang` probe as a Yosys with
+  /// the yosys-slang frontend does.
+  final bool hasSlang;
+
+  /// Every `-p` script the stub was asked to run, probes excluded.
+  final List<String> scripts = <String>[];
 
   static const String _jsonContent = '{"modules":{}}';
 
@@ -51,6 +59,15 @@ class _StubProcessRunner implements ProcessRunner {
     String? stdoutFilePath,
     void Function(String line)? onStderrLine,
   }) async {
+    if (arguments.contains('help read_slang')) {
+      return ProcessRunResult(
+        exitCode: 0,
+        stdout: hasSlang
+            ? '    read_slang [options] [filenames]\n'
+            : 'No such command or cell type: read_slang\n',
+        stderr: '',
+      );
+    }
     calls++;
     lastExecutable = executable;
     lastArgs = arguments;
@@ -63,6 +80,7 @@ class _StubProcessRunner implements ProcessRunner {
         arguments[0] == '-q' &&
         arguments[1] == '-p') {
       final script = arguments[2];
+      scripts.add(script);
       final match = RegExp('write_json "([^"]+)"').firstMatch(script);
       if (match != null) {
         final file = File(match.group(1)!);
@@ -114,6 +132,9 @@ LintRunRequest _request({
 }
 
 void main() {
+  // The slang probe is cached per executable for the life of the process.
+  setUp(YosysAvailabilityService.resetSlangProbeCacheForTesting);
+
   group('YosysCheckEngine', () {
     test('id and displayName are stable', () {
       final engine = YosysCheckEngine();
@@ -385,6 +406,171 @@ void main() {
       expect(engine.cancel, returnsNormally);
       // Calling twice is safe.
       expect(engine.cancel, returnsNormally);
+    });
+
+    group('a run that stops before check -assert', () {
+      // The eduBOS5 report: `return y;` inside a `function automatic` is
+      // legal SystemVerilog that the built-in reader rejects. The parse
+      // error used to be one design `error` and the run ended clean.
+      const parseFailure =
+          "/tmp/a.sv:12: Warning: Identifier `\\x' is implicitly declared.\n"
+          '/tmp/b.sv:182: ERROR: syntax error, unexpected TOK_ID\n';
+
+      test(
+        'a front-end parse failure is one analysis failure, not a design '
+        'error',
+        () async {
+          final engine = YosysCheckEngine(
+            processRunner: _StubProcessRunner(
+              exitCode: 1,
+              stderr: parseFailure,
+            ),
+          );
+          final violations = await engine.run(_request()).toList();
+          final failure = violations.singleWhere(
+            (v) => v.severity == Severity.error,
+          );
+          expect(failure.ruleId, 'yosys/frontend-failed');
+          expect(failure.isAnalysisFailure, isTrue);
+          expect(failure.location.file, '/tmp/b.sv');
+          expect(failure.location.line, 182);
+          expect(failure.message, contains('check pass'));
+          expect(failure.message, contains('did not run'));
+          expect(failure.message, contains('syntax error, unexpected TOK_ID'));
+          // No slang here: the message names the reader that refused it.
+          expect(failure.message, contains('read_verilog -sv'));
+          expect(failure.message, contains('yosys-slang'));
+          // The warning from the part that was read is still reported.
+          expect(
+            violations.where((v) => v.severity == Severity.warning),
+            hasLength(1),
+          );
+        },
+      );
+
+      test('a Verilog-only design is not told about yosys-slang', () async {
+        final engine = YosysCheckEngine(
+          processRunner: _StubProcessRunner(
+            exitCode: 1,
+            stderr: '/tmp/a.v:3: ERROR: syntax error, unexpected TOK_ID\n',
+          ),
+        );
+        final violations = await engine
+            .run(
+              const LintRunRequest(
+                sourceFiles: ['/tmp/a.v'],
+                binary: EngineBinaryConfig.system(),
+                language: HdlLanguage.verilog,
+                topModule: 'top',
+              ),
+            )
+            .toList();
+        final failure = violations.single;
+        expect(failure.ruleId, 'yosys/frontend-failed');
+        expect(failure.isAnalysisFailure, isTrue);
+        expect(failure.message, isNot(contains('yosys-slang')));
+      });
+
+      test(
+        'a stop in hierarchy keeps its findings and notes that check did not '
+        'run',
+        () async {
+          final engine = YosysCheckEngine(
+            processRunner: _StubProcessRunner(
+              exitCode: 1,
+              stderr:
+                  r"ERROR: Module `\Gowin_ALU54' referenced in module `\top' "
+                  r"in cell `\u_alu' is not part of the design."
+                  '\n',
+            ),
+          );
+          final violations = await engine.run(_request()).toList();
+          expect(
+            violations.map((v) => v.ruleId),
+            ['yosys/unknown-module', 'yosys/check-not-run'],
+          );
+          expect(violations.any((v) => v.isAnalysisFailure), isFalse);
+          expect(violations.last.severity, Severity.note);
+        },
+      );
+
+      test('a check -assert failure is reported as before', () async {
+        final engine = YosysCheckEngine(
+          processRunner: _StubProcessRunner(
+            exitCode: 1,
+            stderr:
+                r'Warning: multiple conflicting drivers for top.\q [0]:'
+                '\n'
+                "ERROR: Found 1 problems in 'check -assert'.\n",
+          ),
+        );
+        final violations = await engine.run(_request()).toList();
+        expect(
+          violations.map((v) => v.ruleId),
+          isNot(
+            contains(anyOf('yosys/frontend-failed', 'yosys/check-not-run')),
+          ),
+        );
+        expect(violations.any((v) => v.isAnalysisFailure), isFalse);
+      });
+    });
+
+    group('SystemVerilog reader', () {
+      test('reads SystemVerilog with read_slang when Yosys has it', () async {
+        final stub = _StubProcessRunner(hasSlang: true);
+        final engine = YosysCheckEngine(processRunner: stub);
+        await engine.run(_request()).toList();
+        expect(stub.scripts.single, contains('read_slang -f'));
+        expect(stub.scripts.single, isNot(contains('read_verilog')));
+        expect(stub.scripts.single, contains('check -assert'));
+      });
+
+      test('falls back to read_verilog -sv without yosys-slang', () async {
+        final stub = _StubProcessRunner();
+        final engine = YosysCheckEngine(processRunner: stub);
+        await engine.run(_request()).toList();
+        expect(stub.scripts.single, contains('read_verilog'));
+        expect(stub.scripts.single, contains('-sv'));
+        expect(stub.scripts.single, isNot(contains('read_slang')));
+      });
+
+      test('a Verilog-only design keeps the built-in reader', () async {
+        final stub = _StubProcessRunner(hasSlang: true);
+        final engine = YosysCheckEngine(processRunner: stub);
+        await engine
+            .run(
+              const LintRunRequest(
+                sourceFiles: ['/tmp/a.v'],
+                binary: EngineBinaryConfig.system(),
+                language: HdlLanguage.verilog,
+                topModule: 'top',
+              ),
+            )
+            .toList();
+        expect(stub.scripts.single, contains('read_verilog'));
+        expect(stub.scripts.single, isNot(contains('read_slang')));
+      });
+
+      test(
+        'a slang read failure says slang was used, not to install it',
+        () async {
+          final engine = YosysCheckEngine(
+            processRunner: _StubProcessRunner(
+              hasSlang: true,
+              exitCode: 1,
+              stderr:
+                  "/tmp/a.sv:4:5: error: unknown module 'foo'\n"
+                  'ERROR: Compilation failed\n',
+            ),
+          );
+          final violations = await engine.run(_request()).toList();
+          final failure = violations.single;
+          expect(failure.ruleId, 'yosys/frontend-failed');
+          expect(failure.location.line, 4);
+          expect(failure.message, contains('read with yosys-slang'));
+          expect(failure.message, isNot(contains('read_verilog -sv')));
+        },
+      );
     });
 
     test(

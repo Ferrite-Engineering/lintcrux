@@ -9,7 +9,7 @@ Each open project is a tab. Inside a tab, the violations table fills the center 
 | Dock | Tab | What it shows |
 |---|---|---|
 | Left | Sources | Every source file in the project, with a remove button on each. Removing a file (after a confirmation) rewrites the project file and re-runs the engines; the file on disk is untouched. From 1.2, a project's pin-constraint files are listed under their own **Constraint files** heading beneath the sources, with the same remove button (see [Pin constraints](pin-constraints.md)). |
-| Left | Rules | The rule browser — 646 rules across the seven engines of 1.1, and 656 across eight from 1.2. Search the rules, narrow the list to one engine, open a rule's upstream **Documentation**, or click a rule to filter the violations table to it. |
+| Left | Rules | The rule browser — 646 rules across the seven engines of 1.1, and 659 across eight from 1.2. Search the rules, narrow the list to one engine, open a rule's upstream **Documentation**, or click a rule to filter the violations table to it. |
 | Center | — | The unified violations table. Columns: Severity, Engine, Rule, File, Line, Message. The heart of the app; covered in full on [The violations dashboard](violations.md). |
 | Right | Details | Engine run status while nothing is selected; the Inspector when a violation is — the message, the location with an **Open in editor** button, the rule's tags and **Learn more** link, and related locations. **Back to engine status** returns from one to the other. |
 | Right | Cross-Probe | The [Cross-Probe panel](#crossprobe), shown when you open it. You can drag it to the bottom dock. |

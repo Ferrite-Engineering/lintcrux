@@ -114,6 +114,17 @@ class HeadlessRunResult {
         entry.key,
   ];
 
-  /// The stable label for [exitCode], printed on the summary line.
-  String get exitLabel => CliExitCode.labelFor(exitCode);
+  /// The label for [exitCode], printed on the summary line.
+  ///
+  /// [CliExitCode.labelFor], except for a run that exits `0` with findings:
+  /// that is a report without a gate, and `clean` beside `1 error` reads as
+  /// a contradiction. It is labelled [noGateRequestedLabel] instead.
+  String get exitLabel =>
+      exitCode == CliExitCode.clean && reportableViolations.isNotEmpty
+      ? noGateRequestedLabel
+      : CliExitCode.labelFor(exitCode);
+
+  /// The summary-line label of a run that exits `0` with findings because
+  /// neither `--exit-code` nor `--fail-on-new-violations` was passed.
+  static const String noGateRequestedLabel = 'no gate requested';
 }

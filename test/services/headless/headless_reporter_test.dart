@@ -145,6 +145,21 @@ void main() {
       }
     });
 
+    test('exit 0 with findings is labelled no gate requested, not clean', () {
+      // `1 error` beside `[exit 0: clean]` read as a contradiction.
+      const reporter = HeadlessReporter();
+      final lines = reporter.stdoutLines(
+        HeadlessRunResult(
+          exitCode: CliExitCode.clean,
+          statuses: completed,
+          violations: <Violation>[violation(severity: Severity.error)],
+        ),
+      );
+      expect(lines.last, contains('1 error'));
+      expect(lines.last, endsWith('[exit 0: no gate requested]'));
+      expect(lines.last, isNot(contains('clean')));
+    });
+
     test('breaks the count down per severity', () {
       const reporter = HeadlessReporter();
       final lines = reporter.stdoutLines(

@@ -67,6 +67,21 @@
       ]
     },
     {
+      "id": "frontend-failed",
+      "defaultSeverity": "error",
+      "tags": [
+        "tooling"
+      ]
+    },
+    {
+      "id": "check-not-run",
+      "defaultSeverity": "note",
+      "tags": [
+        "tooling",
+        "info"
+      ]
+    },
+    {
       "id": "check-summary",
       "defaultSeverity": "note",
       "tags": [
