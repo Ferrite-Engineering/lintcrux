@@ -183,6 +183,37 @@ void main() {
       });
     });
 
+    group('--param', () {
+      test('is empty by default', () {
+        expect(parser.parse(const []).args!.parameters, isEmpty);
+      });
+
+      test('repeats, one NAME=VALUE each', () {
+        final r = parser.parse(const [
+          '--param',
+          'EN_WAIT4REGS=1',
+          '--param',
+          "W=8'hff",
+          'a.sv',
+        ]);
+        expect(r.isSuccess, isTrue, reason: r.error);
+        expect(r.args!.parameters, {'EN_WAIT4REGS': '1', 'W': "8'hff"});
+        expect(r.args!.paths, ['a.sv']);
+      });
+
+      test('a malformed one is a usage error, not a dropped setting', () {
+        for (final bad in ['W', '=1', 'W=', 'W=a b', '1W=1', 'W="s"']) {
+          final r = parser.parse(['--param', bad, 'a.sv']);
+          expect(r.isSuccess, isFalse, reason: bad);
+          expect(r.error, contains('--param'), reason: bad);
+        }
+      });
+
+      test('is documented', () {
+        expect(parser.usage, contains('--param'));
+      });
+    });
+
     group('--relative-to', () {
       test('is absent by default, leaving the project root', () {
         expect(parser.parse(const []).args!.relativeTo, isNull);

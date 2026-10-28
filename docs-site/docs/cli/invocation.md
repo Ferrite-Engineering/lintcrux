@@ -77,6 +77,7 @@ clean run over zero files.
 | Flag | Description |
 | --- | --- |
 | `--top <module>` | Top module / entity. Sets it for an ad-hoc source-file run; overrides the project file's `topModule` when a project is loaded. |
+| `--param <NAME=VALUE>` | From 1.2: set a top-level parameter for this run (repeatable), on top of the project file's [`parameters`](../reference/project-file.md#parameters). Passed to Verilator and Slang as `-G` and to the Yosys-based engines as `hierarchy -chparam`, which needs a top module. A malformed value is a usage error (`64`). See [Lint every configuration of a parameterised core](../cookbook-parameterised-core.md). |
 | `--engine <id>` | Run only this engine. Repeatable. One of `verilator`, `verible`, `slang`, `yosys`, `ghdl`, `svlint`, `cdc`, and from 1.2 `constraints`. Overrides the project's `enabledEngineIds` for this invocation — the usual shape for a CI image that installs one engine. |
 | `--constraints <file>` | From 1.2. Check this FPGA pin-constraint file (`.pcf`, `.lpf` or `.cst`; the extension picks the format) against the top module's ports. Repeatable, and added to the project's own `constraintFiles`. Needs a top module: a run with none exits `3`, it is never clean. An extension that is none of the three, or a path that does not exist, is a usage error. See [Pin constraints](../pin-constraints.md). |
 | `--config <path>`, `-c` | Overlay a partial `.lintcrux` document (JSON) on the loaded project. Only the keys present are replaced. See [Config overlay](#config-overlay). |

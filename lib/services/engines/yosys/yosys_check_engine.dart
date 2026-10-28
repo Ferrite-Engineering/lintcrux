@@ -169,6 +169,7 @@ class YosysCheckEngine implements LintEngine {
           defines: yosysDefinesFor(request),
           includePaths: request.includePaths,
           extraCommands: const ['check -assert'],
+          parameters: request.parameters,
           frontend: slang ? YosysFrontend.slang : YosysFrontend.verilog,
           slangOptions: slang ? slangOptions : const <String>[],
         ),

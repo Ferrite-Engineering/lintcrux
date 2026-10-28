@@ -129,6 +129,7 @@ class EngineRunPlanner {
             droppedSources: selection.sourcesDropped,
             includePaths: project.includePaths,
             defines: project.defines,
+            parameters: project.parameters,
             topModule: effectiveTop,
             // An engine that runs another engine's binary (CDC runs Yosys)
             // is configured by that engine's binary settings, so a Custom

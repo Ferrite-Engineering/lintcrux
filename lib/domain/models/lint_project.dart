@@ -30,6 +30,7 @@ class LintProject {
     this.sourceFiles = const <String>[],
     this.includePaths = const <String>[],
     this.defines = const <String, String>{},
+    this.parameters = const <String, String>{},
     this.topModule,
     this.language = HdlLanguage.systemVerilog,
     this.enabledEngineIds = const <String>[],
@@ -60,6 +61,18 @@ class LintProject {
 
   /// `+define+`-style preprocessor defines.
   final Map<String, String> defines;
+
+  /// Top-level parameter overrides, name to value: the `parameters` key of
+  /// the `.lintcrux` file.
+  ///
+  /// Passed to every engine that elaborates the design: Verilator (`-G`),
+  /// Slang (`-G`) and the Yosys-based engines (`hierarchy -chparam`, or
+  /// `-G` under yosys-slang). They select one configuration of a
+  /// parameterised core, so CI can lint each one from the same sources.
+  /// Each name is an identifier and each value a number or an identifier
+  /// (see `kParameterValuePattern`). Older `.lintcrux` files load with the
+  /// empty default unchanged.
+  final Map<String, String> parameters;
 
   /// Optional top module / entity used by engines that benefit from
   /// elaboration ordering (`yosys hierarchy -top`, etc.).
@@ -157,6 +170,7 @@ class LintProject {
     List<String>? sourceFiles,
     List<String>? includePaths,
     Map<String, String>? defines,
+    Map<String, String>? parameters,
     String? topModule,
     HdlLanguage? language,
     List<String>? enabledEngineIds,
@@ -175,6 +189,7 @@ class LintProject {
       sourceFiles: sourceFiles ?? this.sourceFiles,
       includePaths: includePaths ?? this.includePaths,
       defines: defines ?? this.defines,
+      parameters: parameters ?? this.parameters,
       topModule: topModule ?? this.topModule,
       language: language ?? this.language,
       enabledEngineIds: enabledEngineIds ?? this.enabledEngineIds,
@@ -198,6 +213,7 @@ class LintProject {
         _listEq(other.sourceFiles, sourceFiles) &&
         _listEq(other.includePaths, includePaths) &&
         _mapEq(other.defines, defines) &&
+        _mapEq(other.parameters, parameters) &&
         other.topModule == topModule &&
         other.language == language &&
         _listEq(other.enabledEngineIds, enabledEngineIds) &&
@@ -233,6 +249,7 @@ class LintProject {
       Object.hashAll(sourceFiles),
       Object.hashAll(includePaths),
       hashMap(defines),
+      hashMap(parameters),
       topModule,
       language,
       Object.hashAll(enabledEngineIds),

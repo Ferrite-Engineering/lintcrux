@@ -213,6 +213,12 @@ class SlangEngine implements LintEngine {
         args.add('-D$k=$v');
       }
     });
+    // Top-level parameter overrides.
+    request.parameters.forEach((k, v) {
+      args
+        ..add('-G')
+        ..add('$k=$v');
+    });
     if (request.topModule != null && request.topModule!.isNotEmpty) {
       args
         ..add('--top')

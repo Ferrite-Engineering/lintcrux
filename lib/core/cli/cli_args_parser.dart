@@ -4,6 +4,7 @@
 import 'package:args/args.dart';
 import 'package:lintcrux/core/cli/cli_args.dart';
 import 'package:lintcrux/domain/enums/constraint_format.dart';
+import 'package:lintcrux/domain/models/top_parameters.dart';
 
 /// Parses LintCrux CLI arguments into a [CliArgs] snapshot.
 ///
@@ -112,7 +113,27 @@ class CliArgsParser {
       }
     }
 
+    // `--param NAME=VALUE`, under the same rules as the project file's
+    // `parameters` map. A malformed one is a usage error: run with it
+    // dropped, the job would lint the default configuration and pass.
+    final parameters = <String, String>{};
+    for (final raw
+        in results[kParamOption] as List<String>? ?? const <String>[]) {
+      final eq = raw.indexOf('=');
+      final problem = eq <= 0
+          ? 'expected NAME=VALUE, got "$raw"'
+          : parameterProblem(raw.substring(0, eq), raw.substring(eq + 1));
+      if (problem != null) {
+        return CliArgsParseResult(
+          error: 'Option "--$kParamOption": $problem.',
+          usage: usage,
+        );
+      }
+      parameters[raw.substring(0, eq)] = raw.substring(eq + 1);
+    }
+
     final parsed = CliArgs(
+      parameters: Map<String, String>.unmodifiable(parameters),
       constraintFiles: List<String>.unmodifiable(constraintFiles),
       paths: List<String>.unmodifiable(results.rest),
       configPath: results['config'] as String?,
@@ -163,6 +184,9 @@ class CliArgsParser {
 
   /// The repeatable option naming a pin-constraint file to check.
   static const String kConstraintsOption = 'constraints';
+
+  /// The repeatable option setting one top-level parameter, `NAME=VALUE`.
+  static const String kParamOption = 'param';
 
   /// The budget the headless runner applies when [kEngineTimeoutOption] is
   /// absent. One definition, quoted in the usage text and used as the
@@ -279,6 +303,18 @@ Examples:
             'verible, slang, yosys, ghdl, svlint, cdc, constraints. Overrides the '
             "project's enabledEngineIds for this invocation — the "
             'usual shape for a CI image that only installs one engine.',
+      )
+      ..addMultiOption(
+        kParamOption,
+        valueHelp: 'NAME=VALUE',
+        splitCommas: false,
+        help:
+            'Set a top-level parameter of the design for this run '
+            "(repeatable), on top of the project's own parameters. Passed to "
+            'every engine that elaborates: Verilator and Slang as -G, Yosys '
+            'and the engines built on it as hierarchy -chparam (which needs a '
+            "top module). VALUE is a number such as 1 or 8'hff, or an "
+            'identifier.',
       )
       ..addMultiOption(
         kConstraintsOption,

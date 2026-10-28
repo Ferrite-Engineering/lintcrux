@@ -84,6 +84,35 @@ void main() {
       },
     );
 
+    test(
+      'top-level parameters become -G, ahead of extraOptions',
+      () async {
+        // eduBOS5 selects its pipeline with EN_WAIT4REGS. Reaching Verilator
+        // through extraOptions only left the other engines on the default.
+        final fake = FakeProcessRunner();
+        final engine = VerilatorEngine(runner: fake);
+        await engine
+            .run(
+              const LintRunRequest(
+                sourceFiles: ['/x/a.sv'],
+                parameters: {'EN_WAIT4REGS': '1'},
+                options: {
+                  'extraOptions': ['-GEN_WAIT4REGS=0'],
+                },
+                topModule: 'top',
+                binary: EngineBinaryConfig.system(),
+                language: HdlLanguage.systemVerilog,
+              ),
+            )
+            .toList();
+        final args = fake.invocations.single.arguments;
+        expect(
+          args,
+          containsAllInOrder(['-GEN_WAIT4REGS=1', '-GEN_WAIT4REGS=0']),
+        );
+      },
+    );
+
     group('warnFlags', () {
       test('defaults to -Wall', () async {
         // Not cosmetic. UNUSEDSIGNAL, UNDRIVEN, DECLFILENAME, PINMISSING,

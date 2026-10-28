@@ -551,6 +551,53 @@ void main() {
         expect(stub.scripts.single, isNot(contains('read_slang')));
       });
 
+      test('top-level parameters reach hierarchy -chparam', () async {
+        final stub = _StubProcessRunner();
+        final engine = YosysCheckEngine(processRunner: stub);
+        await engine
+            .run(
+              const LintRunRequest(
+                sourceFiles: ['/tmp/a.sv'],
+                binary: EngineBinaryConfig.system(),
+                language: HdlLanguage.systemVerilog,
+                topModule: 'top',
+                parameters: {'EN_WAIT4REGS': '1'},
+              ),
+            )
+            .toList();
+        expect(
+          stub.scripts.single,
+          contains('hierarchy -check -top top -chparam EN_WAIT4REGS 1'),
+        );
+      });
+
+      test(
+        'parameters without a top module fail the run, never apply '
+        'silently',
+        () async {
+          final stub = _StubProcessRunner();
+          final engine = YosysCheckEngine(processRunner: stub);
+          await expectLater(
+            engine.run(
+              const LintRunRequest(
+                sourceFiles: ['/tmp/a.v'],
+                binary: EngineBinaryConfig.system(),
+                language: HdlLanguage.verilog,
+                parameters: {'W': '4'},
+              ),
+            ),
+            emitsError(
+              isA<EngineRunFailedException>().having(
+                (e) => e.outputExcerpt.join('\n'),
+                'outputExcerpt',
+                contains('need a top module'),
+              ),
+            ),
+          );
+          expect(stub.scripts, isEmpty);
+        },
+      );
+
       test(
         'a slang read failure says slang was used, not to install it',
         () async {
@@ -606,6 +653,52 @@ void main() {
         // varies across versions. We assert that the engine ran to
         // completion without throwing.
         expect(results, isNotNull);
+      },
+      skip: _yosysOnPath() ? false : 'yosys not on PATH',
+    );
+
+    test(
+      'integration: a parameter selects the configuration Yosys checks',
+      () async {
+        // The default configuration instantiates a module the design does
+        // not have; EN=1 selects the branch that elaborates.
+        final tmp = Directory.systemTemp.createTempSync('yosys_param_int_');
+        addTearDown(() {
+          if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+        });
+        final src = File(p.join(tmp.path, 'top.v'))
+          ..writeAsStringSync(
+            'module sub(input wire a, output wire y); assign y = a; '
+            'endmodule\n'
+            'module top #(parameter EN = 0) (input wire a, output wire y);\n'
+            '  generate if (EN) begin : g1\n'
+            '    sub u (.a(a), .y(y));\n'
+            '  end else begin : g0\n'
+            '    missing_mod u (.a(a), .y(y));\n'
+            '  end endgenerate\n'
+            'endmodule\n',
+          );
+        LintRunRequest request(Map<String, String> parameters) =>
+            LintRunRequest(
+              sourceFiles: [src.path],
+              binary: const EngineBinaryConfig.system(),
+              language: HdlLanguage.verilog,
+              topModule: 'top',
+              projectRoot: tmp.path,
+              parameters: parameters,
+            );
+        final engine = YosysCheckEngine();
+        final byDefault = await engine.run(request(const {})).toList();
+        expect(
+          byDefault.map((v) => v.ruleId),
+          contains('yosys/unknown-module'),
+        );
+        final selected = await engine.run(request(const {'EN': '1'})).toList();
+        expect(
+          selected.where((v) => v.severity == Severity.error),
+          isEmpty,
+          reason: selected.map((v) => v.message).join('\n'),
+        );
       },
       skip: _yosysOnPath() ? false : 'yosys not on PATH',
     );

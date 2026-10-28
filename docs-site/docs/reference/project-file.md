@@ -31,6 +31,7 @@
 | `sourceFileLanguages` | map | Per-file language override: path → `auto`, `verilog`, `systemverilog`, or `vhdl`. |
 | `includePaths` | string list | Relative paths resolve like `sourceFiles`. |
 | `defines` | map | Macro name → value; an empty value defines the bare name. |
+| `parameters` | map | From 1.2: top-level parameter overrides, name → value. See [below](#parameters). |
 | `topModule` | string | Top module / entity. |
 | `enabledEngineIds` | string list | Engines to run. **Empty or omitted means every registered engine.** |
 | `severityOverrides` | map | Engine-namespaced rule id → `fatal`, `error`, `warning`, `note`, or `none`. |
@@ -62,6 +63,31 @@ From LintCrux 1.2, a project can declare an identity that is the same on every m
 
 LintCrux never adds the key for you. Pick a short name once and keep it: changing it later starts a new history. The Enterprise [team database](../team-database.md) pools runs under it.
 
+## `parameters` {#parameters}
+
+From LintCrux 1.2, a project can set top-level parameters of the design, so every engine that elaborates it sees the same configuration:
+
+```json
+"topModule": "edubos5",
+"parameters": {"EN_WAIT4REGS": 1}
+```
+
+| Key | Type | Meaning |
+|---|---|---|
+| `parameters` | map | Parameter name → value. A value is a number (`1`, `-4`, `8'hff`) or an identifier, written as a JSON string or a whole JSON number. String values, spaces and quotes are not accepted. A name that is not a Verilog identifier, or a value outside that set, is rejected on load with a message naming it. Omitted when empty, so a project file from an earlier release loads and saves unchanged. |
+
+Each engine that elaborates the design receives them:
+
+| Engine | How it is passed |
+|---|---|
+| `verilator` | `-G<name>=<value>`, before `perEngineOptions.verilator.extraOptions`, so a `-G` written there still wins |
+| `slang` | `-G <name>=<value>` |
+| `yosys`, `cdc`, `constraints` | `hierarchy -chparam <name> <value>` on the top module, or `-G <name>=<value>` when Yosys reads SystemVerilog with yosys-slang |
+
+`verible`, `svlint` and `ghdl` read files without elaborating a top module, so the parameters do not apply to them. The Yosys-based engines apply a parameter to the module `topModule` names, so a project that sets `parameters` for them needs a `topModule` (or `--top`); without one their run fails rather than linting the default configuration.
+
+On the command line, `--param NAME=VALUE` (repeatable) sets a parameter for one run, on top of the project's own. See [Lint every configuration of a parameterised core](../cookbook-parameterised-core.md).
+
 ## `constraintFiles` {#constraint-files}
 
 From LintCrux 1.2, a project can list FPGA pin-constraint files:
@@ -83,7 +109,7 @@ includes `constraints`. See [Pin constraints](../pin-constraints.md).
 | Key | Type | Meaning |
 |---|---|---|
 | `warnFlags` | string list | Verilator `-W*` selectors without the leading `-W` (e.g. `["all", "no-DECLFILENAME"]`). Omit for the default `["all"]`; an explicit empty list means "no opt-in warnings". |
-| `extraOptions` | string list | Raw flags appended to the Verilator command line (e.g. `-G` parameter overrides from an EDAM import). Verilator is the only engine with a raw-flags option. |
+| `extraOptions` | string list | Raw flags appended to the Verilator command line (e.g. `-G` parameter overrides from an EDAM import). Verilator is the only engine with a raw-flags option. From 1.2, set parameters every engine should see in [`parameters`](#parameters) instead. |
 | `waiverFiles` | string list | Verilator `.vlt` waiver/config files, passed after the flags and before the sources. Populated by `--import-edam` from `file_type: vlt` entries; only Verilator sees them. |
 
 ## `perEngineOptions.verible`

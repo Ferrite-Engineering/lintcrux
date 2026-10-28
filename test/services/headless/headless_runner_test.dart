@@ -85,6 +85,19 @@ class _RequestRecordingEngine extends _FakeEngine {
   }
 }
 
+/// Records the parameters of every request it is run with.
+class _ParameterRecordingEngine extends _FakeEngine {
+  _ParameterRecordingEngine(this.seen) : super('recorder');
+
+  final List<Map<String, String>> seen;
+
+  @override
+  Stream<Violation> run(LintRunRequest request) {
+    seen.add(request.parameters);
+    return super.run(request);
+  }
+}
+
 /// A Yosys process runner on a machine with no Yosys.
 class _MissingBinaryProcessRunner implements ProcessRunner {
   final List<String> executables = <String>[];
@@ -962,6 +975,45 @@ module top; endmodule
         args(config: configPath),
       );
       expect(r.exitCode, CliExitCode.runFailed);
+    });
+  });
+
+  group('top-level parameters', () {
+    test('the project file reaches every engine request', () async {
+      File(projectPath).writeAsStringSync(
+        jsonEncode(<String, Object?>{
+          'version': 1,
+          'name': 'design',
+          'rootPath': '.',
+          'sourceFiles': <String>['top.sv'],
+          'language': 'systemverilog',
+          'parameters': <String, Object?>{'EN_WAIT4REGS': 0, 'W': '4'},
+        }),
+      );
+      final seen = <Map<String, String>>[];
+      await runnerWith([_ParameterRecordingEngine(seen)]).run(args());
+      expect(seen.single, {'EN_WAIT4REGS': '0', 'W': '4'});
+    });
+
+    test('--param is applied on top of the project', () async {
+      File(projectPath).writeAsStringSync(
+        jsonEncode(<String, Object?>{
+          'version': 1,
+          'name': 'design',
+          'rootPath': '.',
+          'sourceFiles': <String>['top.sv'],
+          'language': 'systemverilog',
+          'parameters': <String, Object?>{'EN_WAIT4REGS': '0', 'W': '4'},
+        }),
+      );
+      final seen = <Map<String, String>>[];
+      await runnerWith([_ParameterRecordingEngine(seen)]).run(
+        CliArgs(
+          paths: <String>[projectPath],
+          parameters: const {'EN_WAIT4REGS': '1'},
+        ),
+      );
+      expect(seen.single, {'EN_WAIT4REGS': '1', 'W': '4'});
     });
   });
 

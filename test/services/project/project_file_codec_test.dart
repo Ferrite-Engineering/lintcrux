@@ -341,6 +341,55 @@ void main() {
       },
     );
 
+    group('parameters', () {
+      test('round-trip unchanged', () {
+        const project = LintProject(
+          name: 'edubos5',
+          rootPath: '/r',
+          parameters: {'EN_WAIT4REGS': '1', 'W': "8'hff"},
+        );
+        final decoded = codec.decode(codec.encode(project));
+        expect(decoded.parameters, project.parameters);
+        expect(decoded, project);
+      });
+
+      test('a project without parameters encodes without the key', () {
+        const project = LintProject(name: 'p', rootPath: '/r');
+        expect(codec.encode(project), isNot(contains('parameters')));
+        expect(codec.decode(codec.encode(project)).parameters, isEmpty);
+      });
+
+      test('a whole-number JSON value reads as its digits', () {
+        final decoded = codec.decode(
+          '{"version": 1, "name": "x", "rootPath": "/y", '
+          '"parameters": {"EN_WAIT4REGS": 1}}',
+        );
+        expect(decoded.parameters, {'EN_WAIT4REGS': '1'});
+      });
+
+      test('a value or name no engine could take fails the load', () {
+        for (final bad in <String>[
+          '{"W": "a b"}',
+          r'{"W": "\"str\""}',
+          '{"W": "1;x"}',
+          '{"W": ""}',
+          '{"W": 1.5}',
+          '{"W": true}',
+          '{"1W": "1"}',
+          '[1]',
+        ]) {
+          expect(
+            () => codec.decode(
+              '{"version": 1, "name": "x", "rootPath": "/y", '
+              '"parameters": $bad}',
+            ),
+            throwsA(isA<ProjectFileException>()),
+            reason: bad,
+          );
+        }
+      });
+    });
+
     test('decode rejects a constraintFiles that is not a list of strings', () {
       expect(
         () => codec.decode(

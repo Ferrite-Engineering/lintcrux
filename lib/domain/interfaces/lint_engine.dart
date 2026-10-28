@@ -83,6 +83,7 @@ class LintRunRequest {
     this.sourceLanguages = const <String, HdlLanguage>{},
     this.includePaths = const <String>[],
     this.defines = const <String, String>{},
+    this.parameters = const <String, String>{},
     this.topModule,
     this.options = const <String, Object?>{},
     this.projectRoot = '',
@@ -127,6 +128,13 @@ class LintRunRequest {
   /// `+define+`-style preprocessor defines.
   final Map<String, String> defines;
 
+  /// Top-level parameter overrides, name to value (`LintProject.parameters`
+  /// with any `--param` from the command line on top). An engine that
+  /// elaborates the design applies them to its top module; one that reads
+  /// files without elaborating (Verible, Svlint) has nothing to apply them
+  /// to.
+  final Map<String, String> parameters;
+
   /// Optional top module / entity for engines that benefit from
   /// elaboration ordering.
   final String? topModule;
@@ -163,6 +171,7 @@ class LintRunRequest {
     Map<String, HdlLanguage>? sourceLanguages,
     List<String>? includePaths,
     Map<String, String>? defines,
+    Map<String, String>? parameters,
     String? topModule,
     HdlLanguage? language,
     EngineBinaryConfig? binary,
@@ -183,6 +192,7 @@ class LintRunRequest {
       sourceLanguages: sourceLanguages ?? this.sourceLanguages,
       includePaths: includePaths ?? this.includePaths,
       defines: defines ?? this.defines,
+      parameters: parameters ?? this.parameters,
       topModule: topModule ?? this.topModule,
       language: language ?? this.language,
       binary: binary ?? this.binary,

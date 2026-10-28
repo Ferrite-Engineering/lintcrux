@@ -75,6 +75,9 @@ class CacheFingerprint {
       'sourceFiles': request.sourceFiles,
       'includePaths': request.includePaths,
       'defines': _sortMap(request.defines),
+      // Absent when there are none, so every existing key is unchanged.
+      if (request.parameters.isNotEmpty)
+        'parameters': _sortMap(request.parameters),
       'topModule': request.topModule,
       'language': request.language.name,
       // Binary resolution.

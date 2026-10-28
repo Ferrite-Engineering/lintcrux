@@ -11,6 +11,7 @@ The rest of these docs explain what each feature *is*. The Cookbook shows you ho
 - [Lint a FuseSoC core](cookbook-fusesoc.md) — let FuseSoC resolve the dependency closure, import the EDAM it generates, and go from `.core` file to SARIF with nothing described by hand. **~10 min · Free**
 - [Gate CI on new violations](cookbook-baseline-ci.md) — set a baseline, fail CI only on new findings, and export SARIF so violations annotate your pull requests. **~10 min · Pro to set the baseline, free to gate**
 - [Track regressions over time](cookbook-track-regressions.md) — open a trend chart, catch a spike, find the rule that caused it, triage, and watch the count recover. **~8 min · Pro**
+- [Lint every configuration of a parameterised core](cookbook-parameterised-core.md): from 1.2, set top-level parameters once for every engine, run each configuration with `--param`, and stub out vendor primitives. **~10 min · Free**
 - [Configure which engines run](cookbook-configure-engines.md) — choose the engines, set their binaries and options, and re-run to see the difference. **~5 min · Free**
 - [CI integration in depth](cookbook/ci-integration.md) — copy-pasteable GitHub Actions and GitLab CI jobs, the exit-code contract, overlays, baselines and SARIF upload. **Free**
 

@@ -131,6 +131,25 @@ void main() {
       expect(args, contains('-DBAR'));
     });
 
+    test('top-level parameters use -G NAME=VALUE', () async {
+      final fake = FakeProcessRunner();
+      final engine = SlangEngine(runner: fake);
+      await engine
+          .run(
+            const LintRunRequest(
+              sourceFiles: ['/x/a.sv'],
+              binary: EngineBinaryConfig.system(),
+              language: HdlLanguage.systemVerilog,
+              parameters: {'EN_WAIT4REGS': '1'},
+            ),
+          )
+          .toList();
+      expect(
+        fake.invocations.single.arguments,
+        containsAllInOrder(['-G', 'EN_WAIT4REGS=1']),
+      );
+    });
+
     test('top module is forwarded via --top', () async {
       final fake = FakeProcessRunner();
       final engine = SlangEngine(runner: fake);

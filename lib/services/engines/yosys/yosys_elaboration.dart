@@ -118,6 +118,7 @@ Future<DesignElaboration> elaborateDesign(
     extraCommands: extraCommands,
     frontend: frontend,
     slangOptions: slangOptions,
+    parameters: request.parameters,
   );
   final result = keepNetlist
       ? await runner.runKeepingJson(yosysRequest)

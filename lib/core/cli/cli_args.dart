@@ -63,6 +63,7 @@ class CliArgs {
     this.sarifRoot,
     this.relativeTo,
     this.constraintFiles = const <String>[],
+    this.parameters = const <String, String>{},
   });
 
   /// Empty/default args — equivalent to `lintcrux` with no flags.
@@ -264,6 +265,12 @@ class CliArgs {
   /// parser refuses any other extension rather than guessing.
   final List<String> constraintFiles;
 
+  /// Top-level parameter overrides supplied by repeating
+  /// `--param NAME=VALUE`, applied on top of the project's own `parameters`
+  /// for this run: a CI job lints each configuration of a parameterised
+  /// core from one project file.
+  final Map<String, String> parameters;
+
   /// Returns a copy with overridden fields.
   CliArgs copyWith({
     List<String>? paths,
@@ -291,8 +298,10 @@ class CliArgs {
     String? sarifRoot,
     String? relativeTo,
     List<String>? constraintFiles,
+    Map<String, String>? parameters,
   }) {
     return CliArgs(
+      parameters: parameters ?? this.parameters,
       constraintFiles: constraintFiles ?? this.constraintFiles,
       paths: paths ?? this.paths,
       configPath: configPath ?? this.configPath,
@@ -354,6 +363,10 @@ class CliArgs {
     if (other.engineTimeout != engineTimeout) return false;
     if (other.sarifRoot != sarifRoot) return false;
     if (other.relativeTo != relativeTo) return false;
+    if (other.parameters.length != parameters.length) return false;
+    for (final entry in parameters.entries) {
+      if (other.parameters[entry.key] != entry.value) return false;
+    }
     if (other.constraintFiles.length != constraintFiles.length) return false;
     for (var i = 0; i < constraintFiles.length; i++) {
       if (other.constraintFiles[i] != constraintFiles[i]) return false;
@@ -401,6 +414,9 @@ class CliArgs {
         engineTimeout,
         sarifRoot,
         relativeTo,
+        Object.hashAllUnordered(
+          parameters.entries.map((e) => Object.hash(e.key, e.value)),
+        ),
         Object.hashAll(mandatoryEngineIds),
         Object.hashAll(constraintFiles),
       ),
@@ -421,5 +437,6 @@ class CliArgs {
       'allowMissingEngines: $allowMissingEngines, engines: $engineIds, '
       'mandatoryEngines: $mandatoryEngineIds, '
       'quiet: $quiet, engineTimeout: $engineTimeout, sarifRoot: $sarifRoot, '
-      'relativeTo: $relativeTo, constraints: $constraintFiles)';
+      'relativeTo: $relativeTo, constraints: $constraintFiles, '
+      'parameters: $parameters)';
 }

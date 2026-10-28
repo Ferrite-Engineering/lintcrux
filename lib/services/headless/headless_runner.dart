@@ -213,6 +213,18 @@ class HeadlessRunner {
       );
     }
 
+    // ── 2c. Add --param ────────────────────────────────────────────
+    // On top of the project's own parameters: one project file, one CI job
+    // per configuration of a parameterised core.
+    if (args.parameters.isNotEmpty) {
+      project = project.copyWith(
+        parameters: <String, String>{
+          ...project.parameters,
+          ...args.parameters,
+        },
+      );
+    }
+
     // ── 3. Plan the run ────────────────────────────────────────────
     const planner = EngineRunPlanner();
     final plan = planner.plan(

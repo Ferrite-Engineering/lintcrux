@@ -402,6 +402,9 @@ class VerilatorEngine implements LintEngine {
         args.add('+define+$k=$v');
       }
     });
+    // Top-level parameter overrides, before `extraOptions` so a raw `-G`
+    // written there still has the last word.
+    request.parameters.forEach((k, v) => args.add('-G$k=$v'));
     if (request.topModule != null && request.topModule!.isNotEmpty) {
       args
         ..add('--top-module')

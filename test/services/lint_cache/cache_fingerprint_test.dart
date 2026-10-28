@@ -102,6 +102,24 @@ void main() {
       expect(a, equals(b));
     });
 
+    test('a parameter override changes the hash; none leaves it as it was', () {
+      // A cached result for one configuration of a core must not answer for
+      // another.
+      final none = CacheFingerprint.configOf(req());
+      final one = CacheFingerprint.configOf(
+        req().copyWith(parameters: const {'EN_WAIT4REGS': '1'}),
+      );
+      final zero = CacheFingerprint.configOf(
+        req().copyWith(parameters: const {'EN_WAIT4REGS': '0'}),
+      );
+      expect(one, isNot(none));
+      expect(one, isNot(zero));
+      expect(
+        CacheFingerprint.configOf(req().copyWith(parameters: const {})),
+        none,
+      );
+    });
+
     test('source file ORDER affects the hash (order is significant)', () {
       final a = CacheFingerprint.configOf(
         req(sourceFiles: const ['/a.sv', '/b.sv']),

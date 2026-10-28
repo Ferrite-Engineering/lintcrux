@@ -10,6 +10,7 @@ import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/named_filter_preset.dart';
 import 'package:lintcrux/domain/models/project_identity.dart';
 import 'package:lintcrux/domain/models/project_source_file.dart';
+import 'package:lintcrux/domain/models/top_parameters.dart';
 
 /// The current `.lintcrux` schema version. Bump whenever a
 /// backwards-incompatible change lands; forward-compatible additions
@@ -51,6 +52,9 @@ class ProjectFileCodec {
         'constraintFiles': List<String>.from(project.constraintFiles),
       'includePaths': List<String>.from(project.includePaths),
       'defines': Map<String, String>.from(project.defines),
+      // Written only when there are some, like constraintFiles.
+      if (project.parameters.isNotEmpty)
+        'parameters': Map<String, String>.from(project.parameters),
       if (project.topModule != null) 'topModule': project.topModule,
       'language': _languageToString(project.language),
       'enabledEngineIds': List<String>.from(project.enabledEngineIds),
@@ -143,6 +147,7 @@ class ProjectFileCodec {
       sourceFiles: _stringList(raw, 'sourceFiles'),
       includePaths: _stringList(raw, 'includePaths'),
       defines: _stringMap(raw, 'defines'),
+      parameters: _parameterMap(raw, 'parameters'),
       topModule: _expectStringOrNull(raw, 'topModule'),
       language: language,
       enabledEngineIds: _stringList(raw, 'enabledEngineIds'),
@@ -380,6 +385,36 @@ class ProjectFileCodec {
         throw ProjectFileException('"$key" entries must be string -> string');
       }
       out[k] = val;
+    });
+    return out;
+  }
+
+  /// The `parameters` map: each value a string or a whole number (JSON
+  /// `1` and `"1"` both mean `1`), and each entry one [parameterProblem]
+  /// accepts. A refused entry fails the load rather than being dropped: a
+  /// run with a parameter silently missing lints the wrong configuration.
+  static Map<String, String> _parameterMap(Map<String, dynamic> m, String key) {
+    final v = m[key];
+    if (v == null) return const {};
+    if (v is! Map) {
+      throw ProjectFileException('"$key" must be a JSON object');
+    }
+    final out = <String, String>{};
+    v.forEach((k, val) {
+      final String value;
+      if (val is String) {
+        value = val;
+      } else if (val is int) {
+        value = '$val';
+      } else {
+        throw ProjectFileException(
+          '"$key" entries must map a name to a string or a whole number',
+        );
+      }
+      final name = k as String;
+      final problem = parameterProblem(name, value);
+      if (problem != null) throw ProjectFileException('"$key": $problem');
+      out[name] = value;
     });
     return out;
   }

@@ -99,6 +99,7 @@ nav:
       - Gate CI on new violations: cookbook-baseline-ci.md
       - Track regressions over time: cookbook-track-regressions.md
       - Configure which engines run: cookbook-configure-engines.md
+      - Lint every configuration of a parameterised core: cookbook-parameterised-core.md
       - CI integration in depth: cookbook/ci-integration.md
   - Reference:
       - Command line: cli/invocation.md
