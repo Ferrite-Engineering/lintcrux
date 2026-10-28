@@ -968,7 +968,16 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
                 // `BetaExpiryMetrics` (44 dp touch target, 20 dp icon, 13 pt
                 // body), so the two beta strips are sized identically without
                 // restating the numbers here.
-                child: UpdateBanner(child: routed),
+                // The licence-expiry strip (crux_license): below the update
+                // prompt, inside the agreement and the expiry gate, which
+                // outrank it. Shows nothing in an open-core build; the Pro
+                // overlay supplies the status and the strings.
+                child: UpdateBanner(
+                  child: CruxLicenseExpiryGate(
+                    onOpenLicenseSettings: _openLicenseSettings,
+                    child: routed,
+                  ),
+                ),
               ),
             ),
           ),
@@ -1891,6 +1900,21 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
     if (context == null || !context.mounted) return;
     final l10n = L10N.of(context);
     showCruxInfoSnack(context, l10n.snackFeatureNotAvailableYet(feature(l10n)));
+  }
+
+  /// Opens Settings at the License category, for the licence-expiry strip.
+  /// The strip sits above the router, so this finds the router's navigator
+  /// the way the menu dispatch does.
+  void _openLicenseSettings() {
+    final router = ref.read(appRouterProvider);
+    final ctx = router.routerDelegate.navigatorKey.currentState?.context;
+    if (ctx == null) return;
+    unawaited(
+      SettingsScreen.openAdaptive(
+        ctx,
+        initialCategoryId: kCruxLicenseCategoryId,
+      ),
+    );
   }
 
   Future<void> _handleOpenSettings(BuildContext context) async {

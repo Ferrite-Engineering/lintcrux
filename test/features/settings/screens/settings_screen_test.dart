@@ -55,6 +55,42 @@ void main() {
       expect(find.text('Auto-reload on source change'), findsOneWidget);
     });
 
+    // The licence-expiry strip opens Settings at License this way; the
+    // shared shell turns the id into the selected category, which
+    // crux_settings_ui's own tests cover.
+    testWidgets('openAdaptive opens on the category it is given', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(1200, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(
+        _wrap(
+          Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => SettingsScreen.openAdaptive(
+                  context,
+                  initialCategoryId: CruxSettingsCategoryId.editors,
+                ),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<CruxSettingsInitialCategory>(
+              find.byType(CruxSettingsInitialCategory),
+            )
+            .id,
+        CruxSettingsCategoryId.editors,
+      );
+      expect(find.text('Click-to-source editor'), findsOneWidget);
+    });
+
     testWidgets('switches to Appearance when its rail item is tapped', (
       tester,
     ) async {

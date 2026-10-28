@@ -50,7 +50,13 @@ class SettingsScreen extends ConsumerWidget {
   /// unaffected: their providers are not re-bound per tab, so reads inside
   /// the tab scope parent-delegate to the root instances. With no tab
   /// open, Settings covers the window as before.
-  static Future<void> openAdaptive(BuildContext context) {
+  ///
+  /// [initialCategoryId] opens it at that category instead of the first: the
+  /// licence-expiry strip opens Settings → License this way.
+  static Future<void> openAdaptive(
+    BuildContext context, {
+    String? initialCategoryId,
+  }) {
     final l10n = L10N.of(context);
     // Re-entrancy guard: Cmd/Ctrl+, auto-repeat, a double-tap on the menu
     // item, or the palette entry must not stack a second settings surface.
@@ -64,6 +70,7 @@ class SettingsScreen extends ConsumerWidget {
         closeTooltip: l10n.settingsClose,
         asDialog: isDesktopPlatform,
         navigator: ActiveTab.navigatorFor(context),
+        initialCategoryId: initialCategoryId,
         bodyBuilder: (_) => const _SettingsBody(),
       ),
     );
