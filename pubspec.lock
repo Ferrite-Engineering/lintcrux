@@ -90,7 +90,7 @@ packages:
     source: hosted
     version: "0.3.5+5"
   crux_a11y:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       path: "crux-shared/packages/crux_a11y"
       relative: true

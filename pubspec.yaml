@@ -19,6 +19,12 @@ dependencies:
   # through this; the parsed args are surfaced to the app via
   # `CliArgsProvider`.
   args: ^2.6.0
+  # The suite's accessibility primitives: `CruxRoutedContent`, the semantics
+  # boundary around the routed content in `MaterialApp.builder`. Its
+  # focus-walk harness (`crux_a11y_testing.dart`) is what
+  # `test/accessibility/` asserts what a screen reader hears with.
+  crux_a11y:
+    path: ./crux-shared/packages/crux_a11y
   # Cross-suite About dialog / screen (CruxAboutDialog). One implementation
   # rendered by every product in the suite; LintCrux supplies its branding,
   # build metadata, edition label, localized chrome strings, an app icon, and
@@ -290,12 +296,6 @@ dev_dependencies:
   # Pinned below 13.0.0: analyzer 13+ requires Dart 3.13 and this package
   # targets the 3.12 SDK.
   analyzer: '>=12.1.0 <13.0.0'
-  # The focus-walk harness (`crux_a11y_testing.dart`): what a screen reader
-  # hears as Tab moves through a surface, asserted by
-  # `test/accessibility/screen_reader_test.dart`. Test-only; no production
-  # code in LintCrux imports the package.
-  crux_a11y:
-    path: ./crux-shared/packages/crux_a11y
   # The audit envelope, named directly by the emission tests' capturing sink.
   # Test-only: production code reaches `AuditEvent` through crux_license's
   # `CruxAuditRecorder`, so the runtime dependency stays where the binding is.
