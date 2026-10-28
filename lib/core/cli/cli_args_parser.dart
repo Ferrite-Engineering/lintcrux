@@ -140,6 +140,10 @@ class CliArgsParser {
         final String s when s.isNotEmpty => s,
         _ => null,
       },
+      relativeTo: switch (results[kRelativeToOption] as String?) {
+        final String s when s.isNotEmpty => s,
+        _ => null,
+      },
     );
     return CliArgsParseResult(args: parsed, usage: usage);
   }
@@ -152,6 +156,10 @@ class CliArgsParser {
 
   /// The option naming the directory SARIF paths are written relative to.
   static const String kSarifRootOption = 'sarif-root';
+
+  /// The option naming the directory JSON, CSV and HTML export paths are
+  /// written relative to.
+  static const String kRelativeToOption = 'relative-to';
 
   /// The repeatable option naming a pin-constraint file to check.
   static const String kConstraintsOption = 'constraints';
@@ -313,6 +321,14 @@ Examples:
             'of the project, else the project root. GitHub code scanning '
             'resolves paths against the repository root, so set this when '
             'the checkout root is not the git root.',
+      )
+      ..addOption(
+        kRelativeToOption,
+        valueHelp: 'dir',
+        help:
+            'Directory the file paths in a JSON, CSV or HTML export are '
+            'written relative to. Default: the project root. A path outside '
+            'it stays absolute. SARIF uses --sarif-root instead.',
       )
       ..addOption(
         'baseline',

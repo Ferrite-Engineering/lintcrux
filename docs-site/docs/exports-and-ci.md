@@ -15,6 +15,10 @@ LintCrux is built to live in your pipeline. It exports to the formats your tools
 
 **The headless binary** exports with `--export <format> --out <path>`, or `--sarif <path>` for short. It writes **every** violation from the run — there are no filters there — and shapes SARIF for code-scanning upload: paths relative to the project root with a declared `%SRCROOT%` base, and a stable `automationDetails.id` per project and engine. See [SARIF output](cli/invocation.md#sarif-output).
 
+From LintCrux 1.2, the JSON, CSV and HTML exports write file paths relative to the project root, from the desktop and from the headless binary, so a report you attach to an issue or send to someone else does not carry your local directory layout. A path outside the project root, such as a vendor library elsewhere on disk, stays absolute. On the command line, `--relative-to <dir>` names a different directory. SARIF keeps its own root (`--sarif-root`).
+
+From LintCrux 1.2, a headless run that fails (exit `3`) writes no export, and removes a file an earlier run left at `--out`: its violation count is partial, and a report on disk would read as the result of the run. A `lintcrux: note:` line says the export was not written. With `--allow-missing-engines`, a missing engine does not fail the run and the export is written.
+
 In both SARIF exports a suppressed violation carries a SARIF `suppressions` entry: kind `inSource` for an inline pragma, `external` for a managed waiver <span class="tier tier-pro">Pro</span>, status `accepted`, and the waiver's reason as the justification. Suppressed findings do not affect the exit code; the marker is what lets a consumer tell a waived finding from an open one. Whether a code-scanning service hides suppressed results is up to that service.
 
 ## Headless CI runs {#headless}

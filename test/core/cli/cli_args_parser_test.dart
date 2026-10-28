@@ -183,6 +183,27 @@ void main() {
       });
     });
 
+    group('--relative-to', () {
+      test('is absent by default, leaving the project root', () {
+        expect(parser.parse(const []).args!.relativeTo, isNull);
+      });
+
+      test('captures the directory', () {
+        final r = parser.parse(const ['--relative-to', '/ci/checkout', 'a.sv']);
+        expect(r.isSuccess, isTrue, reason: r.error);
+        expect(r.args!.relativeTo, '/ci/checkout');
+        expect(
+          r.args,
+          isNot(parser.parse(const ['a.sv']).args),
+          reason: 'equality must see the field',
+        );
+      });
+
+      test('is documented', () {
+        expect(parser.usage, contains('--relative-to'));
+      });
+    });
+
     group('--engine-timeout', () {
       test('is absent by default, leaving the runner its own budget', () {
         expect(parser.parse(const []).args!.engineTimeout, isNull);

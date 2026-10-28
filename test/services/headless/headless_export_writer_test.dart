@@ -379,6 +379,65 @@ void main() {
     });
   });
 
+  group('renderPortable (JSON, CSV, HTML)', () {
+    // These carried the engines' absolute paths, so a report attached to
+    // someone else's issue published the local directory layout.
+    test('JSON paths are relative to the directory, raw paths too', () {
+      final json = writer.renderPortable(
+        violations: <Violation>[
+          violation(
+            related: const <String>['rtl/sub.sv'],
+            raw: <String, dynamic>{'cdc.src': p.join(root, 'rtl', 'a.sv')},
+          ),
+        ],
+        format: 'json',
+        relativeTo: root,
+      );
+      expect(json, isNot(contains(root)));
+      final v = (jsonDecode(json) as List).single as Map<String, dynamic>;
+      expect((v['location'] as Map)['file'], 'rtl/top.sv');
+      expect(
+        ((v['relatedLocations'] as List).single as Map)['file'],
+        'rtl/sub.sv',
+      );
+      expect((v['raw'] as Map)['cdc.src'], 'rtl/a.sv');
+    });
+
+    test('CSV and HTML paths are relative to the directory', () {
+      for (final format in <String>['csv', 'html']) {
+        final out = writer.renderPortable(
+          violations: <Violation>[violation()],
+          format: format,
+          relativeTo: root,
+        );
+        expect(out, isNot(contains(root)), reason: format);
+        expect(out, contains('rtl/top.sv'), reason: format);
+      }
+    });
+
+    test('a path outside the directory stays absolute', () {
+      final outside = p.normalize(p.absolute(p.join('build', 'elsewhere.v')));
+      final json = writer.renderPortable(
+        violations: <Violation>[violation(file: outside)],
+        format: 'json',
+        relativeTo: root,
+      );
+      final v = (jsonDecode(json) as List).single as Map<String, dynamic>;
+      expect((v['location'] as Map)['file'], outside);
+    });
+
+    test('SARIF is not one of its formats', () {
+      expect(
+        () => writer.renderPortable(
+          violations: const <Violation>[],
+          format: 'sarif',
+          relativeTo: root,
+        ),
+        throwsArgumentError,
+      );
+    });
+  });
+
   group('write()', () {
     late Directory tmp;
 

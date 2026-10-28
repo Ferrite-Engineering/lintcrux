@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'dart:async';
-import 'dart:io' show File;
+import 'dart:io' show File, FileSystemException;
 
 import 'package:lintcrux/core/cli/cli_args.dart';
 import 'package:lintcrux/core/cli/cli_args_parser.dart';
@@ -413,10 +413,17 @@ class HeadlessRunner {
     }
 
     // ── 8. Export ──────────────────────────────────────────────────
+    // A run that failed writes no export. Its violation count is partial,
+    // and a report on disk beside `[exit 3: run-failed]` was read as the
+    // result of the run, or uploaded by a CI step that ran anyway. A file
+    // left at --out by an earlier run is removed for the same reason: what
+    // is at that path is this run's export or nothing.
     String? exportPath;
     final format = args.exportFormat;
     final outPath = args.exportOutputPath;
-    if (format != null && outPath != null) {
+    if (format != null && outPath != null && problems.isNotEmpty) {
+      diagnostics.add(_exportSkipped(outPath));
+    } else if (format != null && outPath != null) {
       try {
         await exportWriter.write(
           violations: violations,
@@ -424,6 +431,7 @@ class HeadlessRunner {
           outputPath: outPath,
           projectRoot: project.rootPath,
           sarifRoot: args.sarifRoot,
+          relativeTo: args.relativeTo,
           runId: project.name,
           exportTime: _now(),
         );
@@ -456,6 +464,24 @@ class HeadlessRunner {
       exportPath: exportPath,
       projectName: project.name,
     );
+  }
+
+  /// The note for an export a failed run did not write. Removes a file an
+  /// earlier run left at [outPath], and says so.
+  static String _exportSkipped(String outPath) {
+    var removed = false;
+    try {
+      final stale = File(outPath);
+      if (stale.existsSync()) {
+        stale.deleteSync();
+        removed = true;
+      }
+    } on FileSystemException {
+      // Left in place; the note below still says this run wrote nothing.
+    }
+    return 'export not written to $outPath: the run failed (see the errors '
+        'below), so its violation count is partial'
+        '${removed ? '; the file an earlier run left there was removed' : ''}';
   }
 
   /// The escalation order of the exit-code contract, in one place.

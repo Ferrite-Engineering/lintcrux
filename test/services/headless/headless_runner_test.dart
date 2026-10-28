@@ -159,6 +159,7 @@ void main() {
     String? config,
     String? exportFormat,
     String? out,
+    String? relativeTo,
     List<String> engines = const <String>[],
     List<String> mandatory = const <String>[],
   }) {
@@ -172,6 +173,7 @@ void main() {
       configPath: config,
       exportFormat: exportFormat,
       exportOutputPath: out,
+      relativeTo: relativeTo,
       engineIds: engines,
       mandatoryEngineIds: mandatory,
     );
@@ -229,7 +231,8 @@ void main() {
         expect(r.exitCode, CliExitCode.runFailed);
         expect(r.problems.single, contains('could not analyse the design'));
         expect(r.problems.single, contains('zephyr_hello.hex'));
-        // The finding itself is still reported, so the export carries it.
+        // The finding itself is still reported, so the summary and the
+        // desktop show why nothing was analysed.
         expect(r.violations, hasLength(1));
       },
     );
@@ -972,6 +975,123 @@ module top; endmodule
       expect(File(out).existsSync(), isTrue);
       final decoded = jsonDecode(File(out).readAsStringSync());
       expect((decoded as Map)['version'], '2.1.0');
+    });
+
+    group('a run that failed', () {
+      // With an unavailable engine the export used to be written and
+      // reported (`wrote x.json`) before the error and `[exit 3]`, so the
+      // run read as a success and the partial report was on disk.
+      LintEngine unavailable() => _FakeEngine(
+        'slang',
+        error: const EngineNotAvailableException(
+          engineId: 'slang',
+          reason: 'not on PATH',
+        ),
+      );
+
+      for (final format in <String>['sarif', 'json', 'csv', 'html']) {
+        test('writes no $format export and says why', () async {
+          final out = p.join(tmp.path, 'lint.$format');
+          final r = await runnerWith([
+            _FakeEngine('fake', violations: [violation()]),
+            unavailable(),
+          ]).run(args(exportFormat: format, out: out));
+          expect(r.exitCode, CliExitCode.runFailed);
+          expect(r.exportPath, isNull);
+          expect(File(out).existsSync(), isFalse);
+          expect(
+            r.diagnostics,
+            contains(allOf(contains('export not written'), contains(out))),
+          );
+        });
+      }
+
+      test('removes the export an earlier run left at --out', () async {
+        final out = p.join(tmp.path, 'lint.json');
+        File(out).writeAsStringSync('[]');
+        final r = await runnerWith([
+          _FakeEngine('fake', violations: [violation()]),
+          unavailable(),
+        ]).run(args(exportFormat: 'json', out: out));
+        expect(r.exitCode, CliExitCode.runFailed);
+        expect(File(out).existsSync(), isFalse);
+        expect(r.diagnostics.join('\n'), contains('was removed'));
+      });
+
+      test('--allow-missing-engines still writes the export', () async {
+        final out = p.join(tmp.path, 'lint.json');
+        final r =
+            await runnerWith([
+              _FakeEngine('fake', violations: [violation()]),
+              unavailable(),
+            ]).run(
+              CliArgs(
+                paths: <String>[projectPath],
+                allowMissingEngines: true,
+                exportFormat: 'json',
+                exportOutputPath: out,
+              ),
+            );
+        expect(r.exitCode, CliExitCode.clean);
+        expect(File(out).existsSync(), isTrue);
+      });
+    });
+
+    group('JSON and CSV paths', () {
+      test('are relative to the project root by default', () async {
+        final out = p.join(tmp.path, 'lint.json');
+        await runnerWith([
+          _FakeEngine('fake', violations: [violation()]),
+        ]).run(args(exportFormat: 'json', out: out));
+        final text = File(out).readAsStringSync();
+        expect(text, isNot(contains(tmp.path)));
+        final decoded = jsonDecode(text) as List<Object?>;
+        final location = (decoded.single! as Map)['location'] as Map;
+        expect(location['file'], 'top.sv');
+      });
+
+      test('in CSV too', () async {
+        final out = p.join(tmp.path, 'lint.csv');
+        await runnerWith([
+          _FakeEngine('fake', violations: [violation()]),
+        ]).run(args(exportFormat: 'csv', out: out));
+        final text = File(out).readAsStringSync();
+        expect(text, isNot(contains(tmp.path)));
+        expect(text.split('\n')[1], contains(',top.sv,'));
+      });
+
+      test('--relative-to names the directory', () async {
+        final rtl = Directory(p.join(tmp.path, 'rtl'))..createSync();
+        final nested = p.join(rtl.path, 'core.sv');
+        final out = p.join(tmp.path, 'lint.json');
+        await runnerWith([
+          _FakeEngine('fake', violations: [violation(file: nested)]),
+        ]).run(args(exportFormat: 'json', out: out, relativeTo: rtl.path));
+        final decoded =
+            jsonDecode(File(out).readAsStringSync()) as List<Object?>;
+        expect(
+          ((decoded.single! as Map)['location'] as Map)['file'],
+          'core.sv',
+        );
+      });
+
+      test('a path outside the directory stays absolute', () async {
+        final elsewhere = p.join(
+          Directory.systemTemp.path,
+          'vendor_lib',
+          'cell.v',
+        );
+        final out = p.join(tmp.path, 'lint.json');
+        await runnerWith([
+          _FakeEngine('fake', violations: [violation(file: elsewhere)]),
+        ]).run(args(exportFormat: 'json', out: out));
+        final decoded =
+            jsonDecode(File(out).readAsStringSync()) as List<Object?>;
+        expect(
+          ((decoded.single! as Map)['location'] as Map)['file'],
+          elsewhere,
+        );
+      });
     });
 
     test('an unwritable --out fails the run (3)', () async {

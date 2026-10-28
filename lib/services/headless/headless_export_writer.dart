@@ -42,8 +42,14 @@ import 'package:path/path.dart' as p;
 ///    in-app exporter synthesizes an id containing a microsecond
 ///    timestamp, which would make every CI upload a brand-new category.
 ///
+/// JSON, CSV and HTML go through [renderPortable]: the same serializers,
+/// with every path under the project root (or `--relative-to`) written
+/// relative to it, so a report attached to an issue does not carry the
+/// local directory layout. A path outside that directory stays absolute.
+///
 /// The desktop app's SARIF export goes through [renderSarif] as well, so a
-/// file saved from the app uploads like one the CLI wrote.
+/// file saved from the app uploads like one the CLI wrote, and its JSON, CSV
+/// and HTML exports go through [renderPortable].
 class HeadlessExportWriter {
   /// Creates a [HeadlessExportWriter].
   const HeadlessExportWriter();
@@ -59,7 +65,9 @@ class HeadlessExportWriter {
   /// [projectRoot] is where the SARIF root is looked for; [sarifRoot] names
   /// it outright (`--sarif-root`). [runId] is the `automationDetails.id`;
   /// pass something stable across CI runs of the same workflow (the runner
-  /// passes the project name).
+  /// passes the project name). [relativeTo] is the directory JSON, CSV and
+  /// HTML paths are written relative to (`--relative-to`); `null` is
+  /// [projectRoot].
   ///
   /// Throws [HeadlessExportException] on an unknown format or any I/O
   /// failure, so the caller can exit `CliExitCode.runFailed` rather than
@@ -71,6 +79,7 @@ class HeadlessExportWriter {
     required String projectRoot,
     required String runId,
     String? sarifRoot,
+    String? relativeTo,
     DateTime? exportTime,
     RuleDescriber? describeRule,
   }) async {
@@ -86,12 +95,14 @@ class HeadlessExportWriter {
           exportTime: exportTime,
           describeRule: describeRule,
         );
-      case 'json':
-        contents = const ViolationExporters().toJson(list);
-      case 'csv':
-        contents = const ViolationExporters().toCsv(list);
-      case 'html':
-        contents = const ViolationExporters().toHtml(list);
+      case 'json' || 'csv' || 'html':
+        contents = renderPortable(
+          violations: list,
+          format: format,
+          relativeTo: (relativeTo != null && relativeTo.isNotEmpty)
+              ? relativeTo
+              : projectRoot,
+        );
       default:
         throw HeadlessExportException(
           'unknown export format "$format"; expected one of '
@@ -153,6 +164,37 @@ class HeadlessExportWriter {
       },
       describeRule: describeRule,
     ).write(SarifReport(runs: runs));
+  }
+
+  /// Renders [violations] as JSON, CSV or HTML ([format]) with every path
+  /// under [relativeTo] written relative to it, `/`-separated, and every
+  /// other path left as the engine reported it.
+  ///
+  /// The raw bag is filtered as for SARIF: the original SARIF structures an
+  /// engine's result was read with carry absolute paths and are dropped, and
+  /// a string value that is a path under [relativeTo] is made relative.
+  ///
+  /// Throws [ArgumentError] for any other [format].
+  String renderPortable({
+    required List<Violation> violations,
+    required String format,
+    required String relativeTo,
+  }) {
+    final root = p.normalize(p.absolute(relativeTo));
+    final portable = <Violation>[
+      for (final v in violations) _relativize(v, root),
+    ];
+    const exporters = ViolationExporters();
+    return switch (format) {
+      'json' => exporters.toJson(portable),
+      'csv' => exporters.toCsv(portable),
+      'html' => exporters.toHtml(portable),
+      _ => throw ArgumentError.value(
+        format,
+        'format',
+        'expected json, csv or html',
+      ),
+    };
   }
 
   /// The directory SARIF paths are written relative to: [explicit] when

@@ -61,6 +61,7 @@ class CliArgs {
     this.quiet = false,
     this.engineTimeout,
     this.sarifRoot,
+    this.relativeTo,
     this.constraintFiles = const <String>[],
   });
 
@@ -248,6 +249,14 @@ class CliArgs {
   /// a CI layout whose checkout root is not the git root.
   final String? sarifRoot;
 
+  /// The directory JSON, CSV and HTML export paths are written relative to,
+  /// supplied via `--relative-to <dir>`; `null` means the project root.
+  ///
+  /// Those exports used to carry the absolute paths the engines report, so a
+  /// report attached to someone else's issue published the local directory
+  /// layout. A path outside the directory stays absolute, as in SARIF.
+  final String? relativeTo;
+
   /// Pin-constraint files supplied by repeating `--constraints <file>`, added
   /// to the project's own `constraintFiles` for this run.
   ///
@@ -280,6 +289,7 @@ class CliArgs {
     bool? quiet,
     Duration? engineTimeout,
     String? sarifRoot,
+    String? relativeTo,
     List<String>? constraintFiles,
   }) {
     return CliArgs(
@@ -307,6 +317,7 @@ class CliArgs {
       quiet: quiet ?? this.quiet,
       engineTimeout: engineTimeout ?? this.engineTimeout,
       sarifRoot: sarifRoot ?? this.sarifRoot,
+      relativeTo: relativeTo ?? this.relativeTo,
     );
   }
 
@@ -342,6 +353,7 @@ class CliArgs {
     if (other.quiet != quiet) return false;
     if (other.engineTimeout != engineTimeout) return false;
     if (other.sarifRoot != sarifRoot) return false;
+    if (other.relativeTo != relativeTo) return false;
     if (other.constraintFiles.length != constraintFiles.length) return false;
     for (var i = 0; i < constraintFiles.length; i++) {
       if (other.constraintFiles[i] != constraintFiles[i]) return false;
@@ -388,6 +400,7 @@ class CliArgs {
       Object.hash(
         engineTimeout,
         sarifRoot,
+        relativeTo,
         Object.hashAll(mandatoryEngineIds),
         Object.hashAll(constraintFiles),
       ),
@@ -408,5 +421,5 @@ class CliArgs {
       'allowMissingEngines: $allowMissingEngines, engines: $engineIds, '
       'mandatoryEngines: $mandatoryEngineIds, '
       'quiet: $quiet, engineTimeout: $engineTimeout, sarifRoot: $sarifRoot, '
-      'constraints: $constraintFiles)';
+      'relativeTo: $relativeTo, constraints: $constraintFiles)';
 }

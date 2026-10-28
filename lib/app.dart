@@ -46,6 +46,7 @@ import 'package:lintcrux/core/theme/theme_brightness_toggle.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/domain/models/session/lintcrux_session.dart';
+import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/features/about/lintcrux_about_dialog.dart';
 import 'package:lintcrux/features/beta_expiry/beta_expiry_metrics.dart';
 import 'package:lintcrux/features/beta_expiry/widgets/beta_expiry_gate.dart';
@@ -1347,6 +1348,16 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
     Rule? describeRule(String engineId, String localRuleId) =>
         rules?.lookupBy(engineId: engineId, localRuleId: localRuleId);
     const exporter = ViolationExporters();
+    String portable(
+      String format,
+      String Function(List<Violation> violations) plain,
+    ) => project == null
+        ? plain(violations.toList(growable: false))
+        : const HeadlessExportWriter().renderPortable(
+            violations: violations.toList(growable: false),
+            format: format,
+            relativeTo: project.rootPath,
+          );
     final (String content, String ext, String label) = switch (format) {
       // The desktop SARIF export is the CI export: the same repository-
       // relative paths under `%SRCROOT%`, rule descriptors and stable
@@ -1365,9 +1376,12 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
         'sarif',
         'SARIF',
       ),
-      ExportFormat.json => (exporter.toJson(violations), 'json', 'JSON'),
-      ExportFormat.csv => (exporter.toCsv(violations), 'csv', 'CSV'),
-      ExportFormat.html => (exporter.toHtml(violations), 'html', 'HTML'),
+      // JSON, CSV and HTML are written relative to the project root, as the
+      // command line writes them, so a report shared from the app does not
+      // carry this machine's directory layout.
+      ExportFormat.json => (portable('json', exporter.toJson), 'json', 'JSON'),
+      ExportFormat.csv => (portable('csv', exporter.toCsv), 'csv', 'CSV'),
+      ExportFormat.html => (portable('html', exporter.toHtml), 'html', 'HTML'),
     };
     final picker = ref.read(projectPickerProvider);
     String? path;
