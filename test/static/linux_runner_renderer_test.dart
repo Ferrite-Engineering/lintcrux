@@ -22,6 +22,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// keep the pieces from being lost in an edit of the runner.
 void main() {
   final runner = File('linux/runner/my_application.cc').readAsStringSync();
+  // The probe itself, which every product's runner calls.
+  final probe = File(
+    'crux-shared/packages/crux_file_dialogs/native/linux/crux_file_dialogs.cc',
+  ).readAsStringSync();
 
   String activateBody() {
     final start = runner.indexOf(
@@ -34,12 +38,12 @@ void main() {
 
   test('the probe runs before the Flutter view is created', () {
     final body = activateBody();
-    final probe = body.indexOf('select_renderer_for_display();');
+    final call = body.indexOf('crux_select_renderer_for_display("LintCrux");');
     final view = body.indexOf('fl_view_new(');
-    expect(probe, isNonNegative, reason: 'activate never probes the display');
+    expect(call, isNonNegative, reason: 'activate never probes the display');
     expect(view, isNonNegative);
     expect(
-      probe,
+      call,
       lessThan(view),
       reason: 'the engine reads FLUTTER_LINUX_RENDERER inside fl_view_new',
     );
@@ -47,30 +51,36 @@ void main() {
 
   test('the probe leaves a renderer the user chose alone', () {
     expect(
-      runner,
+      probe,
       contains('if (g_getenv("FLUTTER_LINUX_RENDERER") != nullptr) {'),
     );
     // FALSE: never overwrite a value that is already set.
     expect(
-      runner,
+      probe,
       contains('g_setenv("FLUTTER_LINUX_RENDERER", "software", FALSE);'),
     );
-    expect(runner, contains('gdk_window_create_gl_context('));
-    expect(runner, contains('gdk_gl_context_realize('));
+    expect(probe, contains('gdk_window_create_gl_context('));
+    expect(probe, contains('gdk_gl_context_realize('));
+  });
+
+  test('a display on another machine selects the software renderer', () {
+    expect(probe, contains('x_display_is_remote(gdk_display_get_name('));
   });
 
   test('the fallback says so on stderr', () {
     // The launch smoke looks for this phrase to tell an automatic fallback
     // from a display that simply had OpenGL.
     // Adjacent C string literals are one string to the compiler.
-    final joined = runner.replaceAll(RegExp(r'"\s*\n\s*"'), '');
+    final joined = probe.replaceAll(RegExp(r'"\s*\n\s*"'), '');
     expect(
       joined,
       contains(
-        '"LintCrux: OpenGL is unavailable on this display (%s); falling back '
-        'to the software renderer.',
+        '"%s: OpenGL is unavailable on this display (%s); falling back to the '
+        'software renderer.',
       ),
     );
+    // The first %s is the app name the runner passes.
+    expect(runner, contains('crux_select_renderer_for_display("LintCrux");'));
   });
 
   test('Impeller is off whenever the software renderer is selected', () {
