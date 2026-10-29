@@ -15,7 +15,7 @@ Out of the box, LintCrux runs every engine that has a source file in a language 
 
 2. **Pin the binaries.**
 
-    Press ++cmd+comma++ / ++ctrl+comma++ and open `Settings → Engines`. Under **Engine binary paths**, each engine has **Auto-detect** (search `PATH`), **Bundled** (no engines ship with LintCrux, so this falls back to `PATH`) and **Custom**. Choose **Custom**, enter the **Binary path** of the exact build your CI uses, and press **Probe** to confirm the version it reports. The choice is saved for the next launch. The headless binary does not read Settings; for CI and scripts, use `--verilator-path` and its siblings. The CDC engine has no row: it runs the binary the **Yosys check** row selects.
+    Press ++cmd+comma++ / ++ctrl+comma++ and open `Settings → Engines`. Under **Engine binary paths**, each engine has **Auto-detect** (search `PATH`) and **Custom**. Choose **Custom**, enter the **Binary path** of the exact build your CI uses, and press **Probe** to confirm the version it reports. The choice is saved for the next launch. The headless binary does not read Settings; for CI and scripts, use `--verilator-path` and its siblings. The CDC engine has no row: it runs the binary the **Yosys check** row selects.
 
 3. **Set per-engine options.**
 

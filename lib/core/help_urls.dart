@@ -50,7 +50,7 @@ abstract final class HelpUrls {
   static const String workspaces =
       'https://docs.lintcrux.app/projects-and-engines#workspaces';
 
-  /// Docs — engine binaries: Auto-detect / Bundled / Custom, and Probe.
+  /// Docs — engine binaries: Auto-detect / Custom, and Probe.
   static const String engineBinaries =
       'https://docs.lintcrux.app/projects-and-engines#binaries';
 

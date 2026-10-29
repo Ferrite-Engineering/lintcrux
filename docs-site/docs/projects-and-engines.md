@@ -131,7 +131,7 @@ A `.rules.verible_lint` in the project root turns on Verible's config search by 
 2. `Settings → Engines → Engine binary paths` → **Custom** → **Binary path**. The **Probe** button runs the engine's version command and shows the detected version, so you can confirm the path before you rely on it. The choice is saved and restored at the next launch, before any restored tab runs its engines.
 3. Otherwise the bare executable name, resolved against `PATH`.
 
-**Auto-detect** is the `PATH` lookup. **Bundled** is reserved for per-platform binaries shipped with LintCrux; none ship, so it resolves nothing and falls through to `PATH` unless the `LINTCRUX_BUNDLED_BIN_DIR` environment variable names a root directory containing a per-platform subdirectory (`macos-universal`, `linux-x86_64` or `windows-x86_64`) that holds each binary named by its engine id.
+**Auto-detect** is the `PATH` lookup. Auto-detect and Custom are the only choices offered, because no engine binaries ship with LintCrux. A setting saved as Bundled by an earlier version still loads, shows as Auto-detect, and finds the binary through `PATH` unless the `LINTCRUX_BUNDLED_BIN_DIR` environment variable names a root directory containing a per-platform subdirectory (`macos-universal`, `linux-x86_64` or `windows-x86_64`) that holds each binary named by its engine id.
 
 The `cdc` engine has no binary of its own and no row in `Settings → Engines`: it runs the `yosys` that the **Yosys check** row (or `--yosys-path`) selects.
 

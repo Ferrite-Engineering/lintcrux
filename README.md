@@ -98,16 +98,14 @@ Each engine resolves its executable in this order:
 1. A per-launch CLI override — `--verilator-path`, `--verible-path`, `--slang-path`,
    `--ghdl-path`, `--svlint-path`, `--yosys-path`.
 2. A **Custom** path configured in `Settings → Engines` (session-scoped in open core).
-3. `$LINTCRUX_BUNDLED_BIN_DIR/<platform>/<exe>`, when the engine's binary source is
-   **Bundled** and that environment variable is set —
-   `BundledBinaryResolver` (`lib/services/engines/bundled_binary_resolver.dart`).
-4. The bare executable name, resolved by the OS against `PATH`.
+3. The bare executable name, resolved by the OS against `PATH` (**Auto-detect**).
 
-**No engine binary ships inside the release distribution today.** With
-`LINTCRUX_BUNDLED_BIN_DIR` unset — which is every shipped build — the resolver
-returns `null` and every mode falls through to the `PATH` lookup, so choosing
-**Bundled** in `Settings → Engines` currently behaves exactly like **Auto-detect**.
-Debug and release builds behave identically.
+`Settings → Engines` offers **Auto-detect** and **Custom** only. No engine binary ships
+inside the release distribution, so there is no Bundled choice. A setting saved as
+Bundled by an earlier version still loads and shows as Auto-detect; it resolves through
+`$LINTCRUX_BUNDLED_BIN_DIR/<platform>/<exe>` when that environment variable is set
+(`BundledBinaryResolver`, `lib/services/engines/bundled_binary_resolver.dart`) and
+otherwise through `PATH`. Debug and release builds behave identically.
 
 The pinned versions in [`tool/bundled_engines.yaml`](tool/bundled_engines.yaml) and
 the [`.github/workflows/bundled-engines.yml`](.github/workflows/bundled-engines.yml)

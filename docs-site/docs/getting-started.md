@@ -33,7 +33,7 @@ LintCrux does not reimplement static analysis — it orchestrates the open-sourc
 
 The built-in CDC engine needs no binary of its own — it elaborates the design with the same `yosys`, so whatever the Yosys engine is configured to run, CDC runs too.
 
-For each engine, `Settings → Engines` offers **Auto-detect** (search `PATH`), **Bundled** or **Custom** (a path you supply, with a **Probe** button that runs the engine's version command and shows what it found). No engine binaries are packaged with LintCrux, so **Bundled** currently behaves exactly like **Auto-detect**. Per-engine options and the full resolution order are on [Projects & engines](projects-and-engines.md#per-engine).
+For each engine, `Settings → Engines` offers **Auto-detect** (search `PATH`) or **Custom** (a path you supply, with a **Probe** button that runs the engine's version command and shows what it found). Per-engine options and the full resolution order are on [Projects & engines](projects-and-engines.md#per-engine).
 
 An engine whose binary is not installed is reported as **Binary not available** rather than as a clean run — the other engines still run.
 
