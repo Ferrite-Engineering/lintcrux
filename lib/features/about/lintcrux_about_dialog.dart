@@ -16,7 +16,6 @@ import 'package:lintcrux/core/help_urls.dart';
 import 'package:lintcrux/features/issue_reporter/lintcrux_issue_reporter.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/shared/widgets/glowing_app_icon.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// The LintCrux About dialog.
 ///
@@ -77,12 +76,12 @@ abstract final class LintcruxAboutDialog {
         AboutAction(
           label: l10n.aboutButtonVisitWebsite,
           icon: Icons.language_outlined,
-          onTap: (_) => unawaited(launchUrl(Uri.parse(branding.websiteUrl))),
+          onTap: (_) => unawaited(cruxOpenUrl(Uri.parse(branding.websiteUrl))),
         ),
         AboutAction(
           label: l10n.aboutButtonDocs,
           icon: Icons.menu_book_outlined,
-          onTap: (_) => unawaited(launchUrl(Uri.parse(HelpUrls.docs))),
+          onTap: (_) => unawaited(cruxOpenUrl(Uri.parse(HelpUrls.docs))),
         ),
         // Beta issue reporter. Open to every tier: no badge, no
         // feature gate. Goes through the LintcruxIssueReporter wrapper (not
@@ -105,13 +104,14 @@ abstract final class LintcruxAboutDialog {
         AboutAction(
           label: l10n.aboutButtonPrivacy,
           icon: Icons.privacy_tip_outlined,
-          onTap: (_) => unawaited(launchUrl(Uri.parse(HelpUrls.privacyPolicy))),
+          onTap: (_) =>
+              unawaited(cruxOpenUrl(Uri.parse(HelpUrls.privacyPolicy))),
         ),
         AboutAction(
           label: l10n.aboutButtonTerms,
           icon: Icons.description_outlined,
           onTap: (_) =>
-              unawaited(launchUrl(Uri.parse(HelpUrls.termsOfService))),
+              unawaited(cruxOpenUrl(Uri.parse(HelpUrls.termsOfService))),
         ),
         AboutAction(
           label: l10n.aboutButtonCopyVersionInfo,

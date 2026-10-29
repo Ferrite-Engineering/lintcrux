@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:crux_a11y/crux_a11y.dart' show CruxRoutedContent;
 import 'package:crux_cxp_ui/crux_cxp_ui.dart';
 import 'package:crux_eula/crux_eula.dart';
+import 'package:crux_file_dialogs/crux_file_dialogs.dart';
 import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:crux_issue_reporter/crux_issue_reporter.dart';
 import 'package:crux_license/crux_license.dart';
@@ -118,7 +119,6 @@ import 'package:lintcrux/services/telemetry/telemetry_event_catalog.dart';
 import 'package:lintcrux/services/updates/observed_server_time_store.dart';
 import 'package:lintcrux/services/workspace/lintcrux_workspace_codec.dart';
 import 'package:path/path.dart' as p;
-import 'package:url_launcher/url_launcher.dart';
 
 /// Root-scope overrides wiring the cross-suite beta-distribution packages
 /// (`crux_updates`, `crux_issue_reporter`) and the `crux_license` beta-expiry
@@ -174,7 +174,7 @@ List<Override> lintcruxPhase5Overrides() => <Override>[
           ),
     ),
   ),
-  updateUrlLauncherProvider.overrideWithValue(launchUrl),
+  updateUrlLauncherProvider.overrideWithValue(cruxOpenUrl),
 
   // ── Beta expiry clock hardening (crux_license) ───────────────────────
   observedServerTimeProvider.overrideWith(
@@ -291,6 +291,9 @@ Future<bool> bootstrap({
   LinuxDesktopApp? linuxDesktopApp,
 }) async {
   WidgetsFlutterBinding.ensureInitialized();
+  // file_picker's Linux dialogs need a desktop session's DBus portal, which a
+  // remotely displayed host often lacks; the runner draws them with GTK.
+  useGtkFileDialogsOnLinux();
 
   // `--reset-telemetry-consent` puts this installation back to "never
   // answered", so the one-time disclosure mounts again this launch rather than

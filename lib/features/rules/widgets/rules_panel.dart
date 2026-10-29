@@ -12,7 +12,6 @@ import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/services/rules/rule_database_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// Browses the rule database.
 ///
@@ -334,7 +333,7 @@ class _RuleRow extends ConsumerWidget {
               focusNode: linkFocusNode,
               icon: const Icon(Icons.open_in_new, size: 16),
               tooltip: l10n.rulesPanelLearnMore,
-              onPressed: () => launchUrl(help),
+              onPressed: () => cruxOpenUrl(help),
             ),
     );
   }
