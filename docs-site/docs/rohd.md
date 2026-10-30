@@ -6,8 +6,10 @@ the line you edit. When ROHD has recorded where each signal and instance was
 created, LintCrux shows that **Dart source** next to the SystemVerilog location,
 and **Go to Dart source** opens it in your editor.
 
-This is labelled **ROHD 0.7 or later (source tracing)**: the source-trace file
-it reads is written by ROHD 0.7 and later, and only when source tracing is on.
+This is from LintCrux 1.2, and is labelled **ROHD 0.7 or later (source
+tracing)**: the source-trace file it reads is written by ROHD 0.7 and later, and
+only when source tracing is on. For the whole path from ROHD to LintCrux, see
+[ROHD + EDACrux](rohd-and-edacrux.md).
 
 ## Turn tracing on in your ROHD flow {#flow}
 
