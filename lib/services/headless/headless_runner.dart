@@ -20,9 +20,11 @@ import 'package:lintcrux/services/headless/headless_export_writer.dart';
 import 'package:lintcrux/services/headless/headless_input_resolver.dart';
 import 'package:lintcrux/services/headless/headless_run_result.dart';
 import 'package:lintcrux/services/headless/project_config_overlay.dart';
+import 'package:lintcrux/services/rohd/rohd_source_loader.dart';
 import 'package:lintcrux/services/run/engine_run_planner.dart';
 import 'package:lintcrux/services/telemetry/headless_telemetry.dart';
 import 'package:lintcrux/services/transformers/pragma_waiver_transformer.dart';
+import 'package:lintcrux/services/transformers/rohd_source_transformer.dart';
 import 'package:lintcrux/services/transformers/severity_override_transformer.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
 import 'package:lintcrux/services/waivers/pragma_waiver_reader.dart';
@@ -279,9 +281,18 @@ class HeadlessRunner {
     // overrides, then source pragmas, then anything the caller layered
     // on (the Pro managed-waiver transformer).
     final pragmaRanges = await pragmaReader.readFiles(project.sourceFiles);
+    // The Dart source of findings on ROHD-generated SystemVerilog. A source
+    // map that cannot be used is a diagnostic, never a run failure.
+    final rohd = await loadRohdSourceMaps(
+      sourceFiles: project.sourceFiles,
+      projectRoot: project.rootPath,
+      options: project.perEngineOptions[kRohdOptionsKey] ?? const {},
+    );
+    diagnostics.addAll(rohd.warnings);
     final transformer = CompositeViolationTransformer(<ViolationTransformer>[
       SeverityOverrideTransformer(project.severityOverrides),
       PragmaWaiverTransformer(pragmaRanges),
+      RohdSourceTransformer(rohd.byFile),
       ...extraTransformers,
     ]);
 

@@ -25,12 +25,14 @@ import 'package:lintcrux/services/engines/engine_watchdog_provider.dart';
 import 'package:lintcrux/services/engines/parallel_engine_runner.dart';
 import 'package:lintcrux/services/lint_cache/lint_cache_enabled_provider.dart';
 import 'package:lintcrux/services/lint_cache/lint_run_cache_service_provider.dart';
+import 'package:lintcrux/services/rohd/rohd_source_loader.dart';
 import 'package:lintcrux/services/rules/custom_rule_evaluator.dart';
 import 'package:lintcrux/services/run/engine_run_planner.dart';
 import 'package:lintcrux/services/run/lint_run_lifecycle.dart';
 import 'package:lintcrux/services/telemetry/telemetry_event_catalog.dart';
 import 'package:lintcrux/services/transformers/managed_waiver_transformer.dart';
 import 'package:lintcrux/services/transformers/pragma_waiver_transformer.dart';
+import 'package:lintcrux/services/transformers/rohd_source_transformer.dart';
 import 'package:lintcrux/services/transformers/severity_override_transformer.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
 import 'package:lintcrux/services/waivers/pragma_waiver_reader.dart';
@@ -409,10 +411,21 @@ class LintRunNotifier extends Notifier<LintRunState> {
     // Source pragmas are evaluated first so they always win — see
     // ManagedWaiverTransformer.transform's already-suppressed guard.
     final waiverStore = ref.read(waiverStoreProvider);
+    // Where a finding on ROHD-generated SystemVerilog came from in Dart. A
+    // sidecar we cannot use is said once on stderr and the run goes on.
+    final rohd = await loadRohdSourceMaps(
+      sourceFiles: project.sourceFiles,
+      projectRoot: project.rootPath,
+      options: project.perEngineOptions[kRohdOptionsKey] ?? const {},
+    );
+    for (final warning in rohd.warnings) {
+      stderr.writeln('lintcrux: $warning');
+    }
     return CompositeViolationTransformer([
       SeverityOverrideTransformer(project.severityOverrides),
       PragmaWaiverTransformer(rangeMap),
       ManagedWaiverTransformer(waiverStore),
+      RohdSourceTransformer(rohd.byFile),
       // The overlay's additions, the same seam the headless runner takes as
       // `extraTransformers`: today the organization's severity defaults.
       ...ref.read(extraViolationTransformersProvider),

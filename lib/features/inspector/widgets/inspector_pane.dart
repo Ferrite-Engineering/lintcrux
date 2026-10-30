@@ -9,6 +9,7 @@ import 'package:lintcrux/domain/models/engine_run_status.dart';
 import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
+import 'package:lintcrux/features/inspector/widgets/rohd_dart_source_section.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/features/violations/widgets/severity_chip.dart';
@@ -79,6 +80,7 @@ class InspectorPane extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         _LocationSection(violation: selected),
+        RohdDartSourceSection(violation: selected),
         if (rule != null && (rule.tags.isNotEmpty || rule.helpUri != null)) ...[
           const SizedBox(height: 16),
           _MetadataSection(rule: rule),

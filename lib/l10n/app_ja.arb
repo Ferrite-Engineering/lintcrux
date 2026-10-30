@@ -428,6 +428,39 @@
   "@inspectorOpenInEditor": {
     "description": "Button label that launches the user's editor at the violation's primary location."
   },
+  "inspectorDartSourceHeader": "Dart ソース (ROHD 0.7 以降)",
+  "@inspectorDartSourceHeader": {
+    "description": "Inspector section header for the Dart source a finding on ROHD-generated SystemVerilog was traced to. ROHD is the Dart hardware description library."
+  },
+  "inspectorDartSourceOpen": "Dart ソースへ移動",
+  "@inspectorDartSourceOpen": {
+    "description": "Button in the inspector that opens the Dart source of a finding in the configured editor."
+  },
+  "inspectorDartSourceExact": "ROHD がこの行を記録しています。これは信号またはインスタンスを作成した Dart コードです。",
+  "@inspectorDartSourceExact": {
+    "description": "Inspector note: the finding's line is one ROHD recorded, so the Dart location is the code that created that signal or instance."
+  },
+  "inspectorDartSourceEnclosing": "ROHD はこの行自体を記録していません。これはこの行を囲むブロックまたはインスタンスを作成した Dart コードです。",
+  "@inspectorDartSourceEnclosing": {
+    "description": "Inspector note: the finding's line has no source trace of its own, so the Dart location is the code that created the block or instance around it."
+  },
+  "inspectorDartSourceInline": "ソーストレースファイルが見つからなかったため、生成されたファイルの // ROHD: コメントから読み取りました。",
+  "@inspectorDartSourceInline": {
+    "description": "Inspector note: no source-trace file was available, so the Dart location was read from the // ROHD: comment ROHD wrote into the generated SystemVerilog."
+  },
+  "inspectorDartSourceCalledFrom": "呼び出し元",
+  "@inspectorDartSourceCalledFrom": {
+    "description": "Inspector label above the list of Dart locations that called the code that created the signal or instance, nearest caller first."
+  },
+  "inspectorDartSourceOpenCaller": "エディターで {location} を開く",
+  "@inspectorDartSourceOpenCaller": {
+    "description": "Tooltip and screen-reader label of a Dart caller location in the inspector; opens it in the editor. {location} is the file, line and column.",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
   "inspectorHelpUrlLabel": "詳細を見る",
   "@inspectorHelpUrlLabel": {
     "description": "Button label that opens the rule's help URL in the user's browser."

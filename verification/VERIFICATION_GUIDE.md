@@ -2904,6 +2904,41 @@ Expected behavior:
 
 ---
 
+## 26. Findings on ROHD-generated SystemVerilog map to Dart (ROHD 0.7 or later, source tracing)
+
+### 26.1 What it covers
+
+A finding on SystemVerilog that ROHD generated gets a Dart source location, read from ROHD's source-trace file (`<Top>.flc.json`, version 6) beside the SystemVerilog or named under `perEngineOptions.rohd.sidecar`. The inspector shows it under the SystemVerilog location, with Go to Dart source. Fixtures are real ROHD output from a pinned commit (`fixtures/rohd/README.md`).
+
+### 26.2 Setup
+
+A project whose `sourceFiles` include ROHD-generated `.sv` files, with the `*.flc.json` beside them; or the committed `fixtures/rohd/top.sv` and `Top.flc.json` copied into a Dart package that holds the fixture's design file in its lib folder.
+
+### 26.3 Expected behaviour
+
+- A line the trace recorded (a declaration, a driver, an instance) maps exactly to the Dart line that created it; an instance also lists the instantiation as its caller. `[Coverage: UNIT]` (`rohd_source_index_test.dart`)
+- A line that only reads a signal, such as `if(valid_bit)`, maps to the enclosing `always_comb` or instance; lines past the block's end map to nothing. `[Coverage: UNIT]` (`rohd_source_index_test.dart`)
+- With no trace file, the `// ROHD:` comments answer the same two cases and the inspector says so. `[Coverage: UNIT]` (`rohd_source_index_test.dart`, `rohd_source_loader_test.dart`, `rohd_dart_source_section_test.dart`)
+- The Dart path is normalized (a `.dart_tool/..` prefix is removed and the path is made absolute) and resolved to the package on this machine. `[Coverage: UNIT]` (`rohd_source_loader_test.dart`)
+- A trace file of another version, a truncated one and an unreadable one each warn once and are ignored; the run succeeds. `[Coverage: UNIT]` (`rohd_source_loader_test.dart`, `headless_runner_rohd_test.dart`)
+- The headless runner and the SARIF properties carry the Dart source; the finding's own location is unchanged. `[Coverage: UNIT]` (`headless_runner_rohd_test.dart`, `rohd_source_transformer_test.dart`)
+- Go to Dart source and a caller open the editor at the Dart line. `[Coverage: UNIT]` (`rohd_dart_source_section_test.dart`); `[Coverage: MANUAL]` with VS Code configured, confirm the cursor lands on the line.
+- Strings render in en, zh_CN, zh, ja and ko. `[Coverage: UNIT]` (`rohd_dart_source_section_test.dart`, `l10n_house_style_guard_test.dart`)
+
+### 26.4 Edge cases
+
+Wrong types, unknown shapes and a tree nested thousands deep in the trace file are skipped, not thrown (`rohd_sidecar_test.dart`); malformed `// ROHD:` comments are skipped (`rohd_inline_trace_test.dart`). When several symbols share a line, the one the finding's message names wins, then an instance. `[Coverage: UNIT]`
+
+### 26.5 Tier-gate scenarios
+
+None. Open core and never gated.
+
+### 26.6 Automation Assessment
+
+Fully automated except the editor hand-off.
+
+---
+
 ## 9+. Subsequent phases **(placeholder)**
 
 Add a new top-level section the same day the corresponding phase ships its first deliverable.

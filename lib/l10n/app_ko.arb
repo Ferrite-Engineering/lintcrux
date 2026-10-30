@@ -428,6 +428,39 @@
   "@inspectorOpenInEditor": {
     "description": "Button label that launches the user's editor at the violation's primary location."
   },
+  "inspectorDartSourceHeader": "Dart 소스 (ROHD 0.7 이상)",
+  "@inspectorDartSourceHeader": {
+    "description": "Inspector section header for the Dart source a finding on ROHD-generated SystemVerilog was traced to. ROHD is the Dart hardware description library."
+  },
+  "inspectorDartSourceOpen": "Dart 소스로 이동",
+  "@inspectorDartSourceOpen": {
+    "description": "Button in the inspector that opens the Dart source of a finding in the configured editor."
+  },
+  "inspectorDartSourceExact": "ROHD가 이 줄을 기록했습니다. 신호 또는 인스턴스를 만든 Dart 코드입니다.",
+  "@inspectorDartSourceExact": {
+    "description": "Inspector note: the finding's line is one ROHD recorded, so the Dart location is the code that created that signal or instance."
+  },
+  "inspectorDartSourceEnclosing": "ROHD가 이 줄 자체는 기록하지 않았습니다. 이 줄을 둘러싼 블록 또는 인스턴스를 만든 Dart 코드입니다.",
+  "@inspectorDartSourceEnclosing": {
+    "description": "Inspector note: the finding's line has no source trace of its own, so the Dart location is the code that created the block or instance around it."
+  },
+  "inspectorDartSourceInline": "소스 추적 파일을 찾지 못해 생성된 파일의 // ROHD: 주석에서 읽었습니다.",
+  "@inspectorDartSourceInline": {
+    "description": "Inspector note: no source-trace file was available, so the Dart location was read from the // ROHD: comment ROHD wrote into the generated SystemVerilog."
+  },
+  "inspectorDartSourceCalledFrom": "호출한 곳",
+  "@inspectorDartSourceCalledFrom": {
+    "description": "Inspector label above the list of Dart locations that called the code that created the signal or instance, nearest caller first."
+  },
+  "inspectorDartSourceOpenCaller": "편집기에서 {location} 열기",
+  "@inspectorDartSourceOpenCaller": {
+    "description": "Tooltip and screen-reader label of a Dart caller location in the inspector; opens it in the editor. {location} is the file, line and column.",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
   "inspectorHelpUrlLabel": "자세히 보기",
   "@inspectorHelpUrlLabel": {
     "description": "Button label that opens the rule's help URL in the user's browser."

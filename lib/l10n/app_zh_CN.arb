@@ -428,6 +428,39 @@
   "@inspectorOpenInEditor": {
     "description": "Button label that launches the user's editor at the violation's primary location."
   },
+  "inspectorDartSourceHeader": "Dart 源码（ROHD 0.7 及更高版本）",
+  "@inspectorDartSourceHeader": {
+    "description": "Inspector section header for the Dart source a finding on ROHD-generated SystemVerilog was traced to. ROHD is the Dart hardware description library."
+  },
+  "inspectorDartSourceOpen": "转到 Dart 源码",
+  "@inspectorDartSourceOpen": {
+    "description": "Button in the inspector that opens the Dart source of a finding in the configured editor."
+  },
+  "inspectorDartSourceExact": "ROHD 记录了这一行。这是创建该信号或实例的 Dart 代码。",
+  "@inspectorDartSourceExact": {
+    "description": "Inspector note: the finding's line is one ROHD recorded, so the Dart location is the code that created that signal or instance."
+  },
+  "inspectorDartSourceEnclosing": "ROHD 没有记录这一行本身。这是创建其外层块或实例的 Dart 代码。",
+  "@inspectorDartSourceEnclosing": {
+    "description": "Inspector note: the finding's line has no source trace of its own, so the Dart location is the code that created the block or instance around it."
+  },
+  "inspectorDartSourceInline": "因为没有找到源码追踪文件，所以读取了生成文件中的 // ROHD: 注释。",
+  "@inspectorDartSourceInline": {
+    "description": "Inspector note: no source-trace file was available, so the Dart location was read from the // ROHD: comment ROHD wrote into the generated SystemVerilog."
+  },
+  "inspectorDartSourceCalledFrom": "调用自",
+  "@inspectorDartSourceCalledFrom": {
+    "description": "Inspector label above the list of Dart locations that called the code that created the signal or instance, nearest caller first."
+  },
+  "inspectorDartSourceOpenCaller": "在编辑器中打开 {location}",
+  "@inspectorDartSourceOpenCaller": {
+    "description": "Tooltip and screen-reader label of a Dart caller location in the inspector; opens it in the editor. {location} is the file, line and column.",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
   "inspectorHelpUrlLabel": "了解更多",
   "@inspectorHelpUrlLabel": {
     "description": "Button label that opens the rule's help URL in the user's browser."

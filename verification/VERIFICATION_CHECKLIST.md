@@ -629,6 +629,13 @@ flutter build windows --release --dart-define=TELEMETRY_DEV=true   # or: build l
   buffers the window, replaying into the live service when the gate opens and
   dropping the buffer when it closes. The beta never enters that state.**
 
+### Findings on ROHD-generated SystemVerilog (guide §26)
+
+- [ ] A finding on a line ROHD recorded shows the Dart line that created it; one on a read inside `always_comb` shows the enclosing block's; a line the trace does not cover shows none — `[Coverage: UNIT]` (`rohd_source_index_test.dart`)
+- [ ] Without a source-trace file the `// ROHD:` comments are used and the inspector says so — `[Coverage: UNIT]` (`rohd_source_loader_test.dart`, `rohd_dart_source_section_test.dart`)
+- [ ] A trace file of an unknown version or one that is malformed warns once and the run still succeeds, headless included — `[Coverage: UNIT]` (`headless_runner_rohd_test.dart`)
+- [ ] Go to Dart source opens the editor at the Dart line — `[Coverage: UNIT]` (`rohd_dart_source_section_test.dart`), `[Coverage: MANUAL]` (guide §26.3)
+
 ---
 
 ## Sign-off
