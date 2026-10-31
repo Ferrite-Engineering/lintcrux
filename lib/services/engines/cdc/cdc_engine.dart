@@ -113,6 +113,7 @@ class CdcEngine implements LintEngine {
     // The cost of opting out is one yosys invocation per run, which is what
     // the yosys check engine already pays.
     cacheable: false,
+    elaboratesWithYosys: true,
     // CDC is whole-design analysis by nature: a crossing is a relationship
     // between two modules, so re-analysing one changed file in isolation would
     // answer a different question. Incremental is not merely unimplemented

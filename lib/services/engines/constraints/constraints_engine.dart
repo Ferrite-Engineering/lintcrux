@@ -75,6 +75,7 @@ class ConstraintsEngine implements LintEngine {
     // those: a user edits a pin, re-runs, and a cached answer from before the
     // edit comes back. The cost of opting out is one Yosys run per check.
     cacheable: false,
+    elaboratesWithYosys: true,
   );
 
   @override

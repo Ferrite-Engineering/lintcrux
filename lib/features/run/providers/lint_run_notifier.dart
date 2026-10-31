@@ -507,6 +507,9 @@ class LintRunNotifier extends Notifier<LintRunState> {
       forceBypassCache: forceBypassCache,
       watchdog: ref.read(engineWatchdogProvider),
       engineTimeout: ref.read(engineTimeoutProvider),
+      // Settings, Engines, Yosys time limit: read per run, so a change takes
+      // effect on the next one.
+      yosysTimeLimit: ref.read(appSettingsProvider).elaborationTimeLimit,
       onOutcome: _recordEngineOutcome,
     );
     _runner = runner;

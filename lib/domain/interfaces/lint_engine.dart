@@ -343,7 +343,18 @@ class EngineCapabilities {
     this.supportsAutoFix = false,
     this.supportsConfigFile = false,
     this.cacheable = true,
+    this.elaboratesWithYosys = false,
   });
+
+  /// Whether the engine elaborates the whole design with Yosys before it
+  /// reports anything (the `yosys`, `cdc` and `constraints` engines).
+  ///
+  /// Such an engine streams nothing while Yosys reads a large design, so the
+  /// fixed inactivity watchdog every engine gets would stop a healthy run.
+  /// `ParallelEngineRunner` gives it a budget that grows with the size of
+  /// its sources instead, under the Yosys time limit in Settings, Engines
+  /// (see `YosysEngineBudget`).
+  final bool elaboratesWithYosys;
 
   /// Set of [HdlLanguage]s the engine accepts. The engine-routing
   /// layer rejects requests whose `language` is absent here.

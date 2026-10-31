@@ -1081,6 +1081,19 @@ SARIF model, and aggregates the results. Two subsystems are hardened here:
   `engineTimeoutProvider`). A hung engine is killed and reported failed while
   the other engines keep running. Cancellation kills **every** in-flight child,
   not just the awaited one.
+- **The Yosys time limit** (from 1.2). An engine that elaborates the design
+  with Yosys (`EngineCapabilities.elaboratesWithYosys`: `yosys`, `cdc`,
+  `constraints`) streams nothing until Yosys is done, so it gets a budget that
+  grows with the size of its request's source files instead
+  (`YosysEngineBudget`): 256 KB of source per second, never less than the
+  engine timeout every other engine gets (120 s in the app, 300 s headless),
+  never more than 12 hours. `Settings → Engines → Yosys time limit` multiplies
+  it: **Automatic** (1), **Extended** (4) or **No limit** (no watchdog at all
+  for those engines). It is read when a run starts, so a change takes effect
+  on the next run, and it is persisted. Headless, an explicit
+  `--engine-timeout` applies to every engine; without it the three engines
+  get the scaled budget over the 300 s default. Verilator, Verible, Slang,
+  Svlint and GHDL keep the fixed budget whatever is chosen.
 
 ### 10.2 Setup
 
@@ -1107,6 +1120,13 @@ The committed corpus lives at `test/fixtures/engines/<engine>/generated/<case>/`
 4. Force an engine into colorized output (e.g. a wrapper that ignores
    NO_COLOR) → messages still parse cleanly (the spawn layer suppresses color;
    the parser tolerates residual ANSI in the message as defense in depth).
+5. Open `Settings → Engines` → the **Yosys time limit** row offers
+   **Automatic** (selected), **Extended** and **No limit**. Choose **No
+   limit**, relaunch → it is still selected. Point the `yosys` binary at a
+   wrapper that sleeps for three minutes before running Yosys and run a
+   small project → under **Automatic** the Yosys check, CDC and Constraints
+   rows fail as timed out after two minutes, as before; under **No limit**
+   they complete, and Verilator's watchdog is unchanged.
 
 ### 10.4 Diagnostics-assisted verification
 
@@ -1131,6 +1151,8 @@ children.
 | Canned-output → golden SARIF snapshots | `[Coverage: GOLDEN]` | `test/services/engines/engine_golden_test.dart` + `test/fixtures/engines/**` |
 | NO_COLOR environment injection | `[Coverage: UNIT]` | `test/services/engines/clean_engine_environment_test.dart` |
 | Engine watchdog timeout / transparency / budget-reset | `[Coverage: UNIT]` | `test/services/engines/engine_watchdog_test.dart` |
+| Yosys time limit: budget math (floor raised by the engine timeout, linear scaling, the five-million-gate source, ceiling, Extended, No limit), which engines elaborate with Yosys, per-engine budgets in the runner, the headless `--engine-timeout` rule | `[Coverage: UNIT]` | `test/services/engines/yosys/yosys_engine_budget_test.dart` |
+| Yosys time limit: the setting reaches the next run, persists and survives a relaunch, and its control in five locales | `[Coverage: UNIT]` / `[Coverage: WIDGET]` | `test/features/run/providers/lint_run_notifier_test.dart`, `test/services/persistence/elaboration_time_limit_settings_codec_test.dart`, `test/features/settings/widgets/settings_engines_section_test.dart` |
 | Subprocess chaos (hang / missing / non-zero / drain) | `[Coverage: UNIT]` | `test/services/engines/subprocess_chaos_test.dart` |
 | Cancellation kills all concurrent children | `[Coverage: UNIT]` | `test/services/engines/parallel_engine_runner_cancellation_test.dart` |
 | Zombie-on-exit (OS-level reaping) | `[Coverage: MANUAL]` | deferred to a `ProcessLifecycleRegistry` follow-up |
@@ -2148,7 +2170,7 @@ convenience, the code is the contract.
 | Violation outside the project root (system header) | Stays absolute in SARIF rather than becoming a `../..` escape, which consumers reject. |
 | `Violation.raw` carrying the original absolute paths | Dropped before SARIF export, so a developer's home directory cannot leak into an uploaded artifact. |
 | `SIGINT` / `SIGTERM` mid-run | Any Yosys subprocess is reaped, then the process exits `128 + signal`. Cancelling a CI job must not strand an elaborating `yosys` on the runner. |
-| Engine exceeds its watchdog budget | Exit `3`. The CLI budget is 300 s (vs the GUI's 120 s) because a runner is slower than a workstation. |
+| Engine exceeds its watchdog budget | Exit `3`. The CLI budget is 300 s (vs the GUI's 120 s) because a runner is slower than a workstation. From 1.2, without `--engine-timeout`, the `yosys`, `cdc` and `constraints` engines get a budget that grows with their sources, never less than 300 s; an explicit `--engine-timeout` applies to every engine. |
 | A mandated engine (`CliArgs.mandatoryEngineIds`, populated only by the Pro CLI from the organization's policy) is unavailable, or its id is not registered | Exit `3`, `mandated engine "<id>" is not available`, whatever `--allow-missing-engines` says. A non-mandated missing engine beside it is still tolerated by the flag. |
 | A mandated engine the project or `--engine` left out | Runs, and a `note:` names the policy that added it. One with no compatible source is skipped with the usual note. |
 

@@ -139,6 +139,14 @@ From LintCrux 1.2 there is an eighth engine, `constraints`, which checks FPGA pi
 
 The desktop app lists each engine's run status — Pending, Running, Completed, Failed, Binary not available, Cancelled — in the **Details** pane while no violation is selected; one engine being unavailable does not stop the others. The headless binary is stricter: a missing engine fails the run unless you pass `--allow-missing-engines` — see [Missing engines](cli/invocation.md#missing-engines).
 
+### The Yosys time limit {#yosys-time-limit}
+
+LintCrux stops an engine that goes quiet for too long, so an engine that has hung does not hold a tab forever. The desktop app allows each engine two minutes without output, and the headless binary five minutes. The Yosys check, CDC and Constraints engines elaborate the whole design with Yosys before they report anything, which on a large design can take longer than that while Yosys is still working.
+
+From LintCrux 1.2 those three engines are allowed time in proportion to the size of the source files they elaborate: about four minutes for every 64 MB of source, never less than the two or five minutes every engine gets, and up to twelve hours. A five-million-gate structural netlist is 660 MB of Verilog; Yosys read and elaborated it in under seven minutes on a fast desktop, and LintCrux allows it 44 minutes, so a machine several times slower still finishes. Verilator, Verible, Slang, Svlint and GHDL keep their fixed limit.
+
+`Settings → Engines → Yosys time limit` changes it for the next run: **Automatic** (the default), **Extended** (four times the automatic time) or **No limit** (the three engines run until they finish or you choose **Cancel Run**). In the headless binary, `--engine-timeout` names one limit for every engine and replaces the automatic one; see [Invocation](cli/invocation.md).
+
 !!! note "Every engine ships rule metadata"
     All seven engines have entries in the bundled rule database — 646 rules with default severity, tags and documentation links, browsable from the **Rules** tab in the left dock. Where that metadata came from differs per engine: the Verilator, Verible, Slang and GHDL ids are checked against real releases; Svlint's 159 rules are enumerated from the binary itself; CDC's are LintCrux's own; and Yosys' come from LintCrux's message-pattern table, because Yosys does not name its checks. See the [rule database reference](reference/rule-database.md). From 1.2 an eighth engine, `constraints`, adds ten first-party rules and the other engines gain a few, 664 in all (see below).
 

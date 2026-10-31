@@ -267,6 +267,7 @@ class LintcruxCli {
       extraTransformers: extraTransformers,
       telemetry: telemetry,
       engineTimeout: args.engineTimeout ?? HeadlessRunner.defaultEngineTimeout,
+      yosysTimeLimit: HeadlessRunner.yosysTimeLimitFor(args),
     );
     return runner.run(args);
   }

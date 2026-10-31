@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:crux_settings/crux_settings.dart';
+import 'package:lintcrux/domain/enums/elaboration_time_limit.dart';
 import 'package:lintcrux/domain/models/engine_binary_override.dart';
 import 'package:lintcrux/domain/models/panel_layout_state.dart';
 import 'package:meta/meta.dart';
@@ -35,7 +36,15 @@ class AppSettings {
     this.panelLayout = const PanelLayoutState(),
     this.engineBinaryOverrides = const <String, EngineBinaryOverride>{},
     this.autoCheckForUpdates = true,
+    this.elaborationTimeLimit = ElaborationTimeLimit.automatic,
   });
+
+  /// How long an engine that elaborates the design with Yosys (`yosys`,
+  /// `cdc`, `constraints`) may run before LintCrux stops it: the budget the
+  /// size of the sources gives, four times that, or no limit. Surfaced in
+  /// Settings, Engines and read by the run notifier when it builds the
+  /// next run's `ParallelEngineRunner`.
+  final ElaborationTimeLimit elaborationTimeLimit;
 
   /// The cross-suite shared subset of settings (theme, locale,
   /// diagnostics flag, plugin directories, theme overrides, …). Stored
@@ -146,6 +155,7 @@ class AppSettings {
     PanelLayoutState? panelLayout,
     Map<String, EngineBinaryOverride>? engineBinaryOverrides,
     bool? autoCheckForUpdates,
+    ElaborationTimeLimit? elaborationTimeLimit,
   }) {
     final newCore =
         core ??
@@ -171,6 +181,7 @@ class AppSettings {
       engineBinaryOverrides:
           engineBinaryOverrides ?? this.engineBinaryOverrides,
       autoCheckForUpdates: autoCheckForUpdates ?? this.autoCheckForUpdates,
+      elaborationTimeLimit: elaborationTimeLimit ?? this.elaborationTimeLimit,
     );
   }
 
@@ -187,6 +198,7 @@ class AppSettings {
       if (other.engineBinaryOverrides[entry.key] != entry.value) return false;
     }
     if (other.autoCheckForUpdates != autoCheckForUpdates) return false;
+    if (other.elaborationTimeLimit != elaborationTimeLimit) return false;
     return true;
   }
 
@@ -201,6 +213,7 @@ class AppSettings {
       panelLayout,
       overrideHash,
       autoCheckForUpdates,
+      elaborationTimeLimit,
     );
   }
 
@@ -212,6 +225,7 @@ class AppSettings {
       'diagnosticsEnabled: $diagnosticsEnabled, '
       'activeThemeName: $activeThemeName, '
       'panelLayout: $panelLayout, '
-      'autoCheckForUpdates: $autoCheckForUpdates'
+      'autoCheckForUpdates: $autoCheckForUpdates, '
+      'elaborationTimeLimit: ${elaborationTimeLimit.name}'
       ')';
 }

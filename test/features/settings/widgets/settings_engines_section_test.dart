@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lintcrux/domain/enums/elaboration_time_limit.dart';
 import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_binary_override.dart';
@@ -261,6 +262,66 @@ void main() {
 
       expect(find.textContaining('probe exploded'), findsOneWidget);
     });
+
+    testWidgets(
+      'the Yosys time limit offers Automatic, Extended and No limit, starts '
+      'at Automatic, and saves a choice',
+      (tester) async {
+        await tester.pumpWidget(
+          wrap(
+            const SettingsEnginesSection(),
+            overrides: [registryWith(_FakeEngine())],
+          ),
+        );
+        await tester.pump();
+        final l10n = l10nOf(tester);
+        expect(
+          find.text(l10n.settingsElaborationTimeLimitLabel),
+          findsOneWidget,
+        );
+        expect(
+          find.text(l10n.settingsElaborationTimeLimitDescription),
+          findsOneWidget,
+        );
+        final control = find.byType(
+          CruxSegmentedControl<ElaborationTimeLimit>,
+        );
+        expect(
+          tester
+              .widget<CruxSegmentedControl<ElaborationTimeLimit>>(control)
+              .segments
+              .map((s) => s.value),
+          ElaborationTimeLimit.values,
+        );
+        expect(
+          tester
+              .widget<CruxSegmentedControl<ElaborationTimeLimit>>(control)
+              .selected,
+          ElaborationTimeLimit.automatic,
+        );
+
+        await tester.tap(find.text(l10n.settingsElaborationTimeLimitExtended));
+        await tester.pump();
+        expect(
+          containerOf(tester).read(appSettingsProvider).elaborationTimeLimit,
+          ElaborationTimeLimit.extended,
+        );
+        expect(
+          tester
+              .widget<CruxSegmentedControl<ElaborationTimeLimit>>(control)
+              .selected,
+          ElaborationTimeLimit.extended,
+        );
+
+        await tester.tap(find.text(l10n.settingsElaborationTimeLimitNone));
+        await tester.pump();
+        expect(
+          containerOf(tester).read(appSettingsProvider).elaborationTimeLimit,
+          ElaborationTimeLimit.none,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 
   group('SettingsEnginesSection locale sweep', () {
@@ -290,6 +351,14 @@ void main() {
         );
         expect(find.text(l10n.engineConfigBinarySourceAuto), findsOneWidget);
         expect(find.text(l10n.engineConfigBinarySourceCustom), findsOneWidget);
+        for (final label in <String>[
+          l10n.settingsElaborationTimeLimitLabel,
+          l10n.settingsElaborationTimeLimitAutomatic,
+          l10n.settingsElaborationTimeLimitExtended,
+          l10n.settingsElaborationTimeLimitNone,
+        ]) {
+          expect(find.text(label), findsOneWidget, reason: label);
+        }
 
         await switchToCustom(tester);
         expect(find.text(l10n.engineConfigBinaryPathLabel), findsOneWidget);

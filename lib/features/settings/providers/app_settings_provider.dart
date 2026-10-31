@@ -7,10 +7,12 @@ import 'package:crux_license/crux_license.dart';
 import 'package:crux_settings/crux_settings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/core/policy/lintcrux_policy_keys.dart';
+import 'package:lintcrux/domain/enums/elaboration_time_limit.dart';
 import 'package:lintcrux/domain/models/app_settings.dart';
 import 'package:lintcrux/domain/models/engine_binary_override.dart';
 import 'package:lintcrux/services/persistence/auto_update_check_settings_provider.dart';
 import 'package:lintcrux/services/persistence/diagnostics_enabled_settings_provider.dart';
+import 'package:lintcrux/services/persistence/elaboration_time_limit_settings_provider.dart';
 import 'package:lintcrux/services/persistence/engine_binary_overrides_settings_provider.dart';
 import 'package:lintcrux/services/persistence/locale_settings_provider.dart';
 import 'package:lintcrux/services/persistence/restore_tabs_settings_provider.dart';
@@ -21,10 +23,12 @@ import 'package:lintcrux/services/persistence/restore_tabs_settings_provider.dar
 /// in-memory state immediately. Persistence is per-field rather than
 /// whole-model: [setAutoCheckForUpdates] round-trips through
 /// [autoUpdateCheckSettingsServiceProvider], [setDiagnosticsEnabled] through
-/// [diagnosticsEnabledSettingsServiceProvider], the engine binary overrides
-/// through [engineBinaryOverridesSettingsServiceProvider] (seeded at launch
-/// from [launchEngineBinaryOverridesProvider]), and the theme name / token
-/// overrides reach `cruxColorThemeProvider` through the bootstrap bridge. The
+/// [diagnosticsEnabledSettingsServiceProvider], [setElaborationTimeLimit]
+/// through [elaborationTimeLimitSettingsServiceProvider], the engine binary
+/// overrides through [engineBinaryOverridesSettingsServiceProvider] (seeded at
+/// launch from [launchEngineBinaryOverridesProvider]), and the theme name and
+/// token overrides reach `cruxColorThemeProvider` through the bootstrap
+/// bridge. The
 /// CXP Cross-Probe settings are not here: `cruxCxpSettingsProvider` owns and
 /// saves them. The remaining fields (panel layout) are session-scoped in
 /// open-core.
@@ -47,6 +51,7 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
     unawaited(_restoreRestoreTabsOnLaunch());
     unawaited(_restoreLocale());
     unawaited(_restoreDiagnosticsEnabled());
+    unawaited(_restoreElaborationTimeLimit());
     // Synchronous, unlike the restores above: the overrides pick the binary
     // the first run starts, and a restored tab runs as soon as it opens.
     return AppSettings(
@@ -216,6 +221,44 @@ class AppSettingsNotifier extends Notifier<AppSettings> {
       // See [_persistAutoCheckForUpdates]: no preferences backend. The
       // in-memory state already changed, so the switch still works for the
       // running session.
+    }
+  }
+
+  /// Set once the user changes the Yosys time limit at run time — same guard
+  /// as [_restoreTabsTouched].
+  bool _elaborationTimeLimitTouched = false;
+
+  Future<void> _restoreElaborationTimeLimit() async {
+    final ElaborationTimeLimit stored;
+    try {
+      stored = await ref
+          .read(elaborationTimeLimitSettingsServiceProvider)
+          .load();
+    } on Object {
+      // See [_restoreAutoCheckForUpdates] — no preferences backend.
+      return;
+    }
+    if (!ref.mounted || _elaborationTimeLimitTouched) return;
+    if (state.elaborationTimeLimit == stored) return;
+    state = state.copyWith(elaborationTimeLimit: stored);
+  }
+
+  /// Sets and persists how long an engine that elaborates the design with
+  /// Yosys may run (see [AppSettings.elaborationTimeLimit]). Takes effect on
+  /// the next run.
+  void setElaborationTimeLimit(ElaborationTimeLimit limit) {
+    _elaborationTimeLimitTouched = true;
+    if (state.elaborationTimeLimit == limit) return;
+    state = state.copyWith(elaborationTimeLimit: limit);
+    unawaited(_persistElaborationTimeLimit(limit));
+  }
+
+  Future<void> _persistElaborationTimeLimit(ElaborationTimeLimit limit) async {
+    try {
+      await ref.read(elaborationTimeLimitSettingsServiceProvider).save(limit);
+    } on Object {
+      // See [_persistAutoCheckForUpdates]: no preferences backend. The
+      // in-memory state already changed, so the next run still uses it.
     }
   }
 

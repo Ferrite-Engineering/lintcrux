@@ -109,6 +109,7 @@ class YosysCheckEngine implements LintEngine {
     // miss the cross-file driver-conflict and multiply-driven-net
     // diagnostics that are the whole point of the Yosys check
     // engine. Stay at the default (false).
+    elaboratesWithYosys: true,
   );
 
   @override

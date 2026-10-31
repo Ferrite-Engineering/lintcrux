@@ -1768,5 +1768,10 @@
   "@fileWatcherIgnore": {
     "description": "Button on the source-changed prompt that dismisses it without re-running. Same key and meaning as WaveCrux."
   },
-  "actionCrossProbeSelection": "交叉探测所选内容…"
+  "actionCrossProbeSelection": "交叉探测所选内容…",
+  "settingsElaborationTimeLimitLabel": "Yosys 时间限制",
+  "settingsElaborationTimeLimitDescription": "Yosys check、CDC 和 Constraints 引擎在 LintCrux 将其停止前可运行的时间。自动按源文件大小成比例给出时间；延长为其四倍；不限制则一直运行到完成或选择“取消运行”。其他引擎不受影响。",
+  "settingsElaborationTimeLimitAutomatic": "自动",
+  "settingsElaborationTimeLimitExtended": "延长",
+  "settingsElaborationTimeLimitNone": "不限制"
 }

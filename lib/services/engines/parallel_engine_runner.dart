@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:lintcrux/domain/enums/elaboration_time_limit.dart';
 import 'package:lintcrux/domain/interfaces/engine_watchdog.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/interfaces/lint_run_cache_service.dart';
@@ -15,6 +16,7 @@ import 'package:lintcrux/domain/models/lint_cache_invalidation_event.dart';
 import 'package:lintcrux/domain/models/lint_cache_key.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/timeout_engine_watchdog.dart';
+import 'package:lintcrux/services/engines/yosys/yosys_engine_budget.dart';
 import 'package:lintcrux/services/lint_cache/cache_fingerprint.dart';
 
 /// Orchestrates the parallel execution of multiple [LintEngine]s
@@ -68,8 +70,19 @@ class ParallelEngineRunner {
     this.forceBypassCache = false,
     this.watchdog = const TimeoutEngineWatchdog(),
     this.engineTimeout = const Duration(seconds: 120),
+    this.yosysTimeLimit = ElaborationTimeLimit.automatic,
     this.onOutcome,
   });
+
+  /// The Yosys time limit for engines that elaborate the design with Yosys
+  /// ([EngineCapabilities.elaboratesWithYosys]).
+  ///
+  /// Such an engine's budget is [YosysEngineBudget.forSourceBytes] over the
+  /// size of its request's sources, never less than [engineTimeout]; under
+  /// [ElaborationTimeLimit.none] it runs with no timer at all. `null` gives
+  /// it [engineTimeout] like every other engine: what the headless binary
+  /// passes when `--engine-timeout` names a budget explicitly.
+  final ElaborationTimeLimit? yosysTimeLimit;
 
   /// The violation store mutated on engine completion.
   final ViolationStore store;
@@ -89,7 +102,8 @@ class ParallelEngineRunner {
   final EngineWatchdog watchdog;
 
   /// The per-engine wall-clock budget the [watchdog] enforces. Defaults
-  /// to 120 s; production wires `engineTimeoutProvider` (Settings-driven).
+  /// to 120 s; production wires `engineTimeoutProvider`. An engine that
+  /// elaborates with Yosys gets the larger budget [yosysTimeLimit] gives.
   final Duration engineTimeout;
 
   /// Transform applied to every violation before storage.
@@ -243,13 +257,16 @@ class ParallelEngineRunner {
   }) async {
     final engine = pair.engine;
     final collected = <Violation>[];
+    final timeout = await timeoutFor(pair);
     try {
-      final guarded = watchdog.guard<Violation>(
-        stream,
-        timeout: engineTimeout,
-        engineId: engine.id,
-        onTimeout: engine.cancel,
-      );
+      final guarded = timeout == null
+          ? stream
+          : watchdog.guard<Violation>(
+              stream,
+              timeout: timeout,
+              engineId: engine.id,
+              onTimeout: engine.cancel,
+            );
       await for (final v in guarded) {
         if (_cancelled) break;
         rawSink?.add(v);
@@ -305,6 +322,23 @@ class ParallelEngineRunner {
     }
 
     return _EngineDrainResult(collected, _DrainOutcome.completed);
+  }
+
+  /// The watchdog budget for [pair]'s engine, or `null` for no timer.
+  ///
+  /// [engineTimeout] for every engine, except one that elaborates the design
+  /// with Yosys while [yosysTimeLimit] is set: see [yosysTimeLimit].
+  Future<Duration?> timeoutFor(EngineRunPair pair) async {
+    final limit = yosysTimeLimit;
+    if (limit == null || !pair.engine.capabilities.elaboratesWithYosys) {
+      return engineTimeout;
+    }
+    if (limit == ElaborationTimeLimit.none) return null;
+    return YosysEngineBudget.forSourceBytes(
+      await YosysEngineBudget.sourceBytesOf(pair.request.sourceFiles),
+      limit: limit,
+      minimum: engineTimeout,
+    );
   }
 
   Future<void> _runOne(EngineRunPair pair) async {

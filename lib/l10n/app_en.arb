@@ -2353,5 +2353,25 @@
   "actionCrossProbeSelection": "Cross-probe Selection…",
   "@actionCrossProbeSelection": {
     "description": "Menu / command palette label for the action that sends the selected violation to a running peer product (WaveCrux, NetCrux or SimCrux)."
+  },
+  "settingsElaborationTimeLimitLabel": "Yosys time limit",
+  "@settingsElaborationTimeLimitLabel": {
+    "description": "Settings > Engines row label for how long an engine that elaborates the design with Yosys (Yosys check, CDC, Constraints) may run before LintCrux stops it."
+  },
+  "settingsElaborationTimeLimitDescription": "How long the Yosys check, CDC and Constraints engines may run before LintCrux stops them. Automatic allows time in proportion to the size of the sources; Extended allows four times that; No limit lets them run until they finish or you choose Cancel Run. The other engines are not affected.",
+  "@settingsElaborationTimeLimitDescription": {
+    "description": "Help text under the Yosys time limit row in Settings > Engines. Automatic, Extended and No limit are the three choices of the control. Yosys check, CDC and Constraints are engine names and stay untranslated."
+  },
+  "settingsElaborationTimeLimitAutomatic": "Automatic",
+  "@settingsElaborationTimeLimitAutomatic": {
+    "description": "Yosys time limit choice: the budget the size of the sources gives."
+  },
+  "settingsElaborationTimeLimitExtended": "Extended",
+  "@settingsElaborationTimeLimitExtended": {
+    "description": "Yosys time limit choice: four times the automatic budget, for a slow or loaded machine."
+  },
+  "settingsElaborationTimeLimitNone": "No limit",
+  "@settingsElaborationTimeLimitNone": {
+    "description": "Yosys time limit choice: the engines that elaborate with Yosys run until they finish or the user cancels."
   }
 }

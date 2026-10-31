@@ -7,6 +7,7 @@ import 'dart:io' show File, FileSystemException;
 import 'package:lintcrux/core/cli/cli_args.dart';
 import 'package:lintcrux/core/cli/cli_args_parser.dart';
 import 'package:lintcrux/core/cli/cli_exit_codes.dart';
+import 'package:lintcrux/domain/enums/elaboration_time_limit.dart';
 import 'package:lintcrux/domain/interfaces/violation_transformer.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/domain/models/engine_run_status.dart';
@@ -74,6 +75,7 @@ class HeadlessRunner {
     this.pragmaReader = const PragmaWaiverReader(),
     this.extraTransformers = const <ViolationTransformer>[],
     this.engineTimeout = defaultEngineTimeout,
+    this.yosysTimeLimit = ElaborationTimeLimit.automatic,
     this.telemetry,
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now;
@@ -122,6 +124,20 @@ class HeadlessRunner {
   /// kill reports as a run failure, which fails the build. The CLI passes
   /// `--engine-timeout` here; see [CliArgs.engineTimeout].
   final Duration engineTimeout;
+
+  /// The Yosys time limit for the engines that elaborate the design with
+  /// Yosys (`yosys`, `cdc`, `constraints`): their budget grows with the size
+  /// of their sources and is never less than [engineTimeout]. `null` gives
+  /// them [engineTimeout] like every other engine, which is what the CLI
+  /// passes when `--engine-timeout` names a budget. See
+  /// `ParallelEngineRunner.yosysTimeLimit`.
+  final ElaborationTimeLimit? yosysTimeLimit;
+
+  /// The [yosysTimeLimit] for a command line: an explicit `--engine-timeout`
+  /// applies to every engine (`null`); without it the Yosys-backed engines
+  /// get the automatic budget that grows with their sources.
+  static ElaborationTimeLimit? yosysTimeLimitFor(CliArgs args) =>
+      args.engineTimeout == null ? ElaborationTimeLimit.automatic : null;
 
   final DateTime Function() _now;
 
@@ -302,6 +318,7 @@ class HeadlessRunner {
       store,
       transformer: transformer,
       engineTimeout: engineTimeout,
+      yosysTimeLimit: yosysTimeLimit,
       // The same seam the desktop app binds, so a CI run and a workstation run
       // report `engine.run` identically. `EngineRunOutcome` is the reason this
       // is a callback and not derived from `runner.statuses` afterwards: a

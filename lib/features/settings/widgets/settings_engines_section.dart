@@ -12,6 +12,7 @@ import 'package:lintcrux/domain/models/engine_binary_override.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/features/engine_config/widgets/severity_override_list.dart';
 import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
+import 'package:lintcrux/features/settings/widgets/elaboration_time_limit_tile.dart';
 import 'package:lintcrux/features/settings/widgets/settings_section_card.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/services/engines/engine_binary_ids.dart';
@@ -29,6 +30,8 @@ import 'package:lintcrux/services/engines/engine_registry_provider.dart';
 ///   live-validation "Probe" button that runs `<binary> --version`
 ///   via the engine's own `detectVersion` and surfaces the detected
 ///   version string (or the error).
+/// * The Yosys time limit (Automatic / Extended / No limit) for the engines
+///   that elaborate the design with Yosys ([ElaborationTimeLimitTile]).
 /// * Below the per-engine controls, the historical severity-override
 ///   list is still surfaced — it has nothing to do with binary paths
 ///   but lives under "Engines" semantically.
@@ -71,6 +74,10 @@ class SettingsEnginesSection extends ConsumerWidget {
             // configures it and a CDC row would offer a path nothing reads.
             for (final engine in registry.engines)
               if (hasOwnBinary(engine.id)) _EngineRow(engine: engine),
+            const SizedBox(height: 16),
+            // How long the engines that elaborate with Yosys (yosys, cdc,
+            // constraints) may run; the others keep the fixed watchdog.
+            const ElaborationTimeLimitTile(),
             const SizedBox(height: 32),
             const Divider(),
             const SizedBox(height: 16),

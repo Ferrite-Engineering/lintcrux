@@ -12,9 +12,11 @@ import 'package:lintcrux/services/engines/timeout_engine_watchdog.dart';
 /// [TimeoutEngineWatchdog]).
 ///
 /// 120 s is generous: Verilator on a large SoC can take 30+ s, so the
-/// default never fires for a healthy run. The value is exposed as a
-/// provider so Settings → Engines can make it user-configurable and tests
-/// can shorten it.
+/// default never fires for a healthy run. An engine that elaborates the
+/// design with Yosys streams nothing until Yosys is done, so it gets a budget
+/// that grows with its sources instead, never less than this one (see
+/// `YosysEngineBudget` and Settings → Engines → Yosys time limit). The value
+/// is exposed as a provider so tests can shorten it.
 const Duration kDefaultEngineTimeout = Duration(seconds: 120);
 
 /// The wall-clock budget the [engineWatchdogProvider] enforces per engine.

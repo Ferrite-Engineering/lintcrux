@@ -429,8 +429,10 @@ Examples:
         help:
             'Wall-clock budget per engine, after which the engine is killed '
             'and the run fails (exit 3). Default '
-            '$kDefaultEngineTimeoutSeconds. Raise it for a Yosys-based '
-            'engine (yosys, cdc) flattening a full SoC.',
+            '$kDefaultEngineTimeoutSeconds; without this option the engines '
+            'that elaborate with Yosys (yosys, cdc, constraints) get a budget '
+            'that grows with the size of the sources, never less. Given, it '
+            'applies to every engine.',
       )
       ..addOption(
         'import-filelist',

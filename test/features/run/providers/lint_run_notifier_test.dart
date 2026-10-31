@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/core/cli/cli_args.dart';
 import 'package:lintcrux/core/cli/cli_args_provider.dart';
+import 'package:lintcrux/domain/enums/elaboration_time_limit.dart';
 import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
+import 'package:lintcrux/domain/interfaces/engine_watchdog.dart';
 import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_binary_override.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
@@ -19,6 +21,7 @@ import 'package:lintcrux/features/settings/providers/app_settings_provider.dart'
 import 'package:lintcrux/plugins/mandatory_engine_ids_provider.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
+import 'package:lintcrux/services/engines/engine_watchdog_provider.dart';
 import 'package:lintcrux/services/run/lint_run_lifecycle.dart';
 import 'package:lintcrux/services/violations/in_memory_violation_store.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
@@ -54,6 +57,48 @@ class _ScriptedEngine implements LintEngine {
 
   @override
   void cancel() {}
+}
+
+/// Reports nothing, and elaborates with Yosys as far as the runner knows.
+class _YosysBackedEngine implements LintEngine {
+  @override
+  String get id => 'yosys';
+  @override
+  String get displayName => 'Yosys check';
+  @override
+  EngineCapabilities get capabilities => const EngineCapabilities(
+    supportedLanguages: {HdlLanguage.systemVerilog},
+    cacheable: false,
+    elaboratesWithYosys: true,
+  );
+  @override
+  Future<String?> detectVersion(EngineBinaryConfig config) async => '1.0.0';
+  @override
+  Stream<Violation> run(LintRunRequest request) =>
+      const Stream<Violation>.empty();
+  @override
+  Stream<Violation> runIncremental(
+    LintRunRequest request,
+    Set<String> changedFiles,
+  ) => run(request);
+  @override
+  void cancel() {}
+}
+
+/// Records the budget the runner asks it to enforce, per engine.
+class _RecordingWatchdog implements EngineWatchdog {
+  final Map<String, Duration> budgets = <String, Duration>{};
+
+  @override
+  Stream<T> guard<T>(
+    Stream<T> source, {
+    required Duration timeout,
+    required String engineId,
+    required void Function() onTimeout,
+  }) {
+    budgets[engineId] = timeout;
+    return source;
+  }
 }
 
 class _VhdlOnlyEngine implements LintEngine {
@@ -536,6 +581,49 @@ void main() {
       addTearDown(container.dispose);
       await container.read(lintRunProvider.notifier).runAll(_project);
       expect(store.byEngine['a'], hasLength(1));
+    });
+
+    test('the Yosys time limit in Settings reaches the next run', () async {
+      final watchdog = _RecordingWatchdog();
+      final container = ProviderContainer(
+        overrides: [
+          ...telemetryDeclinedOverrides(),
+          engineRegistryProvider.overrideWithValue(
+            EngineRegistry([
+              _YosysBackedEngine(),
+              _ScriptedEngine('b', const []),
+            ]),
+          ),
+          violationStoreProvider.overrideWithValue(InMemoryViolationStore()),
+          engineWatchdogProvider.overrideWithValue(watchdog),
+        ],
+      );
+      addTearDown(container.dispose);
+      const project = LintProject(
+        name: 'test',
+        rootPath: '/x',
+        sourceFiles: ['/x/y.sv'],
+        enabledEngineIds: ['yosys', 'b'],
+      );
+      final notifier = container.read(lintRunProvider.notifier);
+      final settings = container.read(appSettingsProvider.notifier);
+
+      // Automatic: a source this small gets the engine timeout, no less.
+      await notifier.runAll(project);
+      expect(watchdog.budgets['yosys'], kDefaultEngineTimeout);
+      expect(watchdog.budgets['b'], kDefaultEngineTimeout);
+
+      settings.setElaborationTimeLimit(ElaborationTimeLimit.extended);
+      watchdog.budgets.clear();
+      await notifier.runAll(project);
+      expect(watchdog.budgets['yosys'], kDefaultEngineTimeout * 4);
+      expect(watchdog.budgets['b'], kDefaultEngineTimeout);
+
+      settings.setElaborationTimeLimit(ElaborationTimeLimit.none);
+      watchdog.budgets.clear();
+      await notifier.runAll(project);
+      expect(watchdog.budgets.containsKey('yosys'), isFalse);
+      expect(watchdog.budgets['b'], kDefaultEngineTimeout);
     });
 
     test('CLI engineBinaryPaths shadow Settings overrides', () async {
