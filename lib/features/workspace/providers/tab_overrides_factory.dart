@@ -16,6 +16,7 @@ import 'package:lintcrux/features/violations/providers/saved_filter_presets_prov
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_view_mode_provider.dart';
+import 'package:lintcrux/features/violations/providers/waived_violation_count_provider.dart';
 import 'package:lintcrux/services/bookmarks/bookmark_freshness.dart';
 import 'package:lintcrux/services/bookmarks/bookmarked_violations_count_provider.dart';
 import 'package:lintcrux/services/bookmarks/violation_bookmark_lookup_provider.dart';
@@ -104,6 +105,11 @@ List<Override> lintcruxTabOverridesFactory(crux.TabId tabId) {
     // because it `ref.watch`es the per-tab `violationStoreProvider`
     // and `violationTableStateProvider`.
     visibleViolationsProvider.overrideWith(VisibleViolationsNotifier.new),
+
+    // Findings the current waivers suppress — the status bar's waived tally.
+    // Per-tab for the same reason: it reads this tab's violation and waiver
+    // stores, not the root's.
+    waivedViolationCountProvider.overrideWith(WaivedViolationCountNotifier.new),
 
     // Engine ids present in the loaded report — drives the per-engine
     // filter chips. Per-tab for the same reason as

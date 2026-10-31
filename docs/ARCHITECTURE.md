@@ -220,7 +220,9 @@ rules:
    scope: `currentProjectProvider`, `configLoadErrorProvider`,
    `violationStoreProvider`, `lintRunProvider`, `lintRunLifecycleBusProvider`,
    `selectedViolationProvider`, `violationTableStateProvider`,
-   `visibleViolationsProvider`, `presentEngineIdsProvider`,
+   `visibleViolationsProvider`, `waivedViolationCountProvider` (the status
+   bar's waived tally, counted from the tab's violation and waiver stores),
+   `presentEngineIdsProvider`,
    `savedFilterPresetsProvider`,
    `activeFilterPresetProvider`, `autoReloadControllerProvider`,
    `pendingReloadProvider`, `violationSelectionEmitterProvider`,

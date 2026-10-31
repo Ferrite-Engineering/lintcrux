@@ -12,6 +12,7 @@ import 'package:lintcrux/domain/models/source_location.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
+import 'package:lintcrux/features/violations/providers/waived_violation_count_provider.dart';
 import 'package:lintcrux/features/workspace/widgets/lintcrux_status_bar.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
@@ -28,6 +29,11 @@ class _StubVisible extends VisibleViolationsNotifier {
   final List<Violation> _list;
   @override
   List<Violation> build() => _list;
+}
+
+class _StubWaived extends WaivedViolationCountNotifier {
+  @override
+  int build() => 0;
 }
 
 class _StubRun extends LintRunNotifier {
@@ -86,6 +92,7 @@ ProviderContainer _tabContainer({String projectName = 'demo_soc'}) {
         () => _StubProject(LintProject(name: projectName, rootPath: '/w')),
       ),
       visibleViolationsProvider.overrideWith(_DerivedVisible.new),
+      waivedViolationCountProvider.overrideWith(_StubWaived.new),
       lintRunProvider.overrideWith(() => _StubRun(running: false)),
     ],
   );
@@ -101,6 +108,7 @@ Widget _harness({
     overrides: [
       currentProjectProvider.overrideWith(() => _StubProject(project)),
       visibleViolationsProvider.overrideWith(() => _StubVisible(violations)),
+      waivedViolationCountProvider.overrideWith(_StubWaived.new),
       lintRunProvider.overrideWith(() => _StubRun(running: running)),
     ],
     child: MaterialApp(

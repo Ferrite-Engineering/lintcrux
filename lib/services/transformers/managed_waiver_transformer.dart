@@ -24,6 +24,13 @@ class ManagedWaiverTransformer implements ViolationTransformer {
   /// The waiver store this transformer consults on each `transform`.
   final WaiverStore store;
 
+  /// The `Violation.raw` key marking a suppression that came from the managed
+  /// waiver store, as opposed to a source pragma or an imported report.
+  static const String managedRawKey = 'lintcrux.managedWaiver';
+
+  /// Whether [v]'s suppression was stamped by this transformer.
+  static bool isManaged(Violation v) => v.raw[managedRawKey] == true;
+
   @override
   Violation transform(Violation v) {
     // Source pragmas win: a violation that's already suppressed keeps
@@ -31,6 +38,9 @@ class ManagedWaiverTransformer implements ViolationTransformer {
     if (v.suppression != null) return v;
     final waiver = store.match(v);
     if (waiver == null) return v;
-    return v.copyWith(suppression: waiver);
+    return v.copyWith(
+      suppression: waiver,
+      raw: <String, dynamic>{...v.raw, managedRawKey: true},
+    );
   }
 }

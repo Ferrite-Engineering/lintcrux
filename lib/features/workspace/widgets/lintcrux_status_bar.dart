@@ -11,6 +11,7 @@ import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
+import 'package:lintcrux/features/violations/providers/waived_violation_count_provider.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/active_tab_scope.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
@@ -102,6 +103,7 @@ class _LintcruxTabStatusBarState extends State<LintcruxTabStatusBar> {
 
   LintProject? _project;
   List<Violation> _visible = const <Violation>[];
+  int _waived = 0;
   bool _running = false;
 
   @override
@@ -144,14 +146,17 @@ class _LintcruxTabStatusBarState extends State<LintcruxTabStatusBar> {
           _visible = next;
           _queueRebuild();
         }, fireImmediately: true),
-        container.listen<bool>(
-          lintRunProvider.select((s) => s.isRunning),
-          (_, next) {
-            _running = next;
-            _queueRebuild();
-          },
-          fireImmediately: true,
-        ),
+        container.listen<int>(waivedViolationCountProvider, (_, next) {
+          _waived = next;
+          _queueRebuild();
+        }, fireImmediately: true),
+        container.listen<bool>(lintRunProvider.select((s) => s.isRunning), (
+          _,
+          next,
+        ) {
+          _running = next;
+          _queueRebuild();
+        }, fireImmediately: true),
       ];
       _bound = container;
     });
@@ -186,6 +191,7 @@ class _LintcruxTabStatusBarState extends State<LintcruxTabStatusBar> {
     return _StatusBarContent(
       project: _project,
       visible: _visible,
+      waived: _waived,
       running: _running,
       trailing: widget.trailing,
     );
@@ -207,6 +213,7 @@ class LintcruxStatusBarBody extends ConsumerWidget {
     return _StatusBarContent(
       project: ref.watch(currentProjectProvider),
       visible: ref.watch(visibleViolationsProvider),
+      waived: ref.watch(waivedViolationCountProvider),
       running: ref.watch(lintRunProvider.select((s) => s.isRunning)),
       trailing: ref.watch(statusBarTrailingWidgetsProvider),
     );
@@ -236,12 +243,17 @@ class _StatusBarContent extends StatelessWidget {
   const _StatusBarContent({
     required this.project,
     required this.visible,
+    required this.waived,
     required this.running,
     required this.trailing,
   });
 
   final LintProject? project;
   final List<Violation> visible;
+
+  /// Findings the current waivers suppress. Not derived from [visible]: the
+  /// table never lists suppressed rows, so counting them there always read 0.
+  final int waived;
   final bool running;
   final List<Widget> trailing;
 
@@ -255,9 +267,7 @@ class _StatusBarContent extends StatelessWidget {
     var errors = 0;
     var warnings = 0;
     var notes = 0;
-    var waived = 0;
     for (final v in visible) {
-      if (v.isSuppressed) waived++;
       switch (v.severity) {
         case Severity.fatal:
         case Severity.error:

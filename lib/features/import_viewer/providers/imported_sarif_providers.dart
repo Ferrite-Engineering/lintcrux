@@ -9,6 +9,7 @@ import 'package:lintcrux/features/violations/providers/present_engine_ids_provid
 import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_view_mode_provider.dart';
+import 'package:lintcrux/features/violations/providers/waived_violation_count_provider.dart';
 import 'package:lintcrux/services/filter_presets/active_filter_preset_provider.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
 import 'package:lintcrux/services/violations/violation_store_provider.dart';
@@ -108,5 +109,6 @@ List<Override> importedSarifViewerOverrides() => <Override>[
   activeFilterPresetProvider.overrideWith(ActiveFilterPresetNotifier.new),
   selectedViolationProvider.overrideWith(SelectedViolationNotifier.new),
   visibleViolationsProvider.overrideWith(VisibleViolationsNotifier.new),
+  waivedViolationCountProvider.overrideWith(WaivedViolationCountNotifier.new),
   presentEngineIdsProvider.overrideWith(PresentEngineIdsNotifier.new),
 ];
