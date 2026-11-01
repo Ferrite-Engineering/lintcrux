@@ -14,6 +14,7 @@ import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_domain_analysis.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_netlist_reader.dart';
+import 'package:lintcrux/services/engines/cdc/cdc_offload.dart';
 import 'package:lintcrux/services/engines/cdc/cdc_source_span.dart';
 import 'package:lintcrux/services/engines/cdc/sv_package_use.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_elaboration.dart';
@@ -140,6 +141,7 @@ class CdcEngine implements LintEngine {
 
   @override
   Stream<Violation> run(LintRunRequest request) async* {
+    _cancelRequested = false;
     // Refuse rather than analyse a design we only have part of.
     //
     // CDC elaborates the WHOLE design -- it needs `flatten` for a crossing
@@ -216,10 +218,14 @@ class CdcEngine implements LintEngine {
       slangOptions: slang ? slangOptionsFor(request) : const <String>[],
       keepNetlist: true,
     );
-    final (NetlistModel? model, Object? readError) = switch (elaborated) {
-      DesignElaborated() => _readNetlist(elaborated, request.topModule),
-      DesignElaborationFailed() => (null, null),
+    // Read the netlist and run the analysis off the UI isolate. Both are CPU
+    // bound -- tens of seconds on a flattened SoC -- and on the UI isolate
+    // they stop frames, tooltips and Cancel for that long.
+    final read = switch (elaborated) {
+      DesignElaborated() => await _readAndAnalyze(elaborated, request),
+      DesignElaborationFailed() => null,
     };
+    if (read != null && read.cancelled) return;
 
     switch (elaborated) {
       case DesignElaborated():
@@ -258,14 +264,15 @@ class CdcEngine implements LintEngine {
         return;
     }
 
-    if (model == null) {
+    final cdc = read?.analysis;
+    if (cdc == null) {
       yield Violation(
         engineId: id,
         ruleId: 'cdc/elaboration-failed',
         severity: Severity.error,
         message:
             'CDC analysis could not read the elaborated netlist: '
-            '$readError',
+            '${read?.readError}',
         location: SourceLocation(
           file: request.sourceFiles.isEmpty ? '' : request.sourceFiles.first,
           line: 1,
@@ -275,9 +282,6 @@ class CdcEngine implements LintEngine {
       );
       return;
     }
-    final cdc = analysisFor(
-      request,
-    ).analyze(model, topModuleName: request.topModule);
     final fallback = SourceLocation(
       file: request.sourceFiles.isEmpty ? '' : request.sourceFiles.first,
       line: 1,
@@ -539,29 +543,74 @@ class CdcEngine implements LintEngine {
       for (final name in names.whereType<String>()) '--blackboxed-module $name',
   ];
 
-  /// The netlist of [elaborated], or the reason it could not be read. Removes
-  /// the netlist file, which this run owns, whether or not it was read.
-  (NetlistModel?, Object?) _readNetlist(
+  /// The task reading and analysing the current run's netlist, while there
+  /// is one. [cancel] stops it.
+  OffloadTask<_NetlistOutcome>? _activeRead;
+
+  /// Set by [cancel]; cleared when a run starts. Lets a cancel that arrives
+  /// while Yosys is still running skip the read that would follow.
+  bool _cancelRequested = false;
+
+  /// Reads the netlist of [elaborated] and runs the domain analysis over it,
+  /// both on a separate isolate. Removes the netlist file, which this run
+  /// owns, whether or not it was read.
+  ///
+  /// [analysisFor] is resolved here, on the calling isolate, because the Pro
+  /// overlay's answer depends on the request and on the licence tier; the
+  /// analysis object it returns is what crosses to the worker. Only the
+  /// netlist path and that object are captured, so nothing of this engine
+  /// (its process runner, its Riverpod-bound callbacks) has to be sendable.
+  /// An analysis that is not sendable still runs, on this isolate (see
+  /// [OffloadTask.ranInProcess]).
+  Future<_NetlistOutcome> _readAndAnalyze(
     DesignElaborated elaborated,
-    String? topModule,
-  ) {
+    LintRunRequest request,
+  ) async {
     final file = elaborated.netlistFile;
     try {
-      return (
-        file != null
-            ? netlistReader.readFile(file, topModule: topModule)
-            : netlistReader.readString(
-                elaborated.rawJson,
-                topModule: topModule,
-              ),
-        null,
+      if (_cancelRequested) return const _NetlistOutcome.cancelled();
+      final task = runOffloaded<_NetlistOutcome>(
+        _readAndAnalyzeJob(
+          path: file?.path,
+          rawJson: elaborated.rawJson,
+          topModule: request.topModule,
+          reader: netlistReader,
+          analysis: analysisFor(request),
+        ),
       );
-    } on Object catch (e) {
-      return (null, e);
+      _activeRead = task;
+      try {
+        return await task.result;
+      } on OffloadCancelled {
+        return const _NetlistOutcome.cancelled();
+      }
     } finally {
+      _activeRead = null;
       if (file != null) _removeNetlist(file);
     }
   }
+
+  /// The computation [_readAndAnalyze] sends to the worker, built in a
+  /// static context so it captures the arguments and nothing else.
+  static _NetlistOutcome Function() _readAndAnalyzeJob({
+    required String? path,
+    required String rawJson,
+    required String? topModule,
+    required CdcNetlistReader reader,
+    required CdcDomainAnalysis analysis,
+  }) => () {
+    final NetlistModel model;
+    try {
+      model = path != null
+          ? reader.readFile(File(path), topModule: topModule)
+          : reader.readString(rawJson, topModule: topModule);
+    } on Object catch (e) {
+      return _NetlistOutcome.unreadable('$e');
+    }
+    return _NetlistOutcome.analysed(
+      analysis.analyze(model, topModuleName: topModule),
+    );
+  };
 
   static void _removeNetlist(File file) {
     try {
@@ -619,9 +668,32 @@ class CdcEngine implements LintEngine {
 
   @override
   void cancel() {
-    // The Yosys run is a single subprocess and the netlist read that follows
-    // it is synchronous, so there is nothing to interrupt in between. Left
-    // explicit rather than absent so a reader does not assume cancellation
-    // was forgotten.
+    // Yosys is a single subprocess with no mid-run cancel. The netlist read
+    // and the analysis that follow it run on their own isolate, which is
+    // killed here; a cancel that lands while Yosys is still running skips
+    // them.
+    _cancelRequested = true;
+    _activeRead?.cancel();
   }
+}
+
+/// What the worker isolate sends back: the analysis, or why the netlist could
+/// not be read, or that the run was cancelled. Holds plain data only.
+final class _NetlistOutcome {
+  const _NetlistOutcome.analysed(CdcAnalysisResult this.analysis)
+    : readError = null,
+      cancelled = false;
+
+  const _NetlistOutcome.unreadable(String this.readError)
+    : analysis = null,
+      cancelled = false;
+
+  const _NetlistOutcome.cancelled()
+    : analysis = null,
+      readError = null,
+      cancelled = true;
+
+  final CdcAnalysisResult? analysis;
+  final String? readError;
+  final bool cancelled;
 }
