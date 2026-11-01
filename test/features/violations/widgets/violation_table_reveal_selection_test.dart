@@ -3,6 +3,9 @@
 
 // A selection made outside the table brings its row into view.
 //
+// LOCALE_SWEEP_EXEMPT: scroll-position regression test; it asserts where the
+// list is, and no label or locale-dependent text.
+//
 // Find in Violations, bookmarks and the cross-probe all select through
 // `selectedViolationProvider`. The list is virtualized, so a row far from the
 // viewport is not built, and selecting it used to leave the table where it
