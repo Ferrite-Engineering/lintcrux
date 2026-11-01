@@ -333,7 +333,7 @@ class CdcEngine implements LintEngine {
       severity: Severity.note,
       message:
           'CDC analysed ${cdc.domains.length} clock domain(s) '
-          '(${cdc.domains.map((d) => humanCdcClockName(d.clockName)).join(', ')}) '
+          '(${cdcDomainListLabel(cdc.domains)}) '
           'and found '
           '${cdc.crossings.length} crossing(s), $unsafe unsafe'
           '${reviewed > 0 ? ', $reviewed reviewed' : ''}.'

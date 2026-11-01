@@ -28,6 +28,38 @@ String humanCdcClockName(String raw) {
   return 'generated clock';
 }
 
+/// The domains of a summary as one readable list.
+///
+/// Domains that share a name are different clocks when they are different
+/// bits of one multi-bit net: a packed struct of clocks, say, which the
+/// netlist names once for all its bits. Printed by name alone they read as
+/// the same clock repeated. So a name shared by a few domains carries each
+/// domain's bit (`clk_bus[3]`), and a name shared by [groupFrom] or more is
+/// collapsed to one entry with a count (`clk_bus: 30 bits`) so the list stays
+/// readable. A name that appears once is printed as it always was.
+String cdcDomainListLabel(
+  Iterable<CdcClockDomain> domains, {
+  int groupFrom = 4,
+}) {
+  final byName = <String, List<CdcClockDomain>>{};
+  for (final d in domains) {
+    byName.putIfAbsent(humanCdcClockName(d.clockName), () => []).add(d);
+  }
+  final entries = <String>[];
+  for (final MapEntry(key: name, value: group) in byName.entries) {
+    if (group.length >= groupFrom) {
+      final allBits = group.every((d) => d.bitIndex != null);
+      entries.add('$name: ${group.length} ${allBits ? 'bits' : 'domains'}');
+    } else {
+      for (final d in group) {
+        final bit = d.bitIndex;
+        entries.add(group.length > 1 && bit != null ? '$name[$bit]' : name);
+      }
+    }
+  }
+  return entries.join(', ');
+}
+
 /// A clock domain: one clock and the registers it drives.
 @immutable
 class CdcClockDomain {
@@ -36,6 +68,7 @@ class CdcClockDomain {
     required this.domainKey,
     required this.clockName,
     required this.registerPaths,
+    this.bitIndex,
   });
 
   /// Opaque key from the [CdcClockResolver]. Two registers share a domain iff
@@ -48,6 +81,12 @@ class CdcClockDomain {
 
   /// Hierarchical paths of the registers this clock drives.
   final List<String> registerPaths;
+
+  /// Which bit of its net the clock is, counting from the least significant
+  /// bit, when that net is wider than one bit; `null` for a clock on a net of
+  /// its own. Several domains can share a [clockName] and differ only here:
+  /// they are the bits of one packed bus of clocks.
+  final int? bitIndex;
 
   @override
   String toString() =>
@@ -552,6 +591,7 @@ class CdcDomainAnalysis {
 
     final diagnostics = <String>[];
     final netNames = _netNamesByBit(module);
+    final bitIndexOf = _bitIndexByBit(module, netNames);
 
     // ── Step 1: registers, and the clock each is driven by ────────────────
     final registers = <String, CdcRegister>{};
@@ -580,14 +620,21 @@ class CdcDomainAnalysis {
       byDomain.putIfAbsent(r.domainKey, () => <String>[]).add(r.path);
       clockBitFor.putIfAbsent(r.domainKey, () => r.clockBit);
     }
-    final domains = <CdcClockDomain>[
-      for (final e in byDomain.entries)
-        CdcClockDomain(
-          domainKey: e.key,
-          clockName: clockResolver.domainNameFor(e.key, netNames),
-          registerPaths: List.unmodifiable(e.value..sort()),
-        ),
-    ]..sort((a, b) => a.clockName.compareTo(b.clockName));
+    final domains =
+        <CdcClockDomain>[
+          for (final e in byDomain.entries)
+            CdcClockDomain(
+              domainKey: e.key,
+              clockName: clockResolver.domainNameFor(e.key, netNames),
+              registerPaths: List.unmodifiable(e.value..sort()),
+              bitIndex: e.key is int ? bitIndexOf[e.key] : null,
+            ),
+        ]..sort((a, b) {
+          final byName = a.clockName.compareTo(b.clockName);
+          return byName != 0
+              ? byName
+              : (a.bitIndex ?? -1).compareTo(b.bitIndex ?? -1);
+        });
 
     if (domains.length < 2) {
       // One domain cannot cross itself. Reported rather than silently empty so
@@ -825,6 +872,32 @@ class CdcDomainAnalysis {
       for (final bit in entry.value.bits) {
         if (bit is NetBit) out[bit.netId] = entry.key;
       }
+    }
+    return out;
+  }
+
+  /// For each net bit named by [netNames] on a net wider than one bit, its
+  /// position in that net. Bits on single-bit nets are absent.
+  static Map<int, int> _bitIndexByBit(
+    Module module,
+    Map<int, String> netNames,
+  ) {
+    final out = <int, int>{};
+    void visit(String name, List<BitRef> bits) {
+      if (bits.length < 2) return;
+      for (var i = 0; i < bits.length; i++) {
+        final bit = bits[i];
+        if (bit is NetBit && netNames[bit.netId] == name) {
+          out.putIfAbsent(bit.netId, () => i);
+        }
+      }
+    }
+
+    for (final entry in module.nets.entries) {
+      visit(entry.key, entry.value.bits);
+    }
+    for (final entry in module.ports.entries) {
+      visit(entry.key, entry.value.bits);
     }
     return out;
   }
