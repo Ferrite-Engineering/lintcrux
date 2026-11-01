@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/features/bookmarks/widgets/bookmark_count_badge.dart';
 import 'package:lintcrux/features/bookmarks/widgets/bookmark_leading_cell.dart';
+import 'package:lintcrux/features/violations/providers/selected_violation_provider.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
 import 'package:lintcrux/features/violations/widgets/filter_preset_dropdown.dart';
 import 'package:lintcrux/features/violations/widgets/violation_filter_chips.dart';
@@ -82,6 +83,17 @@ class _ViolationTableState extends ConsumerState<ViolationTable> {
     final l10n = L10N.of(context);
     final visible = ref.watch(visibleViolationsProvider);
     _rowFocus.sync(visible);
+    // A selection made outside the table (Find in Violations, a bookmark, a
+    // cross-probe) brings its row into view. The list is virtualized, so the
+    // row may not be built; the scroll is done on the controller, after the
+    // frame that has laid the list out. A row the user clicked is already on
+    // screen and does not move the list.
+    ref.listen(selectedViolationProvider, (previous, next) {
+      if (next == null || next == previous) return;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _rowFocus.revealIfOffscreen(next);
+      });
+    });
     final store = ref.watch(violationStoreProvider);
     final topActions = ref.watch(violationTableTopActionsProvider);
     final bookmarksAvailable = watchBookmarksAvailable(ref);

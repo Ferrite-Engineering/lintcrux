@@ -190,6 +190,31 @@ class ViolationRowFocus extends ChangeNotifier {
     });
   }
 
+  /// Scrolls [violation]'s row into view when none of it is in view, putting
+  /// it in the middle of the list so the rows around it show; does nothing
+  /// when any part of the row is visible.
+  ///
+  /// For a selection made outside the table (Find in Violations, a bookmark,
+  /// a cross-probe from another product). A row the user clicked is at least
+  /// partly on screen, so a click never moves the list, and the keyboard
+  /// moves already scroll through [focusRow].
+  void revealIfOffscreen(Violation violation) {
+    if (!scrollController.hasClients) return;
+    final index = _order.indexOf(violation);
+    if (index == -1) return;
+    final position = scrollController.position;
+    if (!position.hasViewportDimension) return;
+    final top = index * rowExtent;
+    final bottom = top + rowExtent;
+    final viewTop = position.pixels;
+    final viewBottom = viewTop + position.viewportDimension;
+    if (bottom > viewTop && top < viewBottom) return;
+    final centred = top - (position.viewportDimension - rowExtent) / 2;
+    scrollController.jumpTo(
+      centred.clamp(position.minScrollExtent, position.maxScrollExtent),
+    );
+  }
+
   void _reveal(int index) {
     if (!scrollController.hasClients) return;
     final position = scrollController.position;
