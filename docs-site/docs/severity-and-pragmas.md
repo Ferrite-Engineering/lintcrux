@@ -42,7 +42,7 @@ The block-comment form (`/* verilator lint_off RULE */`) is also recognized. A `
 - **Named rules only.** The rule name must be upper-case letters, digits and underscores (`UNUSEDSIGNAL`, `WIDTHTRUNC`). A bare `// verilator lint_off` with no rule name is ignored by LintCrux.
 - **Verilator findings only.** A pragma suppresses violations whose rule id is `verilator/<RULE>` in the same file and line range. It does not waive the same defect reported by Verible, Slang or any other engine.
 
-A suppressed violation is hidden from the table, and the status bar counts it as *waived*. In the headless binary it is left out of the printed listing and of the `--exit-code` / `--fail-on-new-violations` gates, and counted as `suppressed` in the summary line. Inline pragma waivers are free in Open Core — they live in your RTL and need no LintCrux feature.
+A suppressed violation is hidden from the table, and from LintCrux 1.2 the status bar counts it as *waived*. In the headless binary it is left out of the printed listing and of the `--exit-code` / `--fail-on-new-violations` gates, and counted as `suppressed` in the summary line. Inline pragma waivers are free in Open Core: they live in your RTL and need no LintCrux feature.
 
 In a SARIF export a pragma-suppressed violation is still written — the record stays auditable — but it carries a SARIF `suppressions` entry of kind `inSource`, with the pragma as its justification, so a SARIF consumer can tell it from an open finding.
 

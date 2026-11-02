@@ -45,7 +45,7 @@ Click any column header to sort by it; click again to reverse. For substring, gl
 
 ## Status bar {#statusbar}
 
-The status bar at the bottom edge shows the active project's name (or *No project open*) and the live run summary: `X total · Y errors · Z warnings · N notes · M waived`. The counts follow the table's current filter, so as you narrow the table the summary follows. While engines are running it says so.
+The status bar at the bottom edge shows the active project's name (or *No project open*) and the live run summary: `X total · Y errors · Z warnings · N notes · M waived`. The counts follow the table's current filter, so as you narrow the table the summary follows. The waived count is the exception: from LintCrux 1.2 it is the number of the run's findings that an inline pragma or a managed waiver suppresses, whatever the filter, and it changes as soon as you add or remove a waiver. Before 1.2 it counted only rows in the table, which never include a waived finding, so it read 0. While engines are running it says so.
 
 ## Settings {#settings}
 

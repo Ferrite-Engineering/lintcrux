@@ -23,7 +23,7 @@ The strip above the table combines several independent filters:
 - **Filter by rule or message…** — a case-insensitive substring matched against the rule id and the message text.
 - **Filter by file glob** — a glob matched against the violation's file path, for example `**/top.sv`.
 
-Filters compose: a text filter, two severity chips and a file glob all apply at once, and the status-bar summary reflects the filtered set. Violations suppressed by an inline pragma or a managed waiver are left out of the table; the status bar counts them as *waived*.
+Filters compose: a text filter, two severity chips and a file glob all apply at once, and the status-bar summary reflects the filtered set. Violations suppressed by an inline pragma or a managed waiver are left out of the table; from LintCrux 1.2 the status bar counts them as *waived*, whatever the filter (before 1.2 that count read 0).
 
 With a baseline set, Pro adds an *All violations / Only new / Only resolved* toggle to the same row — see [Baselines & deltas](baselines.md#viewmode).
 
