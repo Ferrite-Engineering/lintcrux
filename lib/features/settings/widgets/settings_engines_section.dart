@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:crux_ide_layout/crux_ide_layout.dart';
+import 'package:crux_settings_ui/crux_settings_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/core/help_urls.dart';
@@ -198,47 +199,56 @@ class _EngineRowState extends ConsumerState<_EngineRow> {
           ),
           if (override.source == EngineBinarySource.custom) ...[
             const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _pathController,
-                    decoration: InputDecoration(
-                      labelText: l10n.engineConfigBinaryPathLabel,
-                      hintText:
-                          '/opt/${widget.engine.id}/bin/'
-                          '${widget.engine.id}',
-                    ),
-                    onSubmitted: (value) {
-                      notifier.setEngineBinaryOverride(
-                        widget.engine.id,
-                        EngineBinaryOverride(
-                          source: EngineBinarySource.custom,
-                          path: value,
+            // The row's label stays visible while the field holds a path. The
+            // field and the Probe button are two focusable parts, so the row
+            // does not merge them and the field names itself.
+            CruxFormRow(
+              label: l10n.engineConfigBinaryPathLabel,
+              mergeSemantics: false,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Semantics(
+                      label: l10n.engineConfigBinaryPathLabel,
+                      child: TextField(
+                        controller: _pathController,
+                        decoration: InputDecoration(
+                          hintText:
+                              '/opt/${widget.engine.id}/bin/'
+                              '${widget.engine.id}',
                         ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _probing
-                      ? null
-                      : () {
-                          // Persist the typed path first, then probe.
-                          final next = EngineBinaryOverride(
-                            source: EngineBinarySource.custom,
-                            path: _pathController.text,
-                          );
+                        onSubmitted: (value) {
                           notifier.setEngineBinaryOverride(
                             widget.engine.id,
-                            next,
+                            EngineBinaryOverride(
+                              source: EngineBinarySource.custom,
+                              path: value,
+                            ),
                           );
-                          unawaited(_probe(next.toEngineBinaryConfig()));
                         },
-                  child: Text(l10n.engineConfigBinaryProbeButton),
-                ),
-              ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: _probing
+                        ? null
+                        : () {
+                            // Persist the typed path first, then probe.
+                            final next = EngineBinaryOverride(
+                              source: EngineBinarySource.custom,
+                              path: _pathController.text,
+                            );
+                            notifier.setEngineBinaryOverride(
+                              widget.engine.id,
+                              next,
+                            );
+                            unawaited(_probe(next.toEngineBinaryConfig()));
+                          },
+                    child: Text(l10n.engineConfigBinaryProbeButton),
+                  ),
+                ],
+              ),
             ),
             if (_probing)
               Padding(

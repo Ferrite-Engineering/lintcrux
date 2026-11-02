@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:crux_settings_ui/crux_settings_ui.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -171,24 +172,39 @@ class _WebLandingScreenState extends ConsumerState<WebLandingScreen> {
                     style: theme.textTheme.labelLarge,
                   ),
                   const SizedBox(height: 8),
-                  Row(
+                  // A form row, so the label stays visible once the field
+                  // holds a URL. The field and the Open button are two
+                  // focusable parts: the row does not merge them and the
+                  // field names itself.
+                  CruxFormSection(
                     children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _urlController,
-                          enabled: !state.isLoading,
-                          decoration: InputDecoration(
-                            hintText: 'https://...',
-                            border: const OutlineInputBorder(),
-                            labelText: l10n.webModeUrlFieldLabel,
-                          ),
-                          onSubmitted: (_) => _loadFromUrlField(),
+                      CruxFormRow(
+                        label: l10n.webModeUrlFieldLabel,
+                        mergeSemantics: false,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Semantics(
+                                label: l10n.webModeUrlFieldLabel,
+                                child: TextField(
+                                  controller: _urlController,
+                                  enabled: !state.isLoading,
+                                  decoration: const InputDecoration(
+                                    hintText: 'https://...',
+                                  ),
+                                  onSubmitted: (_) => _loadFromUrlField(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              onPressed: state.isLoading
+                                  ? null
+                                  : _loadFromUrlField,
+                              child: Text(l10n.webModeUrlOpenButton),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      FilledButton(
-                        onPressed: state.isLoading ? null : _loadFromUrlField,
-                        child: Text(l10n.webModeUrlOpenButton),
                       ),
                     ],
                   ),

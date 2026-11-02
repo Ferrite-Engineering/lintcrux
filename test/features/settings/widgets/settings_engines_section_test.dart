@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:crux_ide_layout/crux_ide_layout.dart';
+import 'package:crux_theme/crux_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,10 +36,12 @@ void main() {
     Widget child, {
     Locale locale = const Locale('en'),
     List<Override> overrides = const [],
+    ThemeData? theme,
   }) {
     return ProviderScope(
       overrides: overrides,
       child: MaterialApp(
+        theme: theme,
         locale: locale,
         localizationsDelegates: const [
           L10N.delegate,
@@ -217,6 +220,58 @@ void main() {
         ).read(appSettingsProvider).engineBinaryOverrideFor(engine.id);
         expect(persisted.source, EngineBinarySource.custom);
         expect(persisted.path, '/opt/fake/bin/fake');
+      },
+    );
+
+    testWidgets(
+      'under the Crux Desktop theme the path label stays visible while the '
+      'field holds a path, and names the field',
+      (tester) async {
+        final semantics = tester.ensureSemantics();
+        // The test font's glyphs are far wider than a real UI font, so the
+        // Yosys time-limit control (not under test) overflows its row here;
+        // any other error still fails the test.
+        final previousOnError = FlutterError.onError;
+        FlutterError.onError = (details) {
+          if (details.exceptionAsString().contains('overflowed')) return;
+          previousOnError?.call(details);
+        };
+        addTearDown(() => FlutterError.onError = previousOnError);
+        final engine = _FakeEngine();
+        await tester.pumpWidget(
+          wrap(
+            const SettingsEnginesSection(),
+            overrides: [registryWith(engine)],
+            theme: cruxThemeForDevice(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+              highContrast: false,
+              mobile: ThemeData.new,
+              platform: TargetPlatform.macOS,
+              isWeb: false,
+            ),
+          ),
+        );
+        await tester.pump();
+        await switchToCustom(tester);
+        await tester.enterText(find.byType(TextField), '/opt/fake/bin/fake');
+        await tester.pump();
+
+        final label = l10nOf(tester).engineConfigBinaryPathLabel;
+        // The row's own label: the field carries no labelText of its own,
+        // which the desktop theme would hide once it holds a value.
+        expect(find.text(label), findsOneWidget);
+        expect(
+          tester
+              .widget<TextField>(find.byType(TextField))
+              .decoration
+              ?.labelText,
+          isNull,
+        );
+        // The accessible name is the same label the field had.
+        final node = tester.getSemantics(find.byType(TextField));
+        expect(node.label, contains(label));
+        expect(node.value, '/opt/fake/bin/fake');
+        semantics.dispose();
       },
     );
 

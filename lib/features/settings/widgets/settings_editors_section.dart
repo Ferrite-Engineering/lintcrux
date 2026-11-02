@@ -1,6 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:crux_settings_ui/crux_settings_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/domain/models/editor/editor_command.dart';
@@ -154,27 +155,25 @@ class _SettingsEditorsSectionState
             ),
             if (isCustom) ...[
               const SizedBox(height: 8),
-              TextField(
-                controller: _executableController,
-                decoration: InputDecoration(
-                  labelText: l10n.settingsEditorExecutableLabel,
-                  border: const OutlineInputBorder(),
+              CruxFormRow(
+                label: l10n.settingsEditorExecutableLabel,
+                child: TextField(
+                  controller: _executableController,
+                  onChanged: (_) => _onCustomFieldChanged(),
                 ),
-                onChanged: (_) => _onCustomFieldChanged(),
               ),
               const SizedBox(height: 12),
-              TextField(
-                controller: _argsTemplateController,
-                decoration: InputDecoration(
-                  labelText: l10n.settingsEditorArgsTemplateLabel,
-                  helperText: l10n.settingsEditorTemplateHelp(
-                    '{file}',
-                    '{line}',
-                    '{column}',
-                  ),
-                  border: const OutlineInputBorder(),
+              CruxFormRow(
+                label: l10n.settingsEditorArgsTemplateLabel,
+                help: l10n.settingsEditorTemplateHelp(
+                  '{file}',
+                  '{line}',
+                  '{column}',
                 ),
-                onChanged: (_) => _onCustomFieldChanged(),
+                child: TextField(
+                  controller: _argsTemplateController,
+                  onChanged: (_) => _onCustomFieldChanged(),
+                ),
               ),
             ],
             const SizedBox(height: 24),
