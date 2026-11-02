@@ -3,7 +3,7 @@
 The browser viewer at [app.lintcrux.app](https://app.lintcrux.app)
 renders any SARIF 2.1.0 document with the same filter chips, virtualized
 violation table, inspector, and source-preview layout as the desktop
-dashboard — but without the ability to spawn lint-engine subprocesses,
+dashboard, but without the ability to spawn lint-engine subprocesses,
 watch project files, or persist settings to disk.
 
 ## When to use it
@@ -19,7 +19,7 @@ watch project files, or persist settings to disk.
   walking them through engine setup.
 
 The desktop app can open a SARIF report too: `File → Import SARIF
-report…` loads it into the same read-only viewer — see
+report…` loads it into the same read-only viewer: see
 [Import a SARIF report on the desktop](../exports-and-ci.md#import-sarif).
 
 ## Two input mechanisms
@@ -28,7 +28,7 @@ report…` loads it into the same read-only viewer — see
 
 Click **Open SARIF File…** on the landing screen and pick a `.sarif` or
 `.json` file from your local disk. The browser reads the bytes through
-its file picker and parses them entirely client-side — the file is never
+its file picker and parses them entirely client-side: the file is never
 uploaded to any server.
 
 ### URL parameter
@@ -53,17 +53,17 @@ are **desktop-only**:
 
 | Feature | Desktop | Web |
 |---|---|---|
-| Run lint engines (Verilator, Verible, Slang, …) | ✓ | ✗ — browsers cannot spawn subprocesses |
+| Run lint engines (Verilator, Verible, Slang, …) | ✓ | ✗: browsers cannot spawn subprocesses |
 | Open project (`.lintcrux`) files | ✓ | ✗ |
 | Import Vivado-style `.f` filelists / FuseSoC EDAM | ✓ | ✗ |
 | Sessions, workspaces, tabs and split panes | ✓ | ✗ |
 | Persist settings to disk | ✓ | ✗ |
 | Render violation table | ✓ | ✓ |
 | Severity / engine chips, text filters, sort | ✓ | ✓ |
-| Search dialog (`Cmd/Ctrl+F`) | ✓ | ✓ — searches the loaded report |
+| Search dialog (`Cmd/Ctrl+F`) | ✓ | ✓: searches the loaded report |
 | Inspector pane (message, location, severity) | ✓ | ✓ |
 | Rule metadata (tags, **Learn more**) and the Rules panel | ✓ | ✓ |
-| Source preview | ✓ — reads the file from disk | ✗ — the pane shows "Could not read source"; SARIF snippets are not rendered |
+| Source preview | ✓: reads the file from disk | ✗: the pane shows "Could not read source"; SARIF snippets are not rendered |
 | Render error / warning / note / fatal levels | ✓ | ✓ |
 | CJK localization | ✓ | ✓ |
 
@@ -84,7 +84,7 @@ parsing starts, and a very large report can take a few seconds to parse.
   machine. Nothing is sent to a server.
 * The URL-fetch path issues a single GET from your browser directly
   to the host you specify. LintCrux's deployment never sees the
-  document body — the request does not pass through our
+  document body: the request does not pass through our
   infrastructure.
 
 ## Deployment

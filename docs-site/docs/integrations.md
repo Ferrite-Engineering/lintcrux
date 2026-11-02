@@ -1,6 +1,6 @@
 # Cross-probe & the suite
 
-LintCrux is part of the EDACrux suite, and it talks to its siblings — WaveCrux, NetCrux and SimCrux — through cross-probe, and to your editor through click-to-source. A lint finding is rarely the end of the investigation; this is how you carry it into the tool that shows you the next layer.
+LintCrux is part of the EDACrux suite, and it talks to its siblings (WaveCrux, NetCrux and SimCrux) through cross-probe, and to your editor through click-to-source. A lint finding is rarely the end of the investigation; this is how you carry it into the tool that shows you the next layer.
 
 ## Cross-probe (CXP) {#cxp}
 
@@ -12,13 +12,13 @@ Cross-probe (CXP) is the suite's lightweight protocol for "show me this location
 
 Two directions exist, and from 1.1 both are free in every tier, with no license key:
 
-- **Receive** — a connected peer can ask LintCrux to highlight a rule or a source location, which filters the table and selects the matching violation; to open a source location in your editor; or to open a design's LintCrux project that the suite's shared workspace knows about. Every request is acknowledged, including the ones LintCrux cannot act on, so the sending tool can tell you why.
+- **Receive**: a connected peer can ask LintCrux to highlight a rule or a source location, which filters the table and selects the matching violation; to open a source location in your editor; or to open a design's LintCrux project that the suite's shared workspace knows about. Every request is acknowledged, including the ones LintCrux cannot act on, so the sending tool can tell you why.
     From LintCrux 1.2, LintCrux records each project it opens in the shared workspace as a `project` (the suite's name for a design's project definition) rather than a `source`, which now names a single HDL source file. It opens a design's project from either kind for one release, so a project recorded or requested the old way still opens, and it only ever opens its own `.lintcrux` project or a `<design>.crux-project` manifest, never another tool's project file recorded under the same design.
-- **Send** — press a peer's send button in the [Cross-Probe panel](#panel), or right-click a violation and choose **Cross-probe to peer…** and pick a connected peer, and LintCrux sends it the selected violation's location. The send is acknowledged: LintCrux tells you whether the peer acted on it (*Sent to …*), declined it with the peer's reason, or did not respond. From LintCrux 1.2, the menu entry is **Cross-probe to**, which opens the running suite products as a second menu where you clicked, and `View → Cross-probe Selection…` (also in the command palette; ++cmd+shift+enter++ / ++ctrl+shift+enter++) sends the selected violation at once when one peer is running and lists the running products as a menu when several are. A focused text field keeps that key.
+- **Send**: press a peer's send button in the [Cross-Probe panel](#panel), or right-click a violation and choose **Cross-probe to peer…** and pick a connected peer, and LintCrux sends it the selected violation's location. The send is acknowledged: LintCrux tells you whether the peer acted on it (*Sent to …*), declined it with the peer's reason, or did not respond. From LintCrux 1.2, the menu entry is **Cross-probe to**, which opens the running suite products as a second menu where you clicked, and `View → Cross-probe Selection…` (also in the command palette; ++cmd+shift+enter++ / ++ctrl+shift+enter++) sends the selected violation at once when one peer is running and lists the running products as a menu when several are. A focused text field keeps that key.
 
 ![Two EDACrux apps running side by side with their Cross-Probe panels open: NetCrux showing the VexRiscv schematic with its peer list (simcrux, wavecrux, lintcrux), and WaveCrux showing waveform lanes with the same connected peers plus a live 'Selection received' cross-probe event from LintCrux.](img/CrossProbe.png)
 
-*Two suite apps discovering each other over CXP — each Cross-Probe panel lists the connected peers, and inbound selections appear in the event feed.*
+*Two suite apps discovering each other over CXP, each Cross-Probe panel lists the connected peers, and inbound selections appear in the event feed.*
 
 ## The Cross-Probe panel {#panel}
 
@@ -26,7 +26,7 @@ The [Cross-Probe panel](interface.md#crossprobe) (++cmd+shift+x++ / ++ctrl+shift
 
 ## Editor presets & click-to-source {#editors}
 
-Click-to-source opens the offending `file:line` in your editor — from a double-click on a table row or the Inspector's **Open in editor** button. Configure the command under `Settings → Editors → Click-to-source editor` with a preset or a custom template:
+Click-to-source opens the offending `file:line` in your editor, from a double-click on a table row or the Inspector's **Open in editor** button. Configure the command under `Settings → Editors → Click-to-source editor` with a preset or a custom template:
 
 | Editor | Command |
 |---|---|
@@ -42,13 +42,13 @@ A **Live preview** shows the command a sample location would produce, and **Rese
 
 Large efforts span many projects. Open Core already opens several projects as tabs and split panes; Pro replaces its single-project registry with a persistent multi-project one, so your open projects, their pinned state and your recent projects survive a restart. What that registry drives:
 
-- **Pin Project Tab** — keep the projects you always want open out of the way of a bulk close.
-- **Close All Projects** — clear the working set in one action; pinned projects stay open.
-- **Reopen Recent Project** — closed projects are remembered across restarts.
+- **Pin Project Tab**: keep the projects you always want open out of the way of a bulk close.
+- **Close All Projects**: clear the working set in one action; pinned projects stay open.
+- **Reopen Recent Project**: closed projects are remembered across restarts.
 
 The project switcher, **Switch Project…** (++cmd+p++ / ++ctrl+p++), lists your open projects and your recents together, so reopening one lands in the same place rather than in a second dialog showing half the picture. **Search Across Projects…** (++cmd+shift+f++ / ++ctrl+shift+f++) searches every open project's violations at once. These actions are in the `File` and `Search` menus and the command palette.
 
-All of them are Pro. In Open Core they are visible and badged, and choosing one tells you it requires LintCrux Pro rather than doing nothing — a deliberate press answered with silence is indistinguishable from a broken build. The Open Core **Close All Tabs** and **Close Active Project** actions work at every tier.
+All of them are Pro. In Open Core they are visible and badged, and choosing one tells you it requires LintCrux Pro rather than doing nothing: a press answered with silence is indistinguishable from a broken build. The Open Core **Close All Tabs** and **Close Active Project** actions work at every tier.
 
 !!! note "Next steps"
-    The suite siblings have their own documentation — WaveCrux for waveforms, NetCrux for netlists, SimCrux for regressions. For sharing trend data across a team, see the [team trend database](team-database.md) <span class="tier tier-enterprise">Enterprise</span>.
+    The suite siblings have their own documentation: WaveCrux for waveforms, NetCrux for netlists, SimCrux for regressions. For sharing trend data across a team, see the [team trend database](team-database.md) <span class="tier tier-enterprise">Enterprise</span>.

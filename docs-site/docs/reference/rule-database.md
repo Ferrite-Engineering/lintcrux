@@ -6,8 +6,7 @@ rule ids with a default severity and optional tags, plus a help link: a
 per-rule `helpUrl`, or a file-level `helpBaseUrl` that LintCrux turns
 into `<helpBaseUrl>#<rule id>`.
 
-The desktop inspector renders the rule metadata from the database —
-tags become chips and the help URL becomes a **Learn more** link — and
+The desktop inspector renders the rule metadata from the database, tags become chips and the help URL becomes a **Learn more** link, and
 the Rules panel and the `Settings → Engines` severity-override list are
 built from it. A violation whose rule is not in the database still
 shows the engine's own message; it just has no tags or link.
@@ -19,11 +18,11 @@ shows the engine's own message; it just has no tags or link.
 | `slang.json` | 246 | slang 11.0 `-W` warning names |
 | `svlint.json` | 159 | `svlint --example` on 0.9.5 |
 | `ghdl.json` | 38 | `ghdl help-warnings` on 6.0.0 and 5.1.1 |
-| `yosys.json` | 17 | LintCrux's own ids — Yosys does not name its checks. From 1.2 this includes `frontend-failed` and `check-not-run`, which report a run that stopped before the check pass, and `unknown-port`, `unknown-parameter`, `module-not-found`, `bad-parameter-value` and `module-redefinition` for the design errors that stop it |
-| `cdc.json` | 10 | First-party CDC rules — every id the CDC engine emits |
+| `yosys.json` | 17 | LintCrux's own ids: Yosys does not name its checks. From 1.2 this includes `frontend-failed` and `check-not-run`, which report a run that stopped before the check pass, and `unknown-port`, `unknown-parameter`, `module-not-found`, `bad-parameter-value` and `module-redefinition` for the design errors that stop it |
+| `cdc.json` | 10 | First-party CDC rules: every id the CDC engine emits |
 | `constraints.json` | 10 | From 1.2: first-party pin-constraint rules, every id the `constraints` engine emits. See [Pin constraints](../pin-constraints.md) |
 
-The database is community-extensible — pull requests adding or
+The database is community-extensible: pull requests adding or
 correcting rule metadata are welcome. `lib/data/rule_aliases.json`
 alongside it maps retired rule ids to their current names (for example
 `verilator/UNUSED` → `verilator/UNUSEDSIGNAL`).
@@ -43,19 +42,18 @@ engine's *option* name, not its internal diagnostic class name:
 | GHDL | `unused` | `ghdl help-warnings` |
 | Yosys | `undriven-wire` | the message-pattern table in `YosysCheckEngine` |
 
-Everywhere else — the violation table, `severityOverrides`, sessions,
-and the JSON / CSV / HTML exports — a rule id is namespaced by engine
+Everywhere else (the violation table, `severityOverrides`, sessions,
+and the JSON / CSV / HTML exports) a rule id is namespaced by engine
 (`verilator/UNUSEDSIGNAL`). SARIF output strips the prefix, because each
 SARIF run already names its engine in `tool.driver.name`.
 
 Several files carry a `verifiedAgainst<Engine>Versions` field naming the
-releases their rule ids were checked against. Keeping those honest
-matters beyond metadata: the curated
+releases their rule ids were checked against. Keeping those accurate matters beyond metadata: the curated
 [rule profiles](project-file.md#rule-profiles) are validated against the
 Verible file, and a rule name Verible does not have makes the engine
 exit non-zero having linted nothing.
 
-The check is mechanical for the engines that reject unknown names — pass
+The check is mechanical for the engines that reject unknown names: pass
 every id in the file back to the binary and see whether it complains:
 
 ```sh

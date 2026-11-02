@@ -1,6 +1,6 @@
 # The interface
 
-LintCrux uses a docked IDE layout built around the violations table. This page tours every surface — the panes, the toolbar, the menu bar, the command palette, the filter and sort controls, the status bar, and Settings — so you know where everything lives before you start triaging.
+LintCrux uses a docked IDE layout built around the violations table. This page tours every surface (the panes, the toolbar, the menu bar, the command palette, the filter and sort controls, the status bar, and Settings) so you know where everything lives before you start triaging.
 
 ## The layout {#layout}
 
@@ -9,9 +9,9 @@ Each open project is a tab. Inside a tab, the violations table fills the center 
 | Dock | Tab | What it shows |
 |---|---|---|
 | Left | Sources | Every source file in the project, with a remove button on each. Removing a file (after a confirmation) rewrites the project file and re-runs the engines; the file on disk is untouched. From 1.2, a project's pin-constraint files are listed under their own **Constraint files** heading beneath the sources, with the same remove button (see [Pin constraints](pin-constraints.md)). |
-| Left | Rules | The rule browser — 646 rules across the seven engines of 1.1, and 664 across eight from 1.2. Search the rules, narrow the list to one engine, open a rule's upstream **Documentation**, or click a rule to filter the violations table to it. |
-| Center | — | The unified violations table. Columns: Severity, Engine, Rule, File, Line, Message. The heart of the app; covered in full on [The violations dashboard](violations.md). |
-| Right | Details | Engine run status while nothing is selected; the Inspector when a violation is — the message, the location with an **Open in editor** button, the rule's tags and **Learn more** link, and related locations. **Back to engine status** returns from one to the other. |
+| Left | Rules | The rule browser: 646 rules across the seven engines of 1.1, and 664 across eight from 1.2. Search the rules, narrow the list to one engine, open a rule's upstream **Documentation**, or click a rule to filter the violations table to it. |
+| Center | – | The unified violations table. Columns: Severity, Engine, Rule, File, Line, Message. The heart of the app; covered in full on [The violations dashboard](violations.md). |
+| Right | Details | Engine run status while nothing is selected; the Inspector when a violation is: the message, the location with an **Open in editor** button, the rule's tags and **Learn more** link, and related locations. **Back to engine status** returns from one to the other. |
 | Right | Cross-Probe | The [Cross-Probe panel](#crossprobe), shown when you open it. You can drag it to the bottom dock. |
 | Bottom | Source | The source preview: the lines around the selected violation (ten either side), with the violation's line highlighted. |
 
@@ -21,9 +21,9 @@ Tabs can be split into two panes. Split the active pane right with ++cmd+backsla
 
 The toolbar carries the actions you reach for constantly. It is split in two. The left group is shared across the EDACrux suite, so it looks the same in WaveCrux, NetCrux and SimCrux: **Open Project…**, **Save Session…**, **Close Active Project**, then **Find in Violations…**, **Cross-Probe Panel** (with a badge counting connected peers) and **Settings…**. The right group is LintCrux's own: **Open Source Files…**, **Open Workspace…** and **Import SARIF report…**, then a single run control that becomes a stop button while a run is in flight, and an **Export Report** button grouping the SARIF, JSON, CSV and HTML exports.
 
-Buttons grey out when they have nothing to act on, using the same rules as the menu bar and the command palette. **Open Source Files…** adds sources to the project you already have open — LintCrux lints a *project*, not loose files — so it stays greyed until one is loaded. If the window is too narrow for every button, the extras move into an **Actions** overflow menu at the end of the strip rather than being clipped.
+Buttons grey out when they have nothing to act on, using the same rules as the menu bar and the command palette. **Open Source Files…** adds sources to the project you already have open (LintCrux lints a *project*, not loose files) so it stays greyed until one is loaded. If the window is too narrow for every button, the extras move into an **Actions** overflow menu at the end of the strip rather than being clipped.
 
-On desktop there is also a native menu bar — `File`, `View`, `Search`, `Tools`, `Help`. On macOS the `LintCrux` application menu holds About, Check for Updates, Settings… and **Quit LintCrux**; on Linux and Windows, Settings… and **Exit** sit at the bottom of `File`, and About and Check for Updates under `Help`. The wording differs because the platforms do — it is the same command on the same key either way. Running the engines, waivers, baselines, trends, bookmarks, Verible auto-fix, the lint cache and the diagnostics surfaces live under `Tools`; the imports, sessions, workspaces and exports live under `File`.
+On desktop there is also a native menu bar: `File`, `View`, `Search`, `Tools`, `Help`. On macOS the `LintCrux` application menu holds About, Check for Updates, Settings… and **Quit LintCrux**; on Linux and Windows, Settings… and **Exit** sit at the bottom of `File`, and About and Check for Updates under `Help`. The wording differs because the platforms do: it is the same command on the same key either way. Running the engines, waivers, baselines, trends, bookmarks, Verible auto-fix, the lint cache and the diagnostics surfaces live under `Tools`; the imports, sessions, workspaces and exports live under `File`.
 
 ## Command palette {#palette}
 
@@ -33,15 +33,15 @@ Every command in LintCrux is reachable from the command palette: press ++cmd+shi
 
 Above the violations table is the filter strip:
 
-- **Filter preset** — a dropdown that saves the current filters under a name (**Save current filters as preset…**) and re-applies them. Pro adds a second preset selector with the built-in presets and saved presets that persist per project — see [Filter presets & bookmarks](violations.md#presets).
-- **Severity chips** — Fatal, Error, Warning, Note, Unclassified.
-- **Engine chips** — one per engine that reported something in the loaded results.
-- **Filter by rule or message…** — a case-insensitive substring matched against the rule id and message.
-- **Filter by file glob** — for example `**/top.sv`.
+- **Filter preset**: a dropdown that saves the current filters under a name (**Save current filters as preset…**) and re-applies them. Pro adds a second preset selector with the built-in presets and saved presets that persist per project: see [Filter presets & bookmarks](violations.md#presets).
+- **Severity chips**: Fatal, Error, Warning, Note, Unclassified.
+- **Engine chips**: one per engine that reported something in the loaded results.
+- **Filter by rule or message…**: a case-insensitive substring matched against the rule id and message.
+- **Filter by file glob**, for example `**/top.sv`.
 
 When a project is open, the row above the filters shows the bookmark count, which opens the Bookmarks panel. With Pro, the same row also carries the baseline buttons and the *All violations / Only new / Only resolved* toggle, the active-baseline chip, and the Verible dry-run button.
 
-Click any column header to sort by it; click again to reverse. For substring, glob or regex search across rule ids and messages, press ++cmd+f++ / ++ctrl+f++ — see [Search](violations.md#search).
+Click any column header to sort by it; click again to reverse. For substring, glob or regex search across rule ids and messages, press ++cmd+f++ / ++ctrl+f++: see [Search](violations.md#search).
 
 ## Status bar {#statusbar}
 
@@ -53,19 +53,19 @@ Open Settings with ++cmd+comma++ / ++ctrl+comma++. On desktop it opens as a dial
 
 | Section | What it controls |
 |---|---|
-| General | **Auto-reload on source change** (Prompt me first / Re-run automatically / Do nothing — see [Auto-reload](projects-and-engines.md#auto-reload); from LintCrux 1.2 the options read Prompt / Auto / Off), **Default sort column**, **Default filter set on launch**, **Restore tabs on launch**, **Automatically check for updates**, and in release builds **Enable diagnostics** (see [Diagnostics](#diagnostics)). |
-| Appearance | The **Language** picker (English, 中文, 日本語, 한국어), color theme presets, per-token color overrides (including the severity colors), and theme packs — see [Appearance & themes](appearance-and-themes.md). |
+| General | **Auto-reload on source change** (Prompt me first / Re-run automatically / Do nothing: see [Auto-reload](projects-and-engines.md#auto-reload); from LintCrux 1.2 the options read Prompt / Auto / Off), **Default sort column**, **Default filter set on launch**, **Restore tabs on launch**, **Automatically check for updates**, and in release builds **Enable diagnostics** (see [Diagnostics](#diagnostics)). |
+| Appearance | The **Language** picker (English, 中文, 日本語, 한국어), color theme presets, per-token color overrides (including the severity colors), and theme packs: see [Appearance & themes](appearance-and-themes.md). |
 | Privacy | The **Send anonymous usage statistics** toggle. See [Usage statistics](getting-started.md#usage-statistics). |
-| Engines | **Engine binary paths** — Auto-detect / Custom per engine, with a **Probe** button — and **Per-rule severity overrides**. From LintCrux 1.2, also the **Yosys time limit** (**Automatic**, **Extended** or **No limit**) for the Yosys check, CDC and Constraints engines; see [The Yosys time limit](projects-and-engines.md#yosys-time-limit). |
-| Editors | The click-to-source editor — Visual Studio Code, Sublime Text, Vim / Neovim, Emacs, or a Custom executable and arguments template, with a live preview. |
+| Engines | **Engine binary paths** (Auto-detect / Custom per engine, with a **Probe** button) and **Per-rule severity overrides**. From LintCrux 1.2, also the **Yosys time limit** (**Automatic**, **Extended** or **No limit**) for the Yosys check, CDC and Constraints engines; see [The Yosys time limit](projects-and-engines.md#yosys-time-limit). |
+| Editors | The click-to-source editor: Visual Studio Code, Sublime Text, Vim / Neovim, Emacs, or a Custom executable and arguments template, with a live preview. |
 | CXP Cross-Probe | **Enable CXP server**, **CXP port**, **Request attention on cross-probe**, **Broadcast selection automatically**, and the live server status. |
-| Keyboard Shortcuts | View and rebind shortcuts, load a preset, and import or export a keymap — see [Customizing shortcuts](keyboard-mouse.md#customizing). |
+| Keyboard Shortcuts | View and rebind shortcuts, load a preset, and import or export a keymap: see [Customizing shortcuts](keyboard-mouse.md#customizing). |
 | License | License status, key entry, machine activation and offline activation. |
 | Custom Rules <span class="tier tier-pro">Pro</span> | User-defined regex rules over source text, signal names or identifiers. |
 | Trend Retention <span class="tier tier-pro">Pro</span> | How much per-run trend history is kept (by default 90 days and 1,000 runs), the prune strategy, and storage stats. |
 | Verible <span class="tier tier-pro">Pro</span> | The Verible binary used for auto-fix and its auto-fix options. |
 | Lint Cache <span class="tier tier-pro">Pro</span> | Enable the lint result cache, its maximum size, statistics, the invalidations log, and **Clear cache now**. |
-| Team Database <span class="tier tier-enterprise">Enterprise</span> | The shared PostgreSQL trend store connection and the organization rollup — covered on [Team trend database](team-database.md). |
+| Team Database <span class="tier tier-enterprise">Enterprise</span> | The shared PostgreSQL trend store connection and the organization rollup: covered on [Team trend database](team-database.md). |
 
 ## Diagnostics {#diagnostics}
 

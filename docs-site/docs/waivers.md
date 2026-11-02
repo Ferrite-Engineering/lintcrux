@@ -15,13 +15,13 @@ Right-click a violation in the table and choose **Waive…**. The **Waive violat
 | Author | Prefilled with your operating-system user name; editable. |
 | Expires (optional) | A date after which the waiver lapses and the violation returns. |
 
-**Waive** writes the waiver; the confirmation says how many active waivers the project now has. Each waiver covers one rule in one file, so waive each false positive in turn — a blank **Lines** field is the way to cover every occurrence of a rule in a file.
+**Waive** writes the waiver; the confirmation says how many active waivers the project now has. Each waiver covers one rule in one file, so waive each false positive in turn: a blank **Lines** field is the way to cover every occurrence of a rule in a file.
 
 ## The waiver file & audit log {#files}
 
-Waivers are stored in `.lintcrux-waivers.json` in the project root — a plain, version-controllable file your whole team shares. Every addition, edit and deletion is also appended to `.lintcrux-waivers.audit.jsonl`, one JSON record per line, so there is a permanent, append-only history of who waived what, when, and why. Check both into git alongside your RTL.
+Waivers are stored in `.lintcrux-waivers.json` in the project root: a plain, version-controllable file your whole team shares. Every addition, edit and deletion is also appended to `.lintcrux-waivers.audit.jsonl`, one JSON record per line, so there is a permanent, append-only history of who waived what, when, and why. Check both into git alongside your RTL.
 
-On an Enterprise seat with a [team database](team-database.md), an organization-wide waiver list applies as well; a violation is waived if either list waives it — see [Administration](administration.md#waivers).
+On an Enterprise seat with a [team database](team-database.md), an organization-wide waiver list applies as well; a violation is waived if either list waives it: see [Administration](administration.md#waivers).
 
 ## Waivers in CI {#ci}
 
@@ -31,16 +31,16 @@ The Pro command line applies the same committed `.lintcrux-waivers.json` in your
 
 A waiver matches a violation when all of these hold:
 
-- **Rule** — the waiver's rule id equals the violation's. Engine rule renames are tolerated through the rule-alias table, so a waiver written against a retired id (for example `verilator/UNUSED`) still matches the renamed rule. Waiver Review shows a notice on that waiver's row naming the new id, and a command-line run prints a warning line on stderr for it, so you can update the waiver to the current id.
-- **File** — the waiver's file path equals the violation's file path exactly. There is no glob or directory matching.
-- **Lines** — if the waiver has a line range, the violation's line falls inside it; a waiver without one covers the whole file.
-- **Not expired** — the waiver has no expiry date, or it has not passed.
+- **Rule**: the waiver's rule id equals the violation's. Engine rule renames are tolerated through the rule-alias table, so a waiver written against a retired id (for example `verilator/UNUSED`) still matches the renamed rule. Waiver Review shows a notice on that waiver's row naming the new id, and a command-line run prints a warning line on stderr for it, so you can update the waiver to the current id.
+- **File**: the waiver's file path equals the violation's file path exactly. There is no glob or directory matching.
+- **Lines**, if the waiver has a line range, the violation's line falls inside it; a waiver without one covers the whole file.
+- **Not expired**: the waiver has no expiry date, or it has not passed.
 
-Choosing the right breadth matters: a line-range waiver stops matching if the finding moves off those lines, while a whole-file waiver covers every occurrence of the rule in that file — including ones added later.
+Choosing the right breadth matters: a line-range waiver stops matching if the finding moves off those lines, while a whole-file waiver covers every occurrence of the rule in that file, including ones added later.
 
 ## The Waivers review screen {#review}
 
-Open the review screen with `Tools → Review Waivers…` or the command palette. It lists every waiver for the active project — rule, file, lines, reason, author and a status badge (Active, Expired, or *Expires in N d*) — with filter chips **All**, **Active**, **Expired** and **Expiring soon**. Each row can be copied as JSON or deleted.
+Open the review screen with `Tools → Review Waivers…` or the command palette. It lists every waiver for the active project (rule, file, lines, reason, author and a status badge (Active, Expired, or *Expires in N d*)) with filter chips **All**, **Active**, **Expired** and **Expiring soon**. Each row can be copied as JSON or deleted.
 
 1. **Open the review screen.**
 
@@ -52,11 +52,11 @@ Open the review screen with `Tools → Review Waivers…` or the command palette
 
 3. **Act on a waiver.**
 
-    **Edit** opens the waiver in the same form it was created with, so you can extend or remove its expiry, narrow or widen its line range, or update the justification. The waiver keeps its id and creation date, and the change is recorded in the audit log as a modification. **Delete** a waiver when the underlying issue is fixed or the decision no longer stands — the violation is reported again and the deletion is recorded in the audit log. **Copy as JSON** puts the waiver record on the clipboard.
+    **Edit** opens the waiver in the same form it was created with, so you can extend or remove its expiry, narrow or widen its line range, or update the justification. The waiver keeps its id and creation date, and the change is recorded in the audit log as a modification. **Delete** a waiver when the underlying issue is fixed or the decision no longer stands: the violation is reported again and the deletion is recorded in the audit log. **Copy as JSON** puts the waiver record on the clipboard.
 
 ## Expiration & re-review {#expiration}
 
-An expired waiver stops matching: the violation it covered reappears in the table on the next run. When waivers have expired or are about to, a banner above the table says so (*1 waiver has expired*, *2 waivers expire soon*), with **Review waivers** to open the review screen and **Dismiss**. This is deliberate — waivers are decisions with a shelf life, and expiry forces a periodic re-review rather than letting suppressions accumulate forever.
+An expired waiver stops matching: the violation it covered reappears in the table on the next run. When waivers have expired or are about to, a banner above the table says so (*1 waiver has expired*, *2 waivers expire soon*), with **Review waivers** to open the review screen and **Dismiss**. Waivers are decisions with a shelf life, and expiry forces a periodic re-review rather than letting suppressions accumulate forever.
 
 !!! note "Next steps"
     Walk through a full triage-and-waive pass in the [Cookbook recipe](cookbook-triage-and-waive.md). To gate CI on *new* findings only, set up a [baseline](baselines.md) <span class="tier tier-pro">Pro</span>.

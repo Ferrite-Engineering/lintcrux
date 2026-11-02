@@ -1,6 +1,6 @@
 # Gate CI on new violations
 
-A legacy codebase has thousands of findings nobody is going to fix today — but you still want to stop *new* ones from sneaking in. This recipe sets a baseline of the accepted state and wires a CI gate that fails only on findings you introduce, then surfaces them right in the pull request.
+A legacy codebase has thousands of findings nobody is going to fix today, but you still want to stop *new* ones from sneaking in. This recipe sets a baseline of the accepted state and wires a CI gate that fails only on findings you introduce, then surfaces them right in the pull request.
 
 - **Goal:** A CI job that passes on legacy violations but fails the moment a change adds a new one, with findings annotated in the pull-request diff.
 - **Time:** About 10 minutes.
@@ -15,7 +15,7 @@ A legacy codebase has thousands of findings nobody is going to fix today — but
 
 2. **Set the baseline.**
 
-    Choose `Tools → Set Baseline from Current Run…` and confirm. LintCrux writes `.lintcrux-baseline.json` in the project root, fingerprinting each finding by rule, project-relative file and message — not line number, and not where the checkout lives — so unrelated edits do not look new and the baseline matches in CI. Every finding no waiver or pragma suppresses is frozen, whatever the table's filters show. From a script, `lintcrux-pro baseline set project.lintcrux` runs the engines and freezes the same set.
+    Choose `Tools → Set Baseline from Current Run…` and confirm. LintCrux writes `.lintcrux-baseline.json` in the project root, fingerprinting each finding by rule, project-relative file and message (not line number, and not where the checkout lives) so unrelated edits do not look new and the baseline matches in CI. Every finding no waiver or pragma suppresses is frozen, whatever the table's filters show. From a script, `lintcrux-pro baseline set project.lintcrux` runs the engines and freezes the same set.
 
 3. **Commit the project and baseline.**
 
@@ -27,7 +27,7 @@ A legacy codebase has thousands of findings nobody is going to fix today — but
 
 5. **Branch on the exit code.**
 
-    Do not just test for non-zero: `3` means LintCrux itself failed — an engine missing or crashed — and reporting that to your team as an RTL defect wastes an afternoon. The [CI integration cookbook](cookbook/ci-integration.md) has a copy-pasteable job that handles each code.
+    Do not just test for non-zero: `3` means LintCrux itself failed, an engine missing or crashed, and reporting that to your team as an RTL defect wastes an afternoon. The [CI integration cookbook](cookbook/ci-integration.md) has a copy-pasteable job that handles each code.
 
 6. **Upload SARIF to GitHub.**
 

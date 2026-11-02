@@ -6,18 +6,18 @@ A LintCrux project tells the engines what to compile and how to run. This page c
 
 A project is a single JSON file with a stable, version-controllable schema. It captures everything the engines need to reproduce a run:
 
-- **`sourceFiles`** — the RTL files to lint, with an optional per-file language override in `sourceFileLanguages`.
-- **`includePaths`** — include search paths.
-- **`defines`** — preprocessor macros.
-- **`topModule`** — the top module or entity.
-- **`language`** — `verilog`, `systemverilog` (the default), `vhdl` or `mixed`.
-- **`enabledEngineIds`** — which engines run (see [Which engines run](#which-engines)).
-- **`severityOverrides`** — per-rule severity overrides (see [Severity & pragmas](severity-and-pragmas.md)).
-- **`perEngineOptions`** — engine-specific options (see [Per-engine configuration](#per-engine)).
+- **`sourceFiles`**: the RTL files to lint, with an optional per-file language override in `sourceFileLanguages`.
+- **`includePaths`**: include search paths.
+- **`defines`**: preprocessor macros.
+- **`topModule`**: the top module or entity.
+- **`language`**: `verilog`, `systemverilog` (the default), `vhdl` or `mixed`.
+- **`enabledEngineIds`**, which engines run (see [Which engines run](#which-engines)).
+- **`severityOverrides`**: per-rule severity overrides (see [Severity & pragmas](severity-and-pragmas.md)).
+- **`perEngineOptions`**: engine-specific options (see [Per-engine configuration](#per-engine)).
 
 Relative paths resolve against the directory that holds the `.lintcrux` file, so a committed project works from any checkout location. Because the file is plain JSON, you check it into the same repository as your RTL and your whole team lints identically. The full schema is in the [project file reference](reference/project-file.md).
 
-**Creating one.** **New Project…** on the welcome screen, or **New Tab** (++cmd+t++ / ++ctrl+t++), asks where to save, writes an empty `.lintcrux`, and opens it. `File → Open Source Files…` (++cmd+shift+o++ / ++ctrl+shift+o++) then adds the files you pick to the active project — stored relative to the project file — and re-runs the engines. The **Sources** tab in the left dock lists what the project holds and removes a file from it.
+**Creating one.** **New Project…** on the welcome screen, or **New Tab** (++cmd+t++ / ++ctrl+t++), asks where to save, writes an empty `.lintcrux`, and opens it. `File → Open Source Files…` (++cmd+shift+o++ / ++ctrl+shift+o++) then adds the files you pick to the active project, stored relative to the project file, and re-runs the engines. The **Sources** tab in the left dock lists what the project holds and removes a file from it.
 
 **Opening one.** `File → Open Project…` (++cmd+o++ / ++ctrl+o++), the welcome screen, or a `.lintcrux` path on the command line. Each project opens in its own tab; opening a project that is already open focuses its tab instead. Opening a project runs its engines immediately.
 
@@ -34,11 +34,11 @@ Relative paths resolve against the directory that holds the `.lintcrux` file, so
 
 A file of any other type is refused with a message naming it. (macOS types `.f` as Fortran source, together with `.for`, so it also offers LintCrux for a `.for` file; that one is refused.)
 
-On Linux the AppImage's desktop entry claims the same file types, so a file manager offers LintCrux for them — with one exception: `.f`, which every Linux desktop reads as Fortran source. Open a filelist from inside LintCrux (`File → Import Vivado Filelist…` or `lintcrux --import-filelist`); a double-clicked `.f` goes to your Fortran editor.
+On Linux the AppImage's desktop entry claims the same file types, so a file manager offers LintCrux for them, with one exception: `.f`, which every Linux desktop reads as Fortran source. Open a filelist from inside LintCrux (`File → Import Vivado Filelist…` or `lintcrux --import-filelist`); a double-clicked `.f` goes to your Fortran editor.
 
 ## Opening a design with `<design>.crux-project` {#crux-project}
 
-A design usually spans more than one EDACrux product — the dump in WaveCrux, the RTL in NetCrux, the lint project in LintCrux, the regression suite in SimCrux. A design manifest — a file named after the design, like `uart_tx.crux-project`, at the root of your design — names all of them. It is a small YAML file you write once and check in alongside the RTL:
+A design usually spans more than one EDACrux product: the dump in WaveCrux, the RTL in NetCrux, the lint project in LintCrux, the regression suite in SimCrux. A design manifest (a file named after the design, like `uart_tx.crux-project`, at the root of your design) names all of them. It is a small YAML file you write once and check in alongside the RTL:
 
 ```yaml
 # uart_tx.crux-project
@@ -56,15 +56,15 @@ artifacts:
   simulation: simcrux.yaml
 ```
 
-LintCrux's part is the `lint` artifact — the `project.lintcrux` the manifest points at. Every path is relative to the manifest's own directory, so the file travels with the repository.
+LintCrux's part is the `lint` artifact: the `project.lintcrux` the manifest points at. Every path is relative to the manifest's own directory, so the file travels with the repository.
 
 **Opening a manifest.** Choose it in `File → Open Project…` (the dialog lists `.crux-project` files alongside `.lintcrux` projects), or pass its path on the command line (`lintcrux uart_tx/uart_tx.crux-project`): LintCrux opens the project the manifest's `lint:` entry names. A manifest with no `lint:` entry, or one naming a file that is missing, is reported rather than opened. A design folder holds exactly one manifest; if it holds two, LintCrux names both and opens neither, so remove or merge the extra.
 
-A manifest still named with the old bare name `.crux-project` opens too, and LintCrux asks you to rename it to `<design>.crux-project` — a later release stops reading the old name.
+A manifest still named with the old bare name `.crux-project` opens too, and LintCrux asks you to rename it to `<design>.crux-project`: a later release stops reading the old name.
 
 **Everything except `version` is optional.** A design that has a dump but no lint project yet just omits the `lint:` line. Keys a newer release understands and an older one does not are ignored, so a manifest never becomes unreadable.
 
-A design manifest holds no view state and no personal settings — it says what the design *is*, not how you last looked at it. That is what sessions are for.
+A design manifest holds no view state and no personal settings: it says what the design *is*, not how you last looked at it. That is what sessions are for.
 
 ## Importing a Vivado filelist {#filelist}
 
@@ -74,7 +74,7 @@ If you already maintain a `.f` filelist, you do not have to retype it. Choose `F
 
 If your design is packaged as FuseSoC `.core` files, let FuseSoC do the resolution and hand LintCrux the **EDAM** file it generates. Run `fusesoc run --target=lint --setup <core>`, then either choose `File → Import FuseSoC EDAM…` and pick the `.eda.yml` from the FuseSoC build directory, or run `lintcrux --import-edam <design>.eda.yml`. The import carries the resolved source list with per-file languages, include directories, defines, the top module, Verilator options, and any `.vlt` waiver files (routed to Verilator only). Which FuseSoC core contributed each file is recorded in the generated project as `sourceFileProvenance`. Anything the importer skips is reported as a warning rather than silently dropped. The [Lint a FuseSoC core](cookbook-fusesoc.md) recipe walks through it.
 
-You can also point the headless binary directly at loose files with `lintcrux foo.v bar.sv --top top_module`. It builds an ad-hoc project rooted at the files' common directory, inferring the language from their extensions. A positional argument that is neither a `.lintcrux` nor a lintable source file is reported as an error rather than skipped — a typo must not produce a clean run over zero files.
+You can also point the headless binary directly at loose files with `lintcrux foo.v bar.sv --top top_module`. It builds an ad-hoc project rooted at the files' common directory, inferring the language from their extensions. A positional argument that is neither a `.lintcrux` nor a lintable source file is reported as an error rather than skipped: a typo must not produce a clean run over zero files.
 
 !!! tip "Language is detected per file"
     Each engine receives only the sources in a language it supports: GHDL sees only the VHDL files, the other engines only the Verilog and SystemVerilog files. A mixed-language project runs the Verilog engines over the Verilog sources and GHDL over the VHDL sources in the same run, and an engine left with no compatible file is skipped.
@@ -91,7 +91,7 @@ LintCrux registers seven engines. Six run a real tool as a subprocess and normal
 | `yosys` | Yosys `hierarchy -check` + `check -assert` | Verilog, SystemVerilog (see [below](#yosys-systemverilog)) | `workingDirectory` |
 | `ghdl` | GHDL `-a` | VHDL | `warnFlags` (the `--warn-*` classes) |
 | `svlint` | Svlint | Verilog, SystemVerilog | `configPath` |
-| `cdc` | Structural clock-domain-crossing lint | Verilog, SystemVerilog | — (no binary of its own; it drives Yosys — see [Clock-domain crossings](cdc.md)) |
+| `cdc` | Structural clock-domain-crossing lint | Verilog, SystemVerilog |: (no binary of its own; it drives Yosys: see [Clock-domain crossings](cdc.md)) |
 
 From LintCrux 1.2, when the Verilator in use is 5.038 or later, LintCrux reads Verilator's own SARIF output (`--diagnostics-sarif-output`, written to a temporary file) instead of parsing its text. The findings are the same: same rules, severities, messages and locations. An older Verilator, or a SARIF file that is missing or unreadable, falls back to the text. If a Verilator release attaches suggested edits (SARIF `fixes`) to a result, they are kept on the finding and written back out by SARIF export; LintCrux does not apply them.
 
@@ -107,7 +107,7 @@ When Yosys stops on an error in the design instead, the error is reported as a f
 
 ### Which engines run {#which-engines}
 
-`enabledEngineIds` selects the engines. **An empty list means every registered engine** — which is what a new or imported project starts with — so list only the engines you have installed if you do not want the rest reported as unavailable. On the command line, `--engine <id>` (repeatable) narrows a headless run without editing the file.
+`enabledEngineIds` selects the engines. **An empty list means every registered engine**, which is what a new or imported project starts with, so list only the engines you have installed if you do not want the rest reported as unavailable. On the command line, `--engine <id>` (repeatable) narrows a headless run without editing the file.
 
 ### Verible rule profiles
 
@@ -119,13 +119,13 @@ Verible can be pointed at a named, curated rule selection instead of its own def
 }
 ```
 
-`lowrisc` is the lowRISC / OpenTitan Verilog style guide — the one Ibex and OpenTitan follow — packaged so you do not have to transcribe it. See [Rule profiles](reference/project-file.md#rule-profiles).
+`lowrisc` is the lowRISC / OpenTitan Verilog style guide, the one Ibex and OpenTitan follow, packaged so you do not have to transcribe it. See [Rule profiles](reference/project-file.md#rule-profiles).
 
-A `.rules.verible_lint` in the project root turns on Verible's config search by itself, and a `.svlint.toml` in the project root is passed to Svlint with `--config` — even for sources that live outside the root. Set `"rulesConfigSearch": true` under `perEngineOptions.verible` to have Verible look for per-directory `.rules.verible_lint` files when the root has none. With the Pro lint cache on, editing either file invalidates that engine's cached result.
+A `.rules.verible_lint` in the project root turns on Verible's config search by itself, and a `.svlint.toml` in the project root is passed to Svlint with `--config`: even for sources that live outside the root. Set `"rulesConfigSearch": true` under `perEngineOptions.verible` to have Verible look for per-directory `.rules.verible_lint` files when the root has none. With the Pro lint cache on, editing either file invalidates that engine's cached result.
 
 ### Engine binaries {#binaries}
 
-**LintCrux does not ship the engines** — install them and put them on `PATH` (see [Installation & first run](getting-started.md#engines)). Each engine's binary is resolved in this order:
+**LintCrux does not ship the engines**: install them and put them on `PATH` (see [Installation & first run](getting-started.md#engines)). Each engine's binary is resolved in this order:
 
 1. A per-launch command-line flag: `--verilator-path`, `--verible-path`, `--slang-path`, `--yosys-path`, `--ghdl-path`, `--svlint-path`.
 2. `Settings → Engines → Engine binary paths` → **Custom** → **Binary path**. The **Probe** button runs the engine's version command and shows the detected version, so you can confirm the path before you rely on it. The choice is saved and restored at the next launch, before any restored tab runs its engines.
@@ -137,7 +137,7 @@ The `cdc` engine has no binary of its own and no row in `Settings → Engines`: 
 
 From LintCrux 1.2 there is an eighth engine, `constraints`, which checks FPGA pin-constraint files (`.pcf`, `.lpf`, `.cst`) against the top module's ports. It is also LintCrux's own, takes its ports from a Yosys elaboration, has no row in `Settings → Engines`, and has nothing to check unless the project lists constraint files. See [Pin constraints](pin-constraints.md).
 
-The desktop app lists each engine's run status — Pending, Running, Completed, Failed, Binary not available, Cancelled — in the **Details** pane while no violation is selected; one engine being unavailable does not stop the others. The headless binary is stricter: a missing engine fails the run unless you pass `--allow-missing-engines` — see [Missing engines](cli/invocation.md#missing-engines).
+The desktop app lists each engine's run status (Pending, Running, Completed, Failed, Binary not available, Cancelled) in the **Details** pane while no violation is selected; one engine being unavailable does not stop the others. The headless binary is stricter: a missing engine fails the run unless you pass `--allow-missing-engines`: see [Missing engines](cli/invocation.md#missing-engines).
 
 ### The Yosys time limit {#yosys-time-limit}
 
@@ -148,7 +148,7 @@ From LintCrux 1.2 those three engines are allowed time in proportion to the size
 `Settings → Engines → Yosys time limit` changes it for the next run: **Automatic** (the default), **Extended** (four times the automatic time) or **No limit** (the three engines run until they finish or you choose **Cancel Run**). In the headless binary, `--engine-timeout` names one limit for every engine and replaces the automatic one; see [Invocation](cli/invocation.md).
 
 !!! note "Every engine ships rule metadata"
-    All seven engines have entries in the bundled rule database — 646 rules with default severity, tags and documentation links, browsable from the **Rules** tab in the left dock. Where that metadata came from differs per engine: the Verilator, Verible, Slang and GHDL ids are checked against real releases; Svlint's 159 rules are enumerated from the binary itself; CDC's are LintCrux's own; and Yosys' come from LintCrux's message-pattern table, because Yosys does not name its checks. See the [rule database reference](reference/rule-database.md). From 1.2 an eighth engine, `constraints`, adds ten first-party rules and the other engines gain a few, 664 in all (see below).
+    All seven engines have entries in the bundled rule database: 646 rules with default severity, tags and documentation links, browsable from the **Rules** tab in the left dock. Where that metadata came from differs per engine: the Verilator, Verible, Slang and GHDL ids are checked against real releases; Svlint's 159 rules are enumerated from the binary itself; CDC's are LintCrux's own; and Yosys' come from LintCrux's message-pattern table, because Yosys does not name its checks. See the [rule database reference](reference/rule-database.md). From 1.2 an eighth engine, `constraints`, adds ten first-party rules and the other engines gain a few, 664 in all (see below).
 
 ### Version drift
 
@@ -158,9 +158,9 @@ Engines rename and retire rules between releases. LintCrux carries a rule-alias 
 
 `Settings → General` has an **Auto-reload on source change** setting that decides what happens when you save a source file of an open project:
 
-- **Prompt me first** (the default) — a notice says the source files changed and offers **Re-run now**, which runs the tab's engines. From 1.1 it is a banner across the top with **Ignore** and **Re-run now**, which stays until you choose; **Ignore** dismisses it without running anything.
-- **Re-run automatically** — the engines re-run shortly after the save, re-linting only the changed files where an engine supports it.
-- **Do nothing** — no files are watched; re-run with ++f5++ or the toolbar run button.
+- **Prompt me first** (the default): a notice says the source files changed and offers **Re-run now**, which runs the tab's engines. From 1.1 it is a banner across the top with **Ignore** and **Re-run now**, which stays until you choose; **Ignore** dismisses it without running anything.
+- **Re-run automatically**: the engines re-run shortly after the save, re-linting only the changed files where an engine supports it.
+- **Do nothing**: no files are watched; re-run with ++f5++ or the toolbar run button.
 
 From LintCrux 1.2 the three options are labelled **Prompt**, **Auto** and **Off** so they fit the settings row; they do what **Prompt me first**, **Re-run automatically** and **Do nothing** do above.
 
@@ -170,7 +170,7 @@ Each tab watches its own project's source files, so a save re-runs only that pro
 
 LintCrux remembers your UI state separately from the project. A project file describes the RTL inputs; a session or workspace describes the lens on top.
 
-A **`.lintcrux-session`** file is a snapshot of one tab: the project it belongs to, the active severity and engine chips, the rule/message and file-glob filter text, the sort column and direction, the selected rule, the active filter-preset name, and the view mode. `File → Save Session…` (or the toolbar button) writes one for the active tab; restore it with `File → Open Session…`, **Open Session…** on the welcome screen, or `lintcrux --session debug.lintcrux-session`. Opening a session opens the project it names — or focuses its tab if it is already open — and then applies the filters and sort on top. The project path is stored absolute, so a session file is tied to the machine and checkout it was saved from. See the [session file format](reference/session-file.md).
+A **`.lintcrux-session`** file is a snapshot of one tab: the project it belongs to, the active severity and engine chips, the rule/message and file-glob filter text, the sort column and direction, the selected rule, the active filter-preset name, and the view mode. `File → Save Session…` (or the toolbar button) writes one for the active tab; restore it with `File → Open Session…`, **Open Session…** on the welcome screen, or `lintcrux --session debug.lintcrux-session`. Opening a session opens the project it names, or focuses its tab if it is already open, and then applies the filters and sort on top. The project path is stored absolute, so a session file is tied to the machine and checkout it was saved from. See the [session file format](reference/session-file.md).
 
 ### Workspaces {#workspaces}
 

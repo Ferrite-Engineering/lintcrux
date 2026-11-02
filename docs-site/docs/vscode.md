@@ -6,7 +6,7 @@ It installs from the [Visual Studio Marketplace](https://marketplace.visualstudi
 
 ## Point it at a results file { #results }
 
-The extension reads a LintCrux results file; it never runs the linter itself. Produce the file however you already run LintCrux — locally, in a pre-commit hook, or in CI — for example:
+The extension reads a LintCrux results file; it never runs the linter itself. Produce the file however you already run LintCrux (locally, in a pre-commit hook, or in CI) for example:
 
 ```bash
 lintcrux rtl/*.sv --sarif lintcrux.sarif
@@ -18,7 +18,7 @@ Diagnostics update on their own when the results file or the waiver file changes
 
 ## Waive from the editor { #waivers }
 
-A quick fix on a violation files a waiver for that line, or for that rule in that file. The waiver is written to `.lintcrux-waivers.json` in the project root — the same file [managed waivers](waivers.md#files) use — and the violation disappears from the editor straight away. LintCrux Pro applies the same waivers in the desktop app. Set `edacrux.lint.waiverAuthor` to control the author recorded on the waiver; left empty, it uses your operating-system user name.
+A quick fix on a violation files a waiver for that line, or for that rule in that file. The waiver is written to `.lintcrux-waivers.json` in the project root (the same file [managed waivers](waivers.md#files) use) and the violation disappears from the editor straight away. LintCrux Pro applies the same waivers in the desktop app. Set `edacrux.lint.waiverAuthor` to control the author recorded on the waiver; left empty, it uses your operating-system user name.
 
 ## Triage in the desktop app { #desktop }
 

@@ -11,7 +11,7 @@ LintCrux is desktop-first. The same dashboard runs on Linux, macOS and Windows. 
 | Linux | x86_64 | AppImage or `.tar.gz` from the [downloads page](https://lintcrux.app/download). A native binary, no webview wrapper. |
 | macOS | 12 or later, universal (Apple silicon and Intel) | `.dmg` from the [downloads page](https://lintcrux.app/download). |
 | Windows | 10 / 11, x86_64 | Installer or portable `.zip` from the [downloads page](https://lintcrux.app/download). |
-| Web | A current desktop browser | The read-only SARIF viewer at [app.lintcrux.app](https://app.lintcrux.app) — not the full dashboard. |
+| Web | A current desktop browser | The read-only SARIF viewer at [app.lintcrux.app](https://app.lintcrux.app), not the full dashboard. |
 
 Release builds do not expire, and the app tells you when a newer build is out (see [Staying up to date](#staying-up-to-date)).
 
@@ -20,7 +20,7 @@ Release builds do not expire, and the app tells you when a newer build is out (s
 
 ## The lint engines {#engines}
 
-LintCrux does not reimplement static analysis — it orchestrates the open-source engines and parses what they emit. **LintCrux does not ship the engines**: install the ones you want and make sure they are on your `PATH`. Most are available through `apt`, Homebrew or `winget`, and all six are in [OSS-CAD-Suite](https://github.com/YosysHQ/oss-cad-suite-build).
+LintCrux does not reimplement static analysis: it orchestrates the open-source engines and parses what they emit. **LintCrux does not ship the engines**: install the ones you want and make sure they are on your `PATH`. Most are available through `apt`, Homebrew or `winget`, and all six are in [OSS-CAD-Suite](https://github.com/YosysHQ/oss-cad-suite-build).
 
 | Engine | Languages | How it is invoked | Executable LintCrux looks for |
 |---|---|---|---|
@@ -31,21 +31,21 @@ LintCrux does not reimplement static analysis — it orchestrates the open-sourc
 | Yosys | Verilog, SystemVerilog | `hierarchy -check` followed by `check -assert` | `yosys` (`yosys.exe` on Windows) |
 | Svlint | Verilog, SystemVerilog | `svlint` with its TOML rule configuration | `svlint` |
 
-The built-in CDC engine needs no binary of its own — it elaborates the design with the same `yosys`, so whatever the Yosys engine is configured to run, CDC runs too.
+The built-in CDC engine needs no binary of its own: it elaborates the design with the same `yosys`, so whatever the Yosys engine is configured to run, CDC runs too.
 
 For each engine, `Settings → Engines` offers **Auto-detect** (search `PATH`) or **Custom** (a path you supply, with a **Probe** button that runs the engine's version command and shows what it found). Per-engine options and the full resolution order are on [Projects & engines](projects-and-engines.md#per-engine).
 
-An engine whose binary is not installed is reported as **Binary not available** rather than as a clean run — the other engines still run.
+An engine whose binary is not installed is reported as **Binary not available** rather than as a clean run: the other engines still run.
 
 ## First launch {#first-launch}
 
-With nothing open, LintCrux shows a welcome screen with **Open Project…**, **Open Workspace…**, **Open Session…**, **New Project…** and **Import SARIF report…** buttons, and a **Recent projects** list of the projects you opened most recently. Click one to reopen it, or click the X at the end of its row to remove it from the list. A project whose file has been moved or deleted is shown greyed as "Project file not found". `File → Clear Recent Projects` (also in the command palette) empties the list. From LintCrux 1.2, opening a project whose file is gone also removes it from the list and says which file could not be opened. You do not need a project loaded to explore: the toolbar, status bar, menu bar, command palette and Settings are all reachable from the welcome screen. LintCrux is localized in English, Simplified Chinese, Japanese and Korean — the **Language** picker lives in `Settings → Appearance`.
+With nothing open, LintCrux shows a welcome screen with **Open Project…**, **Open Workspace…**, **Open Session…**, **New Project…** and **Import SARIF report…** buttons, and a **Recent projects** list of the projects you opened most recently. Click one to reopen it, or click the X at the end of its row to remove it from the list. A project whose file has been moved or deleted is shown greyed as "Project file not found". `File → Clear Recent Projects` (also in the command palette) empties the list. From LintCrux 1.2, opening a project whose file is gone also removes it from the list and says which file could not be opened. You do not need a project loaded to explore: the toolbar, status bar, menu bar, command palette and Settings are all reachable from the welcome screen. LintCrux is localized in English, Simplified Chinese, Japanese and Korean: the **Language** picker lives in `Settings → Appearance`.
 
 ## Run your first lint {#run-first-lint}
 
 1. **Open or create a project.**
 
-    Open an existing `.lintcrux` project with ++cmd+o++ / ++ctrl+o++ (`File → Open Project…`), or click **New Project…** on the welcome screen, which asks where to save and writes an empty project. With a project open, add RTL to it with ++cmd+shift+o++ / ++ctrl+shift+o++ (`File → Open Source Files…`) — the files are added to the active project, stored relative to the project file. No project yet but a build that already describes one? `File → Import Vivado Filelist…` and `File → Import FuseSoC EDAM…` generate one.
+    Open an existing `.lintcrux` project with ++cmd+o++ / ++ctrl+o++ (`File → Open Project…`), or click **New Project…** on the welcome screen, which asks where to save and writes an empty project. With a project open, add RTL to it with ++cmd+shift+o++ / ++ctrl+shift+o++ (`File → Open Source Files…`): the files are added to the active project, stored relative to the project file. No project yet but a build that already describes one? `File → Import Vivado Filelist…` and `File → Import FuseSoC EDAM…` generate one.
 
 2. **Run all engines.**
 
@@ -53,12 +53,12 @@ With nothing open, LintCrux shows a welcome screen with **Open Project…**, **O
 
 3. **Read the result.**
 
-    The status bar summarizes the run — `X total · Y errors · Z warnings · N notes · M waived`. Click a column header to sort, use the severity and engine chips to filter, and click a violation to see its details and the surrounding source; double-click it to open the location in your editor. To stop a run early, press ++escape++ or click the stop button that replaces the run button while a run is in flight.
+    The status bar summarizes the run: `X total · Y errors · Z warnings · N notes · M waived`. Click a column header to sort, use the severity and engine chips to filter, and click a violation to see its details and the surrounding source; double-click it to open the location in your editor. To stop a run early, press ++escape++ or click the stop button that replaces the run button while a run is in flight.
 
 !!! tip "From the command line"
     The desktop app opens from the command line: `lintcrux project.lintcrux` opens a project, `--workspace <file>` opens a saved multi-tab workspace, `--session <file>` restores a session, and `--import-filelist rtl.f` converts a Vivado-style filelist into a `.lintcrux` project.
 
-    A separate **headless binary** does the same lint with no window and a meaningful exit code: `lintcrux project.lintcrux --exit-code` gates on findings, and `lintcrux foo.v bar.sv --top top_module` lints loose sources without a project file. It shares the desktop app's engine planner — see [Exports & CI](exports-and-ci.md) and the [command-line reference](cli/invocation.md).
+    A separate **headless binary** does the same lint with no window and a meaningful exit code: `lintcrux project.lintcrux --exit-code` gates on findings, and `lintcrux foo.v bar.sv --top top_module` lints loose sources without a project file. It shares the desktop app's engine planner: see [Exports & CI](exports-and-ci.md) and the [command-line reference](cli/invocation.md).
 
 ## Staying up to date {#staying-up-to-date}
 
@@ -68,7 +68,7 @@ LintCrux checks a release manifest on launch, once every 24 hours while it is ru
 - **Update Now** opens the [download page](https://lintcrux.app/download) in your browser. There is no in-app download and no self-update: LintCrux tells you, you decide.
 - **✕** dismisses the strip for this session and this version. A release flagged mandatory has no dismiss button.
 
-Turn the automatic check off with `Settings → General → Automatically check for updates`. You can always check by hand from `Help → Check for Updates` (the application menu on macOS), the command palette, or the About box — the manual check runs even when the automatic one is off. The request is a plain `GET` for a static manifest; the only thing it carries is a `User-Agent` of the form `LintCrux/<version> (<os>)`. The update strip does not appear in the web viewer.
+Turn the automatic check off with `Settings → General → Automatically check for updates`. You can always check by hand from `Help → Check for Updates` (the application menu on macOS), the command palette, or the About box: the manual check runs even when the automatic one is off. The request is a plain `GET` for a static manifest; the only thing it carries is a `User-Agent` of the form `LintCrux/<version> (<os>)`. The update strip does not appear in the web viewer.
 
 ## Reporting issues {#reporting-issues}
 
@@ -83,13 +83,13 @@ The fastest way to get something fixed is the built-in issue reporter, reachable
 
 On **Submit**, LintCrux copies the report to your clipboard and opens a pre-filled issue in your browser; if the report is too long to pre-fill, paste it from the clipboard.
 
-The rule is **counts, ids, versions and enum names — nothing else**. A report never contains file paths of any kind, source-file contents, violation message text, the names of your filter presets, or the text you typed into the filters. Version strings are scrubbed of anything path-shaped, because a locally built engine can print its install prefix in its `--version` banner. Nothing leaves your machine until you press **Submit**.
+The rule is **counts, ids, versions and enum names: nothing else**. A report never contains file paths of any kind, source-file contents, violation message text, the names of your filter presets, or the text you typed into the filters. Version strings are scrubbed of anything path-shaped, because a locally built engine can print its install prefix in its `--version` banner. Nothing leaves your machine until you press **Submit**.
 
 ## Usage statistics {#usage-statistics}
 
 The first launch shows a one-time disclosure with a **Send anonymous usage statistics** toggle. It starts **on**, except on machines whose language settings place them in the EEA, the United Kingdom, Switzerland or South Korea, where it starts **off**. From 1.1 the desktop app reads the device's region setting as well; the web edition goes by the browser's languages and time zone. Nothing is sent until the disclosure has been answered, and you can change the choice at any time under `Settings → Privacy`. On an Enterprise seat, an organization policy file can decide for the whole fleet instead, and no disclosure appears.
 
-What is sent: feature, engine and error counters, app and OS version, form factor, language, and license tier — never file names, rule identifiers, or the text of any lint or error message. An error the desktop app did not handle is counted by its kind alone (for example, a state error in the widgets library), never with its message or stack trace. The headless `lintcrux` binary never asks; it sends only on a machine where the desktop app has stored an affirmative answer.
+What is sent: feature, engine and error counters, app and OS version, form factor, language, and license tier: never file names, rule identifiers, or the text of any lint or error message. An error the desktop app did not handle is counted by its kind alone (for example, a state error in the widgets library), never with its message or stack trace. The headless `lintcrux` binary never asks; it sends only on a machine where the desktop app has stored an affirmative answer.
 
 `Settings → Privacy` also shows the **Installation ID**, the random identifier attached to what is sent, with a **Copy** button. Send it to [privacy@ferriteengineering.com](mailto:privacy@ferriteengineering.com) to have this installation's data deleted. The ID appears only after usage statistics have been turned on; until then the row says there is none, and opening Settings does not create one. From 1.1, turning usage statistics off removes the ID, and turning them on again creates a new one, so copy it first if you want that installation's data deleted.
 

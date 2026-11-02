@@ -3,10 +3,10 @@
 LintCrux ships **two** command-line front doors, and the distinction
 matters:
 
-- **`lintcrux` (the headless binary)** — built from `bin/lintcrux.dart`.
+- **`lintcrux` (the headless binary)**: built from `bin/lintcrux.dart`.
   Runs the engines, writes an export, exits with a meaningful code. No
   window, no display server. This is what you put in a pipeline.
-- **The desktop app's command line** — every invocation other than
+- **The desktop app's command line**: every invocation other than
   `--help`, `--version`, a malformed command line (exit `64`) and a
   failed `--import-filelist` / `--import-edam` (exit `65`) opens the GUI.
   Those four print their output and end the process with that code
@@ -29,7 +29,7 @@ lintcrux [options] [path...]
 
 ## Building the headless binary
 
-Prebuilt archives ship with each desktop release — see
+Prebuilt archives ship with each desktop release: see
 [Getting the binary](../cookbook/ci-integration.md#getting-the-binary).
 To build from source, use the `dart` that comes with the Flutter SDK
 (the package's dependency graph includes Flutter, so a standalone Dart
@@ -44,12 +44,12 @@ tool/build_cli.sh
 ```
 
 The executable lands at `build/cli/bundle/bin/lintcrux` and runs
-standalone — nothing else from the bundle is needed. Copy it onto your
+standalone: nothing else from the bundle is needed. Copy it onto your
 `PATH`.
 
 !!! note "Why `dart build cli` and not `dart compile exe`"
     `dart compile` refuses to run when any package in the resolution
-    declares a native build hook, and `objective_c` does — pulled in
+    declares a native build hook, and `objective_c` does: pulled in
     transitively by `path_provider_foundation`, a Flutter plugin the
     *desktop app* needs and the CLI never touches. `dart build cli` is
     the supported replacement.
@@ -78,7 +78,7 @@ clean run over zero files.
 | --- | --- |
 | `--top <module>` | Top module / entity. Sets it for an ad-hoc source-file run; overrides the project file's `topModule` when a project is loaded. |
 | `--param <NAME=VALUE>` | From 1.2: set a top-level parameter for this run (repeatable), on top of the project file's [`parameters`](../reference/project-file.md#parameters). Passed to Verilator and Slang as `-G` and to the Yosys-based engines as `hierarchy -chparam`, which needs a top module. A malformed value is a usage error (`64`). See [Lint every configuration of a parameterised core](../cookbook-parameterised-core.md). |
-| `--engine <id>` | Run only this engine. Repeatable. One of `verilator`, `verible`, `slang`, `yosys`, `ghdl`, `svlint`, `cdc`, and from 1.2 `constraints`. Overrides the project's `enabledEngineIds` for this invocation — the usual shape for a CI image that installs one engine. |
+| `--engine <id>` | Run only this engine. Repeatable. One of `verilator`, `verible`, `slang`, `yosys`, `ghdl`, `svlint`, `cdc`, and from 1.2 `constraints`. Overrides the project's `enabledEngineIds` for this invocation: the usual shape for a CI image that installs one engine. |
 | `--constraints <file>` | From 1.2. Check this FPGA pin-constraint file (`.pcf`, `.lpf` or `.cst`; the extension picks the format) against the top module's ports. Repeatable, and added to the project's own `constraintFiles`. Needs a top module: a run with none exits `3`, it is never clean. An extension that is none of the three, or a path that does not exist, is a usage error. See [Pin constraints](../pin-constraints.md). |
 | `--config <path>`, `-c` | Overlay a partial `.lintcrux` document (JSON) on the loaded project. Only the keys present are replaced. See [Config overlay](#config-overlay). |
 | `--export <format>` | Write the violations in this format to `--out`. One of `sarif`, `json`, `csv`, `html`. Requires `--out`. |
@@ -89,7 +89,7 @@ clean run over zero files.
 | `--baseline <path>` | Baseline file for `--fail-on-new-violations`. Defaults to `.lintcrux-baseline.json` in the project root. |
 | `--exit-code` | Exit `1` when any non-suppressed violation remains. |
 | `--fail-on-new-violations` | Exit `2` when a violation is absent from the baseline. Pre-existing findings do not fail the build. Composes with `--exit-code`. |
-| `--allow-missing-engines` | Treat an engine whose binary cannot be found as skipped rather than as a run failure. Off by default — see [Missing engines](#missing-engines). |
+| `--allow-missing-engines` | Treat an engine whose binary cannot be found as skipped rather than as a run failure. Off by default: see [Missing engines](#missing-engines). |
 | `--quiet`, `-q` | Suppress the per-violation listing; print only the summary. Exit codes are unaffected. |
 | `--engine-timeout <seconds>` | Wall-clock budget per engine; an engine still running when it runs out is killed and the run exits `3`. Default `300`. Raise it for a Yosys-based engine (`yosys`, `cdc`) flattening a full SoC, which can reasonably take longer than five minutes. From LintCrux 1.2, without this option the engines that elaborate with Yosys (`yosys`, `cdc`, `constraints`) are allowed time in proportion to the size of their sources, never less than `300` seconds (see [The Yosys time limit](../projects-and-engines.md#yosys-time-limit)); given, it applies to every engine. A value that is not a positive whole number is a usage error. |
 | `--import-filelist <rtl.f>` | Convert a Vivado-style `.f` filelist into a `.lintcrux` project, print the emitted path, then lint it. Recursive `-f` includes, `+incdir+`, `+define+` and env-var expansion are honored. |
@@ -115,11 +115,11 @@ This is the part a pipeline depends on, so it is spelled out in full.
 | `4` | `over-threshold` | Never returned by the open-core binary. The Pro/Enterprise `lintcrux-pro` binary returns it when an organization's signed policy file sets a violation ceiling and the run exceeds it. |
 | `64` | `usage-error` | Bad flag, `--export` without `--out`, an unknown `--engine` id, no positional argument, an unusable positional argument, or a project or source path that does not exist. |
 | `65` | `data-error` | `--import-filelist` could not read or convert the filelist, or `--import-edam` could not read or convert the EDAM file. |
-| `130` | — | **Cancelled.** `SIGINT`, reported as `128 + 2` the way a shell expects. Ctrl+C, and what a CI runner sends on a cancelled job. Any engine process still running is reaped first. |
-| `143` | — | **Terminated.** `SIGTERM`, reported as `128 + 15`. A runner timeout or a scheduler kill. Same reaping. |
+| `130` | – | **Cancelled.** `SIGINT`, reported as `128 + 2` the way a shell expects. Ctrl+C, and what a CI runner sends on a cancelled job. Any engine process still running is reaped first. |
+| `143` | – | **Terminated.** `SIGTERM`, reported as `128 + 15`. A runner timeout or a scheduler kill. Same reaping. |
 
 `130` and `143` carry no label on the summary line, because a signalled run is
-stopped rather than finished — there is no result to summarise. A pipeline that
+stopped rather than finished: there is no result to summarise. A pipeline that
 branches on the code must handle them explicitly: a catch-all that reads
 "usage error" turns every cancelled job into a hunt for a typo. See the
 [CI cookbook](../cookbook/ci-integration.md#the-exit-code-contract).
@@ -127,10 +127,10 @@ branches on the code must handle them explicitly: a catch-all that reads
 !!! note "A refused policy file is said out loud, and yields no threshold"
 
     `4` needs a threshold, and a threshold comes from the organization's signed
-    `.crux-policy.json`. If that file is found and **refused** — a bad
+    `.crux-policy.json`. If that file is found and **refused** (a bad
     signature, an unsigned file reached through `CRUX_POLICY`, a signed file on
     a machine with no organization public key installed, or a world-writable
-    well-known path — `lintcrux-pro` prints one line on stderr and applies no
+    well-known path) `lintcrux-pro` prints one line on stderr and applies no
     threshold:
 
     ```
@@ -145,7 +145,7 @@ branches on the code must handle them explicitly: a catch-all that reads
     which from the pipeline's side looked exactly like a threshold nobody had
     set. Full reference: [the policy file reference](https://edacrux.app/policy-reference#failures).
 
-Three properties are deliberate:
+Three properties are worth knowing:
 
 **A bare run is a report, not a gate.** `lintcrux project.lintcrux` exits
 `0` even with violations. You opt into failing with `--exit-code` or
@@ -189,17 +189,16 @@ already knows how to click on:
 rtl/top.sv:42:17: warning: [verilator/WIDTHTRUNC] Operator ASSIGNW expects 4 bits ...
 ```
 
-Sorted by severity (fatal → none), then file, then line, then column —
-so a diff between two CI runs shows real changes rather than engine
+Sorted by severity (fatal → none), then file, then line, then column, so a diff between two CI runs shows real changes rather than engine
 scheduling order. Paths are shortened against the working directory.
 With a baseline active, violations absent from it are annotated `(new)`.
 
 Diagnostics go to stderr with two distinct prefixes: `lintcrux: note:`
-(non-fatal — a skipped engine, a missing baseline) and
+(non-fatal: a skipped engine, a missing baseline) and
 `lintcrux: error:` (fatal). Only the latter implies a non-zero exit.
 `--import-edam` additionally prints non-fatal importer advisories as
 `lintcrux: warning:`. A run that never reached the engines (a usage
-error, an unloadable project) prints nothing on stdout — not even a
+error, an unloadable project) prints nothing on stdout, not even a
 summary line.
 
 ## Missing engines
@@ -246,7 +245,7 @@ the project's value wholesale; absent keys leave it alone.
 
 Overlayable keys: `sourceFiles`, `includePaths`, `defines`, `topModule`,
 `language`, `enabledEngineIds`, `severityOverrides`, `perEngineOptions`.
-`name` and `rootPath` are deliberately not overlayable — they identify
+`name` and `rootPath` are not overlayable: they identify
 the project.
 
 An unknown key, a wrong-typed value, or an unparseable file **fails the
@@ -261,8 +260,7 @@ directory.
 `--fail-on-new-violations` compares the run against
 `.lintcrux-baseline.json` in the project root (or `--baseline <path>`)
 and fails only on violations the baseline does not contain. Matching is
-by a fingerprint of `(rule, file, message)` — deliberately **not** line
-number, so adding an import above a violation does not turn it into a
+by a fingerprint of `(rule, file, message)`: **not** line number, so adding an import above a violation does not turn it into a
 regression. The file component is relative to the project root (a
 source outside the root keeps its absolute path), so a baseline matches
 from any checkout location.
@@ -299,8 +297,7 @@ cannot read its baseline must not wave the build through.
 - `ruleId` without the engine prefix (`UNUSEDSIGNAL`, not
   `verilator/UNUSEDSIGNAL`).
 
-A violation reported outside the project root — a system header, say —
-keeps its absolute path rather than becoming a `../..` escape, which
+A violation reported outside the project root (a system header, say) keeps its absolute path rather than becoming a `../..` escape, which
 SARIF consumers reject.
 
 The export contains **every** violation the run produced. A suppressed
@@ -314,6 +311,6 @@ schema.
 
 ## Web builds
 
-The web SARIF viewer ignores the command line entirely — it is driven by
+The web SARIF viewer ignores the command line entirely: it is driven by
 the `?sarif=` query parameter instead. See
 [The web viewer](../user-guide/web-mode.md).

@@ -28,7 +28,7 @@ Per-platform archives ship alongside each desktop release, at
 (`linux-x64.tar.gz`, `macos-arm64.zip`, `windows-x64.zip`); each holds
 the `lintcrux` executable and the `LICENSE`. The current version is the
 `latest.version` field of `https://updates.lintcrux.app/manifest.json`.
-Pin the version — there is deliberately no `latest` alias, so a CI image
+Pin the version: there is no `latest` alias, so a CI image
 cannot silently change linter versions between runs.
 
 Or build it from a checkout of the LintCrux open-core repository, using
@@ -53,19 +53,19 @@ usable:
 | `1` | `--exit-code` was passed and findings remain. |
 | `2` | `--fail-on-new-violations` was passed and a finding is absent from the baseline. |
 | `3` | **The run itself failed.** An engine died, timed out, or was not installed, or the project file could not be loaded. |
-| `4` | `over-threshold` — the organization's signed `ciGateThreshold` is set and the surviving count exceeds it. **Enterprise, and only from `lintcrux-pro`**: the open-core binary never populates a threshold. Outranks `1` and `2`. |
+| `4` | `over-threshold`: the organization's signed `ciGateThreshold` is set and the surviving count exceeds it. **Enterprise, and only from `lintcrux-pro`**: the open-core binary never populates a threshold. Outranks `1` and `2`. |
 | `64` | Bad command line, or a path that does not exist. |
 | `65` | `--import-filelist` / `--import-edam` could not convert the input file. |
-| `130` | **Cancelled** — `SIGINT` (`128 + 2`). A developer pressing Ctrl+C, and what GitHub Actions and GitLab send when a job is cancelled. |
-| `143` | **Terminated** — `SIGTERM` (`128 + 15`). A runner timeout, or a job killed by the scheduler. |
+| `130` | **Cancelled**: `SIGINT` (`128 + 2`). A developer pressing Ctrl+C, and what GitHub Actions and GitLab send when a job is cancelled. |
+| `143` | **Terminated**: `SIGTERM` (`128 + 15`). A runner timeout, or a job killed by the scheduler. |
 
-`lintcrux-pro push-trends` adds `5` (shared database unreachable — retry is reasonable) and `6` (the run cannot be recorded in the shared schema — never retry); see [Team trend database](../team-database.md#ci). They are clear of every code above on purpose.
+`lintcrux-pro push-trends` adds `5` (shared database unreachable (retry is reasonable) and `6` (the run cannot be recorded in the shared schema) never retry); see [Team trend database](../team-database.md#ci). They are clear of every code above on purpose.
 
 **`130` and `143` are why the `case` below has no bare `*)` failure branch.** A cancelled job exits `130`; matched by a catch-all that says "usage error", a cancellation is reported to whoever reads the log as a broken command line, and they go looking for a typo that is not there. Match the codes you handle and say "unexpected" for the rest, with the number in the message.
 
 `3` is the one people forget to handle, and it is the reason the others
 are trustworthy. Most lint binaries exit non-zero *because they found
-violations* — `verible-verilog-lint` does exactly that — so "non-zero"
+violations*, `verible-verilog-lint` does exactly that, so "non-zero"
 alone tells you nothing about whether the tool worked. LintCrux keeps
 them separate, and a run where any engine failed reports `3` **even if
 other engines found violations**, because a count from a partial run is
@@ -75,7 +75,7 @@ The practical consequence: a job that treats every non-zero exit as
 "lint found something" will report a missing Verilator install as an RTL
 defect. Branch on the code.
 
-## Worked example — GitHub Actions
+## Worked example: GitHub Actions
 
 Copy this. It runs as written.
 
@@ -152,7 +152,7 @@ Four details that matter:
   step green so the SARIF upload runs, and puts a readable message in
   the log instead of a bare non-zero exit.
 - **`if: always()` on the upload.** You want the SARIF *especially* when
-  the gate failed — that is the run whose findings a reviewer needs.
+  the gate failed: that is the run whose findings a reviewer needs.
 - **The catch-all names the number and does not guess.** `64`/`65` are the
   input errors; `130`/`143` are a cancellation. A `*)` that says "usage error"
   turns every cancelled job into a hunt for a typo.
@@ -217,10 +217,10 @@ lintcrux project.lintcrux --allow-missing-engines --exit-code
 
 Prefer **(a)**. It states the intent in the command line, so a reviewer
 reading the job sees which engines gate the build. **(b)** is for
-transitional periods, and it is off by default precisely because a job
+transitional periods, and it is off by default because a job
 that asked for every engine and silently ran zero is a green build that
 means nothing. The `cdc` engine runs `yosys`, so on an image without
-Yosys both `yosys` and `cdc` are missing — see
+Yosys both `yosys` and `cdc` are missing: see
 [Missing engines](../cli/invocation.md#missing-engines).
 
 You can also keep the project file untouched and put the CI-specific
@@ -238,7 +238,7 @@ lintcrux project.lintcrux --config ci/lint-overrides.lintcrux --exit-code
 }
 ```
 
-A malformed overlay fails the run rather than being ignored — a job
+A malformed overlay fails the run rather than being ignored: a job
 whose severity overrides silently did not apply reports the wrong
 answer.
 
@@ -246,7 +246,7 @@ answer.
 
 Waivers recorded in the desktop app live in `.lintcrux-waivers.json` in
 the project root. Commit it, and run the **LintCrux Pro** binary in
-place of `lintcrux` — same flags, same exit codes — and a waived
+place of `lintcrux` (same flags, same exit codes) and a waived
 finding does not fail the gate:
 
 ```bash
@@ -290,7 +290,7 @@ is relative to the project root, so a baseline recorded in
 `/home/runner/work/soc/soc`.
 
 Writing a baseline is a Pro feature; reading one is not. With no
-baseline file present the gate still runs — it just treats every
+baseline file present the gate still runs: it just treats every
 violation as new and exits `2`, with a note saying where it looked.
 Strict, not broken.
 
@@ -307,7 +307,7 @@ dashboard reads:
 lintcrux-pro push-trends --db "$CI_TREND_DB" rtl/project.lintcrux
 ```
 
-A run that failed pushes nothing — a partial run recorded as a data
+A run that failed pushes nothing: a partial run recorded as a data
 point shows on the dashboard as a fake improvement, which is worse than
 a gap.
 
@@ -381,7 +381,7 @@ check. The generated project lists no `enabledEngineIds`, so without
 ## Linting a FuseSoC project (EDAM)
 
 If your design is packaged as FuseSoC `.core` files, let FuseSoC do the
-resolution — conditionals, dependency fetching, file staging — and hand
+resolution (conditionals, dependency fetching, file staging) and hand
 LintCrux the **EDAM** file it generates:
 
 ```bash

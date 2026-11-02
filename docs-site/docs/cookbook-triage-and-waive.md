@@ -1,6 +1,6 @@
 # Triage a run & waive false positives
 
-You ran lint and got hundreds of findings. Most are real-but-known or outright false positives. This recipe walks from a raw run to a triaged table — sorting, filtering, inspecting, and recording waivers with a reason — so the next person sees only what matters.
+You ran lint and got hundreds of findings. Most are real-but-known or outright false positives. This recipe walks from a raw run to a triaged table (sorting, filtering, inspecting, and recording waivers with a reason) so the next person sees only what matters.
 
 - **Goal:** Turn a noisy first run into a triaged table where every remaining finding is real, and every false positive is waived with a justification.
 - **Time:** About 10 minutes.
@@ -11,7 +11,7 @@ You ran lint and got hundreds of findings. Most are real-but-known or outright f
 
 1. **Run every engine.**
 
-    Open your project with ++cmd+o++ / ++ctrl+o++; the engines run as it opens (press ++f5++ to run them again). With no violation selected, the **Details** pane lists each engine's status — confirm each one says Completed rather than Failed or Binary not available.
+    Open your project with ++cmd+o++ / ++ctrl+o++; the engines run as it opens (press ++f5++ to run them again). With no violation selected, the **Details** pane lists each engine's status: confirm each one says Completed rather than Failed or Binary not available.
 
 2. **Sort and filter to the worst first.**
 
@@ -23,7 +23,7 @@ You ran lint and got hundreds of findings. Most are real-but-known or outright f
 
 4. **Waive a false positive.**
 
-    Right-click the violation and choose **Waive…**. The rule id, file path and line are prefilled; write a **Justification** — it is required — and optionally set an **Expires (optional)** date so the waiver gets re-reviewed later. Press **Waive**. The waiver is written to `.lintcrux-waivers.json` and the violation drops out of the table.
+    Right-click the violation and choose **Waive…**. The rule id, file path and line are prefilled; write a **Justification**, it is required, and optionally set an **Expires (optional)** date so the waiver gets re-reviewed later. Press **Waive**. The waiver is written to `.lintcrux-waivers.json` and the violation drops out of the table.
 
 5. **Waive a rule that fires falsely all over a file.**
 
@@ -31,7 +31,7 @@ You ran lint and got hundreds of findings. Most are real-but-known or outright f
 
 6. **Confirm the table is clean.**
 
-    Waived findings are hidden from the table, and the status-bar summary counts them as *waived* — check that what remains is the work that needs doing. Open `Tools → Review Waivers…` to confirm what you recorded.
+    Waived findings are hidden from the table, and the status-bar summary counts them as *waived*: check that what remains is the work that needs doing. Open `Tools → Review Waivers…` to confirm what you recorded.
 
 ## Where to go next {#next}
 

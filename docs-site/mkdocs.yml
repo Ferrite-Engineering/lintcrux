@@ -1,6 +1,6 @@
 site_name: LintCrux Documentation
 site_url: https://docs.lintcrux.app/
-site_description: The LintCrux user guide — installation, the interface, projects and lint engines, the violations dashboard, waivers, baselines, trends, exports, CI integration, and the EDACrux suite.
+site_description: The LintCrux user guide covering installation, the interface, projects and lint engines, the violations dashboard, waivers, baselines, trends, exports, CI integration, and the EDACrux suite.
 copyright: Copyright &copy; 2026 Ferrite Engineering LLC
 use_directory_urls: false
 docs_dir: docs

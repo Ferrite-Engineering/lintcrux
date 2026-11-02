@@ -1,6 +1,6 @@
 # Keyboard & mouse reference
 
-This is the complete default binding set — every action LintCrux ships with a keyboard shortcut, the actions that ship unbound, and the mouse gestures the violations table responds to. Bindings are written macOS first; the platform modifier is ++cmd++ on macOS and ++ctrl++ on Linux and Windows. Anything here can be rebound in `Settings → Keyboard Shortcuts`.
+This is the complete default binding set: every action LintCrux ships with a keyboard shortcut, the actions that ship unbound, and the mouse gestures the violations table responds to. Bindings are written macOS first; the platform modifier is ++cmd++ on macOS and ++ctrl++ on Linux and Windows. Anything here can be rebound in `Settings → Keyboard Shortcuts`.
 
 ## Default shortcuts {#defaults}
 
@@ -29,18 +29,18 @@ Twenty-one actions ship with a default binding. Everything else is reachable fro
 | ++cmd+shift+m++ / ++ctrl+shift+m++ | App Diagnostics… | Tools |
 | ++f1++ | About LintCrux | Help (the application menu on macOS) |
 | ++cmd+comma++ / ++ctrl+comma++ | Settings… | LintCrux (File on Linux and Windows) |
-| ++cmd+q++ / ++ctrl+q++ | Quit LintCrux — **Exit** on Linux and Windows | LintCrux (File on Linux and Windows) |
+| ++cmd+q++ / ++ctrl+q++ | Quit LintCrux: **Exit** on Linux and Windows | LintCrux (File on Linux and Windows) |
 
 !!! note "Bindings that are not platform-adapted"
     **Next Tab** and **Previous Tab** are ++ctrl+tab++ and ++ctrl+shift+tab++ on *every* platform, macOS included.
 
-    **Run All Engines** is bare ++f5++, **About LintCrux** is bare ++f1++, and **Cancel Run** is ++escape++ — the suite-wide cancel convention shared with WaveCrux, NetCrux and SimCrux.
+    **Run All Engines** is bare ++f5++, **About LintCrux** is bare ++f1++, and **Cancel Run** is ++escape++: the suite-wide cancel convention shared with WaveCrux, NetCrux and SimCrux.
 
-    **Toggle Theme** switches between Crux Light and Crux Dark — see [Appearance & themes](appearance-and-themes.md#light-dark).
+    **Toggle Theme** switches between Crux Light and Crux Dark: see [Appearance & themes](appearance-and-themes.md#light-dark).
 
 ## Actions without a default binding {#unbound}
 
-These actions ship deliberately unbound. They are fully available from the command palette (++cmd+shift+p++ / ++ctrl+shift+p++) and the menu bar, and you can assign your own shortcut to any of them.
+These actions ship unbound. They are fully available from the command palette (++cmd+shift+p++ / ++ctrl+shift+p++) and the menu bar, and you can assign your own shortcut to any of them.
 
 - **File:** New Workspace, Open Workspace…, Open Session…, Import Vivado Filelist…, Import FuseSoC EDAM…, Import SARIF report…, Save Session…, Save Workspace As…, the four **Export Violations as …** actions, Close All Tabs, Close Active Project, Clear Recent Projects, and the Pro project actions Reopen Recent Project, Pin Project Tab and Close All Projects.
 - **View:** Save Filter Preset…, Manage Filter Presets…, Close Pane, Focus Other Pane, Move Tab to Other Pane.
@@ -51,12 +51,12 @@ Several of these also have a button: **Open Workspace…**, **Import SARIF repor
 
 ## Moving around the window {#navigation}
 
-These keys are fixed rather than rebindable, and work the same on every screen — the workspace, the imported SARIF report viewer and the web viewer.
+These keys are fixed rather than rebindable, and work the same on every screen: the workspace, the imported SARIF report viewer and the web viewer.
 
 | Key | Action |
 |---|---|
 | ++f6++ / ++shift+f6++ | Move focus to the next or previous region: the toolbar, the Rules, Details and bottom docks, the violations table (or the welcome screen), and the status bar when it holds a control. Returning to a region puts focus back where it was. |
-| ++tab++ / ++shift+tab++ | Move between the controls inside a region. Long lists — the violations table and the rule browser — are a single stop. |
+| ++tab++ / ++shift+tab++ | Move between the controls inside a region. Long lists, the violations table and the rule browser, are a single stop. |
 | ++cmd+shift+arrow-left++ / ++ctrl+shift+arrow-left++ and the other arrows | With focus inside the Rules, Details or bottom dock, grow or shrink that dock. The new size is saved like a drag. |
 | ++arrow-up++ / ++arrow-down++ | Move between rows of the violations table or the rule browser. In the table the focused row is selected, so the Details pane follows it. |
 | ++home++ / ++end++ | Move to the first or last row of the violations table. |
@@ -64,7 +64,7 @@ These keys are fixed rather than rebindable, and work the same on every screen �
 | ++space++ | On a violations-table row, tick or clear its checkbox. |
 | ++shift+f10++ or the Menu key | On a violations-table row, open its context menu. |
 
-At launch focus starts on the welcome screen's **Open Project…**. In the desktop app, when focus lands nowhere — after a native file dialog closes, or when the control that had it goes away — LintCrux puts it back on the control that last had it, or on the main surface of the screen. See [the violations table's keyboard section](violations.md#keyboard) for the table in detail.
+At launch focus starts on the welcome screen's **Open Project…**. In the desktop app, when focus lands nowhere (after a native file dialog closes, or when the control that had it goes away) LintCrux puts it back on the control that last had it, or on the main surface of the screen. See [the violations table's keyboard section](violations.md#keyboard) for the table in detail.
 
 ## Mouse {#mouse}
 
@@ -79,7 +79,7 @@ The violations table is the gesture surface in LintCrux. These are the gestures 
 | Click a column header | Sort by that column; click again to reverse. |
 | Drag a column header's right-edge divider | Resize that column against the next (from 1.1). Double-click the divider to restore the default widths. |
 
-Every row gesture has a keyboard equivalent once a row has focus — ++arrow-up++ / ++arrow-down++ select, ++enter++ opens in the editor, ++space++ ticks the checkbox, ++shift+f10++ opens the context menu; see [the violations table's keyboard section](violations.md#keyboard).
+Every row gesture has a keyboard equivalent once a row has focus: ++arrow-up++ / ++arrow-down++ select, ++enter++ opens in the editor, ++space++ ticks the checkbox, ++shift+f10++ opens the context menu; see [the violations table's keyboard section](violations.md#keyboard).
 
 Right-clicking selects the row first, so the context menu always acts on the row under the pointer. The menu's entries come from the Pro overlay: **Waive…** and **Suggest fix with Verible**, each badged <span class="tier tier-pro">Pro</span>, and **Cross-probe to peer…**, which is free in every tier from 1.1. An Open Core build has no row context menu. From LintCrux 1.2 the entry reads **Cross-probe to** and every build, Open Core included, has it, free in every tier.
 
@@ -90,7 +90,7 @@ Right-clicking selects the row first, so the context menu always acts on the row
 
 `Settings → Keyboard Shortcuts` is the full keymap editor. From it you can:
 
-- **Start from a preset.** The **Preset** chooser loads a complete key map in one step — **LintCrux (Default)** ships today — and reads **Custom** once you change any binding.
+- **Start from a preset.** The **Preset** chooser loads a complete key map in one step (**LintCrux (Default)** ships today) and reads **Custom** once you change any binding.
 - **Change** any action's shortcut: press the pencil, then type the new keys (++escape++ cancels).
 - **Remove** a shortcut so the action has none.
 - **Reset** one action to its shipped default, or **Reset all** bindings back to the defaults above.
