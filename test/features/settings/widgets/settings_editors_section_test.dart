@@ -87,6 +87,11 @@ void main() {
       ];
       expect(names[0], contains(l10n.settingsEditorExecutableLabel));
       expect(names[1], contains(l10n.settingsEditorArgsTemplateLabel));
+
+      // Typing into a merged row's field, with semantics on, raises nothing.
+      await tester.enterText(find.byType(TextField).first, 'other-editor');
+      await tester.pump();
+      expect(find.text('other-editor'), findsOneWidget);
       expect(tester.takeException(), isNull);
       semantics.dispose();
     });
