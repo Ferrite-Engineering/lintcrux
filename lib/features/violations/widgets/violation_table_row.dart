@@ -375,15 +375,24 @@ class _ViolationTableRowState extends ConsumerState<ViolationTableRow> {
     final violation = widget.violation;
     final entries = ref.read(violationContextMenuEntriesProvider);
     if (entries.isEmpty) return;
-    final overlay = Overlay.of(context).context.findRenderObject();
+    // The menu shows on the root navigator, so [position] (a global position)
+    // is converted against the root overlay. Each file tab has a navigator of
+    // its own whose overlay starts below the toolbar and tab bar, and the menu
+    // would open that far below the pointer.
+    final overlay = Overlay.of(
+      context,
+      rootOverlay: true,
+    ).context.findRenderObject();
     if (overlay is! RenderBox) return;
+    final local = overlay.globalToLocal(position);
     // Select the row so the menu acts on the right-clicked violation,
     // not whatever was previously focused. Mirrors VS Code / IntelliJ.
     ref.read(selectedViolationProvider.notifier).select(violation);
     final selected = await showMenu<String>(
       context: context,
+      useRootNavigator: true,
       position: RelativeRect.fromRect(
-        Rect.fromLTWH(position.dx, position.dy, 0, 0),
+        Rect.fromLTWH(local.dx, local.dy, 0, 0),
         Offset.zero & overlay.size,
       ),
       items: [
