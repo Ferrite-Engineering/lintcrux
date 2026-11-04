@@ -123,6 +123,39 @@ void main() {
       expect(project.includePaths.single, p.join(tmp.path, 'proj', 'rtl'));
     });
 
+    // A project committed from Windows spells its relative entries with `\`,
+    // and a Linux CI agent runs it. Under POSIX rules a backslash is a
+    // file-name character, so the reader has to take it as a separator. The
+    // resolver uses the host's path rules, so this runs where they are POSIX;
+    // the same rule is held for both styles on every host in
+    // `portable_path_test.dart`.
+    test(
+      'a project saved on Windows resolves its sources',
+      () async {
+        writeFile('proj/rtl/top.sv', 'module top; endmodule');
+        writeFile('proj/board/pins.pcf', 'set_io clk 1\n');
+        final projectFile = writeFile('proj/design.lintcrux', r'''
+{
+  "version": 1,
+  "name": "design",
+  "rootPath": ".",
+  "sourceFiles": ["rtl\\top.sv"],
+  "includePaths": ["rtl"],
+  "constraintFiles": ["board\\pins.pcf"]
+}
+''');
+        final r = await resolver.resolve(<String>[projectFile.path]);
+        expect(r.isSuccess, isTrue, reason: r.problems.join('\n'));
+        expect(r.project!.sourceFiles, [
+          p.join(tmp.path, 'proj', 'rtl', 'top.sv'),
+        ]);
+        expect(r.project!.constraintFiles, [
+          p.join(tmp.path, 'proj', 'board', 'pins.pcf'),
+        ]);
+      },
+      testOn: 'posix',
+    );
+
     test(
       'resolves constraintFiles against the project file directory',
       () async {

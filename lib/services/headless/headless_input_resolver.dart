@@ -3,6 +3,7 @@
 
 import 'dart:io';
 
+import 'package:lintcrux/core/util/portable_path.dart';
 import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/project_source_file.dart';
@@ -283,8 +284,10 @@ class HeadlessInputResolver {
     return HdlLanguage.systemVerilog;
   }
 
-  static String _absoluteAgainst(String base, String path) {
-    if (path.isEmpty) return base;
+  static String _absoluteAgainst(String base, String raw) {
+    if (raw.isEmpty) return base;
+    // A project saved on Windows spells relative entries with `\`.
+    final path = projectEntryForReading(raw);
     if (p.isAbsolute(path)) return p.normalize(path);
     return p.normalize(p.join(base, path));
   }

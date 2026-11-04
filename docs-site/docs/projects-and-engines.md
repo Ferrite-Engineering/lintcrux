@@ -17,7 +17,7 @@ A project is a single JSON file with a stable, version-controllable schema. It c
 
 Relative paths resolve against the directory that holds the `.lintcrux` file, so a committed project works from any checkout location. Because the file is plain JSON, you check it into the same repository as your RTL and your whole team lints identically. The full schema is in the [project file reference](reference/project-file.md).
 
-**Creating one.** **New Project…** on the welcome screen, or **New Tab** (++cmd+t++ / ++ctrl+t++), asks where to save, writes an empty `.lintcrux`, and opens it. `File → Open Source Files…` (++cmd+shift+o++ / ++ctrl+shift+o++) then adds the files you pick to the active project, stored relative to the project file, and re-runs the engines. The **Sources** tab in the left dock lists what the project holds and removes a file from it.
+**Creating one.** **New Project…** on the welcome screen, or **New Tab** (++cmd+t++ / ++ctrl+t++), asks where to save, writes an empty `.lintcrux`, and opens it. `File → Open Source Files…` (++cmd+shift+o++ / ++ctrl+shift+o++) then adds the files you pick to the active project, stored relative to the project file with `/` as the separator on every system (from LintCrux 1.2; a project saved on Windows by an earlier version still opens on macOS and Linux), and re-runs the engines. The **Sources** tab in the left dock lists what the project holds and removes a file from it.
 
 **Opening one.** `File → Open Project…` (++cmd+o++ / ++ctrl+o++), the welcome screen, or a `.lintcrux` path on the command line. Each project opens in its own tab; opening a project that is already open focuses its tab instead. Opening a project runs its engines immediately.
 

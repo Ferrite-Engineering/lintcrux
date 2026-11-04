@@ -1,6 +1,7 @@
 // Copyright 2026 Ferrite Engineering LLC
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:lintcrux/core/util/portable_path.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/project_source_file.dart';
 import 'package:path/path.dart' as p;
@@ -32,13 +33,27 @@ import 'package:path/path.dart' as p;
 /// The returned project is the RUN / ENGINE-facing form. The authored
 /// (relative) form is what belongs on disk: callers that re-serialize a
 /// project must persist the authored paths, not the value this returns.
-LintProject resolveProjectPaths(LintProject project, String projectFileDir) {
-  final base = p.isAbsolute(project.rootPath)
-      ? p.normalize(project.rootPath)
-      : p.normalize(projectFileDir);
+///
+/// A relative entry written with `\` (a project saved on Windows by an earlier
+/// version) is read with `/` under POSIX rules; see [projectEntryForReading].
+/// [pathContext] selects the path style so a test can hold either one on any
+/// host.
+LintProject resolveProjectPaths(
+  LintProject project,
+  String projectFileDir, {
+  p.Context? pathContext,
+}) {
+  final ctx = pathContext ?? p.context;
+  final base = ctx.isAbsolute(project.rootPath)
+      ? ctx.normalize(project.rootPath)
+      : ctx.normalize(projectFileDir);
 
-  String abs(String path) =>
-      p.isAbsolute(path) ? p.normalize(path) : p.normalize(p.join(base, path));
+  String abs(String raw) {
+    final path = projectEntryForReading(raw, context: ctx);
+    return ctx.isAbsolute(path)
+        ? ctx.normalize(path)
+        : ctx.normalize(ctx.join(base, path));
+  }
 
   return project.copyWith(
     rootPath: base,

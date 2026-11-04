@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:lintcrux/core/util/portable_path.dart';
 import 'package:lintcrux/domain/enums/hdl_language.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
@@ -194,8 +195,12 @@ class ProjectConfigOverlay {
     'perEngineOptions',
   };
 
-  static String _abs(String base, String path) =>
-      p.isAbsolute(path) ? p.normalize(path) : p.normalize(p.join(base, path));
+  static String _abs(String base, String raw) {
+    final path = projectEntryForReading(raw);
+    return p.isAbsolute(path)
+        ? p.normalize(path)
+        : p.normalize(p.join(base, path));
+  }
 
   static List<String> _stringList(Object? value, String key) {
     if (value is! List) {

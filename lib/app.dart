@@ -48,6 +48,7 @@ import 'package:lintcrux/core/theme/lintcrux_color_theme_bootstrap.dart';
 import 'package:lintcrux/core/theme/lintcrux_theme.dart';
 import 'package:lintcrux/core/theme/lintcrux_theme_tokens.dart';
 import 'package:lintcrux/core/theme/theme_brightness_toggle.dart';
+import 'package:lintcrux/core/util/portable_path.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/domain/models/rule.dart';
 import 'package:lintcrux/domain/models/session/lintcrux_session.dart';
@@ -1797,7 +1798,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       return;
     }
     final pickedRelative = <String>[
-      for (final path in picked) p.relative(path, from: projectDir),
+      for (final path in picked) portableProjectEntry(path, projectDir),
     ];
     final mergedAuthored = <String>[
       ...authored.sourceFiles,

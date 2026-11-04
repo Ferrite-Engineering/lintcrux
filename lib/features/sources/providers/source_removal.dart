@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:crux_ide_layout/crux_ide_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lintcrux/core/util/portable_path.dart';
 import 'package:lintcrux/domain/models/lint_project.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
@@ -91,7 +92,9 @@ Future<void> removeSourceFromProject(
       : authored.sourceFiles;
   final remaining = <String>[
     for (final authoredPath in authoredList)
-      if (p.canonicalize(p.join(projectDir, authoredPath)) !=
+      if (p.canonicalize(
+            p.join(projectDir, projectEntryForReading(authoredPath)),
+          ) !=
           p.canonicalize(absolutePath))
         authoredPath,
   ];

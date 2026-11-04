@@ -87,6 +87,21 @@ void main() {
       expect(out.includePaths.single, p.join(base, 'inc'));
     });
 
+    test(
+      'a relative path written with a backslash reads as a separator',
+      () {
+        final out = apply(const <String, dynamic>{
+          'sourceFiles': <String>[r'other\a.sv'],
+          'includePaths': <String>[r'inc\common'],
+        });
+        expect(out.sourceFiles.single, p.join(base, 'other', 'a.sv'));
+        expect(out.includePaths.single, p.join(base, 'inc', 'common'));
+      },
+      // The overlay resolves with the host's path rules; both styles are held
+      // on every host in `portable_path_test.dart`.
+      testOn: 'posix',
+    );
+
     test('constraintFiles are replaced wholesale and resolve like sources', () {
       final out = apply(const <String, dynamic>{
         'constraintFiles': <String>['board/pins.pcf'],
