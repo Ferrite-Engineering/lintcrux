@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/models/rohd_dart_source.dart';
 import 'package:lintcrux/services/rohd/rohd_sidecar.dart';
 import 'package:lintcrux/services/rohd/rohd_source_index.dart';
+import 'package:path/path.dart' as p;
 
 import '../../support/rohd_fixture_package.dart';
 
@@ -37,12 +38,12 @@ RohdFileIndex _real({required bool sidecar, bool perModule = false}) {
 }
 
 String _loc(RohdDartLocation l) =>
-    '${l.file.split('/').last}:${l.line}:${l.column}';
+    '${p.basename(l.file)}:${l.line}:${l.column}';
 
 void main() {
   tearDownAll(() {
-    for (final p in _packages) {
-      p.dispose();
+    for (final pkg in _packages) {
+      pkg.dispose();
     }
   });
 
@@ -114,7 +115,8 @@ void main() {
 
     test('the Dart path is normalized and resolved to the package', () {
       final s = index.lookup(43)!;
-      expect(s.primary.file, endsWith('/lib/design.dart'));
+      expect(s.primary.file, endsWith(p.join('lib', 'design.dart')));
+      expect(s.primary.file, p.normalize(s.primary.file));
       expect(s.primary.file, isNot(contains('.dart_tool')));
       expect(File(s.primary.file).existsSync(), isTrue);
     });
@@ -285,6 +287,105 @@ void main() {
 
     test('a file of another name with several candidates matches none', () {
       expect(build('/x/renamed.sv', sidecar(['A', 'B'])).lookup(2), isNull);
+    });
+  });
+
+  group('Dart paths in the platform form', () {
+    // A sidecar always writes `/`; a path a user can open on Windows is all
+    // backslashes. These run on every platform: the Windows layout is given
+    // to the index as a `package:path` context and a pretend file system.
+    final win = p.Context(style: p.Style.windows, current: r'C:\work');
+
+    RohdFileIndex build({
+      required String svPath,
+      required String sidecarDir,
+      required Set<String> existing,
+      String file = '.dart_tool/../lib/design.dart',
+    }) {
+      final sidecar = parseRohdSidecar(
+        jsonEncode({
+          'version': 6,
+          'files': [file],
+          'modules': {
+            'Top': {
+              'outputFiles': {
+                'sv': ['top.sv'],
+              },
+              'tree': [
+                ['0:10:3', 'sig@sv:2:1'],
+              ],
+            },
+          },
+        }),
+      ).sidecar!;
+      return RohdFileIndex.build(
+        svPath: svPath,
+        lines: ['module m;', 'logic sig;', 'endmodule'],
+        sidecars: [sidecar],
+        sidecarDirs: [sidecarDir],
+        pathContext: win,
+        fileExists: existing.contains,
+      );
+    }
+
+    test('the package found by its Dart file is all backslashes', () {
+      final index = build(
+        svPath: r'C:\Users\dev\proj\build\top.sv',
+        sidecarDir: r'C:\Users\dev\proj\build',
+        existing: {r'C:\Users\dev\proj\lib\design.dart'},
+      );
+      expect(
+        index.lookup(2)!.primary.file,
+        r'C:\Users\dev\proj\lib\design.dart',
+      );
+    });
+
+    test('the package found by its pubspec is all backslashes', () {
+      final index = build(
+        svPath: r'C:\Users\dev\proj\build\top.sv',
+        sidecarDir: r'C:\Users\dev\proj\build',
+        existing: {r'C:\Users\dev\proj\pubspec.yaml'},
+      );
+      expect(
+        index.lookup(2)!.primary.file,
+        r'C:\Users\dev\proj\lib\design.dart',
+      );
+    });
+
+    test('with no package found it is still all backslashes', () {
+      final index = build(
+        svPath: r'C:\Users\dev\proj\build\top.sv',
+        sidecarDir: r'C:\Users\dev\proj\build',
+        existing: <String>{},
+      );
+      final file = index.lookup(2)!.primary.file;
+      expect(file, isNot(contains('/')));
+      expect(file, r'C:\Users\dev\proj\build\lib\design.dart');
+    });
+
+    test('a path written with backslashes and an absolute one agree', () {
+      final index = build(
+        svPath: r'C:\Users\dev\proj\build\top.sv',
+        sidecarDir: r'C:\Users\dev\proj\build',
+        existing: <String>{},
+        file: r'C:\Users\dev\proj\lib\..\lib\design.dart',
+      );
+      expect(
+        index.lookup(2)!.primary.file,
+        r'C:\Users\dev\proj\lib\design.dart',
+      );
+    });
+
+    test('the path is what the platform context builds', () {
+      final index = build(
+        svPath: r'C:\Users\dev\proj\build\top.sv',
+        sidecarDir: r'C:\Users\dev\proj\build',
+        existing: {r'C:\Users\dev\proj\lib\design.dart'},
+      );
+      expect(
+        index.lookup(2)!.primary.file,
+        win.joinAll([r'C:\Users\dev\proj', 'lib', 'design.dart']),
+      );
     });
   });
 }
