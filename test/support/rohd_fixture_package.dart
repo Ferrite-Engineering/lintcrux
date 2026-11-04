@@ -69,8 +69,13 @@ class RohdFixturePackage {
   /// A path under [build].
   String inBuild(String name) => p.join(build, name);
 
-  /// A path under the package.
-  String path(String relative) => p.join(root, relative);
+  /// A path under the package, in the platform's own form.
+  ///
+  /// [relative] is written with `/`; the result is normalized the way the
+  /// product normalizes the Dart paths it reports, so on Windows it is all
+  /// backslashes rather than a backslash root with a `/` tail.
+  String path(String relative) =>
+      p.normalize(p.joinAll(<String>[root, ...p.posix.split(relative)]));
 
   /// Removes the package.
   void dispose() {

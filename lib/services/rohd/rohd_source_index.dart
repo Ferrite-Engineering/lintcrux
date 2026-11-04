@@ -61,13 +61,27 @@ class RohdFileIndex {
   ///
   /// [sidecars] are parsed sidecars, [sidecarDirs] the directory each was read
   /// from (parallel lists), used to find the Dart package.
+  ///
+  /// The Dart paths come back in the native form of [pathContext] (the
+  /// platform's own by default): separators the platform uses, normalized, so
+  /// the same string opens in an editor and compares equal to one built with
+  /// `package:path`. [fileExists] stands in for the file system when looking
+  /// for the Dart package; both exist so a Windows layout can be tested on any
+  /// machine.
   factory RohdFileIndex.build({
     required String svPath,
     required List<String> lines,
     required List<RohdSidecar> sidecars,
     required List<String> sidecarDirs,
+    p.Context? pathContext,
+    bool Function(String path)? fileExists,
   }) {
-    final resolver = _DartPathResolver(svDir: p.dirname(svPath));
+    final ctx = pathContext ?? p.context;
+    final resolver = _DartPathResolver(
+      svDir: ctx.dirname(svPath),
+      ctx: ctx,
+      fileExists: fileExists ?? (path) => File(path).existsSync(),
+    );
     final sidecarAnchors = <_Anchor>[];
     for (var i = 0; i < sidecars.length; i++) {
       sidecarAnchors.addAll(
@@ -113,10 +127,7 @@ class RohdFileIndex {
     for (final anchors in <List<_Anchor>>[_sidecar, _inline]) {
       final exact = anchors.where((a) => a.line == line).toList();
       if (exact.isNotEmpty) {
-        return _source(
-          _prefer(exact, message),
-          RohdDartSourceKind.exact,
-        );
+        return _source(_prefer(exact, message), RohdDartSourceKind.exact);
       }
       final enclosing = _enclosing(anchors, line);
       if (enclosing != null) {
@@ -285,9 +296,15 @@ int _extentEnd(List<String> lines, int start) {
 /// nearest directory with a `pubspec.yaml` is used, so the location is still
 /// a usable path, and failing that the sidecar's own directory.
 class _DartPathResolver {
-  _DartPathResolver({required this.svDir});
+  _DartPathResolver({
+    required this.svDir,
+    required this.ctx,
+    required this.fileExists,
+  });
 
   final String svDir;
+  final p.Context ctx;
+  final bool Function(String) fileExists;
 
   String Function(String) forSidecar(RohdSidecar sidecar, String sidecarDir) {
     final roots = <String>[
@@ -303,30 +320,33 @@ class _DartPathResolver {
     return (raw) => _resolve(raw, roots, svDir);
   }
 
-  static List<String> _ancestors(String dir) {
+  List<String> _ancestors(String dir) {
     final out = <String>[];
-    var current = p.absolute(dir);
+    var current = ctx.absolute(dir);
     for (var i = 0; i < 8; i++) {
       out.add(current);
-      final parent = p.dirname(current);
+      final parent = ctx.dirname(current);
       if (parent == current) break;
       current = parent;
     }
     return out;
   }
 
-  static String _resolve(String raw, List<String> roots, String fallbackDir) {
+  String _resolve(String raw, List<String> roots, String fallbackDir) {
+    // Sidecars always use `/`, whichever machine wrote them; `ctx.normalize`
+    // turns the result into the platform's own form, so a path joined from
+    // the package root never carries two kinds of separator.
     final normalized = p.posix.normalize(raw.replaceAll(r'\', '/'));
-    if (p.isAbsolute(normalized)) return p.normalize(normalized);
+    if (ctx.isAbsolute(normalized)) return ctx.normalize(normalized);
     for (final root in roots) {
-      final candidate = p.normalize(p.join(root, normalized));
-      if (File(candidate).existsSync()) return candidate;
+      final candidate = ctx.normalize(ctx.join(root, normalized));
+      if (fileExists(candidate)) return candidate;
     }
     for (final root in roots) {
-      if (File(p.join(root, 'pubspec.yaml')).existsSync()) {
-        return p.normalize(p.join(root, normalized));
+      if (fileExists(ctx.join(root, 'pubspec.yaml'))) {
+        return ctx.normalize(ctx.join(root, normalized));
       }
     }
-    return p.normalize(p.join(fallbackDir, normalized));
+    return ctx.normalize(ctx.join(fallbackDir, normalized));
   }
 }
