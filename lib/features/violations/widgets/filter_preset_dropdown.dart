@@ -131,6 +131,7 @@ class FilterPresetDropdown extends ConsumerWidget {
   Future<void> _showSaveDialog(BuildContext context, WidgetRef ref) async {
     final name = await showCruxDialog<String>(
       context: context,
+      barrierDismissible: false,
       builder: (_) => const _FilterPresetSaveDialog(),
     );
     // The dropdown may be gone by the time the dialog closes (the tab
