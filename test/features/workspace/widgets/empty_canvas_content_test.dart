@@ -198,6 +198,39 @@ void main() {
     expect(find.text('Recent projects'), findsOneWidget);
   });
 
+  testWidgets('offers no recent-workspaces section (nothing backs it)', (
+    tester,
+  ) async {
+    for (final locale in const [Locale('en'), Locale('ja')]) {
+      await pumpContent(
+        tester,
+        locale: locale,
+        callbacks: [() {}, () {}, () {}, () {}],
+      );
+      expect(find.text('Recent workspaces'), findsNothing);
+      expect(find.text('No recent workspaces yet.'), findsNothing);
+      expect(find.text('最近のワークスペース'), findsNothing);
+      expect(find.text('最近のワークスペースはまだありません。'), findsNothing);
+    }
+  });
+
+  test(
+    'File "New Tab" runs New Project, so it is labelled New Project…',
+    () async {
+      // LintcruxAction.newTab opens the New Project save dialog
+      // (app_action_dispatch_test), so its menu and palette label is the
+      // welcome button's, in every locale.
+      for (final locale in L10N.supportedLocales) {
+        final l10n = await L10N.delegate.load(locale);
+        expect(
+          l10n.actionNewTab,
+          l10n.emptyCanvasNewProjectButton,
+          reason: 'newTab label for $locale',
+        );
+      }
+    },
+  );
+
   testWidgets('populated recent-projects shows tappable rows', (tester) async {
     var tapped = '';
     await pumpContent(

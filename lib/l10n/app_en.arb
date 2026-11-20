@@ -1096,14 +1096,6 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
-  "emptyCanvasRecentWorkspacesHeading": "Recent workspaces",
-  "@emptyCanvasRecentWorkspacesHeading": {
-    "description": "Section heading above the recent-workspaces list on the empty-canvas state."
-  },
-  "emptyCanvasNoRecentWorkspaces": "No recent workspaces yet.",
-  "@emptyCanvasNoRecentWorkspaces": {
-    "description": "Placeholder shown in the recent-workspaces section when the list is empty."
-  },
   "actionNewWorkspace": "New Workspace",
   "@actionNewWorkspace": {
     "description": "Menu / command palette label for the action that closes the current workspace and starts a fresh empty one."
@@ -1132,9 +1124,9 @@
   "@actionMoveTabToOtherPane": {
     "description": "Menu / command palette label for the action that moves the active tab to the other pane."
   },
-  "actionNewTab": "New Tab",
+  "actionNewTab": "New Project…",
   "@actionNewTab": {
-    "description": "Menu / command palette label for the action that creates a new empty tab in the active pane."
+    "description": "Menu / command palette label for the action bound to LintcruxAction.newTab, which opens the New Project save dialog (the same as the welcome screen's New Project button)."
   },
   "actionCloseTab": "Close Tab",
   "@actionCloseTab": {

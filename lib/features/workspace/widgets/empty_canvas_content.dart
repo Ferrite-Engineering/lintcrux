@@ -20,7 +20,6 @@ import 'package:lintcrux/shared/widgets/glowing_app_icon.dart';
 /// * the LintCrux title + subtitle,
 /// * a recent-projects section (the shared [crux.CruxRecentListSection] over
 ///   [recentProjects]),
-/// * a recent-workspaces section (currently an empty placeholder),
 /// * the primary actions wired through callbacks supplied by the host
 ///   scaffold (so the empty-canvas widget doesn't re-implement the
 ///   file-picker / workspace-open logic).
@@ -66,7 +65,6 @@ class EmptyCanvasContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10N.of(context);
-    final theme = Theme.of(context);
     // The running version, shown as a muted line under the subtitle. On web
     // there is no native menu bar, so this is the only always-visible place a
     // user can read the version without knowing the palette / overflow About
@@ -88,18 +86,6 @@ class EmptyCanvasContent extends ConsumerWidget {
         onOpen: onOpenRecentProject,
         // The open reports its own failure, in its own words.
         reportFailure: false,
-      ),
-      recentWorkspacesSection: _RecentSection(
-        heading: l10n.emptyCanvasRecentWorkspacesHeading,
-        emptyPlaceholder: l10n.emptyCanvasNoRecentWorkspaces,
-        items: const <String>[],
-        rowBuilder: (item) => ListTile(
-          dense: true,
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.workspaces_outlined),
-          title: Text(item, maxLines: 1, overflow: TextOverflow.ellipsis),
-        ),
-        theme: theme,
       ),
       primaryActions: [
         FilledButton.icon(
@@ -164,50 +150,6 @@ class EmptyCanvasContent extends ConsumerWidget {
         onTap: () =>
             unawaited(lintcruxLaunchUrl(Uri.parse(HelpUrls.suiteHome))),
       ),
-    );
-  }
-}
-
-/// Internal helper rendering one labeled "Recent X" section with a
-/// list of rows built by its owner, or an empty-state placeholder.
-class _RecentSection extends StatelessWidget {
-  const _RecentSection({
-    required this.heading,
-    required this.emptyPlaceholder,
-    required this.items,
-    required this.rowBuilder,
-    required this.theme,
-  });
-
-  final String heading;
-  final String emptyPlaceholder;
-  final List<String> items;
-  final Widget Function(String item) rowBuilder;
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          heading,
-          style: theme.textTheme.labelLarge?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 8),
-        if (items.isEmpty)
-          Text(
-            emptyPlaceholder,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          )
-        else
-          for (final item in items) rowBuilder(item),
-      ],
     );
   }
 }

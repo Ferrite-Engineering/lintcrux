@@ -1057,14 +1057,6 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
-  "emptyCanvasRecentWorkspacesHeading": "最近のワークスペース",
-  "@emptyCanvasRecentWorkspacesHeading": {
-    "description": "Section heading above the recent-workspaces list on the empty-canvas state."
-  },
-  "emptyCanvasNoRecentWorkspaces": "最近のワークスペースはまだありません。",
-  "@emptyCanvasNoRecentWorkspaces": {
-    "description": "Placeholder shown in the recent-workspaces section when the list is empty."
-  },
   "actionNewWorkspace": "新規ワークスペース",
   "@actionNewWorkspace": {
     "description": "Menu / command palette label for the action that closes the current workspace and starts a fresh empty one."
@@ -1093,7 +1085,7 @@
   "@actionMoveTabToOtherPane": {
     "description": "Menu / command palette label for the action that moves the active tab to the other pane."
   },
-  "actionNewTab": "新しいタブ",
+  "actionNewTab": "新規プロジェクト…",
   "@actionNewTab": {
     "description": "Menu / command palette label for the action that creates a new empty tab in the active pane."
   },
