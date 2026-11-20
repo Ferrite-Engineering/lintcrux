@@ -305,9 +305,9 @@ jobs:
         if: runner.os == 'Linux'
         env:
           TEST_REPORT: build/test-results.json
-          # Re-measured 2026-11-12 from run 42449249979 (Linux, commit
-          # 3dceb586): 3820 ran; the floor is that less 0.5%.
-          MIN_TESTS: '3800'
+          # Re-measured 2026-11-20 from run 44825752925 (Linux, commit
+          # 8388b60): 3890 ran; the floor is that less 0.5%.
+          MIN_TESTS: '3870'
           MAX_SKIPPED: '11'
         run: |
           python3 - "$TEST_REPORT" <<'PY'
