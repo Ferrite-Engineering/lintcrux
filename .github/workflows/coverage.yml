@@ -54,7 +54,9 @@ jobs:
       # Ratchet floor — raise as coverage improves. The build fails below this.
       # Baseline measured 86.7% after the audit-remediation changes; floor set
       # a couple of points below to absorb measurement variance.
-      MIN_COVERAGE: '84'
+      # Re-set 2026-11-12: run 43147216818 (commit 3dceb586) measured 90.3%;
+      # the floor is that less 2 points.
+      MIN_COVERAGE: '88'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
