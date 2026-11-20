@@ -10,6 +10,15 @@ const String kRightDockTabDetails = 'details';
 /// The docked cross-probe panel tab (on-demand).
 const String kRightDockTabCrossProbe = 'crossProbe';
 
+/// The left dock's Sources tab.
+const String kLeftDockTabSources = 'sources';
+
+/// The left dock's Rules tab.
+const String kLeftDockTabRules = 'rules';
+
+/// The bottom dock's pinned Source tab.
+const String kBottomDockTabSource = 'source';
+
 /// The bottom dock's region id (drag-between-docks).
 const String kDockRegionBottom = 'bottom';
 
@@ -67,6 +76,13 @@ class LeftDockTabNotifier extends Notifier<String?> {
   /// Records [id] as the active tab.
   // ignore: use_setters_to_change_properties
   void select(String id) => state = id;
+
+  /// Reveals [id]: records the choice AND opens the left region, so a
+  /// restore-bar icon lands on its own tab.
+  void reveal(String id) {
+    state = id;
+    ref.read(panelLayoutProvider.notifier).setRuleBrowserVisible(visible: true);
+  }
 }
 
 /// See [LeftDockTabNotifier].

@@ -55,6 +55,32 @@ class LintcruxRightDock extends ConsumerWidget {
   }
 }
 
+/// The left dock's entries, Sources · Rules. The one list both the dock and
+/// its collapsed restore bar are built from, so a tab cannot be on one and
+/// missing from the other.
+List<CruxDockEntry> _leftEntries(L10N l10n) => [
+  CruxDockEntry(
+    id: kLeftDockTabSources,
+    icon: Icons.description_outlined,
+    label: l10n.dockTabSources,
+    builder: (_) => const SourcesPanel(),
+  ),
+  CruxDockEntry(
+    id: kLeftDockTabRules,
+    icon: Icons.rule,
+    label: l10n.dockTabRules,
+    builder: (_) => const RulesPanel(),
+  ),
+];
+
+/// The bottom dock's pinned Source entry.
+CruxDockEntry _bottomSourceEntry(L10N l10n) => CruxDockEntry(
+  id: kBottomDockTabSource,
+  icon: Icons.code,
+  label: l10n.dockTabSource,
+  builder: (_) => const SourcePreviewPane(),
+);
+
 /// LintCrux's left dock: Sources · Rules.
 ///
 /// Sources leads because it is the only place a project's contents are
@@ -69,20 +95,7 @@ class LintcruxLeftDock extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10N.of(context);
     return CruxDock(
-      entries: [
-        CruxDockEntry(
-          id: 'sources',
-          icon: Icons.description_outlined,
-          label: l10n.dockTabSources,
-          builder: (_) => const SourcesPanel(),
-        ),
-        CruxDockEntry(
-          id: 'rules',
-          icon: Icons.rule,
-          label: l10n.dockTabRules,
-          builder: (_) => const RulesPanel(),
-        ),
-      ],
+      entries: _leftEntries(l10n),
       activeId: ref.watch(leftDockTabProvider),
       onSelect: (id) => ref.read(leftDockTabProvider.notifier).select(id),
       onCollapse: () => ref
@@ -106,17 +119,13 @@ class LintcruxBottomDock extends ConsumerWidget {
     final l10n = L10N.of(context);
     return CruxDock(
       entries: [
-        CruxDockEntry(
-          id: 'source',
-          icon: Icons.code,
-          label: l10n.dockTabSource,
-          builder: (_) => const SourcePreviewPane(),
-        ),
+        _bottomSourceEntry(l10n),
         // A CXP tab dragged down from the right dock.
         ..._crossProbeEntry(context, ref, region: kDockRegionBottom),
       ],
       activeId: ref.watch(bottomDockTabProvider),
       onSelect: (id) => ref.read(bottomDockTabProvider.notifier).select(id),
+      onAutoReveal: ref.read(bottomDockTabProvider.notifier).reveal,
       dockId: kDockRegionBottom,
       onTabMovedIn: (id, _) => _moveTab(ref, id, kDockRegionBottom),
       onCollapse: () => ref
@@ -181,7 +190,6 @@ class LintcruxDockRestoreBars extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10N.of(context);
     final layout = ref.watch(panelLayoutProvider);
-    final notifier = ref.read(panelLayoutProvider.notifier);
 
     final showLeft = !layout.ruleBrowserVisible;
     final showRight = !layout.violationDetailsVisible;
@@ -200,13 +208,14 @@ class LintcruxDockRestoreBars extends ConsumerWidget {
           ? CruxDockRestoreBar(
               edge: CruxDockCollapseDirection.left,
               entries: [
-                CruxDockRestoreEntry(
-                  id: 'rules',
-                  icon: Icons.rule,
-                  label: l10n.dockTabRules,
-                  onRestore: () =>
-                      notifier.setRuleBrowserVisible(visible: true),
-                ),
+                for (final entry in _leftEntries(l10n))
+                  CruxDockRestoreEntry(
+                    id: entry.id,
+                    icon: entry.icon,
+                    label: entry.label,
+                    onRestore: () =>
+                        ref.read(leftDockTabProvider.notifier).reveal(entry.id),
+                  ),
               ],
               semanticsLabel: l10n.accessibilityLeftDockRegion,
             )
@@ -215,12 +224,15 @@ class LintcruxDockRestoreBars extends ConsumerWidget {
           ? CruxDockRestoreBar(
               edge: CruxDockCollapseDirection.down,
               entries: [
-                CruxDockRestoreEntry(
-                  id: 'source',
-                  icon: Icons.code,
-                  label: l10n.dockTabSource,
-                  onRestore: () => notifier.setRunLogVisible(visible: true),
-                ),
+                for (final entry in [_bottomSourceEntry(l10n)])
+                  CruxDockRestoreEntry(
+                    id: entry.id,
+                    icon: entry.icon,
+                    label: entry.label,
+                    onRestore: () => ref
+                        .read(bottomDockTabProvider.notifier)
+                        .reveal(entry.id),
+                  ),
                 for (final entry in _crossProbeEntry(
                   context,
                   ref,
