@@ -27,6 +27,9 @@ On an Enterprise seat with a [team database](team-database.md), an organization-
 
 The Pro command line applies the same committed `.lintcrux-waivers.json` in your pipeline, the way the desktop app does, so a waiver a reviewer approved in the app does not fail the build. Applying managed waivers in CI is part of Pro, like the rest of this page: without a Pro licence the file is not applied, the violations it waives count toward the exit code, and the run says so on stderr. The free `lintcrux` binary applies inline pragma waivers only. See [Managed waivers in CI](exports-and-ci.md#waivers-in-ci) for the command and the licence a build agent runs as.
 
+!!! warning "Waivers match absolute paths today"
+    From LintCrux 1.2, a managed waiver stores the absolute path of the file it waives, and matching compares that path exactly (see [Matching scope](#matching)). A `.lintcrux-waivers.json` committed from one machine therefore waives nothing in a teammate's clone or on a CI runner whose checkout sits at a different path: those findings are reported and count toward the exit code. This fails safe (a finding is never hidden by mistake), but a waiver approved in the app does not yet carry over to CI unless the checkout path is the same. Relative-path waivers are planned; until they ship, either run CI from the same absolute path the waivers were recorded under or use an inline pragma waiver, which travels with the source.
+
 ## Matching scope {#matching}
 
 A waiver matches a violation when all of these hold:

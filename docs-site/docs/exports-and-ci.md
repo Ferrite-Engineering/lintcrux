@@ -64,6 +64,9 @@ lintcrux-pro: rtl/.lintcrux-waivers.json was not applied: managed waivers requir
 
 Inline pragma waivers apply at every tier, in both binaries.
 
+!!! warning "Waivers match absolute paths today"
+    From LintCrux 1.2, a managed waiver stores the absolute path of the file it waives, and the match is exact. A committed `.lintcrux-waivers.json` therefore waives nothing on a CI runner (or in a teammate's clone) whose checkout is at a different path: the findings are reported and count toward `--exit-code` and `--fail-on-new-violations`. This fails safe, but it means the gate above only honours waivers recorded under the same absolute path. Relative-path waivers are planned; until they ship, run the gate from the path the waivers were recorded under, or use inline pragma waivers, which travel with the source. See [Waivers in CI](waivers.md#ci).
+
 ## Setting up a CI gate {#ci-setup}
 
 1. **Commit your project and baseline.**
