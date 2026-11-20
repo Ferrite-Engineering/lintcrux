@@ -16,7 +16,7 @@ Twenty-one actions ship with a default binding. Everything else is reachable fro
 | ++cmd+shift+r++ / ++ctrl+shift+r++ | Reset Workspace… | File |
 | ++cmd+shift+p++ / ++ctrl+shift+p++ | Command Palette… | View |
 | ++cmd+shift+x++ / ++ctrl+shift+x++ | Cross-probe Peers | View |
-| ++cmd+shift+enter++ / ++ctrl+shift+enter++ | Cross-probe Selection… (from LintCrux 1.2; a focused text field keeps the key) | View |
+| ++cmd+shift+enter++ / ++ctrl+shift+enter++ | Cross-Probe Selection… (from LintCrux 1.2; a focused text field keeps the key) | View |
 | ++cmd+backslash++ / ++ctrl+backslash++ | Split Pane Right | View |
 | ++ctrl+tab++ | Next Tab | View |
 | ++ctrl+shift+tab++ | Previous Tab | View |
@@ -42,12 +42,12 @@ Twenty-one actions ship with a default binding. Everything else is reachable fro
 
 These actions ship unbound. They are fully available from the command palette (++cmd+shift+p++ / ++ctrl+shift+p++) and the menu bar, and you can assign your own shortcut to any of them.
 
-- **File:** New Workspace, Open Workspace…, Open Session…, Import Vivado Filelist…, Import FuseSoC EDAM…, Import SARIF report…, Save Session…, Save Workspace As…, the four **Export Violations as …** actions, Close All Tabs, Close Active Project, Clear Recent Projects, and the Pro project actions Reopen Recent Project, Pin Project Tab and Close All Projects.
+- **File:** New Workspace, Open Workspace…, Open Session…, Import Vivado Filelist…, Import FuseSoC EDAM…, Import SARIF report…, Save Session As…, Save Workspace As…, the four **Export Violations as …** actions, Close All Tabs, Close Active Project, Clear Recent Projects, and the Pro project actions Reopen Recent Project, Pin Project Tab and Close All Projects.
 - **View:** Save Filter Preset…, Manage Filter Presets…, Close Pane, Focus Other Pane, Move Tab to Other Pane.
 - **Tools:** Run Lint (Bypass Cache), the bookmark actions, and every Pro waiver, baseline, trend, Verible and lint-cache action.
 - **Help:** Documentation, Submit Issue…, Check for Updates.
 
-Several of these also have a button: **Open Workspace…**, **Import SARIF report…**, **Save Session…** and the exports are on the toolbar, and the welcome screen offers **Open Workspace…**, **Open Session…**, **New Project…** and **Import SARIF report…**.
+Several of these also have a button: **Open Workspace…**, **Import SARIF report…**, **Save Session As…** and the exports are on the toolbar, and the welcome screen offers **Open Workspace…**, **Open Session…**, **New Project…** and **Import SARIF report…**.
 
 ## Moving around the window {#navigation}
 

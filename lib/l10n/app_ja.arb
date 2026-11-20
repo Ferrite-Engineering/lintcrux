@@ -735,7 +735,7 @@
   "@filterPresetDoneButton": {
     "description": "Close button label in the manage-filter-presets dialog."
   },
-  "actionSaveSession": "セッションを保存…",
+  "actionSaveSession": "セッションに名前を付けて保存…",
   "@actionSaveSession": {
     "description": "Menu / command palette label for the action that saves a .lintcrux-session file."
   },
@@ -1240,7 +1240,7 @@
   "@workspaceResetConfirmTitle": {
     "description": "Title of the confirmation dialog shown before `File → Reset Workspace` empties every open tab."
   },
-  "workspaceResetConfirmBody": "開いているすべてのタブが閉じられます。元に戻すことはできませんが、自動保存されたワークスペースファイルが置き換えられるだけで、元のプロジェクトファイルはディスク上に残ります。",
+  "workspaceResetConfirmBody": "開いているすべてのタブが閉じられ、自動保存されたワークスペースは空のワークスペースに置き換えられます。この操作は元に戻せません。プロジェクトファイルはディスク上に残ります。",
   "@workspaceResetConfirmBody": {
     "description": "Body text of the confirmation dialog shown before `File → Reset Workspace`."
   },
@@ -1432,7 +1432,7 @@
   "filePickerExportFormatButton": "{format} をエクスポート",
   "exportFailed": "エクスポートに失敗しました: {error}",
   "snackFeatureRequiresPro": "{feature} には LintCrux Pro が必要です。",
-  "snackFeatureNotAvailableYet": "{feature} はまだ利用できません。",
+  "snackActionUnavailableInThisBuild": "{action}はこのビルドでは利用できません。",
   "engineConfigSeverityOff": "オフ",
   "engineConfigSeverityOverrideLabel": "重大度の上書き",
   "diagnosticsNoProjectLoaded": "プロジェクトが読み込まれていません。",
@@ -1456,7 +1456,7 @@
   "settingsAutoCheckUpdatesDescription": "起動時および 1 日 1 回、新しいバージョンを確認します。送信されるのはアプリのバージョンと OS のみで、プロジェクト、ソース、違反のデータが送信されることはありません。",
   "aboutButtonCheckForUpdates": "更新を確認",
   "actionSubmitIssue": "問題を報告…",
-  "aboutButtonSubmitIssue": "問題を報告",
+  "aboutButtonSubmitIssue": "問題を報告…",
   "issueReporterTitle": "問題を報告",
   "issueReporterTitleFieldLabel": "問題の概要",
   "issueReporterTitleFieldHint": "発生した問題を簡潔に説明してください",

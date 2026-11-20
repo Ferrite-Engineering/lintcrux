@@ -770,7 +770,7 @@
   "@filterPresetDoneButton": {
     "description": "Close button label in the manage-filter-presets dialog."
   },
-  "actionSaveSession": "Save Session…",
+  "actionSaveSession": "Save Session As…",
   "@actionSaveSession": {
     "description": "Menu / command palette label for the action that saves a .lintcrux-session file."
   },
@@ -1279,7 +1279,7 @@
   "@workspaceResetConfirmTitle": {
     "description": "Title of the confirmation dialog shown before `File → Reset Workspace` empties every open tab."
   },
-  "workspaceResetConfirmBody": "All open tabs will be closed. This cannot be undone, but the auto-saved workspace file is replaced — your previous project files remain on disk.",
+  "workspaceResetConfirmBody": "All open tabs will be closed. The auto-saved workspace will be replaced with an empty workspace. This cannot be undone. Your project files stay on disk.",
   "@workspaceResetConfirmBody": {
     "description": "Body text of the confirmation dialog shown before `File → Reset Workspace`."
   },
@@ -1547,11 +1547,11 @@
       }
     }
   },
-  "snackFeatureNotAvailableYet": "{feature} is not available yet.",
-  "@snackFeatureNotAvailableYet": {
-    "description": "Snackbar body shown when an open-core feature is invoked before it ships.",
+  "snackActionUnavailableInThisBuild": "{action} is not available in this build.",
+  "@snackActionUnavailableInThisBuild": {
+    "description": "Snackbar body shown when an open-core action's extension-point opener is not installed in this build.",
     "placeholders": {
-      "feature": {
+      "action": {
         "type": "String"
       }
     }
@@ -1658,7 +1658,7 @@
   "@actionSubmitIssue": {
     "description": "Action label for the beta issue reporter command (Help menu, command palette, About box)."
   },
-  "aboutButtonSubmitIssue": "Submit Issue",
+  "aboutButtonSubmitIssue": "Submit Issue…",
   "@aboutButtonSubmitIssue": {
     "description": "About dialog action button that opens the beta issue reporter."
   },
@@ -2342,7 +2342,7 @@
   "@fileWatcherIgnore": {
     "description": "Button on the source-changed prompt that dismisses it without re-running. Same key and meaning as WaveCrux."
   },
-  "actionCrossProbeSelection": "Cross-probe Selection…",
+  "actionCrossProbeSelection": "Cross-Probe Selection…",
   "@actionCrossProbeSelection": {
     "description": "Menu / command palette label for the action that sends the selected violation to a running peer product (WaveCrux, NetCrux or SimCrux)."
   },

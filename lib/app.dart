@@ -1265,7 +1265,7 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
   /// user gets localized feedback chosen by [action]'s `requiredTier`,
   /// so the snack can never contradict the tier badge the surface
   /// rendered next to the entry: a Pro/Enterprise action says "requires
-  /// LintCrux Pro", an open-core action says "not available yet".
+  /// LintCrux Pro", an open-core action says "not available in this build".
   Future<void> _handleOpener(
     LintcruxAction action,
     Provider<ProActionOpener?> opener,
@@ -1282,8 +1282,8 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
   }
 
   /// Feedback for an action whose opener seam is unpopulated. Routes to
-  /// the Pro-upsell snack or the neutral "not available yet" snack based
-  /// on the action's declared tier.
+  /// the Pro-upsell snack or the neutral "not available in this build" snack,
+  /// based on the action's declared tier.
   void _snackOpenerMissing(BuildContext? context, LintcruxAction action) {
     if (context == null || !context.mounted) return;
     final label = action.label(L10N.of(context));
@@ -1927,7 +1927,10 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
   ) {
     if (context == null || !context.mounted) return;
     final l10n = L10N.of(context);
-    showCruxInfoSnack(context, l10n.snackFeatureNotAvailableYet(feature(l10n)));
+    showCruxInfoSnack(
+      context,
+      l10n.snackActionUnavailableInThisBuild(feature(l10n)),
+    );
   }
 
   /// Opens Settings at the License category, for the licence-expiry strip.

@@ -161,7 +161,7 @@ void main() {
         final l10n = l10nOf(tester);
         final label = action.label(l10n);
         final expected = action.requiredTier == LicenseTier.openCore
-            ? l10n.snackFeatureNotAvailableYet(label)
+            ? l10n.snackActionUnavailableInThisBuild(label)
             : l10n.snackFeatureRequiresPro(label);
 
         expect(
@@ -185,7 +185,7 @@ void main() {
         // An open-core-tier action renders no PRO badge, so telling the
         // user it "requires LintCrux Pro" would be a false upsell.
         expect(
-          l10n.snackFeatureNotAvailableYet(action.label(l10n)),
+          l10n.snackActionUnavailableInThisBuild(action.label(l10n)),
           isNot(contains('Pro')),
           reason:
               '${action.name} declares the open-core tier but its feedback '

@@ -20,7 +20,7 @@
 19. [Panel dock Source grouping — Select a violation to preview source.] Hide Panel button
 20. [Details dock Details grouping — Select a violation to inspect.] Hide Panel button
 21. [Toolbar grouping] Open Project… (Ctrl+O) button
-22. Save Session… button
+22. Save Session As… button
 23. Close Active Project button
 24. Find in Violations… (Ctrl+F) button
 25. Cross-Probe Panel (Ctrl+Shift+X) button

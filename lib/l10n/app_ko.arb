@@ -735,7 +735,7 @@
   "@filterPresetDoneButton": {
     "description": "Close button label in the manage-filter-presets dialog."
   },
-  "actionSaveSession": "세션 저장…",
+  "actionSaveSession": "다른 이름으로 세션 저장…",
   "@actionSaveSession": {
     "description": "Menu / command palette label for the action that saves a .lintcrux-session file."
   },
@@ -1240,7 +1240,7 @@
   "@workspaceResetConfirmTitle": {
     "description": "Title of the confirmation dialog shown before `File → Reset Workspace` empties every open tab."
   },
-  "workspaceResetConfirmBody": "열려 있는 모든 탭이 닫힙니다. 실행을 취소할 수 없지만 자동 저장된 워크스페이스 파일만 교체되며, 기존 프로젝트 파일은 디스크에 그대로 남아 있습니다.",
+  "workspaceResetConfirmBody": "열려 있는 모든 탭이 닫히고 자동 저장된 워크스페이스가 빈 워크스페이스로 대체됩니다. 이 작업은 취소할 수 없습니다. 프로젝트 파일은 디스크에 그대로 남아 있습니다.",
   "@workspaceResetConfirmBody": {
     "description": "Body text of the confirmation dialog shown before `File → Reset Workspace`."
   },
@@ -1432,7 +1432,7 @@
   "filePickerExportFormatButton": "{format} 내보내기",
   "exportFailed": "내보내기에 실패했습니다: {error}",
   "snackFeatureRequiresPro": "{feature}에는 LintCrux Pro가 필요합니다.",
-  "snackFeatureNotAvailableYet": "{feature}은(는) 아직 사용할 수 없습니다.",
+  "snackActionUnavailableInThisBuild": "{action}은(는) 이 빌드에서 사용할 수 없습니다.",
   "engineConfigSeverityOff": "끄기",
   "engineConfigSeverityOverrideLabel": "심각도 재정의",
   "diagnosticsNoProjectLoaded": "로드된 프로젝트가 없습니다.",
@@ -1456,7 +1456,7 @@
   "settingsAutoCheckUpdatesDescription": "시작 시 및 하루에 한 번 새 버전을 확인합니다. 앱 버전과 운영 체제만 전송되며 프로젝트, 소스, 위반 데이터는 전송되지 않습니다.",
   "aboutButtonCheckForUpdates": "업데이트 확인",
   "actionSubmitIssue": "이슈 제출…",
-  "aboutButtonSubmitIssue": "문제 보고",
+  "aboutButtonSubmitIssue": "문제 보고…",
   "issueReporterTitle": "문제 보고",
   "issueReporterTitleFieldLabel": "문제 요약",
   "issueReporterTitleFieldHint": "무엇이 잘못되었는지 간단히 설명하세요",

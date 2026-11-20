@@ -149,7 +149,7 @@ void main() {
       expect(labels, const [
         'Visit Website',
         'Documentation',
-        'Submit Issue',
+        'Submit Issue…',
         'Check for Updates',
         'Privacy Policy',
         'Terms of Service',

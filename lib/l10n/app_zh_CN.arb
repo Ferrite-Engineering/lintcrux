@@ -735,7 +735,7 @@
   "@filterPresetDoneButton": {
     "description": "Close button label in the manage-filter-presets dialog."
   },
-  "actionSaveSession": "保存会话…",
+  "actionSaveSession": "另存会话为…",
   "@actionSaveSession": {
     "description": "Menu / command palette label for the action that saves a .lintcrux-session file."
   },
@@ -1240,7 +1240,7 @@
   "@workspaceResetConfirmTitle": {
     "description": "Title of the confirmation dialog shown before `File → Reset Workspace` empties every open tab."
   },
-  "workspaceResetConfirmBody": "所有已打开的标签页将被关闭。此操作无法撤销，但仅会替换自动保存的工作区文件——您的项目文件仍保留在磁盘上。",
+  "workspaceResetConfirmBody": "所有打开的标签页将被关闭，自动保存的工作区将被替换为空工作区。此操作无法撤销。您的项目文件仍保留在磁盘上。",
   "@workspaceResetConfirmBody": {
     "description": "Body text of the confirmation dialog shown before `File → Reset Workspace`."
   },
@@ -1432,7 +1432,7 @@
   "filePickerExportFormatButton": "导出 {format}",
   "exportFailed": "导出失败：{error}",
   "snackFeatureRequiresPro": "{feature} 需要 LintCrux Pro。",
-  "snackFeatureNotAvailableYet": "{feature} 尚不可用。",
+  "snackActionUnavailableInThisBuild": "{action}在此版本中不可用。",
   "engineConfigSeverityOff": "关闭",
   "engineConfigSeverityOverrideLabel": "严重级别覆盖",
   "diagnosticsNoProjectLoaded": "未加载项目。",
@@ -1456,7 +1456,7 @@
   "settingsAutoCheckUpdatesDescription": "在启动时以及每天检查一次新版本。仅发送您的应用版本和操作系统，绝不发送项目、源文件或违规数据。",
   "aboutButtonCheckForUpdates": "检查更新",
   "actionSubmitIssue": "提交问题…",
-  "aboutButtonSubmitIssue": "提交问题",
+  "aboutButtonSubmitIssue": "提交问题…",
   "issueReporterTitle": "提交问题",
   "issueReporterTitleFieldLabel": "问题摘要",
   "issueReporterTitleFieldHint": "简要描述出现的问题",
