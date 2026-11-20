@@ -2373,5 +2373,52 @@
   "settingsElaborationTimeLimitNone": "No limit",
   "@settingsElaborationTimeLimitNone": {
     "description": "Yosys time limit choice: the engines that elaborate with Yosys run until they finish or the user cancels."
+  },
+  "eduStatusLabel": "Non-commercial use",
+  "@eduStatusLabel": {
+    "description": "Status-bar text beside the EDU chip while an educational license is active; the holder's email follows it."
+  },
+  "eduStatusTooltip": "Educational license. For non-commercial teaching, learning and research only.",
+  "@eduStatusTooltip": {
+    "description": "Tooltip and screen-reader label of the status-bar EDU chip when the license records neither an email nor an end date."
+  },
+  "eduStatusTooltipForEmail": "Educational license for {email}. For non-commercial teaching, learning and research only.",
+  "@eduStatusTooltipForEmail": {
+    "description": "Tooltip and screen-reader label of the status-bar EDU chip: the license holder's email and the non-commercial terms.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "eduStatusTooltipValidUntil": "Educational license. For non-commercial teaching, learning and research only. Valid until {validUntil}.",
+  "@eduStatusTooltipValidUntil": {
+    "description": "Tooltip and screen-reader label of the status-bar EDU chip: the non-commercial terms and the date the license ends (yyyy-MM-dd).",
+    "placeholders": {
+      "validUntil": {
+        "type": "String"
+      }
+    }
+  },
+  "eduStatusTooltipForEmailValidUntil": "Educational license for {email}. For non-commercial teaching, learning and research only. Valid until {validUntil}.",
+  "@eduStatusTooltipForEmailValidUntil": {
+    "description": "Tooltip and screen-reader label of the status-bar EDU chip: the holder's email, the non-commercial terms and the date the license ends (yyyy-MM-dd).",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      },
+      "validUntil": {
+        "type": "String"
+      }
+    }
+  },
+  "eduExportMark": "Made with {productName} Educational · Non-commercial use only",
+  "@eduExportMark": {
+    "description": "Footer line of an HTML report saved from the app while an educational license is active. productName is the product name, never translated. Keep the middle dot separator.",
+    "placeholders": {
+      "productName": {
+        "type": "String"
+      }
+    }
   }
 }

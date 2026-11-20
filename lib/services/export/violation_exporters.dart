@@ -134,9 +134,15 @@ class ViolationExporters {
   /// toggles. No external network dependencies — the file works
   /// offline and can be attached to email or pasted into a code
   /// review as a single static artifact.
+  ///
+  /// [footerMark], when given, closes the page as a footer line. It carries
+  /// the educational-licence mark (`cruxEduExportMark`): the HTML report is
+  /// the one export a person reads rather than a tool, so it is the one that
+  /// says what it was made with. The data formats never take a mark.
   String toHtml(
     Iterable<Violation> violations, {
     String? title,
+    String? footerMark,
   }) {
     final list = violations.toList(growable: false);
     final ts = DateTime.now().toIso8601String();
@@ -159,6 +165,9 @@ class ViolationExporters {
           '</tr>';
       rowsHtml.writeln(row);
     }
+    final footer = footerMark == null
+        ? ''
+        : '<footer class="lc-edu-mark">${_htmlText(footerMark)}</footer>\n';
     return '''
 <!DOCTYPE html>
 <html lang="en">
@@ -185,6 +194,8 @@ class ViolationExporters {
   .lc-sev-note td.lc-sev-cell   { color: #1976d2; }
   .lc-sev-none td.lc-sev-cell   { color: #888; }
   .lc-suppressed { opacity: 0.5; text-decoration: line-through; }
+  .lc-edu-mark { font-size: 11px; color: #5f6368; text-align: right;
+                 margin-top: 16px; }
 </style>
 </head>
 <body>
@@ -211,7 +222,7 @@ class ViolationExporters {
 $rowsHtml
 </tbody>
 </table>
-<script>
+$footer<script>
   const chips = document.querySelectorAll('#lc-chips .lc-chip');
   const tbody = document.querySelector('#lc-table tbody');
   const enabled = new Set(['fatal','error','warning','note','none']);

@@ -33,6 +33,7 @@ import 'package:lintcrux/core/cli/cli_args_provider.dart';
 import 'package:lintcrux/core/cli/macos_launch_options.dart';
 import 'package:lintcrux/core/eula/lintcrux_eula_storage.dart';
 import 'package:lintcrux/core/help_urls.dart';
+import 'package:lintcrux/core/license/lintcrux_edu_notice_strings.dart';
 import 'package:lintcrux/core/lintcrux_url_launcher.dart';
 import 'package:lintcrux/core/platform/linux_desktop_identity.dart';
 import 'package:lintcrux/core/platform/platform_localizations.dart';
@@ -1349,13 +1350,23 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
         : null;
     Rule? describeRule(String engineId, String localRuleId) =>
         rules?.lookupBy(engineId: engineId, localRuleId: localRuleId);
+    // Under an educational licence the HTML report, the one export a person
+    // reads rather than a tool, closes with the non-commercial mark. SARIF,
+    // JSON and CSV are read back by tools and never carry it. Read from the
+    // root scope, which is the one the Pro overlay's licence service
+    // overrides.
+    final reportMark = cruxEduExportMark(
+      ref.read(licenseStatusProvider),
+      'LintCrux',
+      strings: LintCruxEduNoticeStrings(L10N.of(ctx)),
+    );
     const exporter = ViolationExporters();
     String portable(
       String format,
       String Function(List<Violation> violations) plain,
     ) => project == null
         ? plain(violations.toList(growable: false))
-        : const HeadlessExportWriter().renderPortable(
+        : HeadlessExportWriter(reportMark: reportMark).renderPortable(
             violations: violations.toList(growable: false),
             format: format,
             relativeTo: project.rootPath,
@@ -1383,7 +1394,11 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
       // carry this machine's directory layout.
       ExportFormat.json => (portable('json', exporter.toJson), 'json', 'JSON'),
       ExportFormat.csv => (portable('csv', exporter.toCsv), 'csv', 'CSV'),
-      ExportFormat.html => (portable('html', exporter.toHtml), 'html', 'HTML'),
+      ExportFormat.html => (
+        portable('html', (v) => exporter.toHtml(v, footerMark: reportMark)),
+        'html',
+        'HTML',
+      ),
     };
     final picker = ref.read(projectPickerProvider);
     String? path;

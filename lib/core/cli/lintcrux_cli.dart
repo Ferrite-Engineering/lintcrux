@@ -12,6 +12,7 @@ import 'package:lintcrux/domain/interfaces/violation_transformer.dart';
 import 'package:lintcrux/services/cli/cli_args.dart' as launch_cli;
 import 'package:lintcrux/services/engines/default_engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
+import 'package:lintcrux/services/headless/headless_export_writer.dart';
 import 'package:lintcrux/services/headless/headless_reporter.dart';
 import 'package:lintcrux/services/headless/headless_run_result.dart';
 import 'package:lintcrux/services/headless/headless_runner.dart';
@@ -60,9 +61,14 @@ class LintcruxCli {
   ///
   /// [signalGuard] replaces the default guard outright; [installSignalReaper]
   /// only configures the default one.
+  ///
+  /// [exportWriter] writes `--export`. Open core passes the plain writer: it
+  /// resolves no licence, so its HTML report carries no mark. A host that
+  /// resolves one passes a writer carrying the educational-licence mark.
   LintcruxCli({
     EngineRegistry? registry,
     this.extraTransformers = const <ViolationTransformer>[],
+    this.exportWriter = const HeadlessExportWriter(),
     this.installSignalReaper = true,
     Future<HeadlessTelemetry> Function()? telemetryResolver,
     this.argsDecorator,
@@ -84,6 +90,9 @@ class LintcruxCli {
 
   /// Extra violation transformers layered onto the open-core chain.
   final List<ViolationTransformer> extraTransformers;
+
+  /// Writes the `--export` artifact.
+  final HeadlessExportWriter exportWriter;
 
   /// Whether the default [signalGuard] installs its handlers. Tests turn it
   /// off so they do not fight over the process-wide signal handlers.
@@ -265,6 +274,7 @@ class LintcruxCli {
     final runner = HeadlessRunner(
       registry: registry,
       extraTransformers: extraTransformers,
+      exportWriter: exportWriter,
       telemetry: telemetry,
       engineTimeout: args.engineTimeout ?? HeadlessRunner.defaultEngineTimeout,
       yosysTimeLimit: HeadlessRunner.yosysTimeLimitFor(args),

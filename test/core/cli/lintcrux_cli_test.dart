@@ -15,6 +15,7 @@ import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/yosys/yosys_signal_reaper.dart';
+import 'package:lintcrux/services/headless/headless_export_writer.dart';
 import 'package:lintcrux/services/headless/headless_signal_guard.dart';
 import 'package:path/path.dart' as p;
 
@@ -461,6 +462,51 @@ files:
       expect(code, CliExitCode.clean);
       expect(out.last, contains('no violations'));
       expect(out.last, contains('exit 0: clean'));
+    });
+
+    // Open core resolves no licence, so its HTML report carries no mark; a
+    // host that resolves one hands the mark in through [exportWriter].
+    group('the HTML report mark', () {
+      const mark = 'Made with LintCrux Educational · Non-commercial use only';
+
+      Future<String> exportHtml(LintcruxCli host) async {
+        File(
+          p.join(tmp.path, 'top.sv'),
+        ).writeAsStringSync('module top;endmodule');
+        File(p.join(tmp.path, 'p.lintcrux')).writeAsStringSync('''
+{"version":1,"name":"p","rootPath":".","sourceFiles":["top.sv"],
+ "language":"systemverilog","enabledEngineIds":["silent"]}
+''');
+        final report = p.join(tmp.path, 'report.html');
+        final code = await host.run(
+          <String>[
+            p.join(tmp.path, 'p.lintcrux'),
+            '--export',
+            'html',
+            '--out',
+            report,
+          ],
+          stdoutSink: out.add,
+          stderrSink: err.add,
+        );
+        expect(code, CliExitCode.clean);
+        return File(report).readAsStringSync();
+      }
+
+      test('open core writes none', () async {
+        expect(await exportHtml(cli()), isNot(contains('<footer')));
+      });
+
+      test("a host's writer stamps it", () async {
+        final html = await exportHtml(
+          LintcruxCli(
+            registry: EngineRegistry(<LintEngine>[_SilentEngine()]),
+            installSignalReaper: false,
+            exportWriter: const HeadlessExportWriter(reportMark: mark),
+          ),
+        );
+        expect(html, contains('<footer class="lc-edu-mark">$mark</footer>'));
+      });
     });
   });
 }

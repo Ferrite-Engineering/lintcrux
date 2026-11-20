@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crux_license/crux_license_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/models/source_location.dart';
@@ -435,6 +436,91 @@ void main() {
         ),
         throwsArgumentError,
       );
+    });
+  });
+
+  // Under an educational licence the HTML report says what it was made with;
+  // the formats a tool reads back stay byte-for-byte what they were.
+  group('the educational-licence mark', () {
+    CruxLicenseStatus status(LicenseTier tier) => CruxLicenseStatus(
+      activation: CruxLicenseActivation.active,
+      grant: LicenseGrant(
+        issuerId: kEduLicenseIssuerId,
+        tier: tier,
+        products: const {CruxProduct.lintCrux},
+      ),
+    );
+    const edu = 'Made with LintCrux Educational · Non-commercial use only';
+
+    HeadlessExportWriter writerFor(CruxLicenseStatus s) =>
+        HeadlessExportWriter(reportMark: cruxEduExportMark(s, 'LintCrux'));
+
+    String html(HeadlessExportWriter w) => w.renderPortable(
+      violations: <Violation>[violation()],
+      format: 'html',
+      relativeTo: root,
+    );
+
+    test('EDU: the HTML report carries it', () {
+      final out = html(writerFor(status(LicenseTier.edu)));
+      expect(out, contains('<footer class="lc-edu-mark">$edu</footer>'));
+    });
+
+    for (final (name, s) in <(String, CruxLicenseStatus)>[
+      ('open core', CruxLicenseStatus.openCore),
+      ('Pro', status(LicenseTier.pro)),
+      ('Enterprise', status(LicenseTier.enterprise)),
+    ]) {
+      test('$name: the HTML report carries none', () {
+        final out = html(writerFor(s));
+        expect(out, isNot(contains('<footer')));
+        expect(out, isNot(contains('Educational')));
+      });
+    }
+
+    test('EDU: SARIF, JSON and CSV are unchanged', () {
+      final marked = writerFor(status(LicenseTier.edu));
+      final violations = <Violation>[violation()];
+      String sarif(HeadlessExportWriter w) => w.renderSarif(
+        violations: violations,
+        projectRoot: root,
+        sarifRoot: root,
+        runId: 'my-project',
+        exportTime: DateTime.utc(2026, 7, 21, 12),
+      );
+      expect(sarif(marked), sarif(writer));
+      expect(sarif(marked), isNot(contains('Educational')));
+      for (final format in <String>['json', 'csv']) {
+        String render(HeadlessExportWriter w) => w.renderPortable(
+          violations: violations,
+          format: format,
+          relativeTo: root,
+        );
+        expect(render(marked), render(writer), reason: format);
+        expect(render(marked), isNot(contains('Educational')), reason: format);
+      }
+    });
+
+    test('EDU: write() stamps the HTML file and no other', () async {
+      final tmp = Directory.systemTemp.createTempSync('lintcrux_edu_mark_');
+      addTearDown(() => tmp.deleteSync(recursive: true));
+      final marked = writerFor(status(LicenseTier.edu));
+      for (final format in <String>['sarif', 'json', 'csv', 'html']) {
+        final out = p.join(tmp.path, 'lint.$format');
+        await marked.write(
+          violations: <Violation>[violation()],
+          format: format,
+          outputPath: out,
+          projectRoot: root,
+          sarifRoot: root,
+          runId: 'x',
+        );
+        expect(
+          File(out).readAsStringSync().contains(edu),
+          format == 'html',
+          reason: format,
+        );
+      }
     });
   });
 

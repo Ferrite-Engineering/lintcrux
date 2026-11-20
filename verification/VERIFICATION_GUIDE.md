@@ -990,6 +990,61 @@ enforcement).
 
 ---
 
+## 8.9 Educational licence: status-bar statement and report mark
+
+**What it does.** Under an Educational licence the app says the licence is
+for non-commercial use in two places. Both are silent at every other tier, so
+open core mounts them unconditionally; an open-core build never resolves an
+EDU status, and the Pro overlay supplies it from its licence service.
+
+- **Status bar.** `LintcruxEduStatusChip` (shared `CruxEduStatusChip`) sits
+  last in every status bar's trailing slot, after the busy indicator and the
+  Pro extension slot: the EDU chip, *Non-commercial use* and the holder's
+  address, with the terms and end date in the tooltip and screen-reader
+  label. A click opens Settings at the License category. Under EDU the
+  status-bar edition badge (`LintCruxEditionBadge`) renders nothing, so the
+  bar shows one EDU chip, not two.
+- **HTML report.** The HTML export (desktop, and a headless host that
+  resolves a licence) closes with a footer line, *Made with LintCrux
+  Educational · Non-commercial use only*, localized on the desktop. SARIF,
+  JSON and CSV, which tools read back, are never marked; nor are waiver,
+  baseline, project, workspace or session files. The open-core headless
+  binary resolves no licence and never marks.
+
+**Setup:** A Pro build with an Educational licence entered under
+`Settings → License`, and a project with at least one violation.
+
+**Step-by-step expected behavior**
+
+1. Look at the right end of the status bar, with and without a tab open.
+   **Expected:** one EDU chip, then *Non-commercial use · <your address>*.
+   Hover: the tooltip names the address, the non-commercial terms and the
+   end date.
+2. Click it. **Expected:** Settings opens on the License category.
+3. Export the active tab as HTML and open the file. **Expected:** the last
+   line, below the table, is the mark. Export SARIF, JSON and CSV: none
+   contains it.
+4. Switch the locale to zh_CN / ja / ko. **Expected:** the label, tooltip and
+   the HTML mark localize; the label ellipsizes rather than overflowing.
+5. Remove the licence (open core) or enter a Pro licence. **Expected:** the
+   status bar shows no EDU statement and the HTML report has no footer.
+
+**Automation Assessment**
+
+| Surface | Test file | Coverage |
+|---|---|---|
+| Chip shows for EDU, nothing for open core / Pro / Enterprise; click opens Settings → License; locale sweep | `test/features/workspace/widgets/lintcrux_edu_status_chip_test.dart` | `[Coverage: WIDGET]` |
+| Chip last in the trailing slot of the body, no-tab and tab bars; read from the root scope, not the tab container; locale sweep | `test/features/workspace/widgets/lintcrux_status_bar_test.dart` | `[Coverage: WIDGET]` |
+| Edition badge steps aside under EDU | `test/shared/widgets/lintcrux_edition_surfaces_test.dart` | `[Coverage: WIDGET]` |
+| ARB-backed strings match the English default; every locale fills email, date and product name | `test/core/license/lintcrux_edu_notice_strings_test.dart` | `[Coverage: WIDGET]` |
+| Desktop export: EDU marks HTML only; open core and Pro mark nothing | `test/app_edu_export_mark_test.dart` | `[Coverage: WIDGET]` |
+| HTML footer rendering and escaping | `test/services/export/violation_exporters_test.dart` | `[Coverage: UNIT]` |
+| Writer: EDU marks HTML; SARIF / JSON / CSV byte-identical; open core / Pro / Enterprise unmarked | `test/services/headless/headless_export_writer_test.dart` | `[Coverage: UNIT]` |
+| Headless: open core writes no mark; a host's writer stamps it | `test/core/cli/lintcrux_cli_test.dart` | `[Coverage: UNIT]` |
+| Real licence, real window, opened report in a browser | — | `[Coverage: MANUAL]` |
+
+---
+
 ## 9. Color Theming & Customization (suite-wide)
 
 LintCrux adopts `crux_theme`'s preset-driven theming the same way WaveCrux and NetCrux do: `cruxColorThemeProvider` holds the active `CruxColorTheme`, the `LintcruxCruxColorThemeNotifier` override bridges between `AppSettings.core.activeThemeName` / `themeOverrides` and that provider, and the root `MaterialApp` runs every base theme through `applyChromeTokens(...)` while driving `themeMode` via `themeModeFromBrightness(...)`. End-users see the same Settings → Appearance section across the four-app suite.

@@ -14,6 +14,7 @@ import 'package:lintcrux/features/violations/providers/violation_table_provider.
 import 'package:lintcrux/features/violations/providers/waived_violation_count_provider.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/active_tab_scope.dart';
+import 'package:lintcrux/features/workspace/widgets/lintcrux_edu_status_chip.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/plugins/status_bar_trailing_widgets_provider.dart';
 import 'package:lintcrux/services/project/current_project_provider.dart';
@@ -220,7 +221,8 @@ class LintcruxStatusBarBody extends ConsumerWidget {
   }
 }
 
-/// The bar with no tab behind it: says so, and keeps the extension slot.
+/// The bar with no tab behind it: says so, and keeps the extension slot and
+/// the educational-licence statement.
 class _IdleStatusBar extends StatelessWidget {
   const _IdleStatusBar({required this.trailing});
 
@@ -232,7 +234,7 @@ class _IdleStatusBar extends StatelessWidget {
     return CruxStatusBar(
       semanticsLabel: l10n.accessibilityStatusBarRegion,
       segments: [CruxStatusSegment(l10n.statusBarNoProject)],
-      trailing: trailing,
+      trailing: [...trailing, const LintcruxEduStatusChip()],
     );
   }
 }
@@ -298,11 +300,14 @@ class _StatusBarContent extends StatelessWidget {
           ),
         ),
       ],
-      // Suite grammar: progress first, then the Pro extension slot.
+      // Suite grammar: progress first, then the Pro extension slot, then the
+      // educational-licence statement, which renders nothing at every other
+      // tier. LintCrux's bar has no panel chevron to close the slot.
       trailing: [
         if (running)
           CruxStatusBusyIndicator(semanticsLabel: l10n.statusBarBusyLintRun),
         ...trailing,
+        const LintcruxEduStatusChip(),
       ],
     );
   }

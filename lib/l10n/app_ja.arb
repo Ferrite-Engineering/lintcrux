@@ -1773,5 +1773,11 @@
   "settingsElaborationTimeLimitDescription": "Yosys check、CDC、Constraints の各エンジンを LintCrux が停止するまでの実行時間です。自動はソースのサイズに比例した時間、延長はその 4 倍、制限なしは完了するか「実行をキャンセル」を選ぶまで実行します。その他のエンジンには影響しません。",
   "settingsElaborationTimeLimitAutomatic": "自動",
   "settingsElaborationTimeLimitExtended": "延長",
-  "settingsElaborationTimeLimitNone": "制限なし"
+  "settingsElaborationTimeLimitNone": "制限なし",
+  "eduStatusLabel": "非商用",
+  "eduStatusTooltip": "教育用ライセンス。非商用の教育、学習、研究に限ります。",
+  "eduStatusTooltipForEmail": "{email} の教育用ライセンス。非商用の教育、学習、研究に限ります。",
+  "eduStatusTooltipValidUntil": "教育用ライセンス。非商用の教育、学習、研究に限ります。{validUntil} まで有効です。",
+  "eduStatusTooltipForEmailValidUntil": "{email} の教育用ライセンス。非商用の教育、学習、研究に限ります。{validUntil} まで有効です。",
+  "eduExportMark": "{productName} 教育エディションで作成 · 非商用に限ります"
 }

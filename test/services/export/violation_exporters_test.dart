@@ -127,6 +127,25 @@ void main() {
       expect(out, contains('<title>My Project</title>'));
     });
 
+    test('a footer mark closes the page, escaped like user data', () {
+      final out = exp.toHtml(
+        [_v()],
+        footerMark: 'Made with LintCrux Educational · <Non-commercial>',
+      );
+      expect(
+        out,
+        contains(
+          '<footer class="lc-edu-mark">Made with LintCrux Educational · '
+          '&lt;Non-commercial&gt;</footer>',
+        ),
+      );
+      expect(out.indexOf('<footer'), greaterThan(out.indexOf('</table>')));
+    });
+
+    test('no footer mark, no footer', () {
+      expect(exp.toHtml([_v()]), isNot(contains('<footer')));
+    });
+
     test('emits filter chips for every severity', () {
       final out = exp.toHtml(const <Violation>[]);
       for (final s in const ['fatal', 'error', 'warning', 'note', 'none']) {

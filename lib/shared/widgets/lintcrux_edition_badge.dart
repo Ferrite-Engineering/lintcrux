@@ -3,6 +3,7 @@
 
 import 'package:crux_license/crux_license.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/core/license/lintcrux_license_badge_strings.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 
@@ -18,12 +19,20 @@ import 'package:lintcrux/l10n/generated/app_localizations.dart';
 /// `licenseTierProvider` itself, because a statement about what the user owns
 /// has exactly one correct source. Rendering nothing at open core is what makes
 /// it safe to mount unconditionally in the status bar's trailing slot.
-class LintCruxEditionBadge extends StatelessWidget {
+///
+/// Under an educational licence it renders nothing too: the bar's
+/// `LintcruxEduStatusChip` carries the EDU chip itself, with the
+/// non-commercial terms beside it, and two EDU chips side by side would say
+/// the same thing twice.
+class LintCruxEditionBadge extends ConsumerWidget {
   /// Creates an edition badge for the licence currently in force.
   const LintCruxEditionBadge({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (cruxIsEduLicense(ref.watch(licenseStatusProvider))) {
+      return const SizedBox.shrink();
+    }
     return EditionBadge(
       strings: LintCruxLicenseBadgeStrings(L10N.of(context)),
     );

@@ -48,6 +48,34 @@ void main() {
       });
     }
 
+    testWidgets('steps aside under an educational licence', (tester) async {
+      // The bar's EDU statement carries the EDU chip itself; a second one
+      // beside it would say the same thing twice.
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            licenseTierProvider.overrideWithValue(LicenseTier.edu),
+            licenseStatusProvider.overrideWithValue(
+              const CruxLicenseStatus(
+                activation: CruxLicenseActivation.active,
+                grant: LicenseGrant(
+                  issuerId: kEduLicenseIssuerId,
+                  tier: LicenseTier.edu,
+                  products: {CruxProduct.lintCrux},
+                ),
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: L10N.localizationsDelegates,
+            supportedLocales: L10N.supportedLocales,
+            home: Scaffold(body: LintCruxEditionBadge()),
+          ),
+        ),
+      );
+      expect(find.text('EDU'), findsNothing);
+    });
+
     testWidgets('does not throw when no licence exists at all', (tester) async {
       // It is mounted in shared chrome during startup; throwing here would take
       // the window with it.

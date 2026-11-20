@@ -9,7 +9,7 @@ LintCrux is built to live in your pipeline. It exports to the formats your tools
 | SARIF 2.1.0 | The interchange format code-scanning tools ingest: one SARIF run per engine. Upload it to GitHub code scanning and findings annotate the pull-request diff. |
 | JSON | The structured run for your own tooling: an array with one object per violation: `engineId`, `ruleId`, `severity`, `message`, `location`, `relatedLocations`, `suppressed`, and the engine's `raw` payload when present. |
 | CSV | A flat table for spreadsheets and quick pivots, with the columns `severity,engine,rule,file,line,column,message,suppressed`. |
-| HTML | A self-contained report with sortable column headers, severity filter chips and severity-colored cells. No external scripts, so the file works offline: attach it to a build or email it to a reviewer. |
+| HTML | A self-contained report with sortable column headers, severity filter chips and severity-colored cells. No external scripts, so the file works offline: attach it to a build or email it to a reviewer. Under an Educational license it ends with a non-commercial-use line; see [Educational license](licensing.md#edu). |
 
 **On desktop**, the four commands are `File → Export Violations as SARIF…`, `… as JSON…`, `… as CSV…` and `… as HTML…`, also grouped under the toolbar's **Export Report** button. They write **the rows currently visible in the active tab**: your severity, engine and text filters apply, and suppressed violations (hidden from the table) are left out.
 

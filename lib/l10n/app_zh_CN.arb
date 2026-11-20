@@ -1773,5 +1773,11 @@
   "settingsElaborationTimeLimitDescription": "Yosys check、CDC 和 Constraints 引擎在 LintCrux 将其停止前可运行的时间。自动按源文件大小成比例给出时间；延长为其四倍；不限制则一直运行到完成或选择“取消运行”。其他引擎不受影响。",
   "settingsElaborationTimeLimitAutomatic": "自动",
   "settingsElaborationTimeLimitExtended": "延长",
-  "settingsElaborationTimeLimitNone": "不限制"
+  "settingsElaborationTimeLimitNone": "不限制",
+  "eduStatusLabel": "非商业用途",
+  "eduStatusTooltip": "教育版许可证。仅限非商业的教学、学习和研究用途。",
+  "eduStatusTooltipForEmail": "{email} 的教育版许可证。仅限非商业的教学、学习和研究用途。",
+  "eduStatusTooltipValidUntil": "教育版许可证。仅限非商业的教学、学习和研究用途。有效期至 {validUntil}。",
+  "eduStatusTooltipForEmailValidUntil": "{email} 的教育版许可证。仅限非商业的教学、学习和研究用途。有效期至 {validUntil}。",
+  "eduExportMark": "使用 {productName} 教育版制作 · 仅限非商业用途"
 }

@@ -50,9 +50,19 @@ import 'package:path/path.dart' as p;
 /// The desktop app's SARIF export goes through [renderSarif] as well, so a
 /// file saved from the app uploads like one the CLI wrote, and its JSON, CSV
 /// and HTML exports go through [renderPortable].
+///
+/// [reportMark] is stamped on the HTML report only, never on SARIF, JSON or
+/// CSV, which tools read back.
 class HeadlessExportWriter {
   /// Creates a [HeadlessExportWriter].
-  const HeadlessExportWriter();
+  const HeadlessExportWriter({this.reportMark});
+
+  /// The footer line for an HTML report, or `null` for none: the
+  /// educational-licence mark (`cruxEduExportMark`) when the caller knows the
+  /// run is under an educational licence. The open-core command line resolves
+  /// no licence and passes nothing; the desktop app and a licence-resolving
+  /// command line pass the mark.
+  final String? reportMark;
 
   /// The symbolic base id declared for the SARIF root.
   ///
@@ -188,7 +198,7 @@ class HeadlessExportWriter {
     return switch (format) {
       'json' => exporters.toJson(portable),
       'csv' => exporters.toCsv(portable),
-      'html' => exporters.toHtml(portable),
+      'html' => exporters.toHtml(portable, footerMark: reportMark),
       _ => throw ArgumentError.value(
         format,
         'format',
