@@ -4,13 +4,15 @@
 import 'package:crux_license/crux_license.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 
-/// LintCrux's localized [CruxEduNoticeStrings]: the status-bar statement that
-/// an educational licence is for non-commercial use, and the line stamped on
-/// an HTML report saved under one.
+/// LintCrux's localized [CruxEduNoticeStrings] for the status-bar statement
+/// that an educational licence is for non-commercial use.
 ///
 /// The tooltip is four whole sentences in the ARB files rather than one
 /// sentence assembled from fragments, so each locale words and punctuates the
 /// email and end-date variants its own way.
+///
+/// [exportMark] stays English in every locale: the HTML report it closes is
+/// English throughout, and the command line writes the same line.
 class LintCruxEduNoticeStrings extends CruxEduNoticeStrings {
   /// Wraps the localizations for the nearest context.
   const LintCruxEduNoticeStrings(this._l10n);
@@ -31,5 +33,6 @@ class LintCruxEduNoticeStrings extends CruxEduNoticeStrings {
       };
 
   @override
-  String exportMark(String productName) => _l10n.eduExportMark(productName);
+  String exportMark(String productName) =>
+      const CruxEduNoticeStringsEn().exportMark(productName);
 }

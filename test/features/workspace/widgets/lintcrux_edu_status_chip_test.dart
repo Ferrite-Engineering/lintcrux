@@ -4,6 +4,7 @@
 import 'package:crux_license/crux_license.dart';
 import 'package:crux_settings_ui/crux_settings_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -80,6 +81,28 @@ void main() {
       await tester.pumpWidget(_harness(_status(LicenseTier.edu)));
 
       await tester.tap(find.text('Non-commercial use · student@example.edu'));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widget<CruxSettingsInitialCategory>(
+              find.byType(CruxSettingsInitialCategory),
+            )
+            .id,
+        kCruxLicenseCategoryId,
+      );
+    });
+
+    testWidgets('Tab then Enter opens Settings at the License category', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(1200, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(_harness(_status(LicenseTier.edu)));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
 
       expect(

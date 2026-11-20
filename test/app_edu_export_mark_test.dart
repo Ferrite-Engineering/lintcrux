@@ -15,6 +15,7 @@ import 'package:lintcrux/core/shortcuts/shortcut_manager_widget.dart';
 import 'package:lintcrux/core/telemetry/lintcrux_telemetry_config.dart';
 import 'package:lintcrux/features/project/providers/project_picker_provider.dart';
 import 'package:lintcrux/features/project/services/project_picker.dart';
+import 'package:lintcrux/features/settings/providers/app_settings_provider.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
 import 'package:lintcrux/services/engines/engine_registry_provider.dart';
@@ -128,9 +129,17 @@ void main() {
   /// Returns each file's contents by extension.
   Future<Map<String, String>> exportAll(
     WidgetTester tester,
-    CruxLicenseStatus license,
-  ) async {
+    CruxLicenseStatus license, {
+    String? language,
+  }) async {
     final telemetry = await boot(tester, license);
+    if (language != null) {
+      // Settings > Appearance > Language, the switch the app follows.
+      ProviderScope.containerOf(
+        tester.element(find.byType(LintcruxApp)),
+      ).read(appSettingsProvider.notifier).setLocale(language);
+      await tester.pumpAndSettle();
+    }
     final project = p.join(tempDir.path, 'exported.lintcrux');
     File(project).writeAsStringSync(
       jsonEncode(<String, Object?>{
@@ -183,6 +192,23 @@ void main() {
       }
     },
   );
+
+  // The HTML report is English throughout and the command line writes the
+  // same line, so the mark stays English whatever language the app shows.
+  testWidgets('EDU under Japanese: the mark is still English', (tester) async {
+    final out = await exportAll(
+      tester,
+      status(LicenseTier.edu),
+      language: 'ja',
+    );
+
+    // The app really is in Japanese: the status bar's statement is.
+    expect(find.text('非商用 · student@example.edu'), findsOneWidget);
+    expect(
+      out['html'],
+      contains('<footer class="lc-edu-mark">$mark</footer>'),
+    );
+  });
 
   for (final (name, license) in <(String, CruxLicenseStatus)>[
     ('open core', CruxLicenseStatus.openCore),

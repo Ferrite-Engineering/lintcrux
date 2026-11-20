@@ -33,7 +33,6 @@ import 'package:lintcrux/core/cli/cli_args_provider.dart';
 import 'package:lintcrux/core/cli/macos_launch_options.dart';
 import 'package:lintcrux/core/eula/lintcrux_eula_storage.dart';
 import 'package:lintcrux/core/help_urls.dart';
-import 'package:lintcrux/core/license/lintcrux_edu_notice_strings.dart';
 import 'package:lintcrux/core/lintcrux_url_launcher.dart';
 import 'package:lintcrux/core/platform/linux_desktop_identity.dart';
 import 'package:lintcrux/core/platform/platform_localizations.dart';
@@ -1352,13 +1351,13 @@ class _LintcruxAppState extends ConsumerState<LintcruxApp> {
         rules?.lookupBy(engineId: engineId, localRuleId: localRuleId);
     // Under an educational licence the HTML report, the one export a person
     // reads rather than a tool, closes with the non-commercial mark. SARIF,
-    // JSON and CSV are read back by tools and never carry it. Read from the
-    // root scope, which is the one the Pro overlay's licence service
-    // overrides.
+    // JSON and CSV are read back by tools and never carry it. In English
+    // whatever the display language: the report itself is English, and the
+    // command line writes the same line. Read from the root scope, which is
+    // the one the Pro overlay's licence service overrides.
     final reportMark = cruxEduExportMark(
       ref.read(licenseStatusProvider),
       'LintCrux',
-      strings: LintCruxEduNoticeStrings(L10N.of(ctx)),
     );
     const exporter = ViolationExporters();
     String portable(

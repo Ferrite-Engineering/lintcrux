@@ -2411,14 +2411,5 @@
         "type": "String"
       }
     }
-  },
-  "eduExportMark": "Made with {productName} Educational · Non-commercial use only",
-  "@eduExportMark": {
-    "description": "Footer line of an HTML report saved from the app while an educational license is active. productName is the product name, never translated. Keep the middle dot separator.",
-    "placeholders": {
-      "productName": {
-        "type": "String"
-      }
-    }
   }
 }

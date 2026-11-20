@@ -59,7 +59,7 @@ void main() {
       expect(strings.exportMark('LintCrux'), en.exportMark('LintCrux'));
     });
 
-    testWidgets('every locale fills in the email, the date and the name', (
+    testWidgets('every locale fills in the email and the date', (
       tester,
     ) async {
       for (final locale in _locales) {
@@ -89,8 +89,19 @@ void main() {
           allOf(contains('2027-08-02'), isNot(contains('@'))),
           reason: tag,
         );
-        expect(strings.exportMark('LintCrux'), contains('LintCrux'));
-        expect(strings.exportMark('LintCrux'), isNot(contains('—')));
+      }
+    });
+
+    // The HTML report is English throughout, and the command line writes the
+    // same line, so the mark does not follow the display language.
+    testWidgets('the export mark is English in every locale', (tester) async {
+      for (final locale in _locales) {
+        final l10n = await _l10nFor(tester, locale);
+        expect(
+          LintCruxEduNoticeStrings(l10n).exportMark('LintCrux'),
+          'Made with LintCrux Educational · Non-commercial use only',
+          reason: locale.toLanguageTag(),
+        );
       }
     });
   });

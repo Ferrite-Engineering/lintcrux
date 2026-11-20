@@ -1778,6 +1778,5 @@
   "eduStatusTooltip": "교육용 라이선스입니다. 비상업적 교육, 학습, 연구 용도로만 사용할 수 있습니다.",
   "eduStatusTooltipForEmail": "{email}에게 부여된 교육용 라이선스입니다. 비상업적 교육, 학습, 연구 용도로만 사용할 수 있습니다.",
   "eduStatusTooltipValidUntil": "교육용 라이선스입니다. 비상업적 교육, 학습, 연구 용도로만 사용할 수 있습니다. {validUntil}까지 유효합니다.",
-  "eduStatusTooltipForEmailValidUntil": "{email}에게 부여된 교육용 라이선스입니다. 비상업적 교육, 학습, 연구 용도로만 사용할 수 있습니다. {validUntil}까지 유효합니다.",
-  "eduExportMark": "{productName} 교육용 에디션으로 제작 · 비상업적 용도 전용"
+  "eduStatusTooltipForEmailValidUntil": "{email}에게 부여된 교육용 라이선스입니다. 비상업적 교육, 학습, 연구 용도로만 사용할 수 있습니다. {validUntil}까지 유효합니다."
 }

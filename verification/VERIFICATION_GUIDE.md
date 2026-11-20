@@ -1001,12 +1001,14 @@ EDU status, and the Pro overlay supplies it from its licence service.
   last in every status bar's trailing slot, after the busy indicator and the
   Pro extension slot: the EDU chip, *Non-commercial use* and the holder's
   address, with the terms and end date in the tooltip and screen-reader
-  label. A click opens Settings at the License category. Under EDU the
+  label. A click, or Enter / Space with keyboard focus (Tab reaches it),
+  opens Settings at the License category. Under EDU the
   status-bar edition badge (`LintCruxEditionBadge`) renders nothing, so the
   bar shows one EDU chip, not two.
 - **HTML report.** The HTML export (desktop, and a headless host that
   resolves a licence) closes with a footer line, *Made with LintCrux
-  Educational · Non-commercial use only*, localized on the desktop. SARIF,
+  Educational · Non-commercial use only*, in English in every locale like
+  the rest of the report. SARIF,
   JSON and CSV, which tools read back, are never marked; nor are waiver,
   baseline, project, workspace or session files. The open-core headless
   binary resolves no licence and never marks.
@@ -1020,12 +1022,15 @@ EDU status, and the Pro overlay supplies it from its licence service.
    **Expected:** one EDU chip, then *Non-commercial use · <your address>*.
    Hover: the tooltip names the address, the non-commercial terms and the
    end date.
-2. Click it. **Expected:** Settings opens on the License category.
+2. Click it; then Tab to it and press Enter. **Expected:** each time,
+   Settings opens on the License category, and the chip shows a focus ring
+   while it has keyboard focus.
 3. Export the active tab as HTML and open the file. **Expected:** the last
    line, below the table, is the mark. Export SARIF, JSON and CSV: none
    contains it.
-4. Switch the locale to zh_CN / ja / ko. **Expected:** the label, tooltip and
-   the HTML mark localize; the label ellipsizes rather than overflowing.
+4. Switch the locale to zh_CN / ja / ko. **Expected:** the label and tooltip
+   localize and the label ellipsizes rather than overflowing; the HTML mark
+   stays English.
 5. Remove the licence (open core) or enter a Pro licence. **Expected:** the
    status bar shows no EDU statement and the HTML report has no footer.
 
@@ -1036,8 +1041,8 @@ EDU status, and the Pro overlay supplies it from its licence service.
 | Chip shows for EDU, nothing for open core / Pro / Enterprise; click opens Settings → License; locale sweep | `test/features/workspace/widgets/lintcrux_edu_status_chip_test.dart` | `[Coverage: WIDGET]` |
 | Chip last in the trailing slot of the body, no-tab and tab bars; read from the root scope, not the tab container; locale sweep | `test/features/workspace/widgets/lintcrux_status_bar_test.dart` | `[Coverage: WIDGET]` |
 | Edition badge steps aside under EDU | `test/shared/widgets/lintcrux_edition_surfaces_test.dart` | `[Coverage: WIDGET]` |
-| ARB-backed strings match the English default; every locale fills email, date and product name | `test/core/license/lintcrux_edu_notice_strings_test.dart` | `[Coverage: WIDGET]` |
-| Desktop export: EDU marks HTML only; open core and Pro mark nothing | `test/app_edu_export_mark_test.dart` | `[Coverage: WIDGET]` |
+| ARB-backed strings match the English default; every locale fills email and date; the export mark is English in every locale | `test/core/license/lintcrux_edu_notice_strings_test.dart` | `[Coverage: WIDGET]` |
+| Desktop export: EDU marks HTML only, in English with the app in Japanese; open core and Pro mark nothing | `test/app_edu_export_mark_test.dart` | `[Coverage: WIDGET]` |
 | HTML footer rendering and escaping | `test/services/export/violation_exporters_test.dart` | `[Coverage: UNIT]` |
 | Writer: EDU marks HTML; SARIF / JSON / CSV byte-identical; open core / Pro / Enterprise unmarked | `test/services/headless/headless_export_writer_test.dart` | `[Coverage: UNIT]` |
 | Headless: open core writes no mark; a host's writer stamps it | `test/core/cli/lintcrux_cli_test.dart` | `[Coverage: UNIT]` |

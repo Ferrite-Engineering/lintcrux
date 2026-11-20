@@ -1778,6 +1778,5 @@
   "eduStatusTooltip": "教育版许可证。仅限非商业的教学、学习和研究用途。",
   "eduStatusTooltipForEmail": "{email} 的教育版许可证。仅限非商业的教学、学习和研究用途。",
   "eduStatusTooltipValidUntil": "教育版许可证。仅限非商业的教学、学习和研究用途。有效期至 {validUntil}。",
-  "eduStatusTooltipForEmailValidUntil": "{email} 的教育版许可证。仅限非商业的教学、学习和研究用途。有效期至 {validUntil}。",
-  "eduExportMark": "使用 {productName} 教育版制作 · 仅限非商业用途"
+  "eduStatusTooltipForEmailValidUntil": "{email} 的教育版许可证。仅限非商业的教学、学习和研究用途。有效期至 {validUntil}。"
 }

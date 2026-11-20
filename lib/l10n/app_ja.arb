@@ -1778,6 +1778,5 @@
   "eduStatusTooltip": "教育用ライセンス。非商用の教育、学習、研究に限ります。",
   "eduStatusTooltipForEmail": "{email} の教育用ライセンス。非商用の教育、学習、研究に限ります。",
   "eduStatusTooltipValidUntil": "教育用ライセンス。非商用の教育、学習、研究に限ります。{validUntil} まで有効です。",
-  "eduStatusTooltipForEmailValidUntil": "{email} の教育用ライセンス。非商用の教育、学習、研究に限ります。{validUntil} まで有効です。",
-  "eduExportMark": "{productName} 教育エディションで作成 · 非商用に限ります"
+  "eduStatusTooltipForEmailValidUntil": "{email} の教育用ライセンス。非商用の教育、学習、研究に限ります。{validUntil} まで有効です。"
 }
