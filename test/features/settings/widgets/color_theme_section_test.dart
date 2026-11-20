@@ -241,17 +241,24 @@ void main() {
       testWidgets('renders without exception in $locale', (tester) async {
         await pumpSection(tester, locale: locale);
         expect(tester.takeException(), isNull);
-        // NOTE: ColorThemeSection hardcodes `ThemeAppearanceStringsEn()`
-        // instead of a localized `ThemeAppearanceStrings` adapter (see
-        // WaveCrux's `WaveCruxThemeAppearanceStrings` for the reference
-        // pattern), so the section headings below are English text
-        // regardless of `locale`. That is a real localization gap in
-        // the production widget, not a gap in this assertion — this
-        // sweep still proves the widget renders cleanly under every
-        // supported locale's `MaterialApp` context.
-        expect(find.text('Presets'), findsOneWidget);
-        expect(find.text('Color overrides'), findsOneWidget);
-        expect(find.text('Theme packs'), findsOneWidget);
+        // The subsection headings come from the locale's ARB values via
+        // `LintCruxThemeAppearanceStrings`, not from the English defaults.
+        final l10n = L10N.of(tester.element(find.byType(ColorThemeSection)));
+        expect(find.text(l10n.appearancePresetSectionHeading), findsOneWidget);
+        expect(
+          find.text(l10n.appearanceTokenOverridesSectionHeading),
+          findsOneWidget,
+        );
+        expect(
+          find.text(l10n.appearanceThemePackBrowserSectionHeading),
+          findsOneWidget,
+        );
+        if (locale.languageCode != 'en') {
+          const en = ThemeAppearanceStringsEn();
+          expect(find.text(en.presetSectionHeading), findsNothing);
+          expect(find.text(en.tokenOverridesSectionHeading), findsNothing);
+          expect(find.text(en.themePackBrowserSectionHeading), findsNothing);
+        }
       });
     }
   });
