@@ -121,6 +121,9 @@ class _BookmarkDialogState extends ConsumerState<BookmarkDialog> {
           ? l10n.bookmarkDialogTitleEdit
           : l10n.bookmarkDialogTitleCreate,
       width: 520,
+      // Enter runs the default action, Save, unless focus is in the
+      // multi-line note (where Enter is a newline) or on a button.
+      onSubmit: () => _onSave(context),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:crux_telemetry/crux_telemetry.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -182,6 +183,34 @@ void main() {
         await tester.pumpAndSettle();
         expect(store.saved, hasLength(1));
         expect(store.saved.first.note, 'follow up later');
+      },
+    );
+
+    testWidgets(
+      'Enter saves, except in the multi-line note where it is a newline (D39)',
+      (tester) async {
+        final store = _RecordingStore();
+        await _pumpDialog(
+          tester,
+          overrides: [
+            violationBookmarkStoreProvider.overrideWithValue(store),
+          ],
+          dialog: const BookmarkDialog(violation: _violation),
+        );
+        await tester.tap(find.byKey(const ValueKey('bookmarkDialogNoteField')));
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+        expect(store.saved, isEmpty);
+        expect(find.text('Add bookmark'), findsOneWidget);
+
+        // Focus on the dialog body itself, neither a field nor a button.
+        Focus.of(tester.element(find.text(_violation.ruleId))).requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+        expect(store.saved, hasLength(1));
+        expect(find.text('Add bookmark'), findsNothing);
       },
     );
 
