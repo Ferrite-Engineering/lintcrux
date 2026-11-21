@@ -8,7 +8,7 @@ LintCrux is desktop-first. The same dashboard runs on Linux, macOS and Windows. 
 
 | Platform | Versions | How you get it |
 |---|---|---|
-| Linux | x86_64 | AppImage or `.tar.gz` from the [downloads page](https://lintcrux.app/download). A native binary, no webview wrapper. |
+| Linux | x86_64; from LintCrux 1.2, glibc 2.28 or later (RHEL, Rocky Linux and AlmaLinux 8 and 9, Ubuntu 22.04 and later, Debian 12), the headless CLI included; before 1.2, glibc 2.34 | AppImage or `.tar.gz` from the [downloads page](https://lintcrux.app/download), or `.deb` and `.rpm` for managed fleets. A native binary, no webview wrapper. |
 | macOS | 12 or later, universal (Apple silicon and Intel) | `.dmg` from the [downloads page](https://lintcrux.app/download). |
 | Windows | 10 / 11, x86_64 | Installer or portable `.zip` from the [downloads page](https://lintcrux.app/download). |
 | Web | A current desktop browser | The read-only SARIF viewer at [app.lintcrux.app](https://app.lintcrux.app), not the full dashboard. |
@@ -17,6 +17,12 @@ Release builds do not expire, and the app tells you when a newer build is out (s
 
 !!! note "No activation step"
     You do not need an account or a license key to begin: Open Core is free, with no sign-up and no time limit. The Pro and Enterprise features need a license key, entered under `Settings → License`. See [Tiers & licensing](https://edacrux.app/licensing).
+
+### Linux over a remote display {#linux-remote}
+
+On a remote X session (VNC, X forwarding, ETX or NX) or a virtual machine without 3D support there is often no OpenGL. From LintCrux 1.2 the app checks for it at startup and, when there is none, draws with the software renderer and prints one line on stderr saying so; setting `FLUTTER_LINUX_RENDERER=opengl` keeps OpenGL. Before 1.2 the window stayed empty on such a display. LintCrux also needs the EGL and OpenGL ES libraries (`libEGL.so.1`, `libGLESv2.so.2`, from Mesa); the `.deb` and `.rpm` declare them from 1.2.
+
+From LintCrux 1.2 typing works over `ssh -X` from a client that keeps OpenSSH's default of untrusted X forwarding, as macOS does. Before 1.2 the first key press there ended the app, and `ssh -Y` avoided it. From LintCrux 1.2, Backspace, Escape, Return and Tab work in text fields over X forwarding from a Mac (XQuartz). Some Ctrl+letter shortcuts can still act as a different letter there.
 
 ## The lint engines {#engines}
 
