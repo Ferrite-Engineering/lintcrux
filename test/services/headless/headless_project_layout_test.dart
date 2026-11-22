@@ -136,7 +136,7 @@ void main() {
       expect(result.violations, hasLength(1));
       expect(
         result.violations.single.location.file,
-        p.join(tmp.path, 'b/t.sv'),
+        p.join(tmp.path, 'b', 't.sv'),
       );
       expect(result.violations.single.location.line, 4);
       expect(runner.lintRun.workingDirectory, tmp.path);
@@ -174,8 +174,8 @@ void main() {
           ).run(
             CliArgs(
               paths: <String>[
-                p.join(tmp.path, 'a/x.sv'),
-                p.join(tmp.path, 'b/t.sv'),
+                p.join(tmp.path, 'a', 'x.sv'),
+                p.join(tmp.path, 'b', 't.sv'),
               ],
               engineIds: const <String>['slang'],
               exitCodeOnFindings: true,
@@ -265,8 +265,8 @@ void main() {
     expect(
       inv.arguments.sublist(inv.arguments.length - 2),
       <String>[
-        p.join(tmp.path, 'rtl/pkg.vhd'),
-        p.join(tmp.path, 'rtl/top.vhd'),
+        p.join(tmp.path, 'rtl', 'pkg.vhd'),
+        p.join(tmp.path, 'rtl', 'top.vhd'),
       ],
     );
   });
