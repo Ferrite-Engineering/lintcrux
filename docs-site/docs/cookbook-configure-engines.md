@@ -19,7 +19,7 @@ Out of the box, LintCrux runs every engine that has a source file in a language 
 
 3. **Set per-engine options.**
 
-    Add the options each engine needs under `perEngineOptions` in the `.lintcrux` file: Verilator `warnFlags` and `extraOptions`, a Verible `ruleProfile` or `rulesConfigSearch`, an Svlint `configPath`, GHDL `warnFlags`. Defines, include paths and the top module are project-level keys. Because all of this lives in the project file, the whole team runs the same configuration. The keys are listed in the [project file reference](reference/project-file.md).
+    Add the options each engine needs under `perEngineOptions` in the `.lintcrux` file: Verilator `warnFlags` and `extraOptions`, GHDL `std` for a VHDL-2008 design, `extraOptions` for slang, a Verible `ruleProfile` or `rulesConfigSearch`, an Svlint `configPath`, GHDL `warnFlags`. Defines, include paths and the top module are project-level keys. Because all of this lives in the project file, the whole team runs the same configuration. The keys are listed in the [project file reference](reference/project-file.md).
 
 4. **Re-run and check what ran.**
 
