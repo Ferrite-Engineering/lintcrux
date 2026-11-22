@@ -234,6 +234,7 @@ class SvlintEngine implements LintEngine {
     }
     args
       ..addAll(request.binary.extraArgs)
+      ..addAll(engineStringListOption(request, kExtraOptionsKey))
       ..addAll(request.sourceFiles);
     return args;
   }

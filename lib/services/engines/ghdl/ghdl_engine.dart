@@ -35,6 +35,18 @@ import 'package:lintcrux/services/engines/process_runner.dart';
 /// through. The `.lintcrux` per-engine options bag persists the choice
 /// per project.
 ///
+/// Three more keys in that bag change how GHDL is invoked, for designs the
+/// default invocation cannot read. `std` (`87`, `93`, `93c`, `00`, `02`,
+/// `08`, `19`) is passed as `--std=<value>`; without it GHDL uses its own
+/// default, `93c`, and a VHDL-2008 design fails on its first
+/// `ieee.float_pkg`. `syntaxOnly: true` runs `ghdl -s` in place of `ghdl -a`:
+/// the same analysis and the same warnings without GHDL generating code for
+/// every unit, which is what dominates the time on a large generated design
+/// with an LLVM-backed GHDL. `extraOptions`, a `List<String>`, is appended
+/// before the sources (`-frelaxed`, `-P<dir>`). GHDL analyses files in the
+/// order given, so a unit's dependencies must come earlier in the project's
+/// `sourceFiles`.
+///
 /// Binary resolution prefers the [GhdlAvailabilityService]
 /// (bundled cache → PATH); custom paths from
 /// [EngineBinaryConfig.source] = [EngineBinarySource.custom] take
@@ -252,7 +264,11 @@ class GhdlEngine implements LintEngine {
   }
 
   List<String> _buildArgs(LintRunRequest request) {
-    final args = <String>['-a'];
+    // `-s` analyses without generating code or updating the library.
+    final syntaxOnly = request.options['syntaxOnly'] == true;
+    final args = <String>[if (syntaxOnly) '-s' else '-a'];
+    final std = _resolveStd(request);
+    if (std != null) args.add('--std=$std');
     final warnFlags = _resolveWarnFlags(request);
     for (final f in warnFlags) {
       args.add('--warn-$f');
@@ -264,8 +280,29 @@ class GhdlEngine implements LintEngine {
     // is not implemented; every file is analysed into `work`.
     args
       ..addAll(request.binary.extraArgs)
+      ..addAll(engineStringListOption(request, kExtraOptionsKey))
       ..addAll(request.sourceFiles);
     return args;
+  }
+
+  /// The `std` option, or `null` when the project sets none.
+  ///
+  /// A value that is not a non-empty string (`"std": 8`) is a mistake in the
+  /// project file, and silently running GHDL's default standard instead would
+  /// report a VHDL-2008 design as unreadable, so it fails the engine.
+  String? _resolveStd(LintRunRequest request) {
+    final raw = request.options['std'];
+    if (raw == null) return null;
+    if (raw is! String || raw.isEmpty) {
+      throw EngineRunFailedException(
+        engineId: id,
+        exitCode: -1,
+        reason:
+            '"std" must be a VHDL standard string such as "08"; got '
+            '${raw.runtimeType}',
+      );
+    }
+    return raw;
   }
 
   /// Returns the `--warn-*` flag set to pass to GHDL, taking the
