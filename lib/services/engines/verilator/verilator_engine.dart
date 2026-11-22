@@ -9,6 +9,7 @@ import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
+import 'package:lintcrux/services/engines/engine_run_context.dart';
 import 'package:lintcrux/services/engines/process_runner.dart';
 import 'package:lintcrux/services/engines/verilator/verilator_parser.dart';
 import 'package:lintcrux/services/engines/verilator/verilator_sarif_parser.dart';
@@ -111,8 +112,9 @@ class VerilatorEngine implements LintEngine {
   final ProcessRunner runner;
 
   /// Absolute project root used to resolve relative paths reported in
-  /// Verilator output. Empty (the default) falls back to the directory
-  /// of the first source file in the request.
+  /// Verilator output. Empty (the default) falls back to
+  /// [LintRunRequest.projectRoot], then to the directory of the first
+  /// source file in the request.
   final String projectRoot;
 
   /// Bundled-binary resolver, consulted when [EngineBinaryConfig.source]
@@ -196,11 +198,7 @@ class VerilatorEngine implements LintEngine {
   @override
   Stream<Violation> run(LintRunRequest request) async* {
     final exe = _resolveExecutable(request.binary);
-    final root = projectRoot.isNotEmpty
-        ? projectRoot
-        : (request.sourceFiles.isNotEmpty
-              ? _dirname(request.sourceFiles.first)
-              : '');
+    final root = engineRootPath(request, configuredRoot: projectRoot);
     final parser = VerilatorParser(rootPath: root);
 
     // SARIF only on a Verilator that writes it. The stderr transcript is
@@ -452,11 +450,5 @@ class VerilatorEngine implements LintEngine {
       return out;
     }
     return defaultWarnFlags;
-  }
-
-  String _dirname(String filePath) {
-    final i = filePath.lastIndexOf('/');
-    if (i < 0) return '.';
-    return filePath.substring(0, i);
   }
 }

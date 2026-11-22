@@ -9,6 +9,7 @@ import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
+import 'package:lintcrux/services/engines/engine_run_context.dart';
 import 'package:lintcrux/services/engines/ghdl/ghdl_availability_service.dart';
 import 'package:lintcrux/services/engines/ghdl/ghdl_parser.dart';
 import 'package:lintcrux/services/engines/process_runner.dart';
@@ -55,8 +56,9 @@ class GhdlEngine implements LintEngine {
   final ProcessRunner runner;
 
   /// Absolute project root used to resolve relative paths reported in
-  /// GHDL output. Empty (the default) falls back to the directory of
-  /// the first source file in the request.
+  /// GHDL output. Empty (the default) falls back to
+  /// [LintRunRequest.projectRoot], then to the directory of the first source
+  /// file in the request.
   final String projectRoot;
 
   /// Bundled-binary resolver consulted when [EngineBinaryConfig.source]
@@ -138,11 +140,7 @@ class GhdlEngine implements LintEngine {
   Stream<Violation> run(LintRunRequest request) async* {
     final exe = _resolveExecutable(request.binary);
     final args = _buildArgs(request);
-    final root = projectRoot.isNotEmpty
-        ? projectRoot
-        : (request.sourceFiles.isNotEmpty
-              ? _dirname(request.sourceFiles.first)
-              : '');
+    final root = engineRootPath(request, configuredRoot: projectRoot);
     final parser = GhdlParser(rootPath: root);
 
     final LintProcess proc;
@@ -173,10 +171,56 @@ class GhdlEngine implements LintEngine {
     } finally {
       _process = null;
     }
-    final violations = parser.parse(output.stderr);
+    final unusable = <String>[];
+    final violations = parser.parse(
+      output.stderr,
+      onUnrecognized: unusable.add,
+    );
     for (final v in violations) {
       yield v;
     }
+    final lost = unusable.where(_isLostDiagnostic).toList(growable: false);
+    if (lost.isNotEmpty) {
+      throw EngineRunFailedException(
+        engineId: id,
+        exitCode: output.exitCode,
+        reason:
+            'GHDL reported ${lost.length} problem(s) LintCrux could not '
+            'place in a source file, so the findings above may be incomplete',
+        outputExcerpt: lost.take(10).toList(growable: false),
+        resolvedPath: exe,
+      );
+    }
+  }
+
+  /// The tool-level line GHDL prints after any failed analysis.
+  static final RegExp _compilationErrorTrailer = RegExp(
+    r'\bghdl(?:\.exe)?:\s*error:\s*compilation error\s*$',
+    caseSensitive: false,
+  );
+
+  /// Any tool-level error, `ghdl:error: message`.
+  static final RegExp _toolError = RegExp(
+    r'\bghdl(?:\.exe)?:\s*error:',
+    caseSensitive: false,
+  );
+
+  /// The header of a located diagnostic, `file:line:col:error: message`.
+  static final RegExp _locatedDiagnostic = RegExp(
+    r'^.+?:\d+(?::\d+)?:\s*(?:error|fatal|warning):',
+  );
+
+  /// Whether [line], which the parser could not use, was a finding or a
+  /// failure rather than GHDL's chatter.
+  ///
+  /// `ghdl:error: compilation error` follows every analysis that found an
+  /// error and says nothing new. Any other tool-level error
+  /// (`ghdl:error: unknown command option '--x'`, an unknown `--std`) means
+  /// GHDL did not analyse the design; a located error or warning whose path
+  /// was refused is a finding that is not in the results.
+  static bool _isLostDiagnostic(String line) {
+    if (_compilationErrorTrailer.hasMatch(line)) return false;
+    return _locatedDiagnostic.hasMatch(line) || _toolError.hasMatch(line);
   }
 
   @override
@@ -241,11 +285,5 @@ class GhdlEngine implements LintEngine {
       return out;
     }
     return defaultWarnFlags;
-  }
-
-  String _dirname(String filePath) {
-    final i = filePath.lastIndexOf('/');
-    if (i < 0) return '.';
-    return filePath.substring(0, i);
   }
 }

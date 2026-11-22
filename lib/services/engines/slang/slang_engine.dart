@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:lintcrux/domain/enums/hdl_language.dart';
@@ -9,8 +10,10 @@ import 'package:lintcrux/domain/interfaces/lint_engine.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
+import 'package:lintcrux/services/engines/engine_run_context.dart';
 import 'package:lintcrux/services/engines/process_runner.dart';
 import 'package:lintcrux/services/engines/slang/slang_parser.dart';
+import 'package:path/path.dart' as p;
 
 /// LintCrux [LintEngine] wrapper around `slang` (the open-source
 /// SystemVerilog compiler).
@@ -34,6 +37,14 @@ import 'package:lintcrux/services/engines/slang/slang_parser.dart';
 /// forces the text parser, which is the only surface slang < 8.0
 /// offers.
 ///
+/// slang runs in the project root ([LintRunRequest.projectRoot]), and prints
+/// each file in a diagnostic relative to where it ran. A source or include
+/// path outside the root would come back as `../other/x.sv`, and a path that
+/// climbs out of the root is refused, so a run with one is given
+/// `--diag-abs-paths`. A diagnostic that is refused anyway, or that slang
+/// reported without a location, fails the run ([EngineRunFailedException])
+/// rather than disappearing: a run that lost findings must not read as clean.
+///
 /// The binary resolves from `PATH` (system source); bundled per-platform
 /// binaries do not ship yet, and custom paths come from the Settings → Engines
 /// UI. Missing-binary cases surface as [EngineNotAvailableException] on the
@@ -51,8 +62,9 @@ class SlangEngine implements LintEngine {
   final ProcessRunner runner;
 
   /// Absolute project root used to resolve relative paths reported in
-  /// slang output. Empty (the default) falls back to the directory of
-  /// the first source file in the request.
+  /// slang output. Empty (the default) falls back to
+  /// [LintRunRequest.projectRoot], then to the directory of the first source
+  /// file in the request.
   final String projectRoot;
 
   /// Bundled-binary resolver, consulted when [EngineBinaryConfig.source]
@@ -119,12 +131,8 @@ class SlangEngine implements LintEngine {
   Stream<Violation> run(LintRunRequest request) async* {
     final exe = _resolveExecutable(request.binary);
     final textMode = request.options['textModeFallback'] == true;
-    final args = _buildArgs(request, textMode: textMode);
-    final root = projectRoot.isNotEmpty
-        ? projectRoot
-        : (request.sourceFiles.isNotEmpty
-              ? _dirname(request.sourceFiles.first)
-              : '');
+    final root = engineRootPath(request, configuredRoot: projectRoot);
+    final args = _buildArgs(request, root: root, textMode: textMode);
     final parser = SlangParser(rootPath: root);
 
     final LintProcess proc;
@@ -157,12 +165,65 @@ class SlangEngine implements LintEngine {
       _process = null;
     }
     final lines = <String>[...output.stdout, ...output.stderr];
+    final unusable = <String>[];
     final violations = textMode
-        ? parser.parseText(lines)
-        : parser.parseJsonLines(lines);
+        ? parser.parseText(lines, onUnrecognized: unusable.add)
+        : parser.parseJsonLines(lines, onUnrecognized: unusable.add);
     for (final v in violations) {
       yield v;
     }
+    final lost = unusable.where(_isLostDiagnostic).toList(growable: false);
+    if (lost.isNotEmpty) {
+      throw EngineRunFailedException(
+        engineId: id,
+        exitCode: output.exitCode,
+        reason:
+            '${lost.length} slang diagnostic(s) could not be placed in a '
+            'source file or were not diagnostics of the design, so the '
+            'findings above may be incomplete',
+        outputExcerpt: lost.take(10).toList(growable: false),
+        resolvedPath: exe,
+      );
+    }
+  }
+
+  /// Whether any of [paths] lies outside [root].
+  static bool _reachesOutside(String root, Iterable<String> paths) {
+    if (root.isEmpty) return false;
+    return paths.any(
+      (path) => !p.isWithin(root, p.normalize(p.join(root, path))),
+    );
+  }
+
+  /// The header of a located diagnostic, `file:line:col: error: message`.
+  static final RegExp _locatedDiagnostic = RegExp(
+    r'^.+?:\d+:\d+:\s+(?:error|fatal error|fatal|warning):',
+  );
+
+  /// slang's own command-line complaints, which carry no location
+  /// (`error: unknown command line argument '--x'`).
+  static final RegExp _driverError = RegExp('^(?:fatal )?error:');
+
+  /// Whether [line], which the parser could not use, was a finding or a
+  /// failure rather than slang's chatter.
+  ///
+  /// Anything else the parser skips (notes, banners, source context) loses
+  /// nothing. These do: a located error or warning whose path was refused, a
+  /// JSON diagnostic with no usable location or that is not JSON at all, and
+  /// a driver error, after which slang analysed nothing.
+  static bool _isLostDiagnostic(String line) {
+    final text = line.trimLeft();
+    if (text.startsWith('{') || text.startsWith('[')) {
+      try {
+        final decoded = json.decode(text);
+        final severity = decoded is Map ? decoded['severity'] : null;
+        return severity is String &&
+            const {'error', 'fatal', 'warning'}.contains(severity);
+      } on FormatException {
+        return true;
+      }
+    }
+    return _locatedDiagnostic.hasMatch(line) || _driverError.hasMatch(line);
   }
 
   @override
@@ -190,6 +251,7 @@ class SlangEngine implements LintEngine {
 
   List<String> _buildArgs(
     LintRunRequest request, {
+    required String root,
     required bool textMode,
   }) {
     final args = <String>[];
@@ -200,6 +262,13 @@ class SlangEngine implements LintEngine {
         ..add('-q')
         ..add('--diag-json')
         ..add('-');
+    }
+    // A file outside the folder slang runs in would be reported as `../x.sv`.
+    if (_reachesOutside(root, [
+      ...request.sourceFiles,
+      ...request.includePaths,
+    ])) {
+      args.add('--diag-abs-paths');
     }
     for (final inc in request.includePaths) {
       args
@@ -228,11 +297,5 @@ class SlangEngine implements LintEngine {
       ..addAll(request.binary.extraArgs)
       ..addAll(request.sourceFiles);
     return args;
-  }
-
-  String _dirname(String filePath) {
-    final i = filePath.lastIndexOf('/');
-    if (i < 0) return '.';
-    return filePath.substring(0, i);
   }
 }
