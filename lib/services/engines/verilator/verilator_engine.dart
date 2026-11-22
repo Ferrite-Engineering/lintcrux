@@ -410,27 +410,12 @@ class VerilatorEngine implements LintEngine {
     }
     args
       ..addAll(request.binary.extraArgs)
-      ..addAll(_stringListOption(request, 'extraOptions'))
+      ..addAll(engineStringListOption(request, kExtraOptionsKey))
       // Waiver/config files (`.vlt`) must precede the sources they
       // waive — the same ordering Edalize's Verilator backend uses.
-      ..addAll(_stringListOption(request, 'waiverFiles'))
+      ..addAll(engineStringListOption(request, 'waiverFiles'))
       ..addAll(request.sourceFiles);
     return args;
-  }
-
-  /// Reads a `List<String>` entry from the per-project options bag,
-  /// returning an empty list when absent or mistyped. Used for the
-  /// project-scoped `extraOptions` (raw CLI flags, e.g. `-G` parameter
-  /// overrides from an EDAM import) and `waiverFiles` (`.vlt` config
-  /// files) keys — both distinct from [EngineBinaryConfig.extraArgs],
-  /// which is machine-scoped Settings state rather than project state.
-  List<String> _stringListOption(LintRunRequest request, String key) {
-    final raw = request.options[key];
-    if (raw is! List) return const <String>[];
-    return <String>[
-      for (final entry in raw)
-        if (entry is String && entry.isNotEmpty) entry,
-    ];
   }
 
   /// Returns the `-W*` selector set to pass to Verilator, taking the

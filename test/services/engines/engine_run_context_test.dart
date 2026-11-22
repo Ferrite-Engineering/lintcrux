@@ -94,8 +94,40 @@ void main() {
     });
   });
 
+  group('engineStringListOption', () {
+    test('reads a list of strings and skips empty and non-string entries', () {
+      final request = _request(
+        sources: const <String>[],
+        options: const <String, Object?>{
+          'extraOptions': <Object?>['--a', '', 3, '--b'],
+        },
+      );
+      expect(engineStringListOption(request, 'extraOptions'), <String>[
+        '--a',
+        '--b',
+      ]);
+    });
+
+    test('is empty when the key is absent or not a list', () {
+      expect(
+        engineStringListOption(_request(sources: const <String>[]), 'x'),
+        isEmpty,
+      );
+      expect(
+        engineStringListOption(
+          _request(
+            sources: const <String>[],
+            options: const <String, Object?>{'x': '--a'},
+          ),
+          'x',
+        ),
+        isEmpty,
+      );
+    });
+  });
+
   // Every engine runs where the project says, not wherever the first source
-  // file happens to be.
+  // file happens to be, and every engine takes `extraOptions` the same way.
   group('every engine', () {
     final engines = <String, LintEngine Function(FakeProcessRunner)>{
       'slang': (r) => SlangEngine(runner: r),
@@ -128,6 +160,30 @@ void main() {
             )
             .toList();
         expect(fake.invocations.first.workingDirectory, tmp.path);
+      });
+
+      test('${entry.key} appends extraOptions before the sources', () async {
+        final fake = FakeProcessRunner();
+        final source = p.join(tmp.path, 'a.$ext');
+        await entry
+            .value(fake)
+            .run(
+              _request(
+                sources: <String>[source],
+                projectRoot: tmp.path,
+                language: language,
+                options: const <String, Object?>{
+                  'extraOptions': <String>['--flag-one', '--flag-two=2'],
+                },
+              ),
+            )
+            .toList();
+        final args = fake.invocations.first.arguments;
+        expect(
+          args,
+          containsAllInOrder(<String>['--flag-one', '--flag-two=2']),
+        );
+        expect(args.indexOf('--flag-two=2'), lessThan(args.indexOf(source)));
       });
     }
   });

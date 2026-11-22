@@ -35,7 +35,9 @@ import 'package:path/path.dart' as p;
 ///
 /// The `textModeFallback: true` option in [LintRunRequest.options]
 /// forces the text parser, which is the only surface slang < 8.0
-/// offers.
+/// offers. `extraOptions`, a `List<String>` in the same bag, is appended to
+/// the command line before the sources, for flags a project needs that have
+/// no option of their own (`--allow-toplevel-iface-ports`, `--std`).
 ///
 /// slang runs in the project root ([LintRunRequest.projectRoot]), and prints
 /// each file in a diagnostic relative to where it ran. A source or include
@@ -295,6 +297,7 @@ class SlangEngine implements LintEngine {
     }
     args
       ..addAll(request.binary.extraArgs)
+      ..addAll(engineStringListOption(request, kExtraOptionsKey))
       ..addAll(request.sourceFiles);
     return args;
   }

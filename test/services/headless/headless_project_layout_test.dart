@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/core/cli/cli_args.dart';
 import 'package:lintcrux/core/cli/cli_exit_codes.dart';
 import 'package:lintcrux/services/engines/engine_registry.dart';
+import 'package:lintcrux/services/engines/ghdl/ghdl_engine.dart';
 import 'package:lintcrux/services/engines/process_runner.dart';
 import 'package:lintcrux/services/engines/slang/slang_engine.dart';
 import 'package:lintcrux/services/headless/headless_run_result.dart';
@@ -91,7 +92,11 @@ void main() {
     return file.path;
   }
 
-  String project(List<String> sources) {
+  String project(
+    List<String> sources, {
+    Map<String, Object?> perEngineOptions = const <String, Object?>{},
+    List<String> engines = const <String>['slang'],
+  }) {
     final file = File(p.join(tmp.path, 'repro.lintcrux'))
       ..writeAsStringSync(
         jsonEncode(<String, Object?>{
@@ -99,7 +104,8 @@ void main() {
           'name': 'repro',
           'rootPath': '.',
           'sourceFiles': sources,
-          'enabledEngineIds': <String>['slang'],
+          'enabledEngineIds': engines,
+          'perEngineOptions': perEngineOptions,
         }),
       );
     return file.path;
@@ -220,6 +226,71 @@ void main() {
       expect(result.problems.join('\n'), contains('slang'));
     },
   );
+
+  test('GHDL gets the project standard and analysis mode from the project '
+      'file', () async {
+    write('rtl/pkg.vhd', 'package p is end;\n');
+    write('rtl/top.vhd', 'entity t is end;\n');
+    final fake = FakeProcessRunner();
+    final result =
+        await HeadlessRunner(
+          registry: EngineRegistry([GhdlEngine(runner: fake)]),
+        ).run(
+          CliArgs(
+            paths: <String>[
+              project(
+                <String>['rtl/pkg.vhd', 'rtl/top.vhd'],
+                engines: const <String>['ghdl'],
+                perEngineOptions: <String, Object?>{
+                  'ghdl': <String, Object?>{
+                    'std': '08',
+                    'syntaxOnly': true,
+                    'extraOptions': <String>['-frelaxed'],
+                  },
+                },
+              ),
+            ],
+          ),
+        );
+    expect(result.exitCode, CliExitCode.clean);
+    final inv = fake.invocations.firstWhere(
+      (i) => !i.arguments.contains('--version'),
+    );
+    expect(inv.workingDirectory, tmp.path);
+    expect(inv.arguments.first, '-s');
+    expect(
+      inv.arguments,
+      containsAllInOrder(<String>['--std=08', '-frelaxed']),
+    );
+    expect(
+      inv.arguments.sublist(inv.arguments.length - 2),
+      <String>[
+        p.join(tmp.path, 'rtl/pkg.vhd'),
+        p.join(tmp.path, 'rtl/top.vhd'),
+      ],
+    );
+  });
+
+  test('slang gets extraOptions from the project file', () async {
+    write('a/x.sv');
+    final runner = _SlangLikeRunner(const <String, int>{});
+    final result = await runSlang(
+      runner,
+      project(
+        <String>['a/x.sv'],
+        perEngineOptions: <String, Object?>{
+          'slang': <String, Object?>{
+            'extraOptions': <String>['--allow-toplevel-iface-ports'],
+          },
+        },
+      ),
+    );
+    expect(result.exitCode, CliExitCode.clean);
+    expect(
+      runner.lintRun.arguments,
+      contains('--allow-toplevel-iface-ports'),
+    );
+  });
 
   group('with a real slang', () {
     const tSv =

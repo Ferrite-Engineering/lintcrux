@@ -36,3 +36,22 @@ String engineRootPath(LintRunRequest request, {String configuredRoot = ''}) {
   if (request.sourceFiles.isEmpty) return '';
   return p.dirname(request.sourceFiles.first);
 }
+
+/// The `List<String>` option [key] from the project's per-engine options bag,
+/// or an empty list when it is absent or not a list. Empty and non-string
+/// entries are skipped.
+///
+/// This is the one reader behind every per-engine `extraOptions` and
+/// `waiverFiles` key, so the keys mean the same thing for every engine.
+List<String> engineStringListOption(LintRunRequest request, String key) {
+  final raw = request.options[key];
+  if (raw is! List) return const <String>[];
+  return <String>[
+    for (final entry in raw)
+      if (entry is String && entry.isNotEmpty) entry,
+  ];
+}
+
+/// The key under which a project passes raw command-line flags to one engine
+/// (`perEngineOptions.<engine>.extraOptions`).
+const String kExtraOptionsKey = 'extraOptions';
