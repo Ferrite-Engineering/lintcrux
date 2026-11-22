@@ -10,6 +10,7 @@ import 'package:lintcrux/domain/models/engine_config.dart';
 import 'package:lintcrux/domain/models/verible_rule_profile.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/engines/bundled_binary_resolver.dart';
+import 'package:lintcrux/services/engines/engine_run_context.dart';
 import 'package:lintcrux/services/engines/process_runner.dart';
 import 'package:lintcrux/services/engines/verible/builtin_rule_profiles.dart';
 import 'package:lintcrux/services/engines/verible/verible_parser.dart';
@@ -173,11 +174,7 @@ class VeribleEngine implements LintEngine {
 
   @override
   Stream<Violation> run(LintRunRequest request) async* {
-    final root = projectRoot.isNotEmpty
-        ? projectRoot
-        : (request.sourceFiles.isNotEmpty
-              ? _dirname(request.sourceFiles.first)
-              : '');
+    final root = engineRootPath(request, configuredRoot: projectRoot);
     final parser = VeribleParser(rootPath: root);
     final forcedTextMode = request.options['textModeFallback'] == true;
 
@@ -362,11 +359,5 @@ class VeribleEngine implements LintEngine {
       );
     }
     return profile;
-  }
-
-  String _dirname(String filePath) {
-    final i = filePath.lastIndexOf('/');
-    if (i < 0) return '.';
-    return filePath.substring(0, i);
   }
 }
