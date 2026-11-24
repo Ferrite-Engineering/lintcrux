@@ -90,6 +90,9 @@ clean run over zero files.
 | `--exit-code` | Exit `1` when any non-suppressed violation remains. |
 | `--fail-on-new-violations` | Exit `2` when a violation is absent from the baseline. Pre-existing findings do not fail the build. Composes with `--exit-code`. |
 | `--allow-missing-engines` | Treat an engine whose binary cannot be found as skipped rather than as a run failure. Off by default: see [Missing engines](#missing-engines). |
+| `--json` | From 2.0. Write the findings to stdout as one JSON document instead of the listing: the outcome, every engine that ran, the counts and the findings with absolute paths. The exit codes are unchanged. Does not combine with `--export` or `--sarif`: the pair is a usage error (`64`), so run the export as a separate invocation. See [JSON output](#json-output). |
+| `--limit <n>` | From 2.0, with `--json` only. List at most `n` findings, from `0` to `1000`; the default is `100`. The counts and the total still cover every finding. Without `--json` it is a usage error (`64`), as is a value that is not a whole number in range. |
+| `--offset <n>` | From 2.0, with `--json` only. List findings from the `n`th, counting from `0`. Without `--json`, or with a value that is not a whole number of `0` or more, it is a usage error (`64`). |
 | `--quiet`, `-q` | Suppress the per-violation listing; print only the summary. Exit codes are unaffected. |
 | `--engine-timeout <seconds>` | Wall-clock budget per engine; an engine still running when it runs out is killed and the run exits `3`. Default `300`. Raise it for a Yosys-based engine (`yosys`, `cdc`) flattening a full SoC, which can reasonably take longer than five minutes. From LintCrux 1.2, without this option the engines that elaborate with Yosys (`yosys`, `cdc`, `constraints`) are allowed time in proportion to the size of their sources, never less than `300` seconds (see [The Yosys time limit](../projects-and-engines.md#yosys-time-limit)); given, it applies to every engine. A value that is not a positive whole number is a usage error. |
 | `--import-filelist <rtl.f>` | Convert a Vivado-style `.f` filelist into a `.lintcrux` project, print the emitted path, then lint it. Recursive `-f` includes, `+incdir+`, `+define+` and env-var expansion are honored. |
@@ -101,6 +104,93 @@ clean run over zero files.
 | `--reset-eula` | Testing aid: forget this installation's acceptance of the End User License Agreement so the agreement is presented again on this launch. Acted on by the desktop app; the headless binary ignores it. |
 | `--help`, `-h` | Print the usage block and exit `0`. |
 | `--version` | Print the version string and exit `0`. |
+
+## JSON output
+
+`--json` makes stdout carry one JSON document and nothing else; notes and
+errors still go to stderr. It is the document `lintcrux mcp` returns to an
+agent, so a script and an agent read the same answer. The exit code is
+whatever the same run would have produced without `--json`: the
+[exit codes](#exit-codes) below apply unchanged, and `--json` never turns a
+failing run into `0`.
+
+```bash
+lintcrux project.lintcrux --json --exit-code
+lintcrux project.lintcrux --json --limit 50 --offset 50
+```
+
+`--limit` and `--offset` page the list of findings. The counts and the total
+describe every finding, whatever page is shown, and each document says when
+the list was cut short. Because `--json` already uses stdout, it cannot be
+combined with `--export` or `--sarif`: run the export as its own
+invocation, as the [CI cookbook](../cookbook/ci-integration.md) does.
+
+## Subcommands
+
+From 2.0 the headless binary answers three subcommands before it reads the
+rest of the command line. Each is the command-line form of a tool the
+[MCP server](#lintcrux-mcp) offers, with the same inputs and the same
+output. `lintcrux <command> --help` prints that command's usage.
+
+### `lintcrux rule`
+
+```
+lintcrux rule <engine>/<rule> [--json]
+```
+
+Describes one rule by the `engine/rule` id a finding gives, for example
+`verilator/WIDTH`: its default severity and the engine's help link. Without
+`--json` it prints those as plain lines. The rule's description is empty in
+this version, so read the engine's own page at the help link for what the
+rule checks. A rule that LintCrux's rule databases do not list is answered
+with no default severity and a `rule.not_catalogued` warning.
+
+### `lintcrux waivers`
+
+```
+lintcrux waivers <project.lintcrux> [--json]
+```
+
+Lists the waivers in force for a project, and changes nothing. It reports
+inline `lint_off` pragmas, the `lint_off` lines of the project's Verilator
+configuration files, and the findings the project's baseline accepts. Each
+entry gives its kind, the rule, where it is written (`file:line`) and a
+pattern. No engine runs. A project with managed waivers
+(`.lintcrux-waivers.json`) needs LintCrux Pro to read them: the open-core
+binary says so in a `licence.withheld` warning and leaves them out.
+
+### `lintcrux mcp`
+
+```
+lintcrux mcp [--root <dir>]
+```
+
+Serves LintCrux to an agent as Model Context Protocol tools (`lint`, `rule`
+and `waivers`) over stdin and stdout. Every path a tool receives, and every
+source, include directory and configuration file a project names, must be
+inside `--root`; it defaults to the working directory. A path outside it, or
+a project that hands an engine raw flags (`extraOptions`), is refused and
+nothing runs. The server writes nothing into the project and makes no
+network call of its own. It calls no language model and never decides a
+verdict itself: every finding is an engine's, or LintCrux's own CDC and
+pin-constraint check's.
+
+A separate agent page, written for the person who configures an agent and
+for the agent itself, covers how to register the server and how to read a
+document. This page is the command-line reference only.
+
+### Exit codes of `rule` and `waivers`
+
+The two subcommands use the suite's shared exit codes, a subset of the table
+below. They run no engine, so `1`, `2`, `3` and `4` never occur.
+
+| Outcome | Exit code | Means |
+| --- | --- | --- |
+| completed | `0` | The answer was produced. |
+| usage error | `64` | A bad flag, the wrong number of operands, or a malformed rule id. |
+| input error | `65` | The project could not be read, or the engine named in a rule id is not one LintCrux has. |
+
+With `--json` the same outcome is the `outcome` member of the document.
 
 ## Exit codes
 
