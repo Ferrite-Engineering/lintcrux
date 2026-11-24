@@ -87,6 +87,7 @@ nav:
       - Team trend database: team-database.md
       - Cross-probe & the suite: integrations.md
       - Use in VS Code: vscode.md
+      - For coding agents: agents.md
       - The web viewer: user-guide/web-mode.md
   - Administration:
       - Org-wide configuration: administration.md
