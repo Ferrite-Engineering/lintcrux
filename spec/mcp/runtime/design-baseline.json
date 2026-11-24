@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "baselineId": "00000000-0000-4000-8000-000000000001",
+  "createdAt": "2026-11-01T12:00:00.000Z",
+  "projectPath": "/home/alice/design",
+  "createdBy": "alice",
+  "frozenViolations": [
+    {
+      "fingerprint": "68789286ba0fab27",
+      "ruleId": "verilator/UNUSEDSIGNAL",
+      "filePath": "/home/alice/design/rtl/fifo.sv",
+      "line": 6,
+      "message": "Signal is not used: 'spare'"
+    }
+  ]
+}

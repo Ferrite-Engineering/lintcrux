@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "lint",
+  "outcome": "completed",
+  "engines": [
+    {
+      "name": "verible",
+      "version": "v0.0-3946-g851d3ff4",
+      "path": null
+    },
+    {
+      "name": "verilator",
+      "version": "5.020",
+      "path": null
+    }
+  ],
+  "design": {
+    "fingerprint": {
+      "scheme": "lintcrux-sources-sha256/1",
+      "value": "27d6d3ccf1cc9168acffab2128ec7869516d1a20a24a11098ff041f60ec31526"
+    }
+  },
+  "body": {
+    "project": "/spec/fixtures/design/design.lintcrux",
+    "top": "top",
+    "engine_runs": [
+      {
+        "id": "verible",
+        "phase": "completed",
+        "timed_out": false,
+        "message": null
+      },
+      {
+        "id": "verilator",
+        "phase": "completed",
+        "timed_out": false,
+        "message": null
+      }
+    ],
+    "counts": {
+      "fatal": 0,
+      "error": 0,
+      "warning": 3,
+      "note": 1,
+      "suppressed": 1
+    },
+    "total": 5,
+    "returned": 2,
+    "offset": 1,
+    "truncated": true,
+    "findings": [
+      {
+        "engineId": "verible",
+        "ruleId": "verible/explicit-begin",
+        "severity": "note",
+        "message": "All block constructs shall explicitly use begin/end.",
+        "location": {
+          "file": "/spec/fixtures/design/rtl/fifo.sv",
+          "line": 7,
+          "column": 3
+        },
+        "relatedLocations": [],
+        "suppressed": false,
+        "raw": null,
+        "signature": "3f8ec69a86ae5ac4",
+        "baseline": "new"
+      },
+      {
+        "engineId": "verilator",
+        "ruleId": "verilator/WIDTH",
+        "severity": "warning",
+        "message": "Operator ASSIGNW expects 8 bits on the Assign RHS, but Assign RHS's CONST '32'h1' generates 32 bits.",
+        "location": {
+          "file": "/spec/fixtures/design/rtl/top.sv",
+          "line": 6,
+          "column": 14
+        },
+        "relatedLocations": [
+          {
+            "file": "/spec/fixtures/design/rtl/top.sv",
+            "line": 4,
+            "column": 22
+          }
+        ],
+        "suppressed": false,
+        "raw": {
+          "widthExpected": 8,
+          "widthActual": 32
+        },
+        "signature": "e89628c4d581e8eb",
+        "baseline": "new"
+      }
+    ]
+  },
+  "diagnostics": [
+    {
+      "severity": "warning",
+      "code": "licence.withheld",
+      "message": "Applying the project's managed waivers (.lintcrux-waivers.json) needs a Pro licence and was left out of this answer; the rest of the answer stands.",
+      "fix": "LintCrux Pro does this under a Pro licence; this open-core command line reads no licence.",
+      "location": null
+    }
+  ]
+}

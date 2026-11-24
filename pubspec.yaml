@@ -121,6 +121,11 @@ dependencies:
   # and off AppImage.
   crux_linux_integration:
     path: ./crux-shared/packages/crux_linux_integration
+  # The suite's MCP server core, pure Dart: `lintcrux mcp`'s stdio transport,
+  # its tool table, the `--json` document lint, rule and waivers write, and
+  # path confinement (lib/headless/).
+  crux_mcp:
+    path: ./crux-shared/packages/crux_mcp
   # Cross-suite desktop menu bar: one declarative CruxMenuLayout rendered as
   # the native macOS PlatformMenuBar or the in-window VS Code-style menu bar on
   # Windows/Linux, with shared separator grouping, platform-idiomatic

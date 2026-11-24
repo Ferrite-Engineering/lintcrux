@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "rule",
+  "outcome": "input_error",
+  "engines": [],
+  "design": null,
+  "body": null,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "code": "rule.unknown_engine",
+      "message": "LintCrux has no engine `nosuch`. Its engines are verilator, verible, slang, yosys, ghdl, svlint, cdc, constraints.",
+      "fix": null,
+      "location": null
+    }
+  ]
+}

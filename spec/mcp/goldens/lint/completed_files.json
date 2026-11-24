@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "lint",
+  "outcome": "completed",
+  "engines": [
+    {
+      "name": "verible",
+      "version": "v0.0-3946-g851d3ff4",
+      "path": null
+    },
+    {
+      "name": "verilator",
+      "version": "5.020",
+      "path": null
+    }
+  ],
+  "design": {
+    "fingerprint": {
+      "scheme": "lintcrux-sources-sha256/1",
+      "value": "9d690f41745a9d4c48fa25ad8a22e402730dc7a9adcc1315a8e95938aff74d69"
+    }
+  },
+  "body": {
+    "project": null,
+    "top": null,
+    "engine_runs": [
+      {
+        "id": "verible",
+        "phase": "completed",
+        "timed_out": false,
+        "message": null
+      },
+      {
+        "id": "verilator",
+        "phase": "completed",
+        "timed_out": false,
+        "message": null
+      }
+    ],
+    "counts": {
+      "fatal": 0,
+      "error": 0,
+      "warning": 1,
+      "note": 1,
+      "suppressed": 0
+    },
+    "total": 2,
+    "returned": 2,
+    "offset": 0,
+    "truncated": false,
+    "findings": [
+      {
+        "engineId": "verilator",
+        "ruleId": "verilator/UNUSEDSIGNAL",
+        "severity": "warning",
+        "message": "Signal is not used: 'spare'",
+        "location": {
+          "file": "/spec/fixtures/design/rtl/fifo.sv",
+          "line": 6,
+          "column": 15
+        },
+        "relatedLocations": [],
+        "suppressed": false,
+        "raw": null,
+        "signature": "8214a9dcd6202cc6",
+        "baseline": null
+      },
+      {
+        "engineId": "verible",
+        "ruleId": "verible/explicit-begin",
+        "severity": "note",
+        "message": "All block constructs shall explicitly use begin/end.",
+        "location": {
+          "file": "/spec/fixtures/design/rtl/fifo.sv",
+          "line": 7,
+          "column": 3
+        },
+        "relatedLocations": [],
+        "suppressed": false,
+        "raw": null,
+        "signature": "e99bd55b5b5f6203",
+        "baseline": null
+      }
+    ]
+  },
+  "diagnostics": []
+}

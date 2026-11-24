@@ -64,6 +64,9 @@ class CliArgs {
     this.relativeTo,
     this.constraintFiles = const <String>[],
     this.parameters = const <String, String>{},
+    this.json = false,
+    this.limit,
+    this.offset,
   });
 
   /// Empty/default args — equivalent to `lintcrux` with no flags.
@@ -271,6 +274,19 @@ class CliArgs {
   /// core from one project file.
   final Map<String, String> parameters;
 
+  /// `--json`: write one JSON document to stdout (the suite's eight-member
+  /// envelope, `lib/headless/lint_document.dart`) instead of the listing.
+  /// The exit code is unchanged.
+  final bool json;
+
+  /// `--limit`: how many findings the `--json` document lists, or `null` for
+  /// the default. Only with [json].
+  final int? limit;
+
+  /// `--offset`: the first finding the `--json` document lists, or `null`
+  /// for 0. Only with [json].
+  final int? offset;
+
   /// Returns a copy with overridden fields.
   CliArgs copyWith({
     List<String>? paths,
@@ -299,8 +315,14 @@ class CliArgs {
     String? relativeTo,
     List<String>? constraintFiles,
     Map<String, String>? parameters,
+    bool? json,
+    int? limit,
+    int? offset,
   }) {
     return CliArgs(
+      json: json ?? this.json,
+      limit: limit ?? this.limit,
+      offset: offset ?? this.offset,
       parameters: parameters ?? this.parameters,
       constraintFiles: constraintFiles ?? this.constraintFiles,
       paths: paths ?? this.paths,
@@ -363,6 +385,9 @@ class CliArgs {
     if (other.engineTimeout != engineTimeout) return false;
     if (other.sarifRoot != sarifRoot) return false;
     if (other.relativeTo != relativeTo) return false;
+    if (other.json != json) return false;
+    if (other.limit != limit) return false;
+    if (other.offset != offset) return false;
     if (other.parameters.length != parameters.length) return false;
     for (final entry in parameters.entries) {
       if (other.parameters[entry.key] != entry.value) return false;
@@ -419,6 +444,7 @@ class CliArgs {
         ),
         Object.hashAll(mandatoryEngineIds),
         Object.hashAll(constraintFiles),
+        Object.hash(json, limit, offset),
       ),
       Object.hashAll(engineIds),
     );

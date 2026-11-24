@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "The body of lintcrux waivers <project> --json and of the waivers tool",
+  "description": "The waivers in force, read only: inline verilator lint_off ranges (pattern: lines a-b), lint_off lines of the Verilator configuration files the project names (pattern: the directive), and the findings frozen in the project's baseline (pattern: the finding's message; scope rebased onto this checkout). managed waivers are LintCrux Pro's; the open-core binary says with a licence.withheld warning that it left them out. file is reserved.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["total", "waivers"],
+  "properties": {
+    "total": {"type": "integer", "minimum": 0},
+    "waivers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "rule", "scope", "pattern", "reason", "author", "expires", "expired"],
+        "properties": {
+          "kind": {"enum": ["inline", "file", "vlt", "managed", "baseline"]},
+          "rule": {"description": "engineId/ruleId; verilator/* for a lint_off naming no rule.", "type": "string"},
+          "scope": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/source"}]},
+          "pattern": {"type": ["string", "null"]},
+          "reason": {"type": ["string", "null"]},
+          "author": {"type": ["string", "null"]},
+          "expires": {"type": ["string", "null"]},
+          "expired": {"type": "boolean"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "line", "column"],
+      "properties": {
+        "file": {"type": "string"},
+        "line": {"type": "integer", "minimum": 1},
+        "column": {"type": ["integer", "null"], "minimum": 1}
+      }
+    }
+  }
+}

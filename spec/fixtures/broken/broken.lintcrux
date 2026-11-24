@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "broken",
+  "rootPath": ".",
+  "sourceFiles": [
+    "rtl/missing.sv"
+  ],
+  "includePaths": [],
+  "defines": {},
+  "language": "systemverilog",
+  "enabledEngineIds": [],
+  "severityOverrides": {},
+  "perEngineOptions": {},
+  "filterPresets": [],
+  "sourceFileLanguages": {},
+  "customRegexRules": []
+}

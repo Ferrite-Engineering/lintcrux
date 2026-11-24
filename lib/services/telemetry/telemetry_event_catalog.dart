@@ -40,6 +40,10 @@ class TelemetryCatalogEvent {
   ];
 }
 
+/// The `tool` vocabulary of `mcp.tool_call`: every tool the open-core
+/// `lintcrux mcp` and the Pro edition's server list.
+const List<String> kLintcruxMcpToolNames = <String>['lint', 'rule', 'waivers'];
+
 /// **The** LintCrux event catalog — every telemetry event either repository
 /// may record, with the closed vocabulary of every property.
 ///
@@ -246,6 +250,32 @@ const List<TelemetryCatalogEvent> kLintcruxEventCatalog =
       // vetted before that flag flips. The literal, not the package constant,
       // for the reason given above; the conformance test holds them equal.
       TelemetryCatalogEvent('app.unclean_shutdown'),
+
+      // `crux_mcp`'s `McpTelemetry` records this once per tool call of the
+      // headless `lintcrux mcp` server, under the consent this desktop app
+      // recorded and never when `CI` is set; no call site in either
+      // repository spells it. Three properties and nothing else: never an
+      // argument, a path, a rule or a file name. `outcome` and `duration` are
+      // the package's `kMcpToolCallOutcomes` and `kMcpDurationBuckets`, as
+      // literals for the reason given above; the conformance test holds them
+      // equal. `tool` is every tool either edition's server lists.
+      TelemetryCatalogEvent(
+        'mcp.tool_call',
+        enumeratedValues: <String, List<String>>{
+          'tool': kLintcruxMcpToolNames,
+          'outcome': <String>[
+            'completed',
+            'failed_gate',
+            'usage_error',
+            'input_error',
+            'engine_error',
+            'licence_error',
+            'unreadable',
+            'crashed',
+          ],
+          'duration': <String>['lt_1s', '1s_10s', '10s_1m', '1m_10m', 'ge_10m'],
+        },
+      ),
 
       // A violation bookmark written by the bookmark dialog. `edit` separates
       // making a bookmark from coming back to one; `note` says whether the

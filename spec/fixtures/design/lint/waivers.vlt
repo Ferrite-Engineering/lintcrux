@@ -1,0 +1,4 @@
+`verilator_config
+// Reviewed 2026-11-01: one module per file is not this project's rule.
+lint_off -rule DECLFILENAME -file "*/top.sv"
+lint_off -rule PINCONNECTEMPTY -file "*/top.sv" -lines 11  // the fifo has no output

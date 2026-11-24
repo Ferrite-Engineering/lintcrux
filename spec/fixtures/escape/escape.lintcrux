@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "escape",
+  "rootPath": ".",
+  "sourceFiles": [
+    "/nonexistent-lintcrux-spec/escape.sv"
+  ],
+  "includePaths": [],
+  "defines": {},
+  "language": "systemverilog",
+  "enabledEngineIds": [],
+  "severityOverrides": {},
+  "perEngineOptions": {},
+  "filterPresets": [],
+  "sourceFileLanguages": {},
+  "customRegexRules": []
+}

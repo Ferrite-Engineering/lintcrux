@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "waivers",
+  "outcome": "completed",
+  "engines": [],
+  "design": null,
+  "body": {
+    "total": 4,
+    "waivers": [
+      {
+        "kind": "inline",
+        "rule": "verilator/UNUSEDSIGNAL",
+        "scope": {
+          "file": "/spec/fixtures/design/rtl/top.sv",
+          "line": 8,
+          "column": null
+        },
+        "pattern": "lines 8-10",
+        "reason": null,
+        "author": null,
+        "expires": null,
+        "expired": false
+      },
+      {
+        "kind": "vlt",
+        "rule": "verilator/DECLFILENAME",
+        "scope": {
+          "file": "/spec/fixtures/design/lint/waivers.vlt",
+          "line": 3,
+          "column": null
+        },
+        "pattern": "lint_off -rule DECLFILENAME -file \"*/top.sv\"",
+        "reason": null,
+        "author": null,
+        "expires": null,
+        "expired": false
+      },
+      {
+        "kind": "vlt",
+        "rule": "verilator/PINCONNECTEMPTY",
+        "scope": {
+          "file": "/spec/fixtures/design/lint/waivers.vlt",
+          "line": 4,
+          "column": null
+        },
+        "pattern": "lint_off -rule PINCONNECTEMPTY -file \"*/top.sv\" -lines 11",
+        "reason": null,
+        "author": null,
+        "expires": null,
+        "expired": false
+      },
+      {
+        "kind": "baseline",
+        "rule": "verilator/UNUSEDSIGNAL",
+        "scope": {
+          "file": "/spec/fixtures/design/rtl/fifo.sv",
+          "line": 6,
+          "column": null
+        },
+        "pattern": "Signal is not used: 'spare'",
+        "reason": null,
+        "author": "alice",
+        "expires": null,
+        "expired": false
+      }
+    ]
+  },
+  "diagnostics": [
+    {
+      "severity": "warning",
+      "code": "licence.withheld",
+      "message": "Applying the project's managed waivers (.lintcrux-waivers.json) needs a Pro licence and was left out of this answer; the rest of the answer stands.",
+      "fix": "LintCrux Pro does this under a Pro licence; this open-core command line reads no licence.",
+      "location": null
+    }
+  ]
+}

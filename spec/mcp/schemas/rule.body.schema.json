@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "The body of lintcrux rule <engine>/<rule> --json and of the rule tool",
+  "description": "What the SARIF export's rule descriptor gives: the rule id as its title, the default severity from LintCrux's rule database (null, with a rule.not_catalogued warning, for a rule it does not list), and the engine's help page. The bundled databases carry no prose, so description is empty and help_uri is where the rule is explained.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "engine", "title", "description", "default_severity", "help_uri"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[^/]+/.+$"},
+    "engine": {"type": "string"},
+    "title": {"type": "string"},
+    "description": {"type": "string"},
+    "default_severity": {"enum": ["fatal", "error", "warning", "note", "none", null]},
+    "help_uri": {"type": ["string", "null"], "pattern": "^https://"}
+  }
+}

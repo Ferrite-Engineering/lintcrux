@@ -10,6 +10,7 @@ import 'package:lintcrux/core/cli/cli_exit_codes.dart';
 import 'package:lintcrux/domain/enums/elaboration_time_limit.dart';
 import 'package:lintcrux/domain/interfaces/violation_transformer.dart';
 import 'package:lintcrux/domain/models/engine_config.dart';
+import 'package:lintcrux/domain/models/engine_run_outcome.dart';
 import 'package:lintcrux/domain/models/engine_run_status.dart';
 import 'package:lintcrux/domain/models/violation.dart';
 import 'package:lintcrux/services/baseline/baseline_filter.dart';
@@ -179,15 +180,25 @@ class HeadlessRunner {
       // Distinguish "you typed something unusable" (usage) from "the
       // thing you named is broken" (run failure). Both used to be a
       // silent clean run.
+      final loadFailed = resolution.kind == HeadlessInputFailureKind.loadFailed;
       return HeadlessRunResult.failed(
-        code: switch (resolution.kind) {
-          HeadlessInputFailureKind.usage => CliExitCode.usage,
-          HeadlessInputFailureKind.loadFailed => CliExitCode.runFailed,
-        },
+        code: loadFailed ? CliExitCode.runFailed : CliExitCode.usage,
         problems: resolution.problems,
+        failures: <HeadlessFailure>[
+          for (final problem in resolution.problems)
+            if (loadFailed)
+              HeadlessFailure(
+                HeadlessFailureKind.input,
+                'input.project',
+                problem,
+              )
+            else
+              HeadlessFailure(HeadlessFailureKind.usage, 'usage', problem),
+        ],
       );
     }
     var project = resolution.project!;
+    final projectFilePath = resolution.projectFilePath;
 
     // ── 2. Apply --config ──────────────────────────────────────────
     final configPath = args.configPath;
@@ -198,6 +209,15 @@ class HeadlessRunner {
         return HeadlessRunResult.failed(
           code: CliExitCode.runFailed,
           problems: <String>[e.message],
+          failures: <HeadlessFailure>[
+            HeadlessFailure(
+              HeadlessFailureKind.input,
+              'input.config',
+              e.message,
+            ),
+          ],
+          project: project,
+          projectFilePath: projectFilePath,
         );
       }
     }
@@ -215,11 +235,18 @@ class HeadlessRunner {
           if (!File(f).existsSync()) f,
       ];
       if (missing.isNotEmpty) {
+        final problems = <String>[
+          for (final f in missing) 'Constraint file not found: $f',
+        ];
         return HeadlessRunResult.failed(
           code: CliExitCode.usage,
-          problems: <String>[
-            for (final f in missing) 'Constraint file not found: $f',
+          problems: problems,
+          failures: <HeadlessFailure>[
+            for (final problem in problems)
+              HeadlessFailure(HeadlessFailureKind.usage, 'usage', problem),
           ],
+          project: project,
+          projectFilePath: projectFilePath,
         );
       }
       project = project.copyWith(
@@ -248,7 +275,7 @@ class HeadlessRunner {
       engineIdsOverride: args.engineIds,
       mandatoryEngineIds: args.mandatoryEngineIds,
       topModuleOverride: args.topModule,
-      binaryConfigFor: (engineId) => _binaryFor(engineId, args),
+      binaryConfigFor: (engineId) => binaryFor(engineId, args),
     );
 
     if (plan.unknownEngineIds.isNotEmpty) {
@@ -264,16 +291,28 @@ class HeadlessRunner {
         for (final id in plan.unknownEngineIds)
           if (!args.mandatoryEngineIds.contains(id)) id,
       ];
+      final failures = <HeadlessFailure>[
+        for (final id in mandatedUnknown)
+          HeadlessFailure(
+            HeadlessFailureKind.engine,
+            'engine.mandated_unknown',
+            _mandatedUnknownMessage(id, known: known),
+          ),
+        if (typedUnknown.isNotEmpty)
+          HeadlessFailure(
+            HeadlessFailureKind.usage,
+            'usage',
+            'Unknown engine id(s): ${typedUnknown.join(', ')}. Registered engines: $known.',
+          ),
+      ];
       return HeadlessRunResult.failed(
         code: mandatedUnknown.isNotEmpty
             ? CliExitCode.runFailed
             : CliExitCode.usage,
-        problems: <String>[
-          for (final id in mandatedUnknown)
-            _mandatedUnknownMessage(id, known: known),
-          if (typedUnknown.isNotEmpty)
-            'Unknown engine id(s): ${typedUnknown.join(', ')}. Registered engines: $known.',
-        ],
+        problems: <String>[for (final f in failures) f.message],
+        failures: failures,
+        project: project,
+        projectFilePath: projectFilePath,
       );
     }
 
@@ -289,6 +328,15 @@ class HeadlessRunner {
         code: CliExitCode.runFailed,
         problems: const <String>[_noCompatibleSourcesMessage],
         diagnostics: diagnostics,
+        failures: const <HeadlessFailure>[
+          HeadlessFailure(
+            HeadlessFailureKind.input,
+            'input.no_compatible_sources',
+            _noCompatibleSourcesMessage,
+          ),
+        ],
+        project: project,
+        projectFilePath: projectFilePath,
       );
     }
 
@@ -314,6 +362,7 @@ class HeadlessRunner {
 
     // ── 5. Run the engines ─────────────────────────────────────────
     final store = InMemoryViolationStore();
+    final outcomes = <String, EngineRunOutcome>{};
     final runner = ParallelEngineRunner(
       store,
       transformer: transformer,
@@ -323,8 +372,12 @@ class HeadlessRunner {
       // report `engine.run` identically. `EngineRunOutcome` is the reason this
       // is a callback and not derived from `runner.statuses` afterwards: a
       // watchdog kill and a crash are both `EngineRunPhase.failed`, and
-      // the `engine.run` counter needs them apart.
-      onOutcome: telemetry?.recordEngineOutcome,
+      // the `engine.run` counter needs them apart. The `--json` document
+      // needs them apart too (`timed_out`), so the outcome is kept.
+      onOutcome: (engineId, outcome) {
+        outcomes[engineId] = outcome;
+        telemetry?.recordEngineOutcome(engineId, outcome);
+      },
     );
     try {
       await runner.runAll(plan.pairs);
@@ -344,10 +397,22 @@ class HeadlessRunner {
 
     // ── 6. Classify engine failures ────────────────────────────────
     final problems = <String>[];
+    final failures = <HeadlessFailure>[];
+    // Every problem is recorded through this, so `problems` (printed) and
+    // `failures` (what the `--json` document reads) never disagree.
+    void fail(HeadlessFailureKind kind, String code, String message) {
+      problems.add(message);
+      failures.add(HeadlessFailure(kind, code, message));
+    }
+
     for (final status in statuses.values) {
       switch (status.phase) {
         case EngineRunPhase.failed:
-          problems.add(
+          fail(
+            HeadlessFailureKind.engine,
+            outcomes[status.engineId] == EngineRunOutcome.timeout
+                ? 'engine.timeout'
+                : 'engine.failed',
             'engine "${status.engineId}" failed: '
             '${status.error ?? 'no diagnostic available'}',
           );
@@ -366,27 +431,37 @@ class HeadlessRunner {
             // --allow-missing-engines is the pipeline's; a run that silently
             // omits a mandated engine is the failure the mandate exists to
             // prevent, so the flag does not reach it.
-            problems.add(
+            fail(
+              HeadlessFailureKind.engine,
+              'engine.mandated_unavailable',
               '$_mandatedEngineLead "${status.engineId}" is not available: '
-              '${status.error ?? 'binary not found'}. The organization '
-              'policy requires it on every run: install it, ${pointAtIt}or '
-              'ask your administrator; --allow-missing-engines does not '
-              'apply to a mandated engine.',
+                  '${status.error ?? 'binary not found'}. The organization '
+                  'policy requires it on every run: install it, ${pointAtIt}or '
+                  'ask your administrator; --allow-missing-engines does not '
+                  'apply to a mandated engine.',
             );
           } else if (args.allowMissingEngines) {
             diagnostics.add('$message (skipped: --allow-missing-engines)');
           } else {
-            problems.add(
+            fail(
+              HeadlessFailureKind.engine,
+              'engine.unavailable',
               '$message. Install it, $pointAtIt'
-              'drop it with --engine, or pass '
-              '--allow-missing-engines to tolerate its absence.',
+                  'drop it with --engine, or pass '
+                  '--allow-missing-engines to tolerate its absence.',
             );
           }
         case EngineRunPhase.cancelled:
-          problems.add('engine "${status.engineId}" was cancelled');
+          fail(
+            HeadlessFailureKind.engine,
+            'engine.cancelled',
+            'engine "${status.engineId}" was cancelled',
+          );
         case EngineRunPhase.idle:
         case EngineRunPhase.running:
-          problems.add(
+          fail(
+            HeadlessFailureKind.engine,
+            'engine.incomplete',
             'engine "${status.engineId}" never reached a terminal state',
           );
         case EngineRunPhase.completed:
@@ -400,7 +475,9 @@ class HeadlessRunner {
     // checked, and a gate that passes on "nothing analysed" gates nothing.
     for (final v in violations) {
       if (!v.isAnalysisFailure) continue;
-      problems.add(
+      fail(
+        HeadlessFailureKind.engine,
+        'engine.analysis_failed',
         'engine "${v.engineId}" could not analyse the design: ${v.message}',
       );
     }
@@ -429,7 +506,11 @@ class HeadlessRunner {
         // BaselineFilter would treat "no baseline" as "everything new",
         // which is strict, but the *user* asked to compare against a
         // file that exists and is broken. Surface it.
-        problems.add('could not read baseline $baselinePath: ${read.error}');
+        fail(
+          HeadlessFailureKind.input,
+          'input.baseline',
+          'could not read baseline $baselinePath: ${read.error}',
+        );
       } else if (!read.hasBaseline) {
         diagnostics.add(
           'no baseline at $baselinePath — every violation counts as new. '
@@ -472,7 +553,7 @@ class HeadlessRunner {
         );
         exportPath = outPath;
       } on HeadlessExportException catch (e) {
-        problems.add(e.message);
+        fail(HeadlessFailureKind.output, 'output.export', e.message);
       }
     }
 
@@ -502,6 +583,10 @@ class HeadlessRunner {
           args.exitCodeOnFindings ||
           args.failOnNewViolations ||
           args.ciGateThreshold != null,
+      failures: List<HeadlessFailure>.unmodifiable(failures),
+      engineOutcomes: Map<String, EngineRunOutcome>.unmodifiable(outcomes),
+      project: project,
+      projectFilePath: projectFilePath,
     );
   }
 
@@ -568,7 +653,11 @@ class HeadlessRunner {
   /// today, and `EngineBinarySource.bundled` silently degrades to a
   /// `PATH` lookup, which would make a CI failure look like a resolver
   /// bug rather than a missing install.
-  static EngineBinaryConfig _binaryFor(String engineId, CliArgs args) {
+  ///
+  /// [engineId] is the id of the binary (`binaryEngineIdFor`): CDC asks for
+  /// `yosys`. Public so the `--json` document asks the same binary its
+  /// version.
+  static EngineBinaryConfig binaryFor(String engineId, CliArgs args) {
     final override = args.engineBinaryPaths[engineId];
     if (override != null && override.isNotEmpty) {
       return EngineBinaryConfig(

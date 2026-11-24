@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "lint",
+  "outcome": "input_error",
+  "engines": [],
+  "design": null,
+  "body": null,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "code": "input.project",
+      "message": "Source file listed in the project is missing: /spec/fixtures/broken/rtl/missing.sv",
+      "fix": null,
+      "location": null
+    }
+  ]
+}

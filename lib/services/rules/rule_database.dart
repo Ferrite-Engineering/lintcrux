@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:lintcrux/domain/enums/severity.dart';
 import 'package:lintcrux/domain/models/rule.dart';
+import 'package:meta/meta.dart' show visibleForTesting;
 
 /// Central rule metadata lookup.
 ///
@@ -118,6 +119,13 @@ class RuleDatabase {
       rethrow;
     }
   }
+
+  /// [_parseEngineDoc], for the test that holds the headless binary's
+  /// compiled-in catalogue (`bundled_rule_catalogue.dart`) equal to what the
+  /// app reads from the same JSON.
+  @visibleForTesting
+  static RuleEngineEntry? parseEngineDocument(String expectedId, String raw) =>
+      _parseEngineDoc(expectedId, raw);
 
   /// Parse one engine JSON document.
   static RuleEngineEntry? _parseEngineDoc(String expectedId, String raw) {

@@ -177,28 +177,7 @@ class HeadlessInputResolver {
     // written; a relative one is discarded in favor of the directory the
     // project file actually lives in, which is the only value a CI job
     // can derive without knowing the author's checkout layout.
-    final base = p.dirname(absProjectPath);
-    final project = loaded.copyWith(
-      rootPath: p.isAbsolute(loaded.rootPath)
-          ? p.normalize(loaded.rootPath)
-          : base,
-      sourceFiles: <String>[
-        for (final f in loaded.sourceFiles) _absoluteAgainst(base, f),
-      ],
-      includePaths: <String>[
-        for (final d in loaded.includePaths) _absoluteAgainst(base, d),
-      ],
-      constraintFiles: <String>[
-        for (final f in loaded.constraintFiles) _absoluteAgainst(base, f),
-      ],
-      sourceFileLanguages: <String, ProjectSourceFileLanguage>{
-        for (final entry in loaded.sourceFileLanguages.entries)
-          _absoluteAgainst(base, entry.key): entry.value,
-      },
-      topModule: (topModule != null && topModule.isNotEmpty)
-          ? topModule
-          : loaded.topModule,
-    );
+    final project = absolutized(loaded, absProjectPath, topModule: topModule);
 
     final missing = <String>[
       for (final f in project.sourceFiles)
@@ -229,6 +208,43 @@ class HeadlessInputResolver {
     return HeadlessInputResolution.ok(
       project: project,
       projectFilePath: absProjectPath,
+    );
+  }
+
+  /// [loaded], read from the `.lintcrux` at [absProjectPath], with every
+  /// entry resolved the way a run resolves it: relative entries against the
+  /// project file's directory, a relative `rootPath` replaced by that
+  /// directory (see the comment in [resolve]'s project branch), and
+  /// [topModule] over the file's own when given.
+  ///
+  /// Public so `lintcrux mcp` reads a project's files exactly as the run
+  /// will before it lets the run start.
+  static LintProject absolutized(
+    LintProject loaded,
+    String absProjectPath, {
+    String? topModule,
+  }) {
+    final base = p.dirname(absProjectPath);
+    return loaded.copyWith(
+      rootPath: p.isAbsolute(loaded.rootPath)
+          ? p.normalize(loaded.rootPath)
+          : base,
+      sourceFiles: <String>[
+        for (final f in loaded.sourceFiles) _absoluteAgainst(base, f),
+      ],
+      includePaths: <String>[
+        for (final d in loaded.includePaths) _absoluteAgainst(base, d),
+      ],
+      constraintFiles: <String>[
+        for (final f in loaded.constraintFiles) _absoluteAgainst(base, f),
+      ],
+      sourceFileLanguages: <String, ProjectSourceFileLanguage>{
+        for (final entry in loaded.sourceFileLanguages.entries)
+          _absoluteAgainst(base, entry.key): entry.value,
+      },
+      topModule: (topModule != null && topModule.isNotEmpty)
+          ? topModule
+          : loaded.topModule,
     );
   }
 

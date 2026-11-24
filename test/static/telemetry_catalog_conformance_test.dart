@@ -55,6 +55,8 @@
 import 'dart:io';
 
 import 'package:crux_license/crux_license.dart' show LicenseTier;
+import 'package:crux_mcp/crux_mcp.dart'
+    show kMcpDurationBuckets, kMcpToolCallEvent, kMcpToolCallOutcomes;
 import 'package:crux_telemetry/crux_telemetry.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/app.dart' show ExportFormat;
@@ -62,6 +64,7 @@ import 'package:lintcrux/domain/enums/violation_view_mode.dart';
 import 'package:lintcrux/domain/models/custom_regex_rule.dart';
 import 'package:lintcrux/domain/models/editor/editor_command.dart';
 import 'package:lintcrux/domain/models/engine_run_outcome.dart';
+import 'package:lintcrux/headless/lintcrux_mcp.dart' show kLintcruxMcpTools;
 import 'package:lintcrux/services/engines/default_engine_registry.dart';
 import 'package:lintcrux/services/rules/custom_rule_evaluator.dart';
 import 'package:lintcrux/services/search/violation_search.dart';
@@ -131,6 +134,8 @@ const Set<String> _proOnlyEvents = <String>{
 const Set<String> _sharedEvents = <String>{
   'app.uncaught_error',
   'app.unclean_shutdown',
+  // `crux_mcp`'s `McpTelemetry`, once per tool call of `lintcrux mcp`.
+  'mcp.tool_call',
 };
 
 void main() {
@@ -464,6 +469,21 @@ void main() {
       expect(entry.propertyKeys, isEmpty);
     },
   );
+
+  test("mcp.tool_call carries crux_mcp's vocabulary and the served tools", () {
+    // Recorded by `crux_mcp`, not by a call site here, so the lists are the
+    // package's: a token the package records that the catalog lacks would be
+    // a value the catalog never declared.
+    final entry = catalog.firstWhere((e) => e.name == kMcpToolCallEvent);
+    expect(entry.propertyKeys.toSet(), <String>{'tool', 'outcome', 'duration'});
+    expect(entry.enumeratedValues['outcome']!.toSet(), kMcpToolCallOutcomes);
+    expect(entry.enumeratedValues['duration'], kMcpDurationBuckets);
+    expect(
+      entry.enumeratedValues['tool'],
+      containsAll(kLintcruxMcpTools.map((t) => t.name)),
+    );
+    expect(_sharedEvents, contains(kMcpToolCallEvent));
+  });
 
   test('app.uncaught_error carries the shared counter vocabulary', () {
     // Recorded by `crux_telemetry`, not by this repository, so the lists are

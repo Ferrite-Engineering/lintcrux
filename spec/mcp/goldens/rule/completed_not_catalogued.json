@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "rule",
+  "outcome": "completed",
+  "engines": [],
+  "design": null,
+  "body": {
+    "id": "verilator/NOSUCHRULE",
+    "engine": "verilator",
+    "title": "NOSUCHRULE",
+    "description": "",
+    "default_severity": null,
+    "help_uri": "https://verilator.org/warn/NOSUCHRULE"
+  },
+  "diagnostics": [
+    {
+      "severity": "warning",
+      "code": "rule.not_catalogued",
+      "message": "`verilator/NOSUCHRULE` is not in LintCrux's rule database for verilator, so it has no default severity here, and its help link follows verilator's documentation pattern without having been checked.",
+      "fix": null,
+      "location": null
+    }
+  ]
+}

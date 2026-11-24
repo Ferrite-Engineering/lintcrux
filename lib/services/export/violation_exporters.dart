@@ -63,31 +63,35 @@ class ViolationExporters {
   /// `location`, `relatedLocations`, `suppressed`, `raw`).
   String toJson(Iterable<Violation> violations) {
     final list = <Map<String, dynamic>>[
-      for (final v in violations)
-        <String, dynamic>{
-          'engineId': v.engineId,
-          'ruleId': v.ruleId,
-          'severity': v.severity.name,
-          'message': v.message,
-          'location': <String, dynamic>{
-            'file': v.location.file,
-            'line': v.location.line,
-            'column': v.location.column,
-          },
-          'relatedLocations': <Map<String, dynamic>>[
-            for (final loc in v.relatedLocations)
-              <String, dynamic>{
-                'file': loc.file,
-                'line': loc.line,
-                'column': loc.column,
-              },
-          ],
-          'suppressed': v.isSuppressed,
-          if (v.raw.isNotEmpty) 'raw': v.raw,
-        },
+      for (final v in violations) jsonElement(v),
     ];
     return const JsonEncoder.withIndent('  ').convert(list);
   }
+
+  /// One element of [toJson]'s array, members in order. The `--json`
+  /// document's findings are this element with two members added
+  /// (`lib/headless/lint_document.dart`), so the two formats cannot drift.
+  Map<String, dynamic> jsonElement(Violation v) => <String, dynamic>{
+    'engineId': v.engineId,
+    'ruleId': v.ruleId,
+    'severity': v.severity.name,
+    'message': v.message,
+    'location': <String, dynamic>{
+      'file': v.location.file,
+      'line': v.location.line,
+      'column': v.location.column,
+    },
+    'relatedLocations': <Map<String, dynamic>>[
+      for (final loc in v.relatedLocations)
+        <String, dynamic>{
+          'file': loc.file,
+          'line': loc.line,
+          'column': loc.column,
+        },
+    ],
+    'suppressed': v.isSuppressed,
+    if (v.raw.isNotEmpty) 'raw': v.raw,
+  };
 
   /// Encodes [violations] as a CSV document with header row.
   ///

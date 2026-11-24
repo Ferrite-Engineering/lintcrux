@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "name": "flags",
+  "rootPath": ".",
+  "sourceFiles": [
+    "../design/rtl/fifo.sv"
+  ],
+  "includePaths": [],
+  "defines": {},
+  "language": "systemverilog",
+  "enabledEngineIds": [],
+  "severityOverrides": {},
+  "perEngineOptions": {
+    "verilator": {
+      "extraOptions": [
+        "-Wall"
+      ]
+    }
+  },
+  "filterPresets": [],
+  "sourceFileLanguages": {},
+  "customRegexRules": []
+}

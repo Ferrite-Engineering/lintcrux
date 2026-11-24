@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "lint",
+  "outcome": "usage_error",
+  "engines": [],
+  "design": null,
+  "body": null,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "code": "usage",
+      "message": "Option \"--limit\" expects a whole number from 0 to 1000, got \"5000\".",
+      "fix": null,
+      "location": null
+    }
+  ]
+}

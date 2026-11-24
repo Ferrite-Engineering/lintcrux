@@ -364,6 +364,17 @@ Three new actions live in `LintcruxAction`:
 
 All three actions live under `ActionCategory.tools` (alongside `openWaiverReview` and the developer-facing diagnostic surfaces) and are added to the menu-only set in the keyboard-bindings registry. Localized labels live in `actionSetBaseline` / `actionClearBaseline` / `actionOpenBaselineComparison` across all five ARB files.
 
+### The `--json` document and `lintcrux mcp` (open-core)
+
+The headless binary writes one JSON document for a lint run (`lintcrux <project> --json`), for one rule (`lintcrux rule <engine>/<rule> --json`) and for a project's waivers (`lintcrux waivers <project> --json`), and serves the same three as Model Context Protocol tools on stdio (`lintcrux mcp [--root <dir>]`). The document is `crux_mcp`'s eight-member envelope; the server is `crux_mcp`'s `McpServer`, and each tool call runs the command's own code in `LintcruxCli` (`lib/core/cli/lintcrux_cli.dart`), so a tool's text is byte for byte what the command writes.
+
+- `lib/headless/lint_document.dart` — `buildLintDocument` turns a `HeadlessRunResult` into the document. `classifyLintRun` decides the outcome from the run's classified problems (`HeadlessFailure`, recorded by `HeadlessRunner` beside each printed problem): an engine that failed, timed out, was missing or could not analyse the design is `engine_error`, never an answer, and its partial findings stay in the body; with no problem, exit 1, 2 and 4 are `failed_gate`. The exit codes stay LintCrux's own. Each finding is `ViolationExporters.jsonElement` (the `--export json` element) with paths absolute, `raw` always present, and `signature` (the baseline fingerprint) and `baseline` (`new`, `existing` or null) added. `openCoreWithheld` adds a `licence.withheld` warning for the parts the open-core binary leaves out (a project's managed waivers, the Pro CDC analysis); `bin/lintcrux.dart` passes it, the Pro CLI does not.
+- `lib/headless/rule_command.dart` — a rule's default severity from `lib/services/rules/bundled_rule_catalogue.dart` (generated from `lib/data/rules/*.json` by `tool/generate_bundled_rule_catalogue.dart`; `test/static/bundled_rule_catalogue_test.dart` holds it equal to what `RuleDatabase` reads) and its help link from `bundledRuleHelpUri`.
+- `lib/headless/waivers_command.dart` — the inline pragmas, the Verilator configuration files' `lint_off` lines and the baseline's frozen findings. Read only.
+- `lib/headless/lintcrux_mcp.dart` — the three tool tables, the instructions paragraph, and `checkProjectFiles`: a `.lintcrux` a call names is read as the run will read it (`HeadlessInputResolver.absolutized`), and every file and directory it names goes through `Confinement.confineAll`. A project that hands an engine raw flags (`extraOptions`) is refused over MCP. No engine-path override, export, baseline write or `--allow-missing-engines` is offered. The server keeps its last lint run, so a later page of the same call (`offset`) reuses it while every file it read is unchanged.
+
+`spec/mcp/` holds the JSON Schemas, the tool definitions and a golden document per outcome; `test/headless/spec_goldens_test.dart` checks each golden against both doors, `test/headless/lint_outcome_mutation_test.dart` proves a broken outcome mapping is caught, and `test/static/headless_cli_closure_test.dart` walks the binary's imports for Flutter and any model client. The agent instruction file is `docs/agent/LINTCRUX.md`.
+
 ### Beta release infrastructure (open-core)
 
 Three cross-suite packages are wired in `lib/app.dart` through

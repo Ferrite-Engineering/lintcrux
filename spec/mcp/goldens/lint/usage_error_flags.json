@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "lint",
+  "outcome": "usage_error",
+  "engines": [],
+  "design": null,
+  "body": null,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "code": "usage",
+      "message": "`/spec/fixtures/flags/flags.lintcrux` passes raw flags to verilator (perEngineOptions.verilator.extraOptions), which the server does not run, since a flag can name a file outside the root. Run lintcrux on this project from the command line.",
+      "fix": null,
+      "location": null
+    }
+  ]
+}

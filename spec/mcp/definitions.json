@@ -1,0 +1,30 @@
+[
+  {
+    "name": "lint",
+    "description": "Lint a design with its configured engines (Verilator, Verible, Slang, Yosys, GHDL, svlint, CDC). Returns findings with rule, severity and file:line. A failed or missing engine fails the run; it is never reported clean.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "project": {"type": "string", "description": "A .lintcrux project; or give files."},
+        "files": {"type": "array", "items": {"type": "string"}},
+        "top": {"type": "string"},
+        "engines": {"type": "array", "items": {"type": "string"}},
+        "params": {"type": "array", "items": {"type": "string"}, "description": "NAME=VALUE"},
+        "new_only": {"type": "boolean", "description": "Fail the gate on findings absent from the baseline."},
+        "limit": {"type": "integer", "description": "Default 100, at most 1000."},
+        "offset": {"type": "integer"}
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "rule",
+    "description": "A lint rule's default severity and help link, by the engineId/ruleId a finding gives.",
+    "inputSchema": {"type": "object", "properties": {"id": {"type": "string"}}, "required": ["id"]}
+  },
+  {
+    "name": "waivers",
+    "description": "The waivers in force for a project: rule, scope, reason, author and expiry. Read only; a waiver is a person's decision.",
+    "inputSchema": {"type": "object", "properties": {"project": {"type": "string"}}, "required": ["project"]}
+  }
+]

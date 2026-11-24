@@ -1,0 +1,34 @@
+{
+  "root": "spec/fixtures",
+  "golden_root": "/spec/fixtures",
+  "golden_version": "0.0.0",
+  "installs": {
+    "design/.lintcrux-baseline.json": "spec/mcp/runtime/design-baseline.json",
+    "design/.lintcrux-waivers.json": "spec/mcp/runtime/design-waivers.json"
+  },
+  "cases": [
+    {"golden": "lint/completed.json", "tool": "lint", "arguments": {"project": "design/design.lintcrux"}, "exit": 0},
+    {"golden": "lint/completed_page.json", "tool": "lint", "arguments": {"project": "design/design.lintcrux", "limit": 2, "offset": 1}, "exit": 0},
+    {"golden": "lint/completed_files.json", "tool": "lint", "arguments": {"files": ["design/rtl/fifo.sv"]}, "exit": 0},
+    {"golden": "lint/failed_gate.json", "tool": "lint", "arguments": {"project": "design/design.lintcrux", "new_only": true}, "exit": 2},
+    {"golden": "lint/engine_error_timeout.json", "tool": "lint", "arguments": {"project": "design/design.lintcrux"}, "engines": "times_out", "exit": 3},
+    {"golden": "lint/engine_error_missing.json", "tool": "lint", "arguments": {"project": "design/design.lintcrux"}, "engines": "missing", "exit": 3},
+    {"golden": "lint/engine_error_crash.json", "tool": "lint", "arguments": {"project": "design/design.lintcrux"}, "engines": "crashes", "exit": 3},
+    {"golden": "lint/input_error.json", "tool": "lint", "arguments": {"project": "broken/broken.lintcrux"}, "exit": 3},
+    {"golden": "lint/usage_error.json", "tool": "lint", "arguments": {}, "exit": 64},
+    {"golden": "lint/usage_error_limit.json", "tool": "lint", "arguments": {"project": "design/design.lintcrux", "limit": 5000}, "exit": 64},
+    {"golden": "lint/usage_error_outside.json", "tool": "lint", "arguments": {"project": "../outside.lintcrux"}, "door": "mcp"},
+    {"golden": "lint/usage_error_named_file.json", "tool": "lint", "arguments": {"project": "escape/escape.lintcrux"}, "door": "mcp"},
+    {"golden": "lint/usage_error_flags.json", "tool": "lint", "arguments": {"project": "flags/flags.lintcrux"}, "door": "mcp"},
+    {"golden": "lint/usage_error_unknown_field.json", "tool": "lint", "arguments": {"project": "design/design.lintcrux", "verilator_path": "/usr/bin/verilator"}, "door": "mcp"},
+    {"golden": "rule/completed.json", "tool": "rule", "arguments": {"id": "verilator/WIDTH"}, "exit": 0},
+    {"golden": "rule/completed_not_catalogued.json", "tool": "rule", "arguments": {"id": "verilator/NOSUCHRULE"}, "exit": 0},
+    {"golden": "rule/input_error.json", "tool": "rule", "arguments": {"id": "nosuch/RULE"}, "exit": 65},
+    {"golden": "rule/usage_error.json", "tool": "rule", "arguments": {"id": "WIDTH"}, "exit": 64},
+    {"golden": "rule/usage_error_missing_field.json", "tool": "rule", "arguments": {}, "door": "mcp"},
+    {"golden": "waivers/completed.json", "tool": "waivers", "arguments": {"project": "design/design.lintcrux"}, "exit": 0},
+    {"golden": "waivers/input_error.json", "tool": "waivers", "arguments": {"project": "broken/broken.lintcrux"}, "exit": 65},
+    {"golden": "waivers/usage_error.json", "tool": "waivers", "arguments": {"project": "design/rtl/top.sv"}, "exit": 64},
+    {"golden": "waivers/usage_error_outside.json", "tool": "waivers", "arguments": {"project": "/nonexistent-lintcrux-spec/x.lintcrux"}, "door": "mcp"}
+  ]
+}

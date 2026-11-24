@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:lintcrux/core/cli/lintcrux_cli.dart';
+import 'package:lintcrux/headless/lint_document.dart' show openCoreWithheld;
 
 /// The headless `lintcrux` binary.
 ///
@@ -28,7 +29,9 @@ import 'package:lintcrux/core/cli/lintcrux_cli.dart';
 /// `bundle/bin/` runs standalone, and `tool/build_cli.sh` wraps the
 /// invocation.)
 Future<void> main(List<String> args) async {
-  final cli = LintcruxCli();
+  // The open-core binary holds no Pro code, so its `--json` documents and
+  // its `mcp` tools say which parts of an answer that leaves out.
+  final cli = LintcruxCli(withheld: openCoreWithheld);
   final code = await cli.run(
     args,
     stdoutSink: stdout.writeln,

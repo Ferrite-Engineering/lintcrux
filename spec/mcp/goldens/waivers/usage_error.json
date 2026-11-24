@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "waivers",
+  "outcome": "usage_error",
+  "engines": [],
+  "design": null,
+  "body": null,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "code": "usage",
+      "message": "`/spec/fixtures/design/rtl/top.sv` is not a .lintcrux project; `waivers` reads the waivers of a project.",
+      "fix": null,
+      "location": null
+    }
+  ]
+}

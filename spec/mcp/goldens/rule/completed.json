@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "lintcrux",
+    "version": "0.0.0"
+  },
+  "command": "rule",
+  "outcome": "completed",
+  "engines": [],
+  "design": null,
+  "body": {
+    "id": "verilator/WIDTH",
+    "engine": "verilator",
+    "title": "WIDTH",
+    "description": "",
+    "default_severity": "warning",
+    "help_uri": "https://verilator.org/warn/WIDTH"
+  },
+  "diagnostics": []
+}

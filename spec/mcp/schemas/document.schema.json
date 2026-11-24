@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "The document every lintcrux --json command writes and every tool of lintcrux mcp returns",
+  "description": "Eight members, always present, in this order. body is given per command by <command>.body.schema.json. The document, not the exit code, is the authority: lint keeps LintCrux's exit codes, rule and waivers use the suite's.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "tool", "command", "outcome", "engines", "design", "body", "diagnostics"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": {"const": "lintcrux"},
+        "version": {"type": "string"}
+      }
+    },
+    "command": {"enum": ["lint", "rule", "waivers"]},
+    "outcome": {"enum": ["completed", "failed_gate", "usage_error", "input_error", "engine_error", "licence_error"]},
+    "engines": {
+      "description": "Each engine that ran (not one that was unavailable), with the version its binary reports, or unknown.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "version", "path"],
+        "properties": {
+          "name": {"type": "string"},
+          "version": {"type": "string"},
+          "path": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "design": {
+      "description": "For a lint run whose engines ran: SHA-256 over one sha256sum line per source file, in project order, with paths relative to the project root.",
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fingerprint"],
+          "properties": {
+            "fingerprint": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["scheme", "value"],
+              "properties": {
+                "scheme": {"const": "lintcrux-sources-sha256/1"},
+                "value": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "body": {"type": ["object", "null"]},
+    "diagnostics": {"type": "array", "items": {"$ref": "#/$defs/diagnostic"}}
+  },
+  "$defs": {
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "code", "message", "fix", "location"],
+      "properties": {
+        "severity": {"enum": ["error", "warning", "note"]},
+        "code": {"type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$"},
+        "message": {"type": "string"},
+        "fix": {"type": ["string", "null"]},
+        "location": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/source"}]}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "line", "column"],
+      "properties": {
+        "file": {"type": "string"},
+        "line": {"type": "integer", "minimum": 1},
+        "column": {"type": ["integer", "null"], "minimum": 1}
+      }
+    }
+  }
+}

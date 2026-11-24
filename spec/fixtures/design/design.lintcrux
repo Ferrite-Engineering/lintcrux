@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "name": "design",
+  "rootPath": ".",
+  "sourceFiles": [
+    "rtl/top.sv",
+    "rtl/fifo.sv"
+  ],
+  "includePaths": [],
+  "defines": {},
+  "topModule": "top",
+  "language": "systemverilog",
+  "enabledEngineIds": [],
+  "severityOverrides": {},
+  "perEngineOptions": {
+    "verilator": {
+      "waiverFiles": [
+        "lint/waivers.vlt"
+      ]
+    }
+  },
+  "filterPresets": [],
+  "sourceFileLanguages": {},
+  "customRegexRules": []
+}

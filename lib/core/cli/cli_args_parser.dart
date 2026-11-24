@@ -132,7 +132,50 @@ class CliArgsParser {
       parameters[raw.substring(0, eq)] = raw.substring(eq + 1);
     }
 
+    // `--json` writes one document to stdout. An export beside it would be a
+    // second answer with its own failure, so the two do not combine; and
+    // `--limit` / `--offset` page that document, so without it they would be
+    // ignored, which a command line never is.
+    final json = results[kJsonFlag] as bool? ?? false;
+    if (json && exportFormat != null) {
+      return CliArgsParseResult(
+        error:
+            'Option "--$kJsonFlag" writes the findings to stdout and does not '
+            'combine with "--export" or "--sarif"; run the export separately.',
+        usage: usage,
+      );
+    }
+    final page = <String, int>{};
+    for (final (option, max) in <(String, int)>[
+      (kLimitOption, kMaxLimit),
+      (kOffsetOption, 0),
+    ]) {
+      final raw = results[option] as String?;
+      if (raw == null) continue;
+      if (!json) {
+        return CliArgsParseResult(
+          error:
+              'Option "--$option" pages the "--$kJsonFlag" document; add '
+              '"--$kJsonFlag".',
+          usage: usage,
+        );
+      }
+      final value = int.tryParse(raw.trim());
+      if (value == null || value < 0 || (max > 0 && value > max)) {
+        return CliArgsParseResult(
+          error:
+              'Option "--$option" expects a whole number'
+              '${max > 0 ? ' from 0 to $max' : ', 0 or more'}, got "$raw".',
+          usage: usage,
+        );
+      }
+      page[option] = value;
+    }
+
     final parsed = CliArgs(
+      json: json,
+      limit: page[kLimitOption],
+      offset: page[kOffsetOption],
       parameters: Map<String, String>.unmodifiable(parameters),
       constraintFiles: List<String>.unmodifiable(constraintFiles),
       paths: List<String>.unmodifiable(results.rest),
@@ -188,6 +231,21 @@ class CliArgsParser {
   /// The repeatable option setting one top-level parameter, `NAME=VALUE`.
   static const String kParamOption = 'param';
 
+  /// The flag that writes the findings as one JSON document on stdout.
+  static const String kJsonFlag = 'json';
+
+  /// The option naming how many findings the `--json` document lists.
+  static const String kLimitOption = 'limit';
+
+  /// The option naming the first finding the `--json` document lists.
+  static const String kOffsetOption = 'offset';
+
+  /// How many findings the `--json` document lists without `--limit`.
+  static const int kDefaultLimit = 100;
+
+  /// The largest `--limit`.
+  static const int kMaxLimit = 1000;
+
   /// The budget the headless runner applies when [kEngineTimeoutOption] is
   /// absent. One definition, quoted in the usage text and used as the
   /// runner's default.
@@ -220,6 +278,9 @@ class CliArgsParser {
   String get usage =>
       '''
 Usage: lintcrux [options] [path...]
+       lintcrux rule <engine>/<rule> --json
+       lintcrux waivers <project.lintcrux> --json
+       lintcrux mcp [--root <dir>]
 
 Aggregate Verilog/SystemVerilog/VHDL lint output across multiple
 engines and surface every warning in a single dashboard.
@@ -228,6 +289,12 @@ The `lintcrux` executable built from bin/lintcrux.dart runs headless:
 it loads the project, runs the enabled engines, applies waivers and the
 baseline, writes the requested export, and exits with a meaningful code.
 No window is opened. The desktop app shares this argument parser.
+
+With --json the findings are written to stdout as one JSON document, the
+same document `lintcrux mcp` returns to an agent; the exit codes below
+are unchanged. `rule` describes one rule, `waivers` lists the waivers in
+force for a project, and `mcp` serves lint, rule and waivers as Model
+Context Protocol tools on stdin and stdout (`lintcrux <command> --help`).
 
 Positional arguments:
   path                  One or more files to lint. May be:
@@ -414,6 +481,28 @@ Examples:
             'rather than as a run failure. Off by default: a CI job '
             'that asked for an engine and silently ran none is a false '
             'clean result.',
+      )
+      ..addFlag(
+        kJsonFlag,
+        negatable: false,
+        help:
+            'Write the findings to stdout as one JSON document: the outcome, '
+            'every engine run, the counts and the findings with absolute '
+            'paths. The exit code is unchanged. Does not combine with '
+            '--export or --sarif.',
+      )
+      ..addOption(
+        kLimitOption,
+        valueHelp: 'n',
+        help:
+            'With --json: list at most n findings, from 0 to $kMaxLimit. '
+            'Default $kDefaultLimit. The counts and the total cover every '
+            'finding.',
+      )
+      ..addOption(
+        kOffsetOption,
+        valueHelp: 'n',
+        help: 'With --json: list findings from the n-th, counting from 0.',
       )
       ..addFlag(
         'quiet',
