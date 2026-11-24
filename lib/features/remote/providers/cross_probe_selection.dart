@@ -23,10 +23,13 @@ import 'package:path/path.dart' as p;
 /// The shared target table picks the one each peer prefers and can show. A
 /// candidate with no usable path (a violation with no source line) is left
 /// out. [project] attaches the design id, so a peer with none of this design
-/// open can resolve and open it.
+/// open can resolve and open it. [time], when the violation was reported at a
+/// point in simulation time, is carried on the selection unchanged (CXP
+/// §9.3.3); null sends none.
 CrossProbeSelection crossProbeSelectionForViolation(
   Violation violation, {
   LintProject? project,
+  CxpTime? time,
 }) {
   final loc = violation.location;
   final rulePath = LintCruxNameResolver.encodeViolationAsRulePath(violation);
@@ -43,6 +46,7 @@ CrossProbeSelection crossProbeSelectionForViolation(
         ),
     ],
     displayName: violation.message,
+    time: time,
     metadata: <String, Object?>{
       'lintcrux.violation_severity': violation.severity.name,
       cxpDesignIdMetadataKey: ?designId,
