@@ -21,21 +21,24 @@ Right-click a violation in the table and choose **Waive…**. The **Waive violat
 
 Waivers are stored in `.lintcrux-waivers.json` in the project root: a plain, version-controllable file your whole team shares. Every addition, edit and deletion is also appended to `.lintcrux-waivers.audit.jsonl`, one JSON record per line, so there is a permanent, append-only history of who waived what, when, and why. Check both into git alongside your RTL.
 
+Each waiver names its file relative to the project root, with `/` separators on every platform (`rtl/cpu.sv`), so the committed file waives the same findings wherever the project is checked out: a teammate's clone, a CI runner, a Windows machine. A file outside the project root (a vendor library under `/opt`, say) keeps its absolute path and is waived only where it sits at that path; the app logs a warning for each such waiver, and a command-line run prints one on stderr.
+
+A waiver file written by LintCrux 1.2 or earlier (version 1) stores absolute paths. LintCrux 2.0 reads it and takes each path under the project root as relative to it, so it applies in the checkout that wrote it. Reading never changes the file: it is saved in the new format (version 2) the next time you add, edit or delete a waiver. Do that once in the checkout that wrote the file and commit the result; until then, a clone or CI runner at another path reports each old entry as outside the project root and does not apply it. An older LintCrux refuses a version 2 file with an error rather than writing over it.
+
 On an Enterprise seat with a [team database](team-database.md), an organization-wide waiver list applies as well; a violation is waived if either list waives it: see [Administration](administration.md#waivers).
 
 ## Waivers in CI {#ci}
 
 The Pro command line applies the same committed `.lintcrux-waivers.json` in your pipeline, the way the desktop app does, so a waiver a reviewer approved in the app does not fail the build. Applying managed waivers in CI is part of Pro, like the rest of this page: without a Pro licence the file is not applied, the violations it waives count toward the exit code, and the run says so on stderr. The free `lintcrux` binary applies inline pragma waivers only. See [Managed waivers in CI](exports-and-ci.md#waivers-in-ci) for the command and the licence a build agent runs as.
 
-!!! warning "Waivers match absolute paths today"
-    In LintCrux 1.2, a managed waiver stores the absolute path of the file it waives, and matching compares that path exactly (see [Matching scope](#matching)). A `.lintcrux-waivers.json` committed from one machine therefore waives nothing in a teammate's clone or on a CI runner whose checkout sits at a different path: those findings are reported and count toward the exit code. This fails safe (a finding is never hidden by mistake), but a waiver approved in the app does not yet carry over to CI unless the checkout path is the same. Relative-path waivers are planned; until they ship, either run CI from the same absolute path the waivers were recorded under or use an inline pragma waiver, which travels with the source.
+Because the file names paths relative to the project root, the runner's checkout path does not matter. A waiver whose file is outside the project root is the exception: it applies only where that file sits at the same absolute path, and the run names it on stderr.
 
 ## Matching scope {#matching}
 
 A waiver matches a violation when all of these hold:
 
 - **Rule**: the waiver's rule id equals the violation's. Engine rule renames are tolerated through the rule-alias table, so a waiver written against a retired id (for example `verilator/UNUSED`) still matches the renamed rule. Waiver Review shows a notice on that waiver's row naming the new id, and a command-line run prints a warning line on stderr for it, so you can update the waiver to the current id.
-- **File**: the waiver's file path equals the violation's file path exactly. There is no glob or directory matching.
+- **File**: the waiver's file path, relative to the project root, equals the violation's. A waiver for a file outside the root compares absolute paths. There is no glob or directory matching.
 - **Lines**, if the waiver has a line range, the violation's line falls inside it; a waiver without one covers the whole file.
 - **Not expired**: the waiver has no expiry date, or it has not passed.
 
