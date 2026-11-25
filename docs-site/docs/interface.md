@@ -58,7 +58,7 @@ Open Settings with ++cmd+comma++ / ++ctrl+comma++. On desktop it opens as a dial
 | Privacy | The **Send anonymous usage statistics** toggle. See [Usage statistics](getting-started.md#usage-statistics). |
 | Engines | **Engine binary paths** (Auto-detect / Custom per engine, with a **Probe** button) and **Per-rule severity overrides**. From LintCrux 1.2, also the **Yosys time limit** (**Automatic**, **Extended** or **No limit**) for the Yosys check, CDC and Constraints engines; see [The Yosys time limit](projects-and-engines.md#yosys-time-limit). |
 | Editors | The click-to-source editor: Visual Studio Code, Sublime Text, Vim / Neovim, Emacs, or a Custom executable and arguments template, with a live preview. |
-| CXP Cross-Probe | **Enable CXP server**, **CXP port**, **Request attention on cross-probe**, **Broadcast selection automatically**, and the live server status. |
+| CXP Cross-Probe | **Enable CXP server**, **CXP port**, **Request attention on cross-probe**, **Bring the target forward on a directed cross-probe**, **Broadcast selection automatically**, and the live server status. |
 | Keyboard Shortcuts | View and rebind shortcuts, load a preset, and import or export a keymap: see [Customizing shortcuts](keyboard-mouse.md#customizing). |
 | License | License status, key entry, machine activation and offline activation. |
 | Custom Rules <span class="tier tier-pro">Pro</span> | User-defined regex rules over source text, signal names or identifiers. |

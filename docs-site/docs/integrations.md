@@ -8,6 +8,7 @@ Cross-probe (CXP) is the suite's lightweight protocol for "show me this location
 
 - **Enable CXP server** turns it on, and **CXP port** sets where it listens. The section also shows whether the server is running and how many peers are connected. From LintCrux 1.2, each setting takes effect as soon as you change it, and a new port restarts the server on it.
 - **Request attention on cross-probe** bounces the dock icon (or flashes the taskbar) when a peer sends a cross-probe. It never steals focus.
+- **Bring the target forward on a directed cross-probe**: when you cross-probe to one named app, that app comes to the front. Both apps need this on. A broadcast selection never brings an app forward.
 - **Broadcast selection automatically** (on by default) announces every violation you select to connected peers, so a waveform or schematic viewer can follow along. Turn it off to keep selections to yourself; explicit sends still work.
 
 Two directions exist, and from 1.1 both are free in every tier, with no license key:
