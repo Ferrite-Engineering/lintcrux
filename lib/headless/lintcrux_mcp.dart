@@ -95,8 +95,9 @@ final McpTool kLintTool = McpTool(
 final McpTool kRuleTool = McpTool(
   name: kRuleCommand,
   description:
-      "A lint rule's default severity and help link, by the engineId/ruleId "
-      'a finding gives.',
+      'What a lint rule checks, its default severity and help link, by the '
+      'engineId/ruleId a finding gives. Only cdc and constraints rules have a '
+      'sentence.',
   fields: const <McpField>[McpField('id', kind: McpFieldKind.text)],
   required: const <String>['id'],
 );

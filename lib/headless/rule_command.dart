@@ -7,8 +7,10 @@
 /// The answer is the one the SARIF export's rule descriptor gives on the
 /// command line: the rule's id as its title, the default severity from the
 /// bundled rule database, and the engine's help page for the rule. The
-/// bundled databases carry no prose, so `description` is empty and the help
-/// link is where the rule is explained.
+/// rules of the two first-party engines (`cdc`, `constraints`) carry a
+/// one-sentence summary, which is the `description`; the databases of the
+/// third-party engines carry no prose, so their `description` is empty and
+/// the help link is where the rule is explained.
 library;
 
 import 'package:crux_mcp/crux_mcp.dart';
@@ -66,7 +68,7 @@ McpDocument ruleDocument({
       'id': id,
       'engine': engine,
       'title': local,
-      'description': '',
+      'description': kBundledRuleSummaries[id] ?? '',
       'default_severity': severity,
       'help_uri': bundledRuleHelpUri(engine, local)?.toString(),
     },

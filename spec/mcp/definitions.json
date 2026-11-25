@@ -19,7 +19,7 @@
   },
   {
     "name": "rule",
-    "description": "A lint rule's default severity and help link, by the engineId/ruleId a finding gives.",
+    "description": "What a lint rule checks, its default severity and help link, by the engineId/ruleId a finding gives. Only cdc and constraints rules have a sentence.",
     "inputSchema": {"type": "object", "properties": {"id": {"type": "string"}}, "required": ["id"]}
   },
   {

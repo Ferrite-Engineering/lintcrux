@@ -29,6 +29,10 @@ import 'package:meta/meta.dart' show visibleForTesting;
 /// }
 /// ```
 ///
+/// A rule of a first-party engine (`cdc`, `constraints`) also carries a
+/// one-sentence English `summary`, which becomes [Rule.fullDescription].
+/// Third-party engines carry none and keep their help link.
+///
 /// The `helpBaseUrl` is templated with `#<RULE_ID>` to produce a stable
 /// `Rule.helpUri` per rule when the engine docs follow that anchoring
 /// convention. Engines whose docs don't follow that convention will
@@ -154,6 +158,11 @@ class RuleDatabase {
       final tags = tagsRaw is List
           ? tagsRaw.whereType<String>().toList(growable: false)
           : const <String>[];
+      // One English sentence for the first-party engines (`cdc`,
+      // `constraints`), whose pages are LintCrux's own. It becomes the
+      // rule's full description: the SARIF descriptor's `fullDescription`
+      // and the `lintcrux rule` answer's `description`.
+      final summary = r['summary'];
       final perRuleHelp = r['helpUrl'];
       final namespaced = '$engineId/$id';
       final help = perRuleHelp is String && perRuleHelp.isNotEmpty
@@ -165,6 +174,7 @@ class RuleDatabase {
         Rule(
           id: namespaced,
           defaultSeverity: severity,
+          fullDescription: summary is String ? summary : '',
           helpUri: help,
           tags: List<String>.unmodifiable(tags),
         ),

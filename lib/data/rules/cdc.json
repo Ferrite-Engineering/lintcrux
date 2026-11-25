@@ -6,6 +6,7 @@
     {
       "id": "unsync-single-bit",
       "defaultSeverity": "warning",
+      "summary": "A single-bit signal crosses between clock domains with no synchronizer, so the destination flop can go metastable.",
       "tags": [
         "cdc",
         "metastability"
@@ -14,6 +15,7 @@
     {
       "id": "unsync-multi-bit",
       "defaultSeverity": "error",
+      "summary": "A multi-bit bus crosses between clock domains with no synchronizer, so the destination can latch a mix of old and new bits.",
       "tags": [
         "cdc",
         "incoherence",
@@ -23,6 +25,7 @@
     {
       "id": "combo-in-sync",
       "defaultSeverity": "error",
+      "summary": "Combinational logic sits between the two flops of a synchronizer, which removes the settling time the chain exists to give.",
       "tags": [
         "cdc",
         "synchronizer",
@@ -32,6 +35,7 @@
     {
       "id": "per-bit-sync-bus",
       "defaultSeverity": "error",
+      "summary": "A bus is synchronized with a separate two-flop chain per bit, so its bits can arrive in different cycles and the bus is incoherent.",
       "tags": [
         "cdc",
         "incoherence",
@@ -42,6 +46,7 @@
     {
       "id": "reviewed-crossing",
       "defaultSeverity": "note",
+      "summary": "An unprotected crossing that a cdc.yaml waive rule covers, reported as a note that carries the rule's reason.",
       "tags": [
         "cdc",
         "review",
@@ -51,6 +56,7 @@
     {
       "id": "unsupported-sources",
       "defaultSeverity": "error",
+      "summary": "The design includes VHDL, which the CDC analysis does not read, so nothing was analysed.",
       "tags": [
         "cdc",
         "tooling"
@@ -59,6 +65,7 @@
     {
       "id": "needs-slang-frontend",
       "defaultSeverity": "error",
+      "summary": "The design uses SystemVerilog packages that this Yosys cannot read without the yosys-slang frontend, so nothing was analysed.",
       "tags": [
         "cdc",
         "tooling"
@@ -67,6 +74,7 @@
     {
       "id": "elaboration-failed",
       "defaultSeverity": "error",
+      "summary": "Yosys could not elaborate the design, so nothing was analysed.",
       "tags": [
         "cdc",
         "tooling"
@@ -75,6 +83,7 @@
     {
       "id": "analysis-note",
       "defaultSeverity": "note",
+      "summary": "Something the analysis could not do, such as resolve a register's clock or find more than one clock domain.",
       "tags": [
         "cdc",
         "info"
@@ -83,6 +92,7 @@
     {
       "id": "summary",
       "defaultSeverity": "note",
+      "summary": "What the analysis covered: the clock domains and crossings it found and how many were unsafe, reported even on a clean design.",
       "tags": [
         "cdc",
         "info"

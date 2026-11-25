@@ -675,3 +675,49 @@ const Map<String, String> kBundledRuleSeverities = <String, String>{
   'yosys/check-summary': 'note',
   'yosys/run-summary': 'note',
 };
+
+/// The one-sentence English summary of each first-party rule
+/// (`cdc`, `constraints`), by engine-namespaced id. Rules of
+/// third-party engines have none and are not listed.
+const Map<String, String> kBundledRuleSummaries = <String, String>{
+  'cdc/unsync-single-bit':
+      'A single-bit signal crosses between clock domains with no synchronizer, so the destination flop can go metastable.',
+  'cdc/unsync-multi-bit':
+      'A multi-bit bus crosses between clock domains with no synchronizer, so the destination can latch a mix of old and new bits.',
+  'cdc/combo-in-sync':
+      'Combinational logic sits between the two flops of a synchronizer, which removes the settling time the chain exists to give.',
+  'cdc/per-bit-sync-bus':
+      'A bus is synchronized with a separate two-flop chain per bit, so its bits can arrive in different cycles and the bus is incoherent.',
+  'cdc/reviewed-crossing':
+      "An unprotected crossing that a cdc.yaml waive rule covers, reported as a note that carries the rule's reason.",
+  'cdc/unsupported-sources':
+      'The design includes VHDL, which the CDC analysis does not read, so nothing was analysed.',
+  'cdc/needs-slang-frontend':
+      'The design uses SystemVerilog packages that this Yosys cannot read without the yosys-slang frontend, so nothing was analysed.',
+  'cdc/elaboration-failed':
+      'Yosys could not elaborate the design, so nothing was analysed.',
+  'cdc/analysis-note':
+      "Something the analysis could not do, such as resolve a register's clock or find more than one clock domain.",
+  'cdc/summary':
+      'What the analysis covered: the clock domains and crossings it found and how many were unsafe, reported even on a clean design.',
+  'constraints/unknown-port':
+      'A constraint line names a port that the top module does not have.',
+  'constraints/unconstrained-port':
+      'A port of the top module has no pin in the constraint file.',
+  'constraints/bit-out-of-range':
+      "A constraint line names a bit that the port's declared range does not have.",
+  'constraints/pin-reused':
+      'Two different ports, or two bits of a bus, are put on one package pin.',
+  'constraints/port-reassigned':
+      'One port, or one bit of a bus, is placed on two different pins.',
+  'constraints/unparsed-line':
+      'A constraint line that none of the readers recognises, reported so that a misspelt command is not silently ignored.',
+  'constraints/no-top-module':
+      'Constraint files are listed but no top module is set, so there are no ports to check them against.',
+  'constraints/unsupported-sources':
+      'The design includes VHDL, which the constraints check does not read, so nothing was checked.',
+  'constraints/elaboration-failed':
+      'Yosys could not elaborate the design, or the elaborated design has no module named like the top module, so nothing was checked.',
+  'constraints/constraint-file-unreadable':
+      'A listed constraint file is missing, is not a regular file, is over 4 MiB, or has an extension other than .pcf, .lpf or .cst.',
+};

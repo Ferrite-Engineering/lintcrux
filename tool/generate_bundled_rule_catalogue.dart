@@ -5,8 +5,9 @@
 // databases in lib/data/rules/<engineId>.json.
 //
 // The desktop app reads those files from its asset bundle; the headless
-// binary has none, so `lintcrux rule` reads this compiled-in copy of the one
-// fact it needs beyond the help link: each rule's default severity.
+// binary has none, so `lintcrux rule` reads this compiled-in copy of what it
+// needs beyond the help link: each rule's default severity and, for the
+// first-party engines, its one-sentence summary.
 // test/static/bundled_rule_catalogue_test.dart holds the two equal, rule by
 // rule, through the app's own parser.
 //
@@ -28,6 +29,7 @@ void main() {
           .toList()
         ..sort((a, b) => a.path.compareTo(b.path));
   final entries = <String>[];
+  final summaries = <String>[];
   for (final file in files) {
     final doc = jsonDecode(file.readAsStringSync()) as Map<String, Object?>;
     final engine = doc['engineId']! as String;
@@ -41,6 +43,10 @@ void main() {
         final s => s,
       };
       entries.add("  '$engine/$id': '$name',");
+      final summary = rule['summary'];
+      if (summary is String && summary.isNotEmpty) {
+        summaries.add(_entry('$engine/$id', summary));
+      }
     }
   }
   final out = StringBuffer()
@@ -63,7 +69,38 @@ void main() {
     )
     ..writeAll(entries, '\n')
     ..writeln()
+    ..writeln('};')
+    ..writeln()
+    ..writeln('/// The one-sentence English summary of each first-party rule')
+    ..writeln('/// (`cdc`, `constraints`), by engine-namespaced id. Rules of')
+    ..writeln('/// third-party engines have none and are not listed.')
+    ..writeln(
+      'const Map<String, String> kBundledRuleSummaries = '
+      '<String, String>{',
+    )
+    ..writeAll(summaries, '\n')
+    ..writeln()
     ..writeln('};');
   File(_out).writeAsStringSync(out.toString());
-  stdout.writeln('wrote ${entries.length} rules to $_out');
+  stdout.writeln(
+    'wrote ${entries.length} rules and ${summaries.length} summaries '
+    'to $_out',
+  );
+}
+
+/// One map entry in the style `dart format` leaves it: the value moves to its
+/// own line when the entry would pass 80 columns.
+String _entry(String key, String value) {
+  final k = _literal(key);
+  final v = _literal(value);
+  final line = '  $k: $v,';
+  return line.length <= 80 ? line : '  $k:\n      $v,';
+}
+
+/// A Dart string literal for [text]: single-quoted, or double-quoted when
+/// [text] holds an apostrophe, as the repository's lints ask.
+String _literal(String text) {
+  final escaped = text.replaceAll(r'\', r'\\').replaceAll(r'$', r'\$');
+  if (text.contains("'") && !text.contains('"')) return '"$escaped"';
+  return "'${escaped.replaceAll("'", r"\'")}'";
 }

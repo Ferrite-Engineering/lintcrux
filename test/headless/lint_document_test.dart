@@ -203,6 +203,33 @@ void main() {
       },
     );
 
+    test('rule gives a first-party rule its sentence and leaves a third-party '
+        "rule's description empty", () async {
+      Future<Map<String, Object?>> body(String id) async {
+        final out = <String>[];
+        final code =
+            await LintcruxCli(
+              installSignalReaper: false,
+              mcpTelemetry: () => null,
+            ).run(
+              <String>['rule', id, '--json'],
+              stdoutSink: out.add,
+              stderrSink: (_) {},
+            );
+        expect(code, 0);
+        final doc = jsonDecode(out.single) as Map<String, Object?>;
+        return doc['body']! as Map<String, Object?>;
+      }
+
+      expect((await body('cdc/unsync-single-bit'))['description'], isNotEmpty);
+      expect(
+        (await body('constraints/pin-reused'))['description'],
+        'Two different ports, or two bits of a bus, are put on one package '
+        'pin.',
+      );
+      expect((await body('verilator/WIDTH'))['description'], '');
+    });
+
     test('rule and waivers print a plain form without --json', () async {
       final out = <String>[];
       final cli = LintcruxCli(

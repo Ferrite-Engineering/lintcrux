@@ -129,9 +129,10 @@ registers. `signature` is the finding's identity across runs (the baseline's
 fingerprint: rule, file and message, never the line). `baseline` is `new` or
 `existing` against the project's baseline, and `null` when there is none.
 
-**Rules.** `rule` returns the rule's default severity and `help_uri`; its
-`description` is empty in this version, so read the engine's page at
-`help_uri` for what the rule checks.
+**Rules.** `rule` returns the rule's default severity and `help_uri`. For a
+`cdc` or `constraints` rule its `description` is one sentence saying what the
+rule checks; for any other engine it is empty, so read the engine's page at
+`help_uri`.
 
 **Waivers.** Each waiver gives its `kind`, the `rule`, its `scope` (where it is
 written, as `file:line`) and a `pattern`: the lines an inline pragma covers,

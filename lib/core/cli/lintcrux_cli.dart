@@ -602,7 +602,7 @@ class LintcruxCli {
     if (args.contains('--help') || args.contains('-h')) {
       stdoutSink(
         name == kRuleCommand
-            ? "A lint rule's default severity and help link.\n\n"
+            ? 'What a lint rule checks, its default severity and help link.\n\n'
                   'Usage: lintcrux rule <engine>/<rule> [--json]'
             : 'The waivers in force for a project: inline pragmas, Verilator '
                   'configuration files and the baseline. Read only.\n\n'

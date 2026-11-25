@@ -41,4 +41,31 @@ void main() {
     expect(kBundledRuleSeverities, expected);
     expect(kBundledRuleSeverities.length, greaterThan(500));
   });
+
+  test('the summaries are the rule databases summaries, first-party only', () {
+    final expected = <String, String>{};
+    for (final file in Directory(p.join('lib', 'data', 'rules')).listSync()) {
+      if (file is! File || !file.path.endsWith('.json')) continue;
+      final engine = p.basenameWithoutExtension(file.path);
+      final entry = RuleDatabase.parseEngineDocument(
+        engine,
+        file.readAsStringSync(),
+      );
+      for (final rule in entry!.rules) {
+        if (rule.fullDescription.isNotEmpty) {
+          expected[rule.id] = rule.fullDescription;
+        }
+      }
+    }
+    expect(kBundledRuleSummaries, expected);
+    // Every `cdc` and `constraints` rule has one; no third-party rule does.
+    for (final id in kBundledRuleSeverities.keys) {
+      final firstParty = id.startsWith('cdc/') || id.startsWith('constraints/');
+      expect(kBundledRuleSummaries.containsKey(id), firstParty, reason: id);
+    }
+    for (final summary in kBundledRuleSummaries.values) {
+      expect(summary.endsWith('.'), isTrue, reason: summary);
+      expect(summary, isNot(contains('—')), reason: summary);
+    }
+  });
 }
