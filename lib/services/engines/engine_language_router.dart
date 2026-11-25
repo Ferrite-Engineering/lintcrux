@@ -96,7 +96,7 @@ class EngineLanguageRouter {
     HdlLanguage projectLanguage,
   ) {
     if (engineLangs.length == 1) {
-      // Pick the engine's single supported language — Verilator says
+      // Pick the engine's single supported language: Verilator says
       // "SystemVerilog" even when the project is `mixed`.
       return engineLangs.single;
     }

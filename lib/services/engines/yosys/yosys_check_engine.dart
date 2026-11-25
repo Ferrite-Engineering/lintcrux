@@ -20,7 +20,7 @@ import 'package:path/path.dart' as p;
 /// LintCrux lint adapter around Yosys's `check -assert` synthesis-time
 /// diagnostics.
 ///
-/// Yosys is not a primary lint engine — it's a synthesis tool — but it
+/// Yosys is not a primary lint engine (it's a synthesis tool) but it
 /// catches a class of issues that pure-RTL linters cannot (driver
 /// conflicts, multiply-driven nets, undriven outputs, unresolved
 /// hierarchies). This adapter runs a tightly-scoped Yosys script:

@@ -39,7 +39,7 @@ import 'package:lintcrux/services/engines/yosys/yosys_check_engine.dart';
 /// asynchronous domain, and only a two-flop chain counts as protection.
 ///
 /// It is a whole-engine override rather than an analysis override because the
-/// Pro engine's behaviour depends on the *request* — it reads `cdc.yaml` from
+/// Pro engine's behaviour depends on the *request*: it reads `cdc.yaml` from
 /// the directory holding the sources — so there is nothing to inject at
 /// construction time.
 EngineRegistry defaultEngineRegistry({

@@ -154,7 +154,7 @@ class SlangEngine implements LintEngine {
     // the `--diag-json -` array on stdout; we collect both so neither
     // path silently drops violations. Both are read to end-of-file, not
     // to the exit: this engine does not consult the exit code, so output
-    // that lands after it — the array's closing `]` is enough — would
+    // that lands after it (the array's closing `]` is enough) would
     // otherwise parse as a clean run.
     final CapturedProcessOutput output;
     try {

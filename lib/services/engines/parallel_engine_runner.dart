@@ -628,7 +628,7 @@ class ParallelEngineRunner {
   }
 }
 
-/// How an engine's stream drain terminated — see
+/// How an engine's stream drain terminated, see
 /// [ParallelEngineRunner._drainEngine].
 enum _DrainOutcome {
   /// Stream drained cleanly to completion.

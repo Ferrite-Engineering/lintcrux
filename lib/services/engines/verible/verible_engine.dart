@@ -88,7 +88,7 @@ class _VeribleAttempt {
 /// contributes `--ruleset=<base> --rules=<specs>` *before*
 /// [EngineBinaryConfig.extraArgs], so a power user's own flags still
 /// win. An id no profile claims raises [EngineRunFailedException]
-/// rather than quietly linting against Verible's defaults — a run under
+/// rather than quietly linting against Verible's defaults: a run under
 /// a rule set nobody chose is the same false-confidence failure as a
 /// silent false-clean.
 class VeribleEngine implements LintEngine {

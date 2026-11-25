@@ -55,9 +55,9 @@ const int _kOutputExcerptLines = 10;
 /// other engine would reject them as HDL.
 ///
 /// [defaultWarnFlags] is `['all']` and that default is load-bearing:
-/// Verilator's most useful lint checks — UNUSEDSIGNAL, UNDRIVEN,
+/// Verilator's most useful lint checks (UNUSEDSIGNAL, UNDRIVEN,
 /// DECLFILENAME, PINMISSING, VARHIDDEN, UNUSEDPARAM, UNUSEDGENVAR,
-/// IMPORTSTAR, SYNCASYNCNET, DEFPARAM, INCABSPATH, PINCONNECTEMPTY — are
+/// IMPORTSTAR, SYNCASYNCNET, DEFPARAM, INCABSPATH, PINCONNECTEMPTY) are
 /// **off** unless `-Wall` is passed. An earlier revision of this engine
 /// passed no warning flags at all, so none of them could ever fire and a
 /// project whose only defects were in that set linted green. Do not
@@ -158,7 +158,7 @@ class VerilatorEngine implements LintEngine {
         .where(request.sourceFiles.contains)
         .toList(growable: false);
     if (scoped.isEmpty) {
-      // Nothing in the request matched the watcher's set — emit no
+      // Nothing in the request matched the watcher's set, so emit no
       // violations rather than falling through to a full whole-project
       // run that the orchestrator already filtered out.
       return const Stream<Violation>.empty();

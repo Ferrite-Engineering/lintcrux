@@ -302,23 +302,23 @@ Positional arguments:
                           - one or more .v / .sv / .vhd / .vhdl
                             source files forming an ad-hoc project.
                         A positional that is neither is reported as an
-                        error and exits 64 — never silently ignored.
+                        error and exits 64, never silently ignored.
 
 ${_parser.usage}
 Exit codes:
-   0  clean — nothing to report, or findings no gate failed on (no gate
+   0  clean: nothing to report, or findings no gate failed on (no gate
       asked for, every finding in the baseline, or within the ceiling)
-   1  violations — --exit-code was passed and findings remain
-   2  new violations — --fail-on-new-violations was passed and a finding
+   1  violations: --exit-code was passed and findings remain
+   2  new violations: --fail-on-new-violations was passed and a finding
       is absent from the baseline
-   3  run failed — an engine failed, timed out, or was unavailable; the
+   3  run failed: an engine failed, timed out, or was unavailable; the
       named project could not be loaded (unparseable, no sources, or a
       listed source missing); or the export could not be written
-   4  over threshold — the organization's signed ciGateThreshold was
+   4  over threshold: the organization's signed ciGateThreshold was
       exceeded. There is no flag for it: it comes from .crux-policy.json
-  64  usage error — bad flag, an unusable positional argument, or a
+  64  usage error: bad flag, an unusable positional argument, or a
       path that does not exist
-  65  data error — --import-filelist / --import-edam could not
+  65  data error: --import-filelist / --import-edam could not
       convert the input file
 
 Examples:
@@ -369,7 +369,7 @@ Examples:
         help:
             'Run only this engine (repeatable). One of verilator, '
             'verible, slang, yosys, ghdl, svlint, cdc, constraints. Overrides the '
-            "project's enabledEngineIds for this invocation — the "
+            "project's enabledEngineIds for this invocation: the "
             'usual shape for a CI image that only installs one engine.',
       )
       ..addMultiOption(

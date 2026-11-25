@@ -12,7 +12,7 @@ import 'package:crux_yosys/crux_yosys.dart';
 /// The sibling of `YosysProcessReaper`, for hosts that have no widget
 /// tree. `crux_yosys` records each spawned process in a
 /// [ProcessRegistry] but deliberately does not depend on Flutter, so
-/// draining the registry is the host's job — and the two hosts learn
+/// draining the registry is the host's job, and the two hosts learn
 /// they are going away by completely different mechanisms:
 ///
 /// | host | teardown signal |

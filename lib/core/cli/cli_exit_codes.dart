@@ -7,7 +7,7 @@
 /// A CI job must be able to distinguish *"your RTL has lint findings"*
 /// from *"the linter itself did not work"*. Collapsing those two into a
 /// single non-zero exit is the failure mode that makes
-/// `verible-verilog-lint`'s own exit code useless to us — it exits `1`
+/// `verible-verilog-lint`'s own exit code useless to us: it exits `1`
 /// **because it found violations**, so "non-zero" alone carries no
 /// information. See the `EngineRunFailedException` doc comment in
 /// `lib/domain/interfaces/lint_engine.dart` for the sibling rule on the
