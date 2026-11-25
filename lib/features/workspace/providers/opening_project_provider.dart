@@ -22,7 +22,8 @@ class OpeningProjectsNotifier extends Notifier<List<String>> {
   List<String> build() => const <String>[];
 
   /// Marks [path] as being opened.
-  void begin(String path) => state = List<String>.unmodifiable([...state, path]);
+  void begin(String path) =>
+      state = List<String>.unmodifiable([...state, path]);
 
   /// Marks one open of [path] as finished.
   void end(String path) {
