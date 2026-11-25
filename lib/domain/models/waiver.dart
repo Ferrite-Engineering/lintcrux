@@ -40,7 +40,11 @@ class Waiver {
   /// (e.g. `"verilator/UNUSEDSIGNAL"`).
   final String ruleId;
 
-  /// Absolute path to the source file the waiver applies to.
+  /// The source file the waiver applies to, as its store keeps it. A store
+  /// with a project root keeps the path relative to that root,
+  /// `/`-separated, so a committed waiver file matches in any checkout; a
+  /// file outside the root, or a store with no root, keeps the path as given
+  /// (absolute).
   final String filePath;
 
   /// Inclusive 1-based start line of the waiver range. `null` waives
