@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lintcrux/core/app_info/about_providers.dart';
+import 'package:lintcrux/features/workspace/providers/opening_project_provider.dart';
 import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/widgets/empty_canvas_content.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
@@ -93,6 +94,55 @@ void main() {
     expect(find.text('Open Workspace…'), findsOneWidget);
     expect(find.text('Open Session…'), findsOneWidget);
     expect(find.text('New Project…'), findsOneWidget);
+  });
+
+  testWidgets('the first frame after an open starts says the project is '
+      'opening, with a progress bar, and drops it when the open ends', (
+    tester,
+  ) async {
+    final container = ProviderContainer(overrides: [recentProjectsSeed()]);
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          localizationsDelegates: const [
+            L10N.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: L10N.supportedLocales,
+          home: Scaffold(
+            body: EmptyCanvasContent(
+              onOpenProject: () {},
+              onOpenSession: () {},
+              onOpenWorkspace: () {},
+              onNewProject: () {},
+              onOpenRecentProject: (_) async => true,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(LinearProgressIndicator), findsNothing);
+
+    // The open begins; exactly one frame later the banner is up.
+    container
+        .read(openingProjectsProvider.notifier)
+        .begin('/share/chip/chip_earlgrey.lintcrux');
+    await tester.pump();
+    expect(find.text('Opening chip_earlgrey.lintcrux…'), findsOneWidget);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    // The start screen stays underneath it.
+    expect(find.text('Open Project…'), findsOneWidget);
+
+    container
+        .read(openingProjectsProvider.notifier)
+        .end('/share/chip/chip_earlgrey.lintcrux');
+    await tester.pump();
+    expect(find.byType(LinearProgressIndicator), findsNothing);
   });
 
   testWidgets('renders the version line under the subtitle', (tester) async {

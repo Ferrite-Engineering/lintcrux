@@ -11,6 +11,7 @@ import 'package:lintcrux/domain/models/session/lintcrux_session.dart';
 import 'package:lintcrux/features/project/services/open_project_service.dart';
 import 'package:lintcrux/features/run/providers/lint_run_notifier.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
+import 'package:lintcrux/features/workspace/providers/opening_project_provider.dart';
 import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
 import 'package:lintcrux/features/workspace/services/crux_project_resolution.dart';
@@ -54,6 +55,18 @@ class OpenProjectInWorkspace {
   /// Returns the result so the UI can surface an error snackbar on
   /// failure.
   Future<OpenProjectResult> openProject(String rawPath) async {
+    // Acknowledge the open before anything is read: on a network share the
+    // read alone can take a second or two, and the start screen shows a
+    // progress banner for as long as this path is listed.
+    final opening = ref.read(openingProjectsProvider.notifier)..begin(rawPath);
+    try {
+      return await _openProject(rawPath);
+    } finally {
+      opening.end(rawPath);
+    }
+  }
+
+  Future<OpenProjectResult> _openProject(String rawPath) async {
     // A `<design>.crux-project` manifest is swapped for the `lint` project it
     // names before anything else runs, so path anchoring, tab creation and
     // the kicked-off run all behave exactly as they do for a directly-opened

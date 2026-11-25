@@ -12,6 +12,7 @@ import 'package:lintcrux/domain/models/session/lintcrux_session.dart';
 import 'package:lintcrux/domain/models/violation_table_state.dart';
 import 'package:lintcrux/features/project/services/open_project_service.dart';
 import 'package:lintcrux/features/violations/providers/violation_table_provider.dart';
+import 'package:lintcrux/features/workspace/providers/opening_project_provider.dart';
 import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/features/workspace/providers/tab_overrides_factory.dart';
 import 'package:lintcrux/features/workspace/providers/workspace_provider.dart';
@@ -134,6 +135,25 @@ void main() {
       // per-tab, and a root-scope project would let a root-resolved
       // store write into a directory no visible tab corresponds to.
       expect(root.read(currentProjectProvider), isNull);
+    });
+
+    test('the path is listed as opening from the first line of the open and '
+        'cleared when it ends, on success and on failure', () async {
+      final path = await writeProjectFile('listed');
+      await root.read(workspaceProvider.future);
+      final opener = root.read(openProjectInWorkspaceProvider)(tabsForId);
+
+      final pending = opener.openProject(path);
+      // Before the first await inside the open has resumed.
+      expect(root.read(openingProjectsProvider), [path]);
+      expect(await pending, isA<OpenProjectSuccess>());
+      expect(root.read(openingProjectsProvider), isEmpty);
+
+      final missing = p.join(tempDir.path, 'missing.lintcrux');
+      final failed = opener.openProject(missing);
+      expect(root.read(openingProjectsProvider), [missing]);
+      expect(await failed, isA<OpenProjectFailure>());
+      expect(root.read(openingProjectsProvider), isEmpty);
     });
 
     test('an opened project is added to the Recent projects list', () async {

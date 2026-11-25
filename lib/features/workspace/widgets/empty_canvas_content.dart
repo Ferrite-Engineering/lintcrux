@@ -9,9 +9,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lintcrux/core/app_info/about_providers.dart';
 import 'package:lintcrux/core/help_urls.dart';
 import 'package:lintcrux/core/lintcrux_url_launcher.dart';
+import 'package:lintcrux/features/workspace/providers/opening_project_provider.dart';
 import 'package:lintcrux/features/workspace/providers/recent_lists.dart';
 import 'package:lintcrux/l10n/generated/app_localizations.dart';
 import 'package:lintcrux/shared/widgets/glowing_app_icon.dart';
+import 'package:path/path.dart' as p;
 
 /// LintCrux's content composed into `crux_workspace`'s
 /// [crux.EmptyCanvasState] shell when the workspace has zero tabs.
@@ -71,6 +73,43 @@ class EmptyCanvasContent extends ConsumerWidget {
     // entry points. Resolves in milliseconds; renders nothing until then.
     final version = ref.watch(aboutBuildInfoProvider).value?.version;
 
+    final opening = ref.watch(openingProjectsProvider).firstOrNull;
+    final canvas = _buildCanvas(context, l10n, version);
+    if (opening == null) return canvas;
+    // A project is being read: say so on the first frame after the click.
+    final message = l10n.emptyCanvasOpeningProject(p.basename(opening));
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        canvas,
+        Align(
+          alignment: Alignment.topCenter,
+          child: Material(
+            elevation: 2,
+            child: Semantics(
+              liveRegion: true,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const LinearProgressIndicator(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Text(message, textAlign: TextAlign.center),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCanvas(BuildContext context, L10N l10n, String? version) {
     return crux.EmptyCanvasState(
       header: const GlowingAppIcon(size: 72),
       title: l10n.emptyCanvasTitle,

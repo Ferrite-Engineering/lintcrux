@@ -1057,6 +1057,15 @@
   "@emptyCanvasNewProjectButton": {
     "description": "Empty-canvas button that creates a new `.lintcrux` project."
   },
+  "emptyCanvasOpeningProject": "正在打开 {project}…",
+  "@emptyCanvasOpeningProject": {
+    "description": "Progress banner on the start screen while a project is being read, so a project on a slow network share acknowledges the click at once. {project} is the project file name.",
+    "placeholders": {
+      "project": {
+        "type": "String"
+      }
+    }
+  },
   "actionNewWorkspace": "新建工作区",
   "@actionNewWorkspace": {
     "description": "Menu / command palette label for the action that closes the current workspace and starts a fresh empty one."
