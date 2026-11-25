@@ -28,7 +28,7 @@ engine: a person does those from the command line.
 | `waivers` | The waivers in force: inline `lint_off` pragmas, Verilator configuration `lint_off` lines, and the baseline's frozen findings |
 
 `lint` takes a `.lintcrux` project, or source files with an optional top module.
-LintCrux Pro, started as `lintcrux_pro mcp`, serves the same three tools and
+LintCrux Pro, started with the Pro command's `mcp` argument, serves the same three tools and
 includes in the answer what needs a Pro licence, such as CDC findings and a
 project's managed waivers. Below Pro, that part is left out and a
 `licence.withheld` warning in the document says so; the rest of the answer
@@ -52,7 +52,7 @@ agent read the same document.
 The `lintcrux` command must be on the `PATH` of the program that starts the
 server. The instructions below were checked against each host's own
 documentation on 2026-11-24; hosts change, so check theirs if a step differs.
-To use Pro, replace `lintcrux` with `lintcrux_pro`.
+To use Pro, replace `lintcrux` with the Pro command from the desktop bundle.
 
 === "Claude Code"
 
@@ -87,7 +87,7 @@ To use Pro, replace `lintcrux` with `lintcrux_pro`.
     configure. The extension registers the server with the editor for each
     workspace folder you open, with that folder as `--root`, and the editor asks
     you before it first runs. It needs a folder open in a trusted workspace.
-    It finds `lintcrux_pro` or `lintcrux` through the `edacrux.lint.executable`
+    It finds the Pro command or `lintcrux` through the `edacrux.lint.executable`
     setting, then your `PATH`. Turn registration off with the
     `edacrux.lint.mcp.enabled` setting.
 
