@@ -125,8 +125,8 @@ void main() {
   test('a Windows root, as JSON spells it, reads as the goldens write it', () {
     const root = r'C:\Users\RUNNER~1\AppData\Local\Temp\lintcrux_spec_ab12';
     const text =
-        '{\n  "project": "C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp'
-        '\\\\lintcrux_spec_ab12\\\\lint\\\\a.sv",\n'
+        '{\n'
+        '  "project": "C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp\\\\lintcrux_spec_ab12\\\\lint\\\\a.sv",\n'
         '  "message": "`\\\\nonexistent` is outside the root\\n"\n}';
     expect(
       normalizeSpecRoot(
