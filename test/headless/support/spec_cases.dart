@@ -63,6 +63,31 @@ class SpecCase {
   String toString() => golden;
 }
 
+/// [text], a JSON document the tool wrote, with [root] written as the goldens
+/// write it ([goldenRoot], and `/` between every path's segments).
+///
+/// On a POSIX host the root appears verbatim. On Windows it is `C:\...`, which
+/// JSON writes as `C:\\...`, and every path under it joins with `\`, so the
+/// goldens' `/spec/fixtures/lint/a.sv` reads `C:\\Users\\...\\lint\\a.sv`
+/// there; the same file, spelled by the host. [windows] says which spelling
+/// to undo (the host's by default); it is a parameter so a test can prove the
+/// Windows case on any machine.
+String normalizeSpecRoot(
+  String text, {
+  required String root,
+  required String goldenRoot,
+  bool? windows,
+}) {
+  if (!(windows ?? Platform.isWindows)) {
+    return text.replaceAll(root, goldenRoot);
+  }
+  final escaped = root.replaceAll(r'\', r'\\');
+  return text
+      .replaceAll(escaped, goldenRoot)
+      .replaceAll(root.replaceAll(r'\', '/'), goldenRoot)
+      .replaceAll(r'\\', '/');
+}
+
 /// `spec/mcp/cases.json`, read from the package root.
 class SpecCases {
   SpecCases._(
@@ -131,7 +156,8 @@ class SpecCases {
   final List<SpecCase> cases;
 
   /// [text] with this machine's root written as the goldens write it.
-  String normalize(String text) => text.replaceAll(root, goldenRoot);
+  String normalize(String text) =>
+      normalizeSpecRoot(text, root: root, goldenRoot: goldenRoot);
 
   /// The golden document of [c], as written.
   String golden(SpecCase c) =>

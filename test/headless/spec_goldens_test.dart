@@ -122,6 +122,33 @@ void main() {
     );
   });
 
+  test('a Windows root, as JSON spells it, reads as the goldens write it', () {
+    const root = r'C:\Users\RUNNER~1\AppData\Local\Temp\lintcrux_spec_ab12';
+    const text =
+        '{\n  "project": "C:\\\\Users\\\\RUNNER~1\\\\AppData\\\\Local\\\\Temp'
+        '\\\\lintcrux_spec_ab12\\\\lint\\\\a.sv",\n'
+        '  "message": "`\\\\nonexistent` is outside the root\\n"\n}';
+    expect(
+      normalizeSpecRoot(
+        text,
+        root: root,
+        goldenRoot: '/spec/fixtures',
+        windows: true,
+      ),
+      '{\n  "project": "/spec/fixtures/lint/a.sv",\n'
+      '  "message": "`/nonexistent` is outside the root\\n"\n}',
+    );
+    expect(
+      normalizeSpecRoot(
+        '/tmp/x/lint/a.sv',
+        root: '/tmp/x',
+        goldenRoot: '/spec/fixtures',
+        windows: false,
+      ),
+      '/spec/fixtures/lint/a.sv',
+    );
+  });
+
   test('every tool has a golden for each outcome it can produce', () {
     final byTool = <String, Set<String>>{};
     for (final c in spec.cases) {
