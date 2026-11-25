@@ -84,6 +84,35 @@ void main() {
     );
   });
 
+  test('every desktop runner answers the request-attention channel', () {
+    // `requestUserAttention` swallows a missing handler, so a runner that
+    // does not answer `crux_window_chrome/attention` leaves "Request
+    // attention on cross-probe" doing nothing in silence.
+    for (final runner in const <String>[
+      'macos/Runner/WindowAttentionPlugin.swift',
+      'windows/runner/flutter_window.cpp',
+      'linux/runner/my_application.cc',
+    ]) {
+      final source = _read(runner);
+      expect(
+        source,
+        contains('"crux_window_chrome/attention"'),
+        reason: '$runner does not register the attention channel',
+      );
+      expect(source, contains('requestUserAttention'), reason: runner);
+    }
+    expect(
+      _read('windows/runner/flutter_window.cpp'),
+      contains('FlashWindowEx'),
+      reason: 'the Windows runner must flash the taskbar button',
+    );
+    expect(
+      _read('linux/runner/my_application.cc'),
+      contains('gtk_window_set_urgency_hint'),
+      reason: 'the Linux runner must set the window urgency hint',
+    );
+  });
+
   test(
     'the app watches the shared runtime, so the server starts at launch',
     () {
