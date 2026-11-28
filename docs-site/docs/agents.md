@@ -52,7 +52,15 @@ agent read the same document.
 The `lintcrux` command must be on the `PATH` of the program that starts the
 server. The instructions below were checked against each host's own
 documentation on 2026-11-24; hosts change, so check theirs if a step differs.
-To use Pro, replace `lintcrux` with the Pro command from the desktop bundle.
+To use Pro, replace `lintcrux` with `lintcrux_pro`. It is not part of the
+desktop app: it comes in the Pro command-line archive on the
+[download page](https://lintcrux.app/download), next to the free one.
+
+The command-line archives are on the same page, for macOS (Apple silicon),
+Linux (x86_64) and Windows (x86_64). The free archive holds the single
+`lintcrux` executable. The Pro archive unpacks into `bin/`, with the executable,
+and `lib/`, with the native libraries it needs; keep the two folders together,
+and put `bin/` on your `PATH` or give the full path as the command.
 
 === "Claude Code"
 
