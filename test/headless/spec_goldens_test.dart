@@ -149,6 +149,53 @@ void main() {
     );
   });
 
+  test('a path outside the root is host-absolute and reads as the goldens '
+      'write it', () {
+    const root = r'C:\Users\RUNNER~1\AppData\Local\Temp\lintcrux_spec_ab12';
+    final prefix = specOutsidePrefix(root, windows: true);
+    expect(prefix, 'C:');
+    expect(specOutsidePrefix('/tmp/x', windows: false), '');
+    // The point of the prefix: absolute on Windows, and not under the root.
+    const fixture = '/nonexistent-lintcrux-spec/escape.sv';
+    // `CxpPathContainment` takes a path as absolute when it is absolute and
+    // not root-relative; `/x` on Windows is the latter.
+    expect(p.windows.isRootRelative(fixture), isTrue);
+    expect(p.windows.isAbsolute('$prefix$fixture'), isTrue);
+    expect(p.windows.isRootRelative('$prefix$fixture'), isFalse);
+    expect(p.windows.isWithin(root, '$prefix$fixture'), isFalse);
+    expect(hostOutsidePaths(fixture, prefix), '$prefix$fixture');
+    expect(hostOutsidePaths(fixture, ''), fixture);
+    expect(
+      hostOutsidePaths(<String, Object?>{
+        'project': fixture,
+        'files': <Object?>[fixture, 'design/a.sv'],
+        'limit': 2,
+      }, prefix),
+      <String, Object?>{
+        'project': '$prefix$fixture',
+        'files': <Object?>['$prefix$fixture', 'design/a.sv'],
+        'limit': 2,
+      },
+    );
+    // The message, as the server writes it (given as typed, root as JSON).
+    for (final given in <String>[
+      'C:/nonexistent-lintcrux-spec/escape.sv',
+      r'C:\\nonexistent-lintcrux-spec\\escape.sv',
+    ]) {
+      expect(
+        normalizeSpecRoot(
+          '"message": "`$given` is outside the root '
+          r'C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\lintcrux_spec_ab12;"',
+          root: root,
+          goldenRoot: '/spec/fixtures',
+          windows: true,
+        ),
+        '"message": "`/nonexistent-lintcrux-spec/escape.sv` is outside the '
+        'root /spec/fixtures;"',
+      );
+    }
+  });
+
   test('every tool has a golden for each outcome it can produce', () {
     final byTool = <String, Set<String>>{};
     for (final c in spec.cases) {

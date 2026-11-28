@@ -32,7 +32,11 @@ class SpecCase {
   factory SpecCase._fromJson(Map<String, Object?> json) => SpecCase._(
     json['golden']! as String,
     json['tool']! as String,
-    json['arguments']! as Map<String, Object?>,
+    hostOutsidePaths(
+          json['arguments'],
+          specOutsidePrefix(Directory.systemTemp.path),
+        )!
+        as Map<String, Object?>,
     json['door'] as String? ?? 'both',
     SpecScenario.named(json['engines'] as String? ?? 'ok'),
     json['exit'] as int?,
@@ -78,14 +82,51 @@ String normalizeSpecRoot(
   required String goldenRoot,
   bool? windows,
 }) {
-  if (!(windows ?? Platform.isWindows)) {
+  final onWindows = windows ?? Platform.isWindows;
+  if (!onWindows) {
     return text.replaceAll(root, goldenRoot);
   }
   final escaped = root.replaceAll(r'\', r'\\');
   return text
       .replaceAll(escaped, goldenRoot)
       .replaceAll(root.replaceAll(r'\', '/'), goldenRoot)
-      .replaceAll(r'\\', '/');
+      .replaceAll(r'\\', '/')
+      .replaceAll(
+        '${specOutsidePrefix(root, windows: true)}$kSpecOutsideDir',
+        kSpecOutsideDir,
+      );
+}
+
+/// The directory the goldens name for a path that is outside the root and
+/// exists nowhere: absolute on a POSIX host, but not on Windows, where an
+/// absolute path has a drive.
+const String kSpecOutsideDir = '/nonexistent-lintcrux-spec';
+
+/// What goes before [kSpecOutsideDir] so the path is absolute on the host
+/// whose temporary [root] is given: nothing on POSIX, the root's drive (`C:`)
+/// on Windows. The path stays outside the root and is still refused as such,
+/// never as "not absolute". [windows] is a parameter so a test can prove the
+/// Windows case on any machine.
+String specOutsidePrefix(String root, {bool? windows}) {
+  if (!(windows ?? Platform.isWindows)) return '';
+  final prefix = p.windows.rootPrefix(root);
+  return prefix.replaceAll(RegExp(r'[\\/]+$'), '');
+}
+
+/// [value] (a string, or a list or map holding strings) with every path that
+/// starts with [kSpecOutsideDir] made absolute on the host by [prefix].
+Object? hostOutsidePaths(Object? value, String prefix) {
+  if (prefix.isEmpty) return value;
+  return switch (value) {
+    final String s when s.startsWith(kSpecOutsideDir) => '$prefix$s',
+    final List<Object?> l => <Object?>[
+      for (final e in l) hostOutsidePaths(e, prefix),
+    ],
+    final Map<String, Object?> m => <String, Object?>{
+      for (final e in m.entries) e.key: hostOutsidePaths(e.value, prefix),
+    },
+    _ => value,
+  };
 }
 
 /// `spec/mcp/cases.json`, read from the package root.
@@ -110,11 +151,25 @@ class SpecCases {
             as Map<String, Object?>;
     final copy = Directory.systemTemp.createTempSync('lintcrux_spec_');
     final fixtures = Directory(json['root']! as String);
+    // A path the fixtures name outside the root is spelled for this host
+    // (`C:/nonexistent-lintcrux-spec/...` on Windows), so the server judges
+    // it outside the root, as on POSIX, and not "not an absolute path".
+    final outside = specOutsidePrefix(copy.path);
     for (final e in fixtures.listSync(recursive: true)) {
       if (e is! File) continue;
-      File(p.join(copy.path, p.relative(e.path, from: fixtures.path)))
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(e.readAsBytesSync());
+      final target = File(
+        p.join(copy.path, p.relative(e.path, from: fixtures.path)),
+      )..createSync(recursive: true);
+      if (outside.isNotEmpty && e.path.endsWith('.lintcrux')) {
+        target.writeAsStringSync(
+          e.readAsStringSync().replaceAll(
+            '"$kSpecOutsideDir',
+            '"$outside$kSpecOutsideDir',
+          ),
+        );
+      } else {
+        target.writeAsBytesSync(e.readAsBytesSync());
+      }
     }
     final installs = json['installs']! as Map<String, Object?>;
     for (final entry in installs.entries) {
